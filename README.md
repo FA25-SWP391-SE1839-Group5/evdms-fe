@@ -11,7 +11,7 @@ The system allows dealers, managers, and admins to manage electric vehicle sales
 
 - ⚡ [Vite](https://vitejs.dev/) - Next Generation Frontend Tooling
 - ⚛️ [React](https://react.dev/) - UI Library
-- 🎨 [Ant Design / Tailwind CSS] (choose what you use) - UI Components & Styling
+- 🎨 [Ant Design / Tailwind CSS / Boostraps / MUI] - UI Components & Styling
 - 🔗 [Axios](https://axios-http.com/) - API calls
 - 🛠️ ESLint + Prettier - Code Quality
 
