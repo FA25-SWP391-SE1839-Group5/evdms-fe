@@ -25,6 +25,32 @@ const VehcileCard = ({
                 {/* Badge trạng thái */}
                 <div className="absolute top-4 left-4">{getAvailabilityBadge(vehicle.availability)}</div>
 
+                {/* Icon hành động */}
+                <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            toggleFavorite(vehicle.id);
+                        }}
+                        className={`p-2 rounded-full backdrop-blur-sm transition-all ${
+                            favorites.has(vehicle.id) 
+                            ? "bg-red-500 text-white scale-110" 
+                            : "bg-white/90 text-gray-600 hover:text-red-500"
+                        }`}
+                    >
+                        <Heart className="w-4 h-4" fill={favorites.has(vehicle.id) ? "currentColor" : "none"} />
+                    </button>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            toggleCompare(vehicle.id);
+                        }}
+                        className={`p-2 rounded-full backdrop-blur-sm transition-all ${
+                            compareList.includes(vehicle.id)
+                            ? "bg-blue-500 text-white scale-110"
+                            : "bg-white/90 text-gray-600 hover:text-blue-500"
+                        }`}
+
 
     )
 }
