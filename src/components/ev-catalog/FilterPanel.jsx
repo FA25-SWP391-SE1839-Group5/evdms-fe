@@ -31,7 +31,20 @@ const FilterPanel = ({ filters, resetFilters, handleFilterChange, formatPrice })
                 />
             </div>
 
-            
+            {/* Brand Filter */}
+            <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Thương hiệu</label>
+                <select
+                    value={filters.brand}
+                    onChange={(e) => handleFilterChange("brand", e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                >
+                    <option value="">Tất cả</option>
+                    <option value="Tesla">Tesla</option>
+                    <option value="BMW">BMW</option>
+                    <option value="Audi">Audi</option>
+                </select>
+            </div>
         </div>
     );
 };
