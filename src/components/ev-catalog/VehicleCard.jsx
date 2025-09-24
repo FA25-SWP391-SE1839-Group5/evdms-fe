@@ -48,7 +48,7 @@ const VehicleCard = ({
                     compareList.includes(vehicle.id)
                     ? 'bg-blue-500 text-white scale-110'
                     : 'bg-white/90 text-gray-600 hover:text-blue-500'
-             }`}
+                }`}
             >
                 <GitCompare className="w-4 h-4" />
             </button>
@@ -60,42 +60,58 @@ const VehicleCard = ({
                 className="p-2 rounded-full bg-white/90 text-gray-600 hover:text-blue-500 backdrop-blur-sm transition-all hover:scale-110"
             >
                 <Eye className="w-4 h-4" />
-          </button>
+            </button>
         </div>
 
         {/* Discount Badge */}
         {vehicle.originalPrice > vehicle.price && (
-          <div className="absolute bottom-4 left-4">
-            <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
-                GIẢM {Math.round(((vehicle.originalPrice - vehicle.price) / vehicle.originalPrice) * 100)}%
-            </span>
-          </div>
+            <div className="absolute bottom-4 left-4">
+                <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                    GIẢM {Math.round(((vehicle.originalPrice - vehicle.price) / vehicle.originalPrice) * 100)}%
+                </span>
+            </div>
         )}
 
         {/* Quick Action Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
-            <button
-                onClick={(e) => {
-                    e.stopPropagation();
-                    openQuickView(vehicle);
-                }}
-                className="px-4 py-2 bg-white/90 text-gray-800 rounded-lg hover:bg-white transition-colors text-sm font-medium"
-            >
-                Xem nhanh
-            </button>
-            <button
-                onClick={(e) => {
-                    e.stopPropagation();
-                    openDetailPage(vehicle);
-                }}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-            >
-                Chi tiết
-            </button>
-          </div>
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        openQuickView(vehicle);
+                    }}
+                    className="px-4 py-2 bg-white/90 text-gray-800 rounded-lg hover:bg-white transition-colors text-sm font-medium"
+                >
+                    Xem nhanh
+                </button>
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        openDetailPage(vehicle);
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                >
+                    Chi tiết
+                </button>
+            </div>
         </div>
-      </div> 
+    </div>
+
+      <div className="p-6 cursor-pointer" onClick={() => openDetailPage(vehicle)}>
+        {/* Header */}
+        <div className="flex justify-between items-start mb-3">
+          <div className="flex-1">
+            <h3 className="font-bold text-xl text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
+              {vehicle.name}
+            </h3>
+            <p className="text-gray-600 font-medium">{vehicle.brand} • {vehicle.model}</p>
+          </div>
+          <div className="flex items-center gap-1 ml-4">
+            <Star className="w-4 h-4 text-yellow-400 fill-current" />
+            <span className="text-sm font-medium">{vehicle.rating}</span>
+            <span className="text-xs text-gray-500">({vehicle.reviews})</span>
+          </div>
+        </div> 
      
     );
 };
