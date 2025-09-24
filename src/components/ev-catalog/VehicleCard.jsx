@@ -19,13 +19,12 @@ const VehicleCard = ({
                         alt={vehicle.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
-
-                    {/* Badge */}
+                    
+                    {/* Overlay Icons */}
                     <div className="absolute top-4 left-4">
                         {getAvailabilityBadge(vehicle.availability)}
                     </div>
 
-                    {/* Action Buttons */}
                     <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                             onClick={(e) => {
@@ -34,8 +33,8 @@ const VehicleCard = ({
                             }}
                             className={`p-2 rounded-full backdrop-blur-sm transition-all ${
                                 favorites.has(vehicle.id)
-                                    ? "bg-red-500 text-white scale-110"
-                                    : "bg-white/90 text-gray-600 hover:text-red-500"
+                                    ? 'bg-red-500 text-white scale-110'
+                                    : 'bg-white/90 text-gray-600 hover:text-red-500'
                             }`}
                             >
                                 <Heart className="w-4 h-4" fill={favorites.has(vehicle.id) ? "currentColor" : "none"} />
@@ -47,8 +46,8 @@ const VehicleCard = ({
                                 }}
                                 className={`p-2 rounded-full backdrop-blur-sm transition-all ${
                                     compareList.includes(vehicle.id)
-                                        ? "bg-blue-500 text-white scale-110"
-                                        : "bg-white/90 text-gray-600 hover:text-blue-500"
+                                        ? 'bg-blue-500 text-white scale-110'
+                                        : 'bg-white/90 text-gray-600 hover:text-blue-500'
                                 }`}
                             >
                                 <GitCompare className="w-4 h-4" />
@@ -58,66 +57,13 @@ const VehicleCard = ({
                                     e.stopPropagation();
                                     openQuickView(vehicle);
                                 }}
-                                 className="p-2 rounded-full bg-white/90 text-gray-600 hover:text-blue-500 backdrop-blur-sm transition-all hover:scale-110"
+                                    className="p-2 rounded-full bg-white/90 text-gray-600 hover:text-blue-500 backdrop-blur-sm transition-all hover:scale-110"
                             >
                                 <Eye className="w-4 h-4" />
                             </button>
                     </div>
                 </div>
-
-                <div className="p-6 cursor-pointer" onClick={() => openDetailPage(vehicle)}>
-                    {/* Title */}
-                    <div className="flex justify-between items-start mb-3">
-                        <div>
-                            <h3 className="font-bold text-xl text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
-                                {vehicle.name}
-                            </h3>
-                            <p className="text-gray-600 font-medium">{vehicle.brand} • {vehicle.model}</p>
-                        </div>
-                        <div className="flex items-center gap-1 ml-4">
-                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                            <span className="text-sm font-medium">{vehicle.rating}</span>
-                            <span className="text-xs text-gray-500">({vehicle.reviews})</span>
-                        </div>
-                    </div>
-
-                    {/* Specs */}
-                    <div className="grid grid-cols-3 gap-3 mb-4">
-                        <div className="text-center p-3 bg-blue-50 rounded-lg">
-                            <Battery className="w-5 h-5 text-blue-600 mx-auto mb-1" />
-                            <div className="text-sm font-semibold text-blue-900">{vehicle.range} km</div>
-                            <div className="text-xs text-blue-600">Phạm vi</div>
-                        </div>
-                        <div className="text-center p-3 bg-green-50 rounded-lg">
-                            <Zap className="w-5 h-5 text-green-600 mx-auto mb-1" />
-                            <div className="text-sm font-semibold text-green-900">{vehicle.chargingTime}</div>
-                            <div className="text-xs text-green-600">Sạc nhanh</div>
-                        </div>
-                        <div className="text-center p-3 bg-purple-50 rounded-lg">
-                            <Gauge className="w-5 h-5 text-purple-600 mx-auto mb-1" />
-                            <div className="text-sm font-semibold text-purple-900">{vehicle.acceleration}</div>
-                            <div className="text-xs text-purple-600">0-100km/h</div>
-                        </div>
-                    </div>
-
-                    {/* Price */}
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                        <div>
-                            <div className="text-sm text-gray-500 mb-1">Bắt đầu từ</div>
-                                <span className="text-2xl font-bold text-gray-900">{formatPrice(vehicle.startingPrice)}</span>
-                            </div>
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    openDetailPage(vehicle);
-                                }}
-                                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
-                            >
-                                {vehicle.availability === "in-stock" ? "Mua ngay" : "Đặt trước"}
-                            </button>
-                    </div>
-                </div>
-            </div>
+                   
     );
 };
 
