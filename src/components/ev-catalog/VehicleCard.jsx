@@ -101,8 +101,24 @@ const VehicleCard = ({
                         </div>
                     </div>
 
-
-
+                    {/* Price */}
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                        <div>
+                            <div className="text-sm text-gray-500 mb-1">Bắt đầu từ</div>
+                                <span className="text-2xl font-bold text-gray-900">{formatPrice(vehicle.startingPrice)}</span>
+                            </div>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    openDetailPage(vehicle);
+                                }}
+                                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+                            >
+                                {vehicle.availability === "in-stock" ? "Mua ngay" : "Đặt trước"}
+                            </button>
+                    </div>
+                </div>
+            </div>
     );
 };
 
