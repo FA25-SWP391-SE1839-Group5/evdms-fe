@@ -50,6 +50,21 @@ const VehcileCard = ({
                             ? "bg-blue-500 text-white scale-110"
                             : "bg-white/90 text-gray-600 hover:text-blue-500"
                         }`}
+                    >
+                        <GitCompare className="w-4 h-4" />
+                    </button>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            openQuickView(vehicle);
+                        }}
+                        className="p-2 rounded-full bg-white/90 text-gray-600 hover:text-blue-500 backdrop-blur-sm transition-all hover:scale-110"
+                    >
+                        <Eye className="w-4 h-4" />
+                    </button>
+                </div>
+                
+
 
 
     )
