@@ -1,5 +1,6 @@
 import React from "react";
 import { Heart, GitCompare, Eye, Star, Battery, Zap, Gauge } from "lucide-react";
+import { formatPrice, getAvailabilityBadge } from "../../services/evUtils";
 
 const VehicleCard = ({
     vehicle,
@@ -9,8 +10,6 @@ const VehicleCard = ({
     toggleCompare,
     openQuickView,
     openDetailPage,
-    formatPrice,
-    getAvailabilityBadge,
 }) => {
     return (
             <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 hover:border-blue-200 hover:scale-[1.02]">
