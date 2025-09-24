@@ -1,13 +1,12 @@
 import React from "react";
 import { X, Star, Battery, Zap, Users } from "lucide-react";
+import { formatPrice, getAvailabilityBadge } from "../../services/evUtils";
 
 const QuickViewModal = ({
     showQuickView,
     quickViewVehicle,
     setShowQuickView,
     openDetailPage,
-    formatPrice,
-    getAvailabilityBadge,
 }) => {
     if (!showQuickView || !quickViewVehicle) return null;
 
