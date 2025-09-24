@@ -64,6 +64,15 @@ const VehicleCard = ({
                     </div>
                 </div>
                    
+                   {/* Discount Badge */}
+                    {vehicle.originalPercentage > vehicle.price && (
+                        <div className="absolute bottom-4 left-4">
+                            <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                                GIẢM {Math.round(((vehicle.originalPrice - vehicle.price) / vehicle.originalPrice) * 100)}%
+                            </span>
+                        </div>
+                    )}
+
     );
 };
 
