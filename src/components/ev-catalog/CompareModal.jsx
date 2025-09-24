@@ -18,7 +18,7 @@ const CompareModal = ({ showCompare, compareList, vehicles, setShowCompare, form
             </div>
 
             {/* Body */}
-            <div className="p-6 overflow-x-auto">
+            < className="p-6 overflow-x-auto">
                 <table className="w-full">
                     <thead>
                         <tr>
@@ -42,7 +42,7 @@ const CompareModal = ({ showCompare, compareList, vehicles, setShowCompare, form
                     </thead>
 
                     <tbody className="divide-y">
-                        
+
                         {/* Price */}
                         <tr>
                             <td className="py-4 px-6 font-medium">Giá bán</td>
@@ -57,5 +57,27 @@ const CompareModal = ({ showCompare, compareList, vehicles, setShowCompare, form
                                 );
                             })}
                         </tr>
+
+                        {/* Rating */}
+                        <tr>
+                            <td className="py-4 px-6 font-medium">Đánh giá</td>
+                            {compareList.map((id) => {
+                                const v = vehicles.find((x) => x.id === id);
+                                return (
+                                    <td key={id} className="py-4 px-6 text-center">
+                                        <div className="flex items-center justify-center gap-1">
+                                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                                            <span className="font-semibold">{v.rating}</span>
+                                            <span className="text-gray-500 text-sm">({v.reviews})</span>
+                                        </div>
+                                    </td>
+                                );
+                            })}
+                        </tr>
+                        </tbody>
+                </table>
+
+                
+
     );
 };
