@@ -34,7 +34,7 @@ src/
 
 ### 1️⃣ Clone repository
 ```
-git clone https://github.com/your-username/ev-dealer-management-fe.git
+git clone https://github.com/nguyew/ev-dealer-management-fe.git
 cd ev-dealer-management-fe
 ```
 ### 2️⃣ Install dependencies
@@ -55,19 +55,43 @@ npm run build
 ## 🔌 API Connection
 
 Create a `.env` file in the project root:
+
+- .env.development → used when running npm run dev
 ```
 VITE_API_BASE_URL=http://localhost:8080/api
 ```
 
-Use it in code:
+- .env.production → used when running npm run build / npm run preview
+```
+VITE_API_BASE_URL=https://api.myapp.com/api
+```
+
+### 📦 Usage in code
+
+Create a shared Axios instance (src/services/api.js):
+
 ```
 import axios from "axios";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 export default api;
+```
+
+Now you can import it anywhere:
+
+```
+import api from "../services/api";
+
+async function getUsers() {
+  const res = await api.get("/users");
+  return res.data;
+}
 ```
 
 ---
