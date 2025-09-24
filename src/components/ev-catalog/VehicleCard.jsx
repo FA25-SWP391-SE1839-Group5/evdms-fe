@@ -85,12 +85,20 @@ const VehcileCard = ({
                         >
                             Xem nhanh
                         </button>
-
-
-
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                openDetailPage(vehicle.id);
+                            }}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                        >
+                            Xem chi tiết
+                        </button>
+                    </div>
+                </div>
             </div>
 
-                    </div>
+            
                 )}
 
 
