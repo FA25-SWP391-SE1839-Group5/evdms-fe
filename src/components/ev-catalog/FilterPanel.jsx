@@ -13,24 +13,26 @@ const FilterPanel = ({ filters, resetFilters, handleFilterChange, formatPrice })
                 </button>
             </div>
 
-            <div className="space-y-6">
-                {/* Price Range Filter */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Khoảng giá: {formatPrice(filters.priceRange[0])} - {formatPrice(filters.priceRange[1])}
-                    </label>
-                    <input
-                        type="range"
-                        min="0"
-                        max="4000000000"
-                        step="100000000"
-                        value={filters.priceRange[1]}
-                        onChange={(e) => handleFilterChange("priceRange", [filters.priceRange[0], parseInt(e.target.value)])}
-                        className="w-full h-2 bg-gradient-to-r from-blue-200 to-blue-500 rounded-lg"
-                    />
-                </div>
+            {/* Price Range Filter */}
+            <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Khoảng giá: {formatPrice(filters.priceRange[0])} - {formatPrice(filters.priceRange[1])}
+                </label>
+                <input
+                    type="range"
+                    min="0"
+                    max="4000000000"
+                    step="100000000"
+                    value={filters.priceRange[1]}
+                    onChange={(e) =>
+                        handleFilterChange("priceRange", [filters.priceRange[0]], parseInt(e.target.value))
+                    }
+                    className="w-full h-2 bg-gradient-to-r from-blue-200 to-blue-500 rounded-lg appearance-none cursor-pointer"
+                />
+            </div>
+
+            
         </div>
-    </div>
     );
 };
 
