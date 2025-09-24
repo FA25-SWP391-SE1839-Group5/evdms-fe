@@ -40,8 +40,22 @@ const CompareModal = ({ showCompare, compareList, vehicles, setShowCompare, form
                             })}
                         </tr>
                     </thead>
-                    <tbody className="divide-y">
 
+                    <tbody className="divide-y">
+                        
                         {/* Price */}
+                        <tr>
+                            <td className="py-4 px-6 font-medium">Giá bán</td>
+                            {compareList.map((id) => {
+                                const v = vehicles.find((x) => x.id === id);
+                                return (
+                                    <td key={id} className="py-4 px-6 text-center">
+                                        <div className="text-green-600 font-bold text-lg">
+                                            {formatPrice(v.startingPrice)}
+                                        </div>
+                                    </td>
+                                );
+                            })}
+                        </tr>
     );
 };
