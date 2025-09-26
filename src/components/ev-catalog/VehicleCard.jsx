@@ -97,21 +97,40 @@ const VehicleCard = ({
         </div>
     </div>
 
-      <div className="p-6 cursor-pointer" onClick={() => openDetailPage(vehicle)}>
+    <div className="p-6 cursor-pointer" onClick={() => openDetailPage(vehicle)}>
         {/* Header */}
         <div className="flex justify-between items-start mb-3">
-          <div className="flex-1">
-            <h3 className="font-bold text-xl text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
-              {vehicle.name}
-            </h3>
-            <p className="text-gray-600 font-medium">{vehicle.brand} • {vehicle.model}</p>
-          </div>
-          <div className="flex items-center gap-1 ml-4">
-            <Star className="w-4 h-4 text-yellow-400 fill-current" />
-            <span className="text-sm font-medium">{vehicle.rating}</span>
-            <span className="text-xs text-gray-500">({vehicle.reviews})</span>
-          </div>
-        </div> 
+            <div className="flex-1">
+                <h3 className="font-bold text-xl text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
+                    {vehicle.name}
+                </h3>
+                <p className="text-gray-600 font-medium">{vehicle.brand} • {vehicle.model}</p>
+            </div>
+            <div className="flex items-center gap-1 ml-4">
+                <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                <span className="text-sm font-medium">{vehicle.rating}</span>
+                <span className="text-xs text-gray-500">({vehicle.reviews})</span>
+            </div>
+        </div>
+
+        {/* Key Specs */}
+        <div className="grid grid-cols-3 gap-4 mb-4">
+            <div className="text-center p-3 bg-blue-50 rounded-lg">
+                <Battery className="w-5 h-5 text-blue-600 mx-auto mb-1" />
+                <p className="text-sm font-semibold text-blue-900">{vehicle.range} km</p>
+                <div className="text-xs text-gray-600">Phạm vị</div>
+            </div>
+            <div className="text-center p-3 bg-green-50 rounded-lg">
+                <Zap className="w-5 h-5 text-green-600 mx-auto mb-1" />
+                <div className="text-sm font-semibold text-green-900">{vehicle.chargeTime}</div>
+                <div className="text-xs text-gray-600">Sạc nhanh</div>
+            </div>
+            <div className="text-center p-3 bg-purple-50 rounded-lg">
+                <Gauge className="w-5 h-5 text-purple-600 mx-auto mb-1" />
+                <div className="text-sm font-semibold text-purple-900">{vehicle.acceleration} km/h</div>
+                <div className="text-xs text-gray-600">0-100km/h</div></div>
+            </div>
+        </div>
      
     );
 };
