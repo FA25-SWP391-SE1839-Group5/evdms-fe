@@ -82,6 +82,40 @@ const CompareModal = ({ showCompare, compareList, vehicles, setShowCompare }) =>
                                 })}
                             </tr>
 
+                            {/* Range */}
+                            <tr className="hover:bg-gray-50">
+                                <td className="py-4 px-6 font-semibold text-gray-700">
+                                    Phạm vi hoạt động
+                                </td>
+                                {compareList.map((vehicleId) => {
+                                    const vehicle = getVehicleById(vehicleId);
+                                    const maxRange = Math.max(
+                                        ...compareList.map(
+                                            id => getVehicleById(id).range
+                                        )
+                                    );
+                                    return (
+                                        <td key={vehicleId} className="py-4 px-6 text-center">
+                                            <div 
+                                                className={`text-lg font-semibold ${
+                                                    vehicle.range === maxRange
+                                                    ? "text-blue-600" 
+                                                    : "text-gray-900"
+                                                }`}
+                                            >
+                                                {vehicle.range} km
+                                            </div>
+                                            {vehicle.range === maxRange && (
+                                                <div className="text-xs text-green-600 flex items-center justify-center gap-1 mt-1">
+                                                    <Check className="w-3 h-3" />
+                                                        Tốt nhất
+                                                </div>
+                                            )}
+                                        </td>
+                                    );
+                                })}
+                            </tr>
+
                         {/* Rating */}
                         <tr>
                             <td className="py-4 px-6 font-medium">Đánh giá</td>
