@@ -59,21 +59,28 @@ const CompareModal = ({ showCompare, compareList, vehicles, setShowCompare }) =>
                             </tr>
                         </thead>
 
-                        <tbody className="divide-y">
-                        {/* Price */}
-                        <tr>
-                            <td className="py-4 px-6 font-medium">Giá bán</td>
-                            {compareList.map((id) => {
-                                const v = vehicles.find((x) => x.id === id);
-                                return (
-                                    <td key={id} className="py-4 px-6 text-center">
-                                        <div className="text-green-600 font-bold text-lg">
-                                            {formatPrice(v.startingPrice)}
-                                        </div>
-                                    </td>
-                                );
-                            })}
-                        </tr>
+                        <tbody className="divide-y divide-gray-100">
+                            {/* Price */}
+                            <tr className="hover:bg-gray-50">
+                                <td className="py-4 px-6 font-semibold text-gray-700">
+                                    Giá bán
+                                </td>
+                                {compareList.map((vehicleId) => {
+                                    const vehicle = getVehicleById(vehicleId);
+                                    return (
+                                        <td key={vehicleId} className="py-4 px-6 text-center">
+                                            <div className="text-xl font-bold text-green-600">
+                                                {formatPrice(vehicle.startingPrice)}
+                                            </div>
+                                            {vehicle.originalPrice > vehicle.price && (
+                                                <div className="text-sm text-gray-500 line-through">
+                                                    {formatPrice(vehicle.originalPrice)}
+                                                </div>
+                                            )}
+                                        </td>
+                                    );
+                                })}
+                            </tr>
 
                         {/* Rating */}
                         <tr>
