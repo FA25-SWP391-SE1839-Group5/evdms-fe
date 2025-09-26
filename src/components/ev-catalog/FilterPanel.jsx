@@ -64,6 +64,24 @@ const FilterPanel = ({ filters, setFilters, brands }) => {
                     <option value="2000+">Trên 2 tỷ</option>
                 </select>
             </div>
+
+            {/* Status */}
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Tình trạng
+                </label>
+                <select
+                    value={filters.availability}
+                    onChange={(e) => updateFilter("availability", e.target.value)}
+                    className="w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                >
+                    <option value="">Tất cả</option>
+                    <option value="in-stock">Còn hàng</option>
+                    <option value="pre-order">Đặt trước</option>
+                    <option value="out-of-stock">Hết hàng</option>
+                </select>
+            </div>
+        </div>
     );
    
 };
