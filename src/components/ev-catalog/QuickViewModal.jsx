@@ -1,5 +1,5 @@
 import React from "react";
-import { X, Star, Battery, Zap, Users, User } from "lucide-react";
+import { X, Star, Battery, Zap, Users } from "lucide-react";
 import { formatPrice, getAvailabilityBadge } from "../../services/evUtils";
 
 const QuickViewModal = ({
@@ -7,6 +7,7 @@ const QuickViewModal = ({
     quickViewVehicle,
     setShowQuickView,
     openDetailPage,
+    toggleCompare
 }) => {
     if (!showQuickView || !quickViewVehicle) return null;
 
@@ -93,7 +94,14 @@ const QuickViewModal = ({
                                     }}
                                     className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-semibold"
                                 >
-                                    
+                                    Xem chi tiết
+                                </button>
+                                <button
+                                    onClick={() => toggleCompare(quickViewVehicle.id)}
+                                    className="px-6 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+
+                                >
+                                    So sánh
                                 </button>
                             </div>
                         </div>
