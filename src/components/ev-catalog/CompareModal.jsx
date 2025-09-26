@@ -10,7 +10,7 @@ const CompareModal = ({ showCompare, compareList, vehicles, setShowCompare }) =>
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+            < className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div className="sticky top-0 bg-white border-b border-gray-200 p-6 rounded-t-2xl">
                 <div className="flex items-center justify-between">
@@ -117,23 +117,47 @@ const CompareModal = ({ showCompare, compareList, vehicles, setShowCompare }) =>
                             </tr>
 
                         {/* Rating */}
-                        <tr>
-                            <td className="py-4 px-6 font-medium">Đánh giá</td>
-                            {compareList.map((id) => {
-                                const v = vehicles.find((x) => x.id === id);
+                        <tr className="hover:bg-gray-50">
+                            <td className="py-4 px-6 font-semibold text-gray-700">
+                                Đánh giá
+                            </td>
+                            {compareList.map((vehicleId) => {
+                                const vehicle = getVehicleById(vehicleId);
+                                const bestRating = Math.max(
+                                    ...compareList.map(
+                                        (id) => getVehicleById(id).rating
+                                    )
+                                );
                                 return (
-                                    <td key={id} className="py-4 px-6 text-center">
+                                    <td key={vehicleId} className="py-4 px-6 text-center">
                                         <div className="flex items-center justify-center gap-1">
-                                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                                            <span className="font-semibold">{v.rating}</span>
-                                            <span className="text-gray-500 text-sm">({v.reviews})</span>
+                                            <Star className="w-5 h-5 text-yellow-400 fill-current" />
+                                            <span 
+                                                className={`text-xl font-bold ${
+                                                    vehicle.rating === bestRating
+                                                        ? "text-green-600"
+                                                        : "text-gray-900"
+                                                }`}
+                                            >
+                                                {vehicle.rating}
+                                            </span>
                                         </div>
+                                        <div className="text-sm text-gray-500">
+                                            ({vehicle.reviews} đánh giá)
+                                        </div>
+                                        {vehicle.rating === bestRating && (
+                                            <div className="text-xs text-green-600 flex items-center justify-center gap-1 mt-1">
+                                                <Check className="w-3 h-3" />
+                                                Tốt nhất
+                                            </div>
+                                        )}
                                     </td>
                                 );
                             })}
                         </tr>
-                        </tbody>
+                    </tbody>
                 </table>
+            </div>
 
                 {/* Footer */}
                 <div className="flex justify-end mt-6 gap-3">
@@ -153,7 +177,7 @@ const CompareModal = ({ showCompare, compareList, vehicles, setShowCompare }) =>
                 </div>
             </div>
         </div>
-        </div>
+
     );
 };
 
