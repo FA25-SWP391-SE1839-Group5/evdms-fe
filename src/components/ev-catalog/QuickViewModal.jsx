@@ -1,5 +1,5 @@
 import React from "react";
-import { X, Star, Battery, Zap, Users } from "lucide-react";
+import { X, Star, Battery, Zap, Users, User } from "lucide-react";
 import { formatPrice, getAvailabilityBadge } from "../../services/evUtils";
 
 const QuickViewModal = ({
@@ -45,7 +45,58 @@ const QuickViewModal = ({
                             </div>
                         </div>
 
-                        
+                        {/* Details */}
+                        <div>
+                            <div className="flex items-center gap-2 mb-4">
+                                <Star className="w-5 h-5 text-yellow-400 fill-current" />
+                                <span className="font-medium">{quickViewVehicle.rating}</span>
+                                <span className="text-gray-500">
+                                    {quickViewVehicle.reviews} đánh giá
+                                </span>
+                                {getAvailabilityBadge (quickViewVehicle.availability)}
+                            </div>
+
+                            <div className="mb-6">
+                                <div className="text-3xl font-bold text-gray-900 mb-2">
+                                    {formatPrice(quickViewVehicle.startingPrice)}
+                                </div>
+                                <p className="text-gray-600">{quickViewVehicle.description}</p>
+                            </div>
+
+                            <div className="space-y-4 mb-6">
+                                <div className="flex items-center gap-3">
+                                    <Battery className="w-5 h-5 text-blue-600" />
+                                    <span className="font-medium">
+                                        Phạm vi: {quickViewVehicle.range} km
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <Zap className="w-5 h-5 text-green-600" />
+                                    <span className="font-medium">
+                                        Sạc: {quickViewVehicle.chargingTime}
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <Users className="w-5 h-5 text-purple-600" />
+                                    <span className="font-medium">
+                                        {quickViewVehicle.settingCapacity} chỗ ngồi
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            {/* Buttons */}
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => {
+                                        setShowQuickView(false);
+                                        openDetailPage(quickViewVehicle);
+                                    }}
+                                    className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-semibold"
+                                >
+                                    
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
