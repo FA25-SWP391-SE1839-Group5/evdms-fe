@@ -1,6 +1,5 @@
 import React from "react";
 import { X, Star, Check, Download } from "lucide-react";
-import { getAvailabilityBadge } from "../../services/evUtils";
 import { formatPrice } from "../../services/evUtils";
 
 const CompareModal = ({ showCompare, compareList, vehicles, setShowCompare }) => {
@@ -10,7 +9,7 @@ const CompareModal = ({ showCompare, compareList, vehicles, setShowCompare }) =>
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            < className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div className="sticky top-0 bg-white border-b border-gray-200 p-6 rounded-t-2xl">
                 <div className="flex items-center justify-between">
@@ -159,25 +158,22 @@ const CompareModal = ({ showCompare, compareList, vehicles, setShowCompare }) =>
                 </table>
             </div>
 
-                {/* Footer */}
-                <div className="flex justify-end mt-6 gap-3">
-                    <button
-                        onClick={() => setShowCompare(false)}
-                        className="px-4 py-2 border rounded-lg"
-                    >
-                        Đóng
-                    </button>
-                    <button
-                        onClick={() => alert("Tính năng tải về đang phát triển")}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-                    >
-                        <Download className="w-4 h-4 inline mr-1" />
-                        Xuất so sánh
-                    </button>
+            {/* Actions */}
+            <div className="mt-8 pt-6 border-t border-gray-200 flex justify-end gap-4">
+                <button
+                    onClick={() => setShowCompare(false)}
+                    className="px-6 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+                >
+                    Đóng
+                </button>
+                <button className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors">
+                    <Download className="w-4 h-4 inline mr-1" />
+                    Xuất so sánh
+                </button>
                 </div>
             </div>
         </div>
-
+    </div>
     );
 };
 
