@@ -46,6 +46,24 @@ const FilterPanel = ({ filters, setFilters, brands }) => {
                     ))}
                 </select>
             </div>
+
+            {/* Price */}
+            <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Khoảng giá
+                </label>
+                <select
+                    value={filters.priceRange}
+                    onChange={(e) => updateFilter("priceRange", e.target.value)}
+                    className="w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                >
+                    <option value="">Tất cả</option>
+                    <option value="0-500">Dưới 500 triệu</option>
+                    <option value="500-1000">500 - 1 tỷ</option>
+                    <option value="1000-2000">1 -2 tỷ</option>
+                    <option value="2000+">Trên 2 tỷ</option>
+                </select>
+            </div>
     );
    
 };
