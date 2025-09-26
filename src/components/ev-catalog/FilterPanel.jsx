@@ -27,6 +27,25 @@ const FilterPanel = ({ filters, setFilters, brands }) => {
                     <X className="w-4 h-4" /> Xóa bộ lọc
                 </button>
             </div>
+
+            {/* Brand */}
+            <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Thương hiệu
+                </label>
+                <select
+                    value={filters.brand}
+                    onChange={(e) => updateFilter("brand", e.target.value)}
+                    className="w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                >
+                    <option value="">Tất cả</option>
+                    {brands.map((brand) => (
+                        <option key={brand} value={brand}>
+                            {brand}
+                        </option>
+                    ))}
+                </select>
+            </div>
     );
    
 };
