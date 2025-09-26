@@ -27,7 +27,25 @@ const QuickViewModal = ({
                 <div className="p-6">
                     <div className="p-6 grid md:grid-cols-2 gap-8">
                         {/* Images */}
-                    
+                        <div>
+                            <img 
+                                src={quickViewVehicle.images[0]}
+                                alt={quickViewVehicle.name} 
+                                className="w-full h-64 object-cover rounded-xl"
+                            />
+                            <div className="grid grid-cols-4 gap-2 mt-4">
+                                {quickViewVehicle.images.slice(0, 4).map((img, idx) => (
+                                    <img 
+                                        key={idx}
+                                        src={img}
+                                        alt={`${quickViewVehicle.name} ${idx + 1}`}
+                                        className="w-full h-16 object-cover rounded-lg"
+                                    />
+                                ))}
+                            </div>
+                        </div>
+
+                        
                     </div>
                 </div>
             </div>
