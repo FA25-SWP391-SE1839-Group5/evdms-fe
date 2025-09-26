@@ -24,32 +24,42 @@ const CompareModal = ({ showCompare, compareList, vehicles, setShowCompare }) =>
                 </div>
             </div>
 
-            {/* Body */}
-            <div className="p-6 overflow-x-auto">
-                <table className="w-full">
-                    <thead>
-                        <tr>
-                            <th className="text-left py-4 px-6">Thông số</th>
-                            {compareList.map((id) => {
-                                const v = vehicles.find((x) => x.id === id);
-                                return (
-                                    <th key={id} className="py-4 px-6 text-center">
-                                        <img 
-                                            src={v.images[0]}
-                                            alt={v.name} 
-                                            className="w-32 h-20 object-cover rounded-lg mx-auto mb-2" 
-                                        />
-                                        <div className="font-bold">{v.name}</div>
-                                        <div className="text-sm text-gray-600">{v.brand}</div>
-                                        {getAvailabilityBadge(v.availability)}
-                                    </th>
-                                );
-                            })}
-                        </tr>
-                    </thead>
+            {/* Content */}
+            <div className="p-6">
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead>
+                            <tr>
+                                <th className="text-left py-4 px-6 font-semibold text-gray-700 bg-gray-50 rounded-tl-xl">
+                                    Thông số
+                                </th>
+                                {compareList.map((vehicleId) => {
+                                    const vehicle = getVehicleById(vehicleId);
+                                    return (
+                                        <th 
+                                            key={vehicleId} 
+                                            className="py-4 px-6 bg-gray-50 last:rounded-tr-xl"
+                                        >
+                                            <div className="text-center">
+                                                <img 
+                                                    src={vehicle.images[0]}
+                                                    alt={vehicle.name} 
+                                                    className="w-32 h-20 object-cover rounded-xl mx-auto mb-3 shadow-md"
+                                                />
+                                                <div className="font-bold text-gray-600">
+                                                    {vehicle.name}
+                                                </div>
+                                                <div className="text-sm text-gray-600">
+                                                    {vehicle.brand}
+                                                </div>
+                                            </div>
+                                        </th>
+                                    );
+                                })}
+                            </tr>
+                        </thead>
 
-                    <tbody className="divide-y">
-
+                        <tbody className="divide-y">
                         {/* Price */}
                         <tr>
                             <td className="py-4 px-6 font-medium">Giá bán</td>
