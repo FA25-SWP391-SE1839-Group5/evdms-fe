@@ -22,26 +22,12 @@ const QuickViewModal = ({
                         </button>
                     </div>
                 </div>
-                <div className="p-6 grid md:grid-cols-2 gap-6">
-                    <img src={quickViewVehicle.images[0]} className="rounded-xl" />
-                    <div>
-                        <div className="flex items-center gap-2 mb-4">
-                            <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                            <span>{quickViewVehicle.rating}</span>
-                            {getAvailabilityBadge(quickViewVehicle.availability)}
-                        </div>
-                        <div className="text-2xl font-bold mb-4">
-                            {formatPrice(quickViewVehicle.startingPrice)}
-                        </div>
-                        <button
-                            onClick={() => {
-                                setShowQuickView(false);
-                                openDetailPage(quickViewVehicle);
-                            }}
-                            className="px-6 py-3 bg-blue-600 text-white rounded-xl"
-                        >
-                            Xem chi tiết
-                        </button>
+
+                {/* Content */}
+                <div className="p-6">
+                    <div className="p-6 grid md:grid-cols-2 gap-8">
+                        {/* Images */}
+                    
                     </div>
                 </div>
             </div>
