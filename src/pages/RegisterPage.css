@@ -1,0 +1,287 @@
+/* RegisterPage.css - Facebook-style Registration */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.register-container {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f2f5;
+  padding: 20px;
+  font-family: Helvetica, Arial, sans-serif;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.register-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.register-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  max-width: 432px;
+  width: 100%;
+}
+
+.register-header {
+  margin-bottom: 16px;
+}
+
+.register-title {
+  color: #1c1e21;
+  font-size: 32px;
+  font-weight: bold;
+  line-height: 38px;
+  margin-bottom: 8px;
+}
+
+.register-subtitle {
+  color: #606770;
+  font-size: 15px;
+  line-height: 24px;
+  margin-bottom: 16px;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+/* Name fields */
+.name-group {
+  display: flex;
+  gap: 12px;
+}
+
+.name-group .input-group {
+  flex: 1;
+}
+
+.input-group {
+  width: 100%;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #dddfe2;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #1c1e21;
+  font-size: 15px;
+  line-height: 16px;
+  transition: all 0.2s ease;
+}
+
+.input-group input::placeholder {
+  color: #8a8d91;
+  font-size: 15px;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #1877f2;
+  box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+}
+
+/* Birth date section */
+.birth-section {
+  margin: 8px 0;
+}
+
+.birth-label {
+  color: #606770;
+  font-size: 12px;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.info-icon {
+  color: #8a8d91;
+  font-size: 12px;
+  cursor: help;
+}
+
+.birth-group {
+  display: flex;
+  gap: 12px;
+}
+
+.birth-select {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #dddfe2;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #1c1e21;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.birth-select:focus {
+  outline: none;
+  border-color: #1877f2;
+  box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+}
+
+/* Gender section */
+.gender-section {
+  margin: 8px 0;
+}
+
+.gender-label {
+  color: #606770;
+  font-size: 12px;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.gender-group {
+  display: flex;
+  gap: 12px;
+}
+
+.gender-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px solid #dddfe2;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gender-option:hover {
+  background: #f5f6f7;
+}
+
+.gender-option input[type="radio"] {
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
+}
+
+.gender-text {
+  color: #1c1e21;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+
+
+/* Sign up button */
+.signup-button {
+  width: 50%;
+  padding: 8px 24px;
+  margin: 16px auto 0;
+  background: #00a400;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 24px;
+  display: block;
+}
+
+.signup-button:hover:not(:disabled) {
+  background: #36a420;
+}
+
+.signup-button:active:not(:disabled) {
+  background: #2e8b17;
+}
+
+.signup-button:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+/* Login link */
+.login-link {
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #dadde1;
+}
+
+.login-link a {
+  color: #1877f2;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 400;
+  transition: all 0.2s ease;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 520px) {
+  .register-container {
+    padding: 10px;
+  }
+  
+  .register-card {
+    max-width: 100%;
+    margin: 0;
+  }
+  
+  .name-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .birth-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .gender-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .register-title {
+    font-size: 28px;
+  }
+  
+  .signup-button {
+    width: 70%;
+  }
+}
+
+@media (max-width: 360px) {
+  .register-card {
+    padding: 16px;
+  }
+  
+  .signup-button {
+    width: 80%;
+  }
+}
