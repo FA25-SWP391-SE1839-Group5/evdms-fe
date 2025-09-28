@@ -91,5 +91,32 @@ const EVDetailPage = ({ vehicle, onBack, favorites, toggleFavorite, compareList,
                 </div>
             </div>
         </div>
+
+        <div className="max-w-7xl mx-auto px-4 py-8">
+            <div className="grid lg:grid-cols-2 gap-12">
+            {/* Image Gallery */}
+            <div className="space-y-4">
+                <div className="relative aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden">
+                    <img
+                        src={vehicle.images[currentImageIndex]}
+                        alt={vehicle.name}
+                        className="w-full h-full object-cover"
+                    />
+                    <button
+                        onClick={() => setCurrentImageIndex(Math.max(0, currentImageIndex - 1))}
+                        className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 bg-white/80 rounded-full hover:bg-white transition-colors"
+                        disabled={currentImageIndex === 0}
+                    >
+                        <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button
+                        onClick={() => setCurrentImageIndex(Math.min(vehicle.images.length - 1, currentImageIndex + 1))}
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 bg-white/80 rounded-full hover:bg-white transition-colors"
+                        disabled={currentImageIndex === vehicle.images.length - 1}
+                    >
+                        <ChevronRight className="w-5 h-5" />
+                    </button>
+                    
+                    
     );
 };
