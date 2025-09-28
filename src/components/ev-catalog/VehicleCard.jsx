@@ -139,6 +139,21 @@ const VehicleCard = ({
                 <div className="text-xs text-purple-600">0-100km/h</div>
             </div>
         </div>
+
+        {/* Features */}
+        <div className="flex flex-wrap gap-1 mb-4">
+            {vehicle.features.slice(0, 3).map((feature, index) => (
+                <span key={index} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full font-medium">
+                    {feature}
+                </span>
+            ))}
+            {vehicle.features.length > 3 && (
+                <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full font-medium">
+                    +{vehicle.features.length - 3} khác
+                </span>
+            )}
+        </div>
+
     );
     
     
