@@ -121,6 +121,24 @@ const VehicleCard = ({
             </div>
         </div>
 
+        {/* Key Specs */}
+        <div className="grid grid-cols-3 gap-3 mb-4">
+            <div className="text-center p-3 bg-blue-50 rounded-lg">
+                <Battery className="w-5 h-5 text-blue-600 mx-auto mb-1" />
+                <div className="text-sm font-semibold text-blue-900">{vehicle.range} km</div>
+                <div className="text-xs text-blue-600">Phạm vi</div>
+            </div>
+            <div className="text-center p-3 bg-green-50 rounded-lg">
+                <Zap className="w-5 h-5 text-green-600 mx-auto mb-1" />
+                <div className="text-sm font-semibold text-green-900">{vehicle.chargingTime}</div>
+                <div className="text-xs text-green-600">Sạc nhanh</div>
+            </div>
+            <div className="text-center p-3 bg-purple-50 rounded-lg">
+                <Gauge className="w-5 h-5 text-purple-600 mx-auto mb-1" />
+                <div className="text-sm font-semibold text-purple-900">{vehicle.acceleration}</div>
+                <div className="text-xs text-purple-600">0-100km/h</div>
+            </div>
+        </div>
     );
     
     
