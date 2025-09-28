@@ -46,6 +46,24 @@ const FilterPanel = ({ filters, handleFilterChange, resetFilters }) => {
                     className="w-full h-2 bg-gradient-to-r from-green-200 to-green-500 rounded-lg appearance-none cursor-pointer"
                 />
             </div>
+
+            {/* Brand */}
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Thương hiệu</label>
+                <select
+                    value={filters.brand}
+                    onChange={(e) => handleFilterChange('brand', e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                    <option value="">Tất cả thương hiệu</option>
+                    <option value="Tesla">Tesla</option>
+                    <option value="BMW">BMW</option>
+                    <option value="Audi">Audi</option>
+                    <option value="Hyundai">Hyundai</option>
+                    <option value="Ford">Ford</option>
+                    <option value="Lucid">Lucid</option>
+                </select>
+            </div>
    );
 };
 
