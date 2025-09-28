@@ -148,6 +148,18 @@ const EVDetailPage = ({ vehicle, onBack, favorites, toggleFavorite, compareList,
                     </button>
                 ))}
             </div>
+
+            {/* Video Section */}
+            <div className="bg-white rounded-2xl p-6 border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Video giới thiệu</h3>
+                <div className="aspect-video bg-gray-100 rounded-xl flex items-center justify-center">
+                    <button className="flex items-center gap-3 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors">
+                        <Play className="w-5 h-5" />
+                        Xem video
+                    </button>
+                </div>
+            </div>
+        </div>
                     
     );
 };
