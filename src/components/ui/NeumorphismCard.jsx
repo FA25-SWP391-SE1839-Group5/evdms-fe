@@ -33,5 +33,14 @@ const NeumorphismCard = ({ children, className = '', onMouseMove = true }) => {
         return () => document.removeEventListener('mousemove', handleMouseMove);
     }, [onMouseMove]);
 
-    
+    return (
+        <div
+            ref={cardRef}
+            className={`neu-card relative ${className}`}
+        >
+            {children}
+        </div>
+    );
 };
+
+export default NeumorphismCard
