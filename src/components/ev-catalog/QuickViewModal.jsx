@@ -1,6 +1,6 @@
 import React from "react";
 import { X, Star, Battery, Zap, Users } from "lucide-react";
-import { formatPrice, getAvailabilityBadge } from "../../services/evUtils";
+import { formatPrice, getAvailabilityBadge } from "../../services/evService";
 
 const QuickViewModal = ({
     showQuickView,
@@ -11,6 +11,14 @@ const QuickViewModal = ({
 }) => {
     if (!showQuickView || !quickViewVehicle) return null;
 
+    const { badges, labels } = getAvailabilityBadge(quickViewVehicle.availability);
+
+    const renderAvailabilityBadge = (availability) => (
+        <span className={`px-2 py-1 rounded-full text-xs font-medium border ${badges[availability]}`}>
+            {labels[availability]}
+        </span>
+    );
+
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
@@ -18,7 +26,10 @@ const QuickViewModal = ({
                 <div className="sticky top-0 bg-white border-b p-6 flex justify-between items-center">
                     <div className="flex items-center justify-between">
                         <h2 className="text-2xl font-bold">{quickViewVehicle.name}</h2>
-                        <button onClick={() => setShowQuickView(false)}>
+                        <button 
+                            onClick={() => setShowQuickView(false)}
+                            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                        >    
                             <X className="w-6 h-6" />    
                         </button>
                     </div>
