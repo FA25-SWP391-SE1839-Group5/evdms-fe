@@ -13,7 +13,7 @@ const VehicleCard = ({
 }) => {
     const { badges, labels } = getAvailabilityBadge(vehicle.availability);
     
-    const renderAvailabilityBadge = (availability)= (
+    const renderAvailabilityBadge = (availability) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium border ${badges[availability]}`}>
             {labels[availability]}
         </span>
@@ -154,9 +154,30 @@ const VehicleCard = ({
             )}
         </div>
 
-    );
-    
-    
+        {/* Price and CTA */}
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+            <div>
+                <div className="text-sm text-gray-500 mb-1">Bắt đầu từ</div>
+                <div className="flex items-center gap-2">
+                <span className="text-2xl font-bold text-gray-900">{formatPrice(vehicle.startingPrice)}</span>
+                {vehicle.originalPrice > vehicle.price && (
+                    <span className="text-sm text-gray-500 line-through">{formatPrice(vehicle.originalPrice)}</span>
+                )}
+                </div>
+            </div>
+            <button 
+                onClick={(e) => {
+                    e.stopPropagation();
+                    openDetailPage(vehicle);
+                }}
+                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                    {vehicle.availability === 'in-stock' ? 'Mua ngay' : 'Đặt trước'}
+                </button>
+                </div>
+            </div>
+        </div>
+    );    
 };
 
 export default VehicleCard;
