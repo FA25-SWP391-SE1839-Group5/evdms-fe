@@ -130,6 +130,24 @@ const EVDetailPage = ({ vehicle, onBack, favorites, toggleFavorite, compareList,
                     ))}
                 </div>
             </div>
+
+            {/* Thumbnail Grid */}
+            <div className="grid grid-cols-4 gap-4">
+                {vehicle.images.map((img, idx) => (
+                    <button
+                        key={idx}
+                        onClick={() => setCurrentImageIndex(idx)}
+                        className={`aspect-video rounded-lg overflow-hidden border-2 transition-all ${
+                            idx === currentImageIndex ? 'border-blue-500' : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                    >
+                        <img 
+                            src={img}
+                            alt={`${vehicle.name} ${idx + 1}`} 
+                            className="w-full h-full object-cover" />
+                    </button>
+                ))}
+            </div>
                     
     );
 };
