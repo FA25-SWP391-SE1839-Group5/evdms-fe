@@ -128,5 +128,53 @@ const CatalogPage = ({ onVehicleSelect }) => {
                 </div>
             </div>
 
+            {/* Controls */}
+            <div className="max-w-7xl mx-auto px-4 py-8">
+                <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-6">
+                        <div className="flex items-center bg-white rounded-xl overflow-hidden shadow-md border border-gray-200">
+                        <button
+                            onClick={() => setViewMode('grid')}
+                            className={`p-3 ${
+                                viewMode === 'grid' 
+                                ? 'bg-blue-600 text-white' 
+                                : 'text-gray-600 hover:bg-gray-50'
+                            }`}
+                        >
+                            <Grid className="w-5 h-5" />
+                        </button>
+                        <button
+                            onClick={() => setViewMode('list')}
+                            className={`p-3 ${
+                                viewMode === 'list' 
+                                ? 'bg-blue-600 text-white' 
+                                : 'text-gray-600 hover:bg-gray-50'
+                            }`}
+                        >
+                            <List className="w-5 h-5"/>
+                        </button>
+                    </div>
+
+                    <button
+                        onClick={() => setShowFilters(!showFilters)}
+                        className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 shadow-md transition-all"
+                    >
+                        <Filter className="w-5 h-5" />
+                        Bộ lọc
+                        {Object.values(filters).some(v => v !== '' && !Array.isArray(v)) && (
+                            <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                        )}
+                    </button>
+                </div>
+
+            <div className="text-gray-600 font-medium">
+                Hiển thị 
+                <span className="text-blue-600 font-bold">
+                    {filteredVehicles.length}
+                </span> trong số {vehicles.length} xe
+            </div>
         </div>
+              
+
+        
 }; 
