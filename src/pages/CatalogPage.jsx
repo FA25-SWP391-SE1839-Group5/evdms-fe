@@ -217,9 +217,41 @@ const CatalogPage = ({ onVehicleSelect }) => {
                         </button>
                     </div>
                 )}
-          </div>
+            </div>
         </div>
-      </div>   
+    </div>
 
-        
-}; 
+    {/* Modals */}
+        <QuickViewModal 
+            showQuickView={showQuickView}
+            quickViewVehicle={quickViewVehicle}
+            setShowQuickView={setShowQuickView}
+            openDetailPage={openDetailPage}
+            toggleCompare={toggleCompare}
+        />
+      
+        <CompareModal 
+            showCompare={showCompare}
+            compareList={compareList}
+            vehicles={vehicles}
+            setShowCompare={setShowCompare}
+        />
+
+    {/* Floating Compare Button */}
+    {compareList.length > 0 && (
+        <div className="fixed bottom-6 right-6 z-40">
+            <button
+                onClick={() => setShowCompare(true)}
+                className="bg-blue-600 text-white px-6 py-3 rounded-full shadow-lg hover:bg-blue-700 transition-all hover:shadow-xl flex items-center gap-2"
+                disabled={compareList.length < 2}
+            >
+                <GitCompare className="w-5 h-5" />
+                So sánh ({compareList.length})
+            </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default CatalogPage;
