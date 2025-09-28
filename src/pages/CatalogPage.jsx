@@ -95,4 +95,21 @@ const CatalogPage = ({ onVehicleSelect }) => {
         onVehicleSelect(vehicle);
     };
 
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+            {/* Hero Header */}
+            <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-purple-700 text-white">
+                <div className="max-w-7xl mx-auto px-4 py-16">
+                    <div className="text-center mb-12">
+                        <h1 className="text-5xl font-bold mb-4">
+                            Tương lai xe điện
+                            <span className="block text-3xl font-normal mt-2 text-blue-200">
+                                Khám phá bộ sưu tập xe điện hàng đầu Việt Nam
+                            </span>
+                        </h1>
+                        <p className="text-xl text-blue-100 max-w-2xl mx-auto">
+                            Trải nghiệm công nghệ tiên tiến, thiết kế đẳng cấp và hiệu suất vượt trội
+                        </p>
+                    </div>
+
 }; 
