@@ -176,16 +176,50 @@ const CatalogPage = ({ onVehicleSelect }) => {
         </div>
 
         <div className="flex gap-8">
-          {/* Filters Sidebar */}
-          {showFilters && (
-            <div className="w-80 flex-shrink-0">
-              <FilterPanel 
-                filters={filters} 
-                handleFilterChange={handleFilterChange} 
-                resetFilters={resetFilters} 
-              />
-            </div>
-          )}   
+            {/* Filters Sidebar */}
+            {showFilters && (
+                <div className="w-80 flex-shrink-0">
+                    <FilterPanel 
+                        filters={filters} 
+                        handleFilterChange={handleFilterChange} 
+                        resetFilters={resetFilters} 
+                    />
+                </div>
+            )}
+
+            {/* Vehicle Grid */}
+            <div className="flex-1">
+                {filteredVehicles.length > 0 ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+                        {filteredVehicles.map(vehicle => (
+                            <VehicleCard 
+                                key={vehicle.id} 
+                                vehicle={vehicle}
+                                favorites={favorites}
+                                compareList={compareList}
+                                toggleFavorite={toggleFavorite}
+                                toggleCompare={toggleCompare}
+                                openQuickView={openQuickView}
+                                openDetailPage={openDetailPage}
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-16">
+                        <div className="text-gray-300 text-8xl mb-6">🔍</div>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-4">Không tìm thấy xe phù hợp</h3>
+                        <p className="text-gray-600 mb-8 text-lg">Hãy thử điều chỉnh bộ lọc để tìm chiếc xe mơ ước của bạn</p>
+                        <button
+                            onClick={resetFilters}
+                            className="px-8 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-semibold"
+                            >
+                                Đặt lại bộ lọc
+                        </button>
+                    </div>
+                )}
+          </div>
+        </div>
+      </div>   
 
         
 }; 
