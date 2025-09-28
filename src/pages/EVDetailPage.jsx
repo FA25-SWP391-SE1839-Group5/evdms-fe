@@ -116,7 +116,20 @@ const EVDetailPage = ({ vehicle, onBack, favorites, toggleFavorite, compareList,
                     >
                         <ChevronRight className="w-5 h-5" />
                     </button>
-                    
+
+                    {/* Image Indicators */}
+                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+                        {vehicle.images.map((_, idx) => (
+                        <button
+                            key={idx}
+                            onClick={() => setCurrentImageIndex(idx)}
+                            className={`w-2 h-2 rounded-full transition-all ${
+                                idx === currentImageIndex ? 'bg-white w-8' : 'bg-white/60'
+                            }`}
+                        />
+                    ))}
+                </div>
+            </div>
                     
     );
 };
