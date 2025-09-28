@@ -160,6 +160,20 @@ const EVDetailPage = ({ vehicle, onBack, favorites, toggleFavorite, compareList,
                 </div>
             </div>
         </div>
+
+        {/* Product Info */}
+        <div className="space-y-8">
+            {/* Rating & Availability */}
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1">
+                        <Star className="w-5 h-5 text-yellow-400 fill-current" />
+                        <span className="font-semibold text-lg">{vehicle.rating}</span>
+                        <span className="text-gray-500">({vehicle.reviews} đánh giá)</span>
+                    </div>
+                </div>
+                {renderAvailabilityBadge(vehicle.availability)}
+            </div>
                     
     );
 };
