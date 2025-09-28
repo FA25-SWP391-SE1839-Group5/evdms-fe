@@ -30,6 +30,22 @@ const FilterPanel = ({ filters, handleFilterChange, resetFilters }) => {
                     className="w-full h-2 bg-gradient-to-r from-blue-200 to-blue-500 rounded-lg appearance-none cursor-pointer"
                 />
             </div>
+
+            {/* Range */}
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Phạm vi hoạt động: {filters.range[0]} - {filters.range[1]} km
+                </label>
+                <input
+                    type="range"
+                    min="0"
+                    max="600"
+                    step="10"
+                    value={filters.range[1]}
+                    onChange={(e) => handleFilterChange('range', [filters.range[0], parseInt(e.target.value)])}
+                    className="w-full h-2 bg-gradient-to-r from-green-200 to-green-500 rounded-lg appearance-none cursor-pointer"
+                />
+            </div>
    );
 };
 
