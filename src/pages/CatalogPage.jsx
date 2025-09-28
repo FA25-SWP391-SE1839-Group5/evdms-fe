@@ -174,7 +174,18 @@ const CatalogPage = ({ onVehicleSelect }) => {
                 </span> trong số {vehicles.length} xe
             </div>
         </div>
-              
+
+        <div className="flex gap-8">
+          {/* Filters Sidebar */}
+          {showFilters && (
+            <div className="w-80 flex-shrink-0">
+              <FilterPanel 
+                filters={filters} 
+                handleFilterChange={handleFilterChange} 
+                resetFilters={resetFilters} 
+              />
+            </div>
+          )}   
 
         
 }; 
