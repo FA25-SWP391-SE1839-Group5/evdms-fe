@@ -112,4 +112,21 @@ const CatalogPage = ({ onVehicleSelect }) => {
                         </p>
                     </div>
 
+                    {/* Search Bar */}
+                    <div className="max-w-2xl mx-auto">
+                        <div className="relative">
+                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
+                            <input
+                                type="text"
+                                placeholder="Tìm kiếm xe điện của bạn..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-12 pr-4 py-4 text-lg bg-white/90 backdrop-blur-sm border-0 rounded-2xl focus:ring-4 focus:ring-white/30 focus:bg-white transition-all placeholder-gray-500"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
 }; 
