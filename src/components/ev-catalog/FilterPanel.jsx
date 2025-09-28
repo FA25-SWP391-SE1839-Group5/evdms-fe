@@ -64,6 +64,22 @@ const FilterPanel = ({ filters, handleFilterChange, resetFilters }) => {
                     <option value="Lucid">Lucid</option>
                 </select>
             </div>
+
+            {/* Body Type */}
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Kiểu dáng</label>
+                <select
+                    value={filters.bodyType}
+                    onChange={(e) => handleFilterChange('bodyType', e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                    <option value="">Tất cả kiểu dáng</option>
+                    <option value="Sedan">Sedan</option>
+                    <option value="SUV">SUV</option>
+                    <option value="Coupe">Coupe</option>
+                    <option value="Hatchback">Hatchback</option>
+                </select>
+            </div>
    );
 };
 
