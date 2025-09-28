@@ -80,6 +80,23 @@ const FilterPanel = ({ filters, handleFilterChange, resetFilters }) => {
                     <option value="Hatchback">Hatchback</option>
                 </select>
             </div>
+
+            {/* Availability */}
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Tình trạng</label>
+                <select
+                    value={filters.availability}
+                    onChange={(e) => handleFilterChange('availability', e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                    <option value="all">Tất cả</option>
+                    <option value="in-stock">Có sẵn</option>
+                    <option value="pre-order">Đặt trước</option>
+                    <option value="out-of-stock">Hết hàng</option>
+                </select>
+            </div>
+        </div>
+    </div>
    );
 };
 
