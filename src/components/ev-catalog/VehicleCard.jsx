@@ -80,6 +80,32 @@ const VehicleCard = ({
                     </div>
                 )}
 
+                {/* Quick Action Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            openQuickView(vehicle);
+                        }}
+                        className="px-4 py-2 bg-white/90 text-gray-800 rounded-lg hover:bg-white transition-colors text-sm font-medium"
+                    >
+                        Xem nhanh
+                    </button>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            openDetailPage(vehicle);
+                        }}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                    >
+                        Chi tiết
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
     );
     
     
