@@ -1,4 +1,4 @@
-import React, { Children, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
 const NeumorphismCard = ({ children, className = '', onMouseMove = true }) => {
     const cardRef = useRef(null);
