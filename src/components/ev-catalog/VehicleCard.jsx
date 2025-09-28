@@ -104,7 +104,22 @@ const VehicleCard = ({
                 </div>
             </div>
         </div>
-
+        
+        <div className="p-6 cursor-pointer" onClick={() => openDetailPage(vehicle)}>
+            {/* Header */}
+            <div className="flex justify-between items-start mb-3">
+                <div className="flex-1">
+                    <h3 className="font-bold text-xl text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
+                        {vehicle.name}
+                    </h3>
+                    <p className="text-gray-600 font-medium">{vehicle.brand} • {vehicle.model}</p>
+            </div>
+            <div className="flex items-center gap-1 ml-4">
+                <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                <span className="text-sm font-medium">{vehicle.rating}</span>
+                <span className="text-xs text-gray-500">({vehicle.reviews})</span>
+            </div>
+        </div>
 
     );
     
