@@ -1,11 +1,9 @@
 import React from "react";
 import { X, Star, Check, Download } from "lucide-react";
-import { formatPrice } from "../../services/evUtils";
+import { formatPrice } from "../../services/evService";
 
 const CompareModal = ({ showCompare, compareList, vehicles, setShowCompare }) => {
     if (!showCompare || compareList.length < 2) return null;
-
-    const getVehicleById = (id) => vehicles.find((v) => v.id === id);
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -33,7 +31,7 @@ const CompareModal = ({ showCompare, compareList, vehicles, setShowCompare }) =>
                                     Thông số
                                 </th>
                                 {compareList.map((vehicleId) => {
-                                    const vehicle = getVehicleById(vehicleId);
+                                    const vehicle = vehicles.find(v => v.id === vehicleId);
                                     return (
                                         <th 
                                             key={vehicleId} 
@@ -45,7 +43,7 @@ const CompareModal = ({ showCompare, compareList, vehicles, setShowCompare }) =>
                                                     alt={vehicle.name} 
                                                     className="w-32 h-20 object-cover rounded-xl mx-auto mb-3 shadow-md"
                                                 />
-                                                <div className="font-bold text-gray-600">
+                                                <div className="font-bold text-gray-900 text-lg">
                                                     {vehicle.name}
                                                 </div>
                                                 <div className="text-sm text-gray-600">
@@ -65,7 +63,7 @@ const CompareModal = ({ showCompare, compareList, vehicles, setShowCompare }) =>
                                     Giá bán
                                 </td>
                                 {compareList.map((vehicleId) => {
-                                    const vehicle = getVehicleById(vehicleId);
+                                    const vehicle = vehicles.find(v => v.id === vehicleId);
                                     return (
                                         <td key={vehicleId} className="py-4 px-6 text-center">
                                             <div className="text-xl font-bold text-green-600">
@@ -83,37 +81,25 @@ const CompareModal = ({ showCompare, compareList, vehicles, setShowCompare }) =>
 
                             {/* Range */}
                             <tr className="hover:bg-gray-50">
-                                <td className="py-4 px-6 font-semibold text-gray-700">
-                                    Phạm vi hoạt động
-                                </td>
-                                {compareList.map((vehicleId) => {
-                                    const vehicle = getVehicleById(vehicleId);
-                                    const maxRange = Math.max(
-                                        ...compareList.map(
-                                            id => getVehicleById(id).range
-                                        )
-                                    );
+                                <td className="py-4 px-6 font-semibold text-gray-700">Phạm vi hoạt động</td>
+                                {compareList.map(vehicleId => {
+                                    const vehicle = vehicles.find(v => v.id === vehicleId);
+                                    const maxRange = Math.max(...compareList.map(id => vehicles.find(v => v.id === id).range));
                                     return (
-                                        <td key={vehicleId} className="py-4 px-6 text-center">
-                                            <div 
-                                                className={`text-lg font-semibold ${
-                                                    vehicle.range === maxRange
-                                                    ? "text-blue-600" 
-                                                    : "text-gray-900"
-                                                }`}
-                                            >
-                                                {vehicle.range} km
+                                    <td key={vehicleId} className="py-4 px-6 text-center">
+                                        <div className={`text-xl font-bold ${vehicle.range === maxRange ? 'text-green-600' : 'text-gray-900'}`}>
+                                            {vehicle.range} km
+                                        </div>
+                                        {vehicle.range === maxRange && (
+                                            <div className="text-xs text-green-600 flex items-center justify-center gap-1 mt-1">
+                                                <Check className="w-3 h-3" />
+                                                Tốt nhất
                                             </div>
-                                            {vehicle.range === maxRange && (
-                                                <div className="text-xs text-green-600 flex items-center justify-center gap-1 mt-1">
-                                                    <Check className="w-3 h-3" />
-                                                        Tốt nhất
-                                                </div>
-                                            )}
-                                        </td>
-                                    );
-                                })}
-                            </tr>
+                                        )}
+                                    </td>
+                                );
+                            })}
+                        </tr>
 
                         {/* Rating */}
                         <tr className="hover:bg-gray-50">
@@ -121,12 +107,8 @@ const CompareModal = ({ showCompare, compareList, vehicles, setShowCompare }) =>
                                 Đánh giá
                             </td>
                             {compareList.map((vehicleId) => {
-                                const vehicle = getVehicleById(vehicleId);
-                                const bestRating = Math.max(
-                                    ...compareList.map(
-                                        (id) => getVehicleById(id).rating
-                                    )
-                                );
+                                const vehicle = vehicles.find(v => v.id === vehicleId);
+                                const bestRating = Math.max(...compareList.map(id => vehicles.find(v => v.id === id).rating));
                                 return (
                                     <td key={vehicleId} className="py-4 px-6 text-center">
                                         <div className="flex items-center justify-center gap-1">
@@ -167,7 +149,7 @@ const CompareModal = ({ showCompare, compareList, vehicles, setShowCompare }) =>
                     Đóng
                 </button>
                 <button className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors">
-                    <Download className="w-4 h-4 inline mr-1" />
+                    <Download className="w-4 h-4 inline mr-2" />
                     Xuất so sánh
                 </button>
                 </div>
