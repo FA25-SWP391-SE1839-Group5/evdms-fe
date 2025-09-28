@@ -37,7 +37,7 @@ const QuickViewModal = ({
 
                 {/* Content */}
                 <div className="p-6">
-                    <div className="p-6 grid md:grid-cols-2 gap-8">
+                    <div className="grid md:grid-cols-2 gap-8">
                         {/* Images */}
                         <div>
                             <img 
@@ -63,9 +63,9 @@ const QuickViewModal = ({
                                 <Star className="w-5 h-5 text-yellow-400 fill-current" />
                                 <span className="font-medium">{quickViewVehicle.rating}</span>
                                 <span className="text-gray-500">
-                                    {quickViewVehicle.reviews} đánh giá
+                                    ({quickViewVehicle.reviews} đánh giá)
                                 </span>
-                                {getAvailabilityBadge (quickViewVehicle.availability)}
+                                {renderAvailabilityBadge (quickViewVehicle.availability)}
                             </div>
 
                             <div className="mb-6">
