@@ -158,75 +158,88 @@ const LoginPage = ({ onLoginSuccess }) => {
     >
       <BackgroundElements />
 
-      <div className="w-full max-width-md relative z-10" style={{ maxWidth: '420px' }}>
-        
-        <BrandHeader />
-
-        {/* Main Card */}
-        <NeumorphismCard>
-          {!showSuccess ? (
-            <>
-              {showForgotPassword ? (
-                <ForgotPasswordForm
-                  onSubmit={handleForgotPassword}
-                  onBack={() => setShowForgotPassword(false)}
-                  isLoading={isLoading}
-                />
-              ) : showOTP ? (
-                <>
-                  <ErrorMessage message={loginError} />
-                  <OTPVerification
-                    onVerify={handleOTPVerify}
-                    onResend={handleOTPResend}
-                    onBack={handleOTPBack}
-                    isLoading={isLoading}
-                  />
-                </>
-              ) : (
-                <>
-                  <LoginAvatar />
-
-                  <div className="text-center mb-8">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-2">Chào mừng trở lại</h2>
-                    <p className="text-gray-500">Vui lòng đăng nhập để tiếp tục</p>
-                  </div>
-
-                  <LoginForm 
-                    onSubmit={handleLogin} 
-                    onForgotPassword={() => setShowForgotPassword(true)}
-                    isLoading={isLoading}
-                    loginError={loginError}
-                  />
-
-                  <SocialLogin onSocialLogin={handleSocialLogin} />
-
-                  <div className="text-center">
-                    <p className="text-gray-500 text-sm">
-                      Chưa có tài khoản?{' '}
-                      <a href="#" className="text-blue-600 hover:text-blue-800 transition-colors font-semibold">
-                        Đăng ký ngay
-                      </a>
-                    </p>
-                  </div>
-                </>
-              )}
-            </>
-          ) : (
-            <SuccessMessage 
-              userName={userRole?.name} 
-              userRole={userRole?.role} 
-            />
-          )}
-        </NeumorphismCard>
-
-        {/* Bottom Info */}
-        <div className="text-center mt-8 space-y-2">
-          <p className="text-xs text-gray-400">© 2024 EV Dealer Pro - Công nghệ xe điện tương lai</p>
-          <div className="flex items-center justify-center space-x-4 text-xs text-gray-500">
-            <a href="#" className="hover:text-blue-500 transition-colors">Chính sách bảo mật</a>
-            <span>•</span>
-            <a href="#" className="hover:text-blue-500 transition-colors">Điều khoản sử dụng</a>
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="flex items-center min-h-screen">
+          
+          {/* Left Side - Logo and Description */}
+          <div className="hidden lg:flex lg:w-1/2 lg:pr-12 flex-col">
+            <BrandHeader />
           </div>
+
+          {/* Right Side - Login Form */}
+          <div className="w-full lg:w-1/2 flex justify-center lg:justify-end">
+            <div className="w-full" style={{ maxWidth: '420px' }}>
+              
+              {/* Main Card */}
+              <NeumorphismCard>
+                {!showSuccess ? (
+                  <>
+                    {showForgotPassword ? (
+                      <ForgotPasswordForm
+                        onSubmit={handleForgotPassword}
+                        onBack={() => setShowForgotPassword(false)}
+                        isLoading={isLoading}
+                      />
+                    ) : showOTP ? (
+                      <>
+                        <ErrorMessage message={loginError} />
+                        <OTPVerification
+                          onVerify={handleOTPVerify}
+                          onResend={handleOTPResend}
+                          onBack={handleOTPBack}
+                          isLoading={isLoading}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <LoginAvatar />
+
+                        <div className="text-center mb-8">
+                          <h2 className="text-2xl font-bold text-gray-800 mb-2">Chào mừng trở lại</h2>
+                          <p className="text-gray-500">Vui lòng đăng nhập để tiếp tục</p>
+                        </div>
+
+                        <LoginForm 
+                          onSubmit={handleLogin} 
+                          onForgotPassword={() => setShowForgotPassword(true)}
+                          isLoading={isLoading}
+                          loginError={loginError}
+                        />
+
+                        <SocialLogin onSocialLogin={handleSocialLogin} />
+
+                        <div className="text-center">
+                          <p className="text-gray-500 text-sm">
+                            Chưa có tài khoản?{' '}
+                            <a href="#" className="text-blue-600 hover:text-blue-800 transition-colors font-semibold">
+                              Đăng ký ngay
+                            </a>
+                          </p>
+                        </div>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <SuccessMessage 
+                    userName={userRole?.name} 
+                    userRole={userRole?.role} 
+                  />
+                )}
+              </NeumorphismCard>
+
+              {/* Bottom Info */}
+              <div className="text-center mt-8 space-y-2">
+                <p className="text-xs text-gray-400">© 2024 EV Dealer Pro - Công nghệ xe điện tương lai</p>
+                <div className="flex items-center justify-center space-x-4 text-xs text-gray-500">
+                  <a href="#" className="hover:text-blue-500 transition-colors">Chính sách bảo mật</a>
+                  <span>•</span>
+                  <a href="#" className="hover:text-blue-500 transition-colors">Điều khoản sử dụng</a>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
