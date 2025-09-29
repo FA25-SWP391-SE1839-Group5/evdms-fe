@@ -79,6 +79,24 @@ return (
             <span>Xác thực OTP</span>
             )}
         </NeumorphismButton>
+
+        {/* Actions */}
+        <div className="text-center space-y-3">
+            <button
+                onClick={onResend}
+                className="text-blue-600 hover:text-blue-800 transition-colors font-medium text-sm"
+            >
+                Gửi lại mã OTP
+            </button>
+            <div>
+                <button
+                    onClick={onBack}
+                    className="text-gray-500 hover:text-gray-700 transition-colors font-medium text-sm"
+                >
+                    ← Quay lại đăng nhập
+                </button>
+             </div>
+        </div>
     </>
     );
 };
