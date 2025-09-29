@@ -26,6 +26,19 @@ const ForgotPasswordForm = ({ onSubmit, onBack, isLoading }) => {
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">Quên mật khẩu?</h2>
                 <p className="text-gray-500">Nhập email để nhận link reset mật khẩu</p>
             </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Email Input */}
+            <NeumorphismInput icon={Mail}>
+            <input
+                type="email"
+                value={forgotPasswordData.email}
+                onChange={(e) => setForgotPasswordData({...forgotPasswordData, email: e.target.value})}
+                placeholder="your-email@company.com"
+                className="flex-1 bg-transparent text-gray-700 placeholder-gray-500 outline-none text-sm font-medium"
+                required
+            />
+            </NeumorphismInput>
         </>
     );
 };
