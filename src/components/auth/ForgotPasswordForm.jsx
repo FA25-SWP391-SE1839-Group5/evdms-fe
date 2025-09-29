@@ -103,6 +103,20 @@ const ForgotPasswordForm = ({ onSubmit, onBack, isLoading }) => {
                     </>
                 )}
             </NeumorphismButton>
-        </>
+
+            {/* Back to login */}
+            <div className="text-center">
+                <button
+                    type="button"
+                    onClick={onBack}
+                    className="text-blue-600 hover:text-blue-800 transition-colors font-medium text-sm"
+                >
+                    ← Quay lại đăng nhập
+                </button>
+            </div>
+        </form>
+      </>
     );
 };
+
+export default ForgotPasswordForm
