@@ -42,6 +42,26 @@ return (
             <h2 className="text-2xl font-bold text-gray-800 mb-2">Xác thực OTP</h2>
             <p className="text-gray-500">Nhập mã OTP 6 số đã được gửi đến thiết bị của bạn</p>
         </div>
+
+        {/* OTP Input */}
+        <div className="flex justify-center space-x-3 mb-6">
+            {[0, 1, 2, 3, 4, 5].map((index) => (
+                <input
+                    key={index}
+                    ref={otpRefs[index]}
+                    type="text"
+                    maxLength="1"
+                    value={otpCode[index] || ''}
+                    onChange={(e) => handleOTPChange(index, e.target.value)}
+                    onKeyDown={(e) => handleOTPKeyDown(index, e)}
+                    className="w-12 h-12 text-center text-lg font-bold bg-transparent border-none outline-none neu-input rounded-xl"
+                    style={{
+                        background: '#e0e5ec',
+                        boxShadow: 'inset 4px 4px 8px #bec3cf, inset -4px -4px 8px #ffffff'
+                    }}
+                />
+            ))}
+        </div>
     </>
     );
 };
