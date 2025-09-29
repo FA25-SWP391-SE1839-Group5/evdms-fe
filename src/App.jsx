@@ -1,13 +1,35 @@
 import React, { useReducer, useState } from 'react';
+import LoginPage from './pages/LoginPage';
 import CatalogPage from './pages/CatalogPage';
 import EVDetailPage from './pages/EVDetailPage';
 import { routeReducer, initialState, ROUTES } from './routes';
+import { logout } from './services/authService';
 
 const App = () => {
   const [routeState, dispatch] = useReducer(routeReducer, initialState);
   const [favorites, setFavorites] = useState(new Set());
   const [compareList, setCompareList] = useState([]);
 
+  // ============================================
+  // AUTHENTICATION HANDLERS
+  // ============================================
+  const handleLoginSuccess = (userData) => {
+    dispatch({
+      type: 'LOGIN_SUCCESS',
+      payload: userData
+    });
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    dispatch({ type: 'LOGOUT' });
+    setFavorites(new Set());
+    setCompareList([]);
+  };
+
+  // ============================================
+  // NAVIGATION HANDLERS
+  // ============================================
   const navigateToDetail = (vehicle) => {
     dispatch({
       type: 'NAVIGATE_TO_DETAIL',
@@ -21,6 +43,9 @@ const App = () => {
     });
   };
 
+  // ============================================
+  // FAVORITES & COMPARE HANDLERS
+  // ============================================
   const toggleFavorite = (vehicleId) => {
     setFavorites(prev => {
       const newFavorites = new Set(prev);
@@ -46,14 +71,26 @@ const App = () => {
     });
   };
 
+  // ============================================
+  // RENDER PAGES
+  // ============================================
   return (
     <div className="font-sans">
+      {/* LOGIN PAGE */}
+      {routeState.currentPage === ROUTES.LOGIN && (
+        <LoginPage onLoginSuccess={handleLoginSuccess} />
+      )}
+      
+      {/* CATALOG PAGE */}
       {routeState.currentPage === ROUTES.CATALOG && (
         <CatalogPage
           onVehicleSelect={navigateToDetail}
+          user={routeState.user}
+          onLogout={handleLogout}
         />
       )}
       
+      {/* DETAIL PAGE */}
       {routeState.currentPage === ROUTES.DETAIL && (
         <EVDetailPage
           vehicle={routeState.selectedVehicle}
@@ -62,12 +99,11 @@ const App = () => {
           toggleFavorite={toggleFavorite}
           compareList={compareList}
           toggleCompare={toggleCompare}
+          user={routeState.user}
+          onLogout={handleLogout}
         />
       )}
     </div>
-
-    
   );
 };
-
 export default App;
