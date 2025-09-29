@@ -71,10 +71,22 @@ const LoginPage = () => {
                             <LoginForm onSubmit={handleLogin} isLoading={isLoading} />
                             <SocialLogin onSocialLogin={handleSocialLogin} />
 
-                            {/* */}
+                            {/* Footer */}
+                            <div className="text-center">
+                                <p className="text-gray-500 text-sm">
+                                    Chưa có tài khoản?{' '}
+                                    <a href="#" className="text-blue-600 hover:text-blue-800 transition-colors font-semibold">
+                                        Đăng ký ngay
+                                    </a>
+                                </p>
+                            </div>
                         </>
+                    ) : (
+                        <SuccessMessage />
                     )}
                 </NeumorphismCard>
+
+                {/* Bottom Info */}
             </div> 
         </div>
 
