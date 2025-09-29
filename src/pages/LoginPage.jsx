@@ -5,41 +5,139 @@ import NeumorphismCard from '../components/ui/NeumorphismCard';
 import LoginAvatar from '../components/auth/LoginAvatar';
 import LoginForm from '../components/auth/LoginForm';
 import SocialLogin from '../components/auth/SocialLogin';
+import OTPVerification from '../components/auth/OTPVerification';
+import ForgotPasswordForm from '../components/auth/ForgotPasswordForm';
 import SuccessMessage from '../components/auth/SuccessMessage';
+import ErrorMessage from '../components/common/ErrorMessage';
+
+import { 
+    validateLogin, 
+    verifyOTP, 
+    sendResetPasswordLink, 
+    socialLogin,
+    saveLoginToken,
+    navigateToRoleBasedDashboard 
+} from '../services/authService';
 import '../assets/styles/neumorphism.css';
 
 const LoginPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [showOTP, setShowOTP] = useState(false);
+    const [showForgotPassword, setShowForgotPassword] = useState(false);
+    const [loginError, setLoginError] = useState('');
+    const [userRole, setUserRole] = useState(null);
+    const [rememberMe, setRememberMe] = useState(false);
 
-    const handleLogin = async (FormData) => {
+    const handleLogin = async (formData) => {
         setIsLoading(true);
+        setLoginError('');
+        setRememberMe(formData.rememberMe);
         
         try {
-        // Simulate login process
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Show success animation
-        setShowSuccess(true);
-        
-        // Simulate redirect after success
-        setTimeout(() => {
-            console.log('Redirecting to dashboard...');
-            // window.location.href = '/dashboard';
-        }, 2500);
-        
-        } catch (error) {
-            console.error('Login failed:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+            const user = await validateLogin(formData.email, formData.password);
+            
+            // Check if OTP is required
+            if (user.requireOTP) {
+                setUserRole(user);
+                setShowOTP(true);
+            } else {
+                // No OTP required, proceed to dashboard
+                saveLoginToken(user, formData.rememberMe);
+                setUserRole(user);
+                setShowSuccess(true);
+                
+                setTimeout(() => {
+                navigateToRoleBasedDashboard(user.role);
+                }, 2500);
+            }
+            } catch (error) {
+                setLoginError('Sai tên đăng nhập hoặc mật khẩu. Vui lòng thử lại.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-    const handleSocialLogin = async (provider) => {
-        console.log(`Initiating ${provider} login...`);
-        // Implement social login logic
-    }
+        // Handle OTP verification
+        const handleOTPVerify = async (otpCode) => {
+            setIsLoading(true);
+            setLoginError('');
 
+            try {
+                await verifyOTP(otpCode);
+                
+                saveLoginToken(userRole, rememberMe);
+                setShowOTP(false);
+                setShowSuccess(true);
+            
+                setTimeout(() => {
+                    navigateToRoleBasedDashboard(userRole.role);
+                }, 2500);
+            } catch (error) {
+                setLoginError('Mã OTP không chính xác. Vui lòng thử lại.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        // Handle OTP resend
+        const handleOTPResend = () => {
+            console.log('Resending OTP...');
+            setLoginError('');
+            // Simulate resend
+            alert('Mã OTP mới đã được gửi!');
+        };
+
+        // Handle back from OTP
+        const handleOTPBack = () => {
+            setShowOTP(false);
+            setUserRole(null);
+            setLoginError('');
+        };
+
+        // Handle forgot password
+        const handleForgotPassword = async (data) => {
+            if (!data.email) {
+                setLoginError('Vui lòng nhập email để reset mật khẩu');
+                return;
+            }
+
+            setIsLoading(true);
+            setLoginError('');
+
+            try {
+                const result = await sendResetPasswordLink(data.email, data.method);
+                alert(`Đã gửi link reset mật khẩu qua ${data.method === 'email' ? 'email' : 'SMS'}: ${data.email}`);
+                setShowForgotPassword(false);
+            } catch (error) {
+                setLoginError('Có lỗi xảy ra. Vui lòng thử lại.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        // Handle social login
+        const handleSocialLogin = async (provider) => {
+            setIsLoading(true);
+            setLoginError('');
+            
+            try {
+                const user = await socialLogin(provider);
+            
+                saveLoginToken(user, false);
+                setUserRole(user);
+                setShowSuccess(true);
+            
+                setTimeout(() => {
+                    navigateToRoleBasedDashboard(user.role);
+                }, 2500);
+            } catch (error) {
+                setLoginError(`Đăng nhập ${provider} thất bại. Vui lòng thử lại.`);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+          
     return (
         <div
             className="min-h-screen flex items-center justify-center p-5 relative overflow-hidden"
