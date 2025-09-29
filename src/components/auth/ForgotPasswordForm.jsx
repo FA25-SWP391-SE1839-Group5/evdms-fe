@@ -84,6 +84,25 @@ const ForgotPasswordForm = ({ onSubmit, onBack, isLoading }) => {
                     </label>
                 </div>
             </div>
+
+            {/* Submit Button */}
+            <NeumorphismButton
+                type="submit"
+                size="full"
+                disabled={isLoading}
+            >
+                {isLoading ? (
+                    <>
+                        <div className="spinner"></div>
+                        <span>Đang gửi...</span>
+                    </>
+                ) : (
+                    <>
+                        <span>Gửi link reset mật khẩu</span>
+                        <ChevronRight className="w-4 h-4" />
+                    </>
+                )}
+            </NeumorphismButton>
         </>
     );
 };
