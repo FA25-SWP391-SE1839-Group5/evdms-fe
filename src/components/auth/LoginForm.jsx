@@ -106,7 +106,30 @@ return (
             />
         </NeumorphismInput>
 
-        
+        {/* Password Input */}
+        <NeumorphismInput
+            ref={passwordRef}
+            icon={Lock}
+            error={errors.password}
+        >
+            <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                onBlur={() => handleInputBlur('password')}
+                placeholder="••••••••"
+                className="flex-1 bg-transparent text-gray-700 placeholder-gray-500 outline-none text-sm font-medium"
+            />
+        <NeumorphismButton
+            type="button"
+            variant="toggle"
+            onClick={() => setShowPassword(!showPassword)}
+        >
+            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+        </NeumorphismButton>
+    </NeumorphismInput>
+
     </form>
 
     );
