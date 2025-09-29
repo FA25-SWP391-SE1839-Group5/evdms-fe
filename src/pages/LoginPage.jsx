@@ -39,4 +39,44 @@ const LoginPage = () => {
         console.log(`Initiating ${provider} login...`);
         // Implement social login logic
     }
+
+    return (
+        <div
+            className="min-h-screen flex items-center justify-center p-5 relative overflow-hidden"
+            style={{
+                background: '#e0e5ec',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+            }}
+        >
+            <BackgroundElements />
+
+            <div 
+                className="w-full max-width-md relative z-10" 
+                style={{ maxWidth: '420px' }}
+            >
+                <BrandHeader />
+
+                {/* Main Card */}
+                <NeumorphismCard>
+                    {!showSuccess ? (
+                        <>
+                            <LoginAvatar />
+
+                            {/* Welcome Text */}
+                            <div className="text-center mb-8">
+                                <h2 className="text-2xl font-bold text-gray-800 mb-2">Chào mừng trở lại</h2>
+                                <p className="text-gray-500">Vui lòng đăng nhập để tiếp tục</p>
+                            </div>
+
+                            <LoginForm onSubmit={handleLogin} isLoading={isLoading} />
+                            <SocialLogin onSocialLogin={handleSocialLogin} />
+
+                            {/* */}
+                        </>
+                    )}
+                </NeumorphismCard>
+            </div> 
+        </div>
+
+    );
 };
