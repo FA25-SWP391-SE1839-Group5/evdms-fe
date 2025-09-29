@@ -87,8 +87,17 @@ const LoginPage = () => {
                 </NeumorphismCard>
 
                 {/* Bottom Info */}
+                <div className="text-center mt-8 space-y-2">
+                    <p className="text-xs text-gray-400">© 2025 Elecar Dealer - Công nghệ xe điện tương lai</p>
+                    <div className="flex items-center justify-center space-x-4 text-xs text-gray-500">
+                        <a href="#" className="hover:text-blue-500 transition-colors">Chính sách bảo mật</a>
+                        <span>•</span>
+                        <a href="#" className="hover:text-blue-500 transition-colors">Điều khoản sử dụng</a>
+                    </div>
+                </div>
             </div> 
         </div>
-
     );
 };
+
+export default LoginPage;
