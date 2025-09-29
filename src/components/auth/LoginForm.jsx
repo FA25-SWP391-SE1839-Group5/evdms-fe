@@ -130,6 +130,31 @@ return (
         </NeumorphismButton>
     </NeumorphismInput>
 
+    {/* Remember Me & Forgot Password */}
+    <div className="flex items-center justify-between text-sm">
+        <label className="flex items-center space-x-3 cursor-pointer group">
+            <div 
+                className={`neu-checkbox w-5 h-5 rounded-lg flex items-center justify-center transition-all duration-200 ${formData.rememberMe ? 'checked' : ''}`}
+            >
+                <input
+                    type="checkbox"
+                    name="rememberMe"
+                    checked={formData.rememberMe}
+                    onChange={handleInputChange}
+                    className="sr-only"
+                />
+                {formData.rememberMe && (
+                    <Check className="w-3 h-3 text-green-600" />
+                )}
+            </div>
+            <span className="text-gray-600 group-hover:text-gray-800 transition-colors font-medium">
+                Remember me
+            </span>
+        </label>
+        <a href="#" className="text-gray-500 hover:text-blue-600 transition-colors font-medium">
+            Quên mật khẩu?
+        </a>
+    </div>
     </form>
 
     );
