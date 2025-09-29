@@ -155,8 +155,24 @@ return (
             Quên mật khẩu?
         </a>
     </div>
-    </form>
 
+    {/* Sign In Button */}
+    <NeumorphismButton
+        type="submit"
+        size="full"
+        disabled={isLoading}
+    >
+        {isLoading ? (
+            <>
+                <div className="spinner"></div>
+                <span>Đang đăng nhập...</span>
+            </>
+        ) : (
+            <span>Đăng nhập</span>
+        )}
+      </NeumorphismButton>            
+    </form>
     );
 };
 
+export default LoginForm
