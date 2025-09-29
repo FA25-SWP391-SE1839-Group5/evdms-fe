@@ -4,18 +4,26 @@ import NeumorphismButton from '../ui/NeumorphismButton';
 
 const BrandHeader = () => {
     return (
-        <div className="text-center mb-8">
-            <NeumorphismButton variant="icon" className="mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 via-purple-500 to-green-500 rounded-xl flex items-center justify-center">
-                    <Zap className="w-7 h-7 text-white" />
+        <div className="mb-8">
+            <div className="flex items-center mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-500 to-green-500 rounded-2xl flex items-center justify-center mr-4 neu-icon">
+                    <img 
+                        src="src/assets/favicon.png"  
+                        alt="Logo" 
+                        className="w-12 h-12 object-cover rounded-xl" 
+                    />
                 </div>
-            </NeumorphismButton>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 bg-clip-text text-transparent mb-2">
-                Elecar Dealer 
-            </h1>
-            <p className="text-gray-500 text-sm">Hệ thống quản lý đại lý xe điện</p>
+                <div>
+                    <h1 className="text-4xl font-bold text-gray-800 mb-2">
+                        Elecar Dealer
+                    </h1>
+                    <p className="text-lg text-gray-600 mt-1">
+                        Hệ thống quản lý đại lý xe điện
+                    </p>
+                </div>
+            </div>
         </div>
     );
 };
 
-export default BrandHeader;
+export default BrandHeader; 
