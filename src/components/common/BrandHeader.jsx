@@ -6,11 +6,11 @@ const BrandHeader = () => {
     return (
         <div className="mb-8">
             <div className="flex items-center mb-6">
-                <div className="flex items-center justify-center w-16 h-16">
+                <div className="flex items-center justify-center w-18 h-16">
                     <img 
                         src="src/assets/elecar_logo.png"  
                         alt="Logo" 
-                        className="w-14 h-14 object-cover rounded-xl" 
+                        className="w-18 h-18 object-cover rounded-xl" 
                     />
                 </div>
                 <div>
