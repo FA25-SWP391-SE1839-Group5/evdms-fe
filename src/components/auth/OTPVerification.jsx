@@ -62,6 +62,23 @@ return (
                 />
             ))}
         </div>
+
+        {/* Submit OTP */}
+        <NeumorphismButton
+            onClick={handleSubmit}
+            disabled={isLoading || otpCode.length !== 6}
+            size="full"
+            className="mb-4"
+        >
+            {isLoading ? (
+            <>
+                <div className="spinner"></div>
+                <span>Đang xác thực...</span>
+            </>
+            ) : (
+            <span>Xác thực OTP</span>
+            )}
+        </NeumorphismButton>
     </>
     );
 };
