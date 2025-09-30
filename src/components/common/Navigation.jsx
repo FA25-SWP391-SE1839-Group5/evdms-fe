@@ -15,6 +15,10 @@ const Navigation = () => {
                             <p className="menu_p">PRODUCT</p>
                             <div className="menu_line"></div>
                         </a>
+                        <a href="/team" className="menu_link w-inline-block">
+                            <p className="menu_p">TEAM</p>
+                            <div className="menu_line"></div>
+                        </a>
                     </div>
                 </div>
             </div>
