@@ -61,3 +61,84 @@
   width: 100%;
 }
 
+/* Name fields */
+.name-group {
+  display: flex;
+  gap: 12px;
+}
+
+.name-group .input-group {
+  flex: 1;
+}
+
+.input-group {
+  width: 100%;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #dddfe2;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #1c1e21;
+  font-size: 15px;
+  line-height: 16px;
+  transition: all 0.2s ease;
+}
+
+.input-group input::placeholder {
+  color: #8a8d91;
+  font-size: 15px;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #1877f2;
+  box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+}
+
+/* Birth date section */
+.birth-section {
+  margin: 8px 0;
+}
+
+.birth-label {
+  color: #606770;
+  font-size: 12px;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.info-icon {
+  color: #8a8d91;
+  font-size: 12px;
+  cursor: help;
+}
+
+.birth-group {
+  display: flex;
+  gap: 12px;
+}
+
+.birth-select {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #dddfe2;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #1c1e21;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.birth-select:focus {
+  outline: none;
+  border-color: #1877f2;
+  box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+}
+
