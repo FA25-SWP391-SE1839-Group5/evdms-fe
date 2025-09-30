@@ -1,35 +1,87 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useReducer, useState } from 'react';
+import CatalogPage from './pages/CatalogPage';
+import EVDetailPage from './pages/EVDetailPage';
+import RegisterPage from './pages/RegisterPage'; // Import RegisterPage
+import { routeReducer, initialState, ROUTES } from './routes';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [routeState, dispatch] = useReducer(routeReducer, initialState);
+  const [favorites, setFavorites] = useState(new Set());
+  const [compareList, setCompareList] = useState([]);
+
+  const navigateToDetail = (vehicle) => {
+    dispatch({
+      type: 'NAVIGATE_TO_DETAIL',
+      payload: vehicle
+    });
+  };
+
+  const navigateToCatalog = () => {
+    dispatch({
+      type: 'NAVIGATE_TO_CATALOG'
+    });
+  };
+
+  const navigateToRegister = () => { // Thêm function này
+    dispatch({
+      type: 'NAVIGATE_TO_REGISTER'
+    });
+  };
+
+  const toggleFavorite = (vehicleId) => {
+    setFavorites(prev => {
+      const newFavorites = new Set(prev);
+      if (newFavorites.has(vehicleId)) {
+        newFavorites.delete(vehicleId);
+      } else {
+        newFavorites.add(vehicleId);
+      }
+      return newFavorites;
+    });
+  };
+
+  const toggleCompare = (vehicleId) => {
+    setCompareList(prev => {
+      if (prev.includes(vehicleId)) {
+        return prev.filter(id => id !== vehicleId);
+      } else if (prev.length < 3) {
+        return [...prev, vehicleId];
+      } else {
+        alert('Chỉ có thể so sánh tối đa 3 xe');
+        return prev;
+      }
+    });
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="font-sans">
+      {routeState.currentPage === ROUTES.CATALOG && (
+        <CatalogPage
+          onVehicleSelect={navigateToDetail}
+          onNavigateToRegister={navigateToRegister} // Pass function để navigate
+        />
+      )}
+      
+      {routeState.currentPage === ROUTES.DETAIL && (
+        <EVDetailPage
+          vehicle={routeState.selectedVehicle}
+          onBack={navigateToCatalog}
+          favorites={favorites}
+          toggleFavorite={toggleFavorite}
+          compareList={compareList}
+          toggleCompare={toggleCompare}
+        />
+      )}
 
-export default App
+      {routeState.currentPage === ROUTES.REGISTER && ( // Thêm RegisterPage render
+        <RegisterPage
+          onBack={navigateToCatalog}
+        />
+      )}
+    </div>
+
+    
+  );
+};
+
+export default App;
