@@ -9,7 +9,6 @@ import SuccessMessage from '../components/auth/SuccessMessage';
 import { 
   validateLogin,  
   sendResetPasswordLink, 
-  socialLogin,
   saveLoginToken,
   navigateToRoleBasedDashboard, 
 } from '../services/authService';
@@ -128,7 +127,7 @@ const LoginPage = ({ onLoginSuccess }) => {
 
               {/* Bottom Info */}
               <div className="text-center mt-8 space-y-2">
-                <p className="text-xs text-gray-400">© 2024 Elecar Dealer - Electric Vehicle Dealer Management System</p>
+                <p className="text-xs text-gray-400">© 2024 EVDMS - Electric Vehicle Dealer Management System</p>
                 <div className="flex items-center justify-center space-x-4 text-xs text-gray-500">
                   <a href="#" className="hover:text-blue-500 transition-colors">Privacy Policy</a>
                   <span>•</span>
