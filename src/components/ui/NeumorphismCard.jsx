@@ -9,7 +9,7 @@ const NeumorphismCard = ({ children, className = '', onMouseMove = true }) => {
         const handleMouseMove = (e) => {
             if (cardRef.current) {
                 const card = cardRef.current;
-                const rect = card.getBouncingClientRect();
+                const rect = card.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
 
