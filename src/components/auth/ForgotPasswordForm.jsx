@@ -23,8 +23,8 @@ const ForgotPasswordForm = ({ onSubmit, onBack, isLoading }) => {
             </div>
 
             <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">Quên mật khẩu?</h2>
-                <p className="text-gray-500">Nhập email để nhận link reset mật khẩu</p>
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">Forgot Password?</h2>
+                <p className="text-gray-500">Enter your email to receive a password reset link</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -42,7 +42,7 @@ const ForgotPasswordForm = ({ onSubmit, onBack, isLoading }) => {
 
             {/* Reset Method Selection */}
             <div className="space-y-3">
-                <p className="text-sm font-medium text-gray-600">Phương thức nhận link:</p>
+                <p className="text-sm font-medium text-gray-600">Send reset link via:</p>
                 <div className="flex space-x-4">
                     <label className="flex items-center space-x-2 cursor-pointer">
                         <input
@@ -94,11 +94,11 @@ const ForgotPasswordForm = ({ onSubmit, onBack, isLoading }) => {
                 {isLoading ? (
                     <>
                         <div className="spinner"></div>
-                        <span>Đang gửi...</span>
+                        <span>Sending...</span>
                     </>
                 ) : (
                     <>
-                        <span>Gửi link reset mật khẩu</span>
+                        <span>Send Reset Link</span>
                         <ChevronRight className="w-4 h-4" />
                     </>
                 )}
@@ -111,7 +111,7 @@ const ForgotPasswordForm = ({ onSubmit, onBack, isLoading }) => {
                     onClick={onBack}
                     className="text-blue-600 hover:text-blue-800 transition-colors font-medium text-sm"
                 >
-                    ← Quay lại đăng nhập
+                    ← Back to Login
                 </button>
             </div>
         </form>
