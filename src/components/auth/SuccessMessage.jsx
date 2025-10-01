@@ -4,12 +4,12 @@ import { Check } from 'lucide-react';
 const SuccessMessage = ({ userName, userRole }) => {
     const getRoleName = (role) => {
         const roleNames = {
-        admin: 'admin',
-        dealer_manager: 'dealer_manager',
-        dealer_staff: 'dealer_staff',
-        evm_staff: 'evm_staff'
+        admin: 'Admin Dashboard',
+        dealer_manager: 'Manager Dashboard',
+        dealer_staff: 'Staff Dashboard',
+        evm_staff: 'EVM Dashboard'
     };
-    return roleNames[role] || 'dashboard';
+    return roleNames[role] || 'Dashboard';
 };
 
   return (
@@ -20,12 +20,12 @@ const SuccessMessage = ({ userName, userRole }) => {
         <div className="neu-icon w-20 h-20 mx-auto mb-5 rounded-full flex items-center justify-center">
             <Check className="w-8 h-8 text-green-600" />
         </div>
-        <h3 className="text-gray-800 text-2xl font-bold mb-2">Đăng nhập thành công!</h3>
+        <h3 className="text-gray-800 text-2xl font-bold mb-2">Login Successfull!</h3>
         <p className="text-gray-500 mb-2">
-            Chào mừng {userName || 'User'}
+            Welcome back, {userName || 'User'}
         </p>
         <p className="text-gray-400 text-sm">
-            Đang chuyển hướng đến {getRoleName(userRole)}...
+            Redirecting to {getRoleName(userRole)}...
         </p>
     </div>
   );
