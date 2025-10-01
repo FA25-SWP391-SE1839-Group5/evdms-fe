@@ -100,23 +100,13 @@ const LoginPage = ({ onLoginSuccess }) => {
                         onBack={() => setShowForgotPassword(false)}
                         isLoading={isLoading}
                       />
-                    ) : showOTP ? (
-                      <>
-                        <ErrorMessage message={loginError} />
-                        <OTPVerification
-                          onVerify={handleOTPVerify}
-                          onResend={handleOTPResend}
-                          onBack={handleOTPBack}
-                          isLoading={isLoading}
-                        />
-                      </>
                     ) : (
                       <>
                         <LoginAvatar />
 
                         <div className="text-center mb-8">
-                          <h2 className="text-2xl font-bold text-gray-800 mb-2">Chào mừng trở lại</h2>
-                          <p className="text-gray-500">Vui lòng đăng nhập để tiếp tục</p>
+                          <h2 className="text-2xl font-bold text-gray-800 mb-2">Welcome back</h2>
+                          <p className="text-gray-500">Please sign in to continue</p>
                         </div>
 
                         <LoginForm 
@@ -125,17 +115,6 @@ const LoginPage = ({ onLoginSuccess }) => {
                           isLoading={isLoading}
                           loginError={loginError}
                         />
-
-                        <SocialLogin onSocialLogin={handleSocialLogin} />
-
-                        <div className="text-center">
-                          <p className="text-gray-500 text-sm">
-                            Chưa có tài khoản?{' '}
-                            <a href="#" className="text-blue-600 hover:text-blue-800 transition-colors font-semibold">
-                              Đăng ký ngay
-                            </a>
-                          </p>
-                        </div>
                       </>
                     )}
                   </>
@@ -149,11 +128,11 @@ const LoginPage = ({ onLoginSuccess }) => {
 
               {/* Bottom Info */}
               <div className="text-center mt-8 space-y-2">
-                <p className="text-xs text-gray-400">© 2024 EV Dealer Pro - Công nghệ xe điện tương lai</p>
+                <p className="text-xs text-gray-400">© 2024 Elecar Dealer - Electric Vehicle Dealer Management System</p>
                 <div className="flex items-center justify-center space-x-4 text-xs text-gray-500">
-                  <a href="#" className="hover:text-blue-500 transition-colors">Chính sách bảo mật</a>
+                  <a href="#" className="hover:text-blue-500 transition-colors">Privacy Policy</a>
                   <span>•</span>
-                  <a href="#" className="hover:text-blue-500 transition-colors">Điều khoản sử dụng</a>
+                  <a href="#" className="hover:text-blue-500 transition-colors">Terms of Service</a>
                 </div>
               </div>
 
