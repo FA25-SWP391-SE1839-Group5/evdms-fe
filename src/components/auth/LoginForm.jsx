@@ -152,7 +152,7 @@ return (
             </span>
         </label>
         <a href="#" className="text-gray-500 hover:text-blue-600 transition-colors font-medium">
-            Quên mật khẩu?
+            Forgot Password?
         </a>
     </div>
 
@@ -165,10 +165,10 @@ return (
         {isLoading ? (
             <>
                 <div className="spinner"></div>
-                <span>Đang đăng nhập...</span>
+                <span>Signing in...</span>
             </>
         ) : (
-            <span>Đăng nhập</span>
+            <span>Sign In</span>
         )}
       </NeumorphismButton>            
     </form>
