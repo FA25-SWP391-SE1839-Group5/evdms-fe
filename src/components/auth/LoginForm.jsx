@@ -101,7 +101,7 @@ return (
                 value={formData.email}
                 onChange={handleInputChange}
                 onBlur={() => handleInputBlur('email')}
-                placeholder="admin@evdealer.com"
+                placeholder="Email address"
                 className="flex-1 bg-transparent text-gray-700 placeholder-gray-500 outline-none text-sm font-medium"
             />
         </NeumorphismInput>
@@ -118,7 +118,7 @@ return (
                 value={formData.password}
                 onChange={handleInputChange}
                 onBlur={() => handleInputBlur('password')}
-                placeholder="••••••••"
+                placeholder="Password"
                 className="flex-1 bg-transparent text-gray-700 placeholder-gray-500 outline-none text-sm font-medium"
             />
         <NeumorphismButton
@@ -152,7 +152,7 @@ return (
             </span>
         </label>
         <a href="#" className="text-gray-500 hover:text-blue-600 transition-colors font-medium">
-            Forgot Password?
+            Forgot password?
         </a>
     </div>
 
