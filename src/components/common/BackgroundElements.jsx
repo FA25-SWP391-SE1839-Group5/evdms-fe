@@ -14,7 +14,22 @@ const BackgroundElements = () => {
                     }}
                 >    
                 </div>
-
+                {/* Secondary mesh layers */}
+                <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-br from-green-300 via-emerald-200 to-transparent rounded-full blur-3xl animate-pulse"></div>
+                <div 
+                    className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-gradient-to-br from-blue-300 via-indigo-200 to-transparent rounded-full blur-3xl" 
+                    style={{ 
+                        animationDelay: '2s', animation: 'pulse 8s ease-in-out infinite' 
+                    }}
+                >
+                </div>
+                <div 
+                    className="absolute top-1/2 left-1/2 w-72 h-72 bg-gradient-to-br from-teal-200 to-transparent rounded-full blur-2xl opacity-50" 
+                    style={{ 
+                        animationDelay: '4s', animation: 'pulse 10s ease-in-out infinite' 
+                    }}
+                >
+                </div>
             </div>
         </>
     );
