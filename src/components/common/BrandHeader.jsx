@@ -17,7 +17,7 @@ const BrandHeader = () => {
                     <h1 className="text-4xl font-bold text-gray-800 mb-2">
                         EVDMS
                     </h1>
-                    <p className="text-lg text-gray-600 mt-1">
+                    <p className="text-lg text-gray-700 mt-1 font-medium">
                         Electric Vehicle Dealer Management System
                     </p>
                 </div>
@@ -26,20 +26,20 @@ const BrandHeader = () => {
             {/* Features List */}
             <div className="space-y-3 text-gray-700">
                 <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-lg text-gray-600 mt-1">Smart inventory management</span>
+                   <i class="ri-arrow-right-line"></i>
+                    <span className="text-base text-gray-700 font-medium">Smart inventory management</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                    <span className="text-lg text-gray-600 mt-1">Real-time sales tracking</span>
+                    <i class="ri-arrow-right-line"></i>
+                    <span className="text-base text-gray-700 font-medium">Real-time sales tracking</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-gray-600 mt-1">Detailed analytics & reporting</span>
+                    <i class="ri-arrow-right-line"></i>
+                    <span className="text-base text-gray-700 font-medium">Detailed analytics & reporting</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                    <span className="text-gray-600 mt-1">Multi-platform integration</span>
+                    <i class="ri-arrow-right-line"></i>
+                    <span className="text-base text-gray-700 font-medium">Multi-platform integration</span>
                 </div>
             </div>
         </div>
