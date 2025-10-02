@@ -12,7 +12,6 @@ const LoginForm = ({ onSubmit, onForgotPassword, isLoading, loginError }) => {
     const [formData, setFormData] = useState({
         email: '',
         password: '',
-        rememberMe: false
     });
 
     const emailRef = useRef(null);
