@@ -43,3 +43,13 @@ export const updateVehicleModel = async (id, modelData) => {
     throw error;
   }
 };
+
+export const deleteVehicleModel = async (id) => {
+  try {
+    const response = await api.delete(`/vehicle-models/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting vehicle model:', error);
+    throw error;
+  }
+};
