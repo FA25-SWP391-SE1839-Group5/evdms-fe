@@ -41,6 +41,17 @@ const VehicleModelForm = ({ initialData, onSubmit, onCancel }) => {
         e.preventDefault();
         onSubmit(formData);
     };
+
+    return (
+        <form
+            onSubmit={handleSubmit}
+            className="bg-white shadow-md rounded-2xl p-6 max-w-lg mx-auto space-y-4"
+        >
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                {initialData ? "Edit Vehicle Model" : "Add Vehicle Model"}
+            </h2>
+        </form>
+    );
 };
 
 export default VehicleModelForm;
