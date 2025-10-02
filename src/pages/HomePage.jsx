@@ -138,4 +138,55 @@ const HomePage = () => {
                 </div>
             </section>
 
+            {/* Home Future Section */}
+            <section className="home-future-section">
+                <div className="container">
+                    <div className="future-content">
+                        <div className="future-text">
+                            <h2>The Future of EV Business, Today.</h2>
+                            <p>
+                                Integrate your dealership seamlessly with our advanced management
+                                system. Control inventory, monitor sales performance, and optimize
+                                your business operations all from one intelligent platform.
+                            </p>
+                            <button className="btn-primary">Learn More</button>
+                        </div>
+                        <div className="future-image">
+                            <img src="/src/assets/images/bg_2.jpg" alt="Smart Home Integration" />
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Customer Reviews Section */}
+            <section className="customer-reviews-section">
+                <div className="container">
+                    <h2>Loved by Customers, Built for the Future</h2>
+                    <div className="reviews-grid">
+                        <div className="review-card">
+                            <div className="review-image">
+                                <img src="/src/assets/images/car-4.jpg" alt="Customer Vehicle" />
+                            </div>
+                            <div className="review-content">
+                                <h3>Built For Any Planet</h3>
+                                <div className="review-stats">
+                                    <div className="stat">
+                                        <span className="number">11,000</span>
+                                        <span className="label">Miles Driven</span>
+                                    </div>
+                                    <div className="stat">
+                                        <span className="number">300</span>
+                                        <span className="label">Charging Sessions</span>
+                                    </div>
+                                    <div className="stat">
+                                        <span className="number">2.5</span>
+                                        <span className="label">Years Owned</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             
