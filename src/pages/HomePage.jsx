@@ -66,4 +66,27 @@ const HomePage = () => {
         </div>
       </section>
 
-     
+      {/* Innovation Section */}
+      <section className="innovation-section">
+        <div className="container">
+          <div className="innovation-content">
+            <div className="innovation-text">
+              <h2>Comprehensive Management System: Optimize Dealer Operations and Enhance Business Efficiency.</h2>
+              <p>
+                We provide modern electric vehicle dealer management solutions 
+                that optimize sales processes, customer management, and revenue reporting.
+                Our system is designed to enhance business efficiency and deliver 
+                the best experience for both dealers and customers.
+              </p>
+              <button className="btn-primary">Learn More</button>
+            </div>
+            <div className="innovation-image">
+              <img src="/src/assets/images/bg_1.jpg" alt="Innovation" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+
+export default HomePage;
