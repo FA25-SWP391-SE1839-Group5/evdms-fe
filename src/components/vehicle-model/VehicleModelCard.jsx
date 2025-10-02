@@ -51,6 +51,13 @@ const VehicleModelCard = ({model, onEdit, onDelete }) => {
                             </p>
                         </div>
                     </div>
+
+                    {/* Price */}
+                    <div className="mb-4">
+                        <span className="text-2xl font-bold text-blue-600">
+                            {model.price.toLocaleString("vi-VN")} ₫
+                        </span>
+                    </div>
             </div>
             
 
