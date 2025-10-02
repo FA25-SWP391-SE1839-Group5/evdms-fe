@@ -6,7 +6,6 @@ import NeumorphismInput from '../ui/NeumorphismInput';
 const ForgotPasswordForm = ({ onSubmit, onBack, isLoading }) => {
     const [forgotPasswordData, setForgotPasswordData] = useState({
         email: '',
-        method: 'email'
     });
 
     const handleSubmit = (e) => {
