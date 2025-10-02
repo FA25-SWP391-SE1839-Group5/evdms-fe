@@ -217,4 +217,70 @@ const HomePage = () => {
                 </div>
             </section>
 
-   
+            {/* Final CTA Section */}
+            <section className="final-cta-section">
+                <div className="container">
+                    <div className="cta-content">
+                        <h2>Become a Partner</h2>
+                        <h3>Join Our Leading Dealer Network.</h3>
+                        <p>Register now to become a dealer and grow your electric vehicle business with us</p>
+                        <button className="btn-primary" onClick={() => navigate('/register')}>Register Now</button>
+                    </div>
+                    <div className="cta-image">
+                        <img src="/src/assets/images/car-5.jpg" alt="Future Vehicle" />
+                    </div>
+                </div>
+            </section>
+
+            {/* Footer */}
+            <footer className="footer">
+                <div className="container">
+                    <div className="footer-content">
+                        <div className="footer-section">
+                            <h4>Products</h4>
+                            <ul>
+                                <li><a href="#">Electric Vehicles</a></li>
+                                <li><a href="#">Accessories</a></li>
+                                <li><a href="#">Services</a></li>
+                            </ul>
+                        </div>
+                        <div className="footer-section">
+                            <h4>Dealers</h4>
+                            <ul>
+                                <li><a href="#" onClick={() => navigate('/register')}>Become a Dealer</a></li>
+                                <li><a href="#" onClick={() => navigate('/login')}>Login</a></li>
+                                <li><a href="#">Support</a></li>
+                            </ul>
+                        </div>
+                        <div className="footer-section">
+                            <h4>System</h4>
+                            <ul>
+                                <li><a href="#">Sales Management</a></li>
+                                <li><a href="#">Reports</a></li>
+                                <li><a href="#">Customers</a></li>
+                            </ul>
+                        </div>
+                        <div className="footer-section">
+                            <h4>About Us</h4>
+                            <ul>
+                                <li><a href="#">Company</a></li>
+                                <li><a href="#">Careers</a></li>
+                                <li><a href="#">Contact</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div className="footer-bottom">
+                        <p>&copy; 2025 Electric Vehicle Dealer Management System. All rights reserved.</p>
+                        <div className="social-links">
+                            <a href="#">Facebook</a>
+                            <a href="#">Twitter</a>
+                            <a href="#">Instagram</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    );
+};
+
+export default HomePage;
