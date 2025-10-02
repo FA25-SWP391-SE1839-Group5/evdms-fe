@@ -13,3 +13,13 @@ export const getAllVehicleModels = async () => {
     throw error;
   }
 };
+
+export const getVehicleModelById = async (id) => {
+  try {
+    const response = await api.get(`/vehicle-models/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching vehicle model:', error);
+    throw error;
+  }
+};
