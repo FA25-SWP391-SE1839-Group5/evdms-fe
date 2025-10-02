@@ -53,3 +53,26 @@ export const deleteVehicleModel = async (id) => {
     throw error;
   }
 };
+
+// ============================================
+// IMAGE UPLOAD
+// ============================================
+
+export const uploadVehicleImage = async (file) => {
+  try {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const response = await api.post('/vehicle-models/upload-image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    
+    // Response structure: { success: true, imageUrl: "...", message: "..." }
+    return response.data;
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    throw error;
+  }
+};
