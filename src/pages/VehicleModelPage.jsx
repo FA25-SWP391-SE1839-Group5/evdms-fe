@@ -46,3 +46,45 @@ const VehicleModelPage = () => {
             setModels((prev) => prev.filter((m) => m.id !== id));
         }
     };
+
+    return (
+    <div className="p-6 space-y-6">
+        <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-gray-800">Vehicle Models</h1>
+            <button
+            onClick={() => {
+                setShowForm(true);
+                setEditModel(null);
+            }}
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl"
+            >
+                <Plus size={18} />
+                Add Model
+            </button>
+        </div>
+
+        {/* Search */}
+        <VehicleModelSearch value={search} onChange={setSearch} />
+
+        {/* Form or List */}
+        {showForm ? (
+            <VehicleModelForm
+                initialData={editModel}
+                onSubmit={handleSubmit}
+                onCancel={() => {
+                    setShowForm(false);
+                    setEditModel(null);
+            }}
+            />
+        ) : (
+            <VehicleModelList
+                models={filteredModels}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+            />
+        )}
+    </div>
+  );
+};
+
+export default VehicleModelPage;
