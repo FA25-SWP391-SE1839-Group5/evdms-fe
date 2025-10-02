@@ -189,4 +189,32 @@ const HomePage = () => {
                 </div>
             </section>
 
-            
+            {/* Journey Section */}
+            <section className="journey-section">
+                <div className="container">
+                    <div className="journey-content">
+                        <div className="journey-text">
+                            <h2>Your Journey to Business Success</h2>
+                            <p>
+                                From dealer registration, inventory management, customer care
+                                to sales reporting - we support the entire business process
+                                so you can focus on growth and market expansion.
+                            </p>
+                            <div className="journey-features">
+                                <div className="feature">
+                                    <h4>Efficient Management</h4>
+                                    <p>Easy. Fast. Accurate. Optimize every operation.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="journey-image">
+                            <div className="charging-card">
+                                <h3>Charging Made Simple</h3>
+                                <p>Fast, convenient, and accessible charging network</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+   
