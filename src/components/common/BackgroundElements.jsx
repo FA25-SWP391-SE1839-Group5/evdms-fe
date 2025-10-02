@@ -2,7 +2,7 @@ import React from 'react';
 
 const BackgroundElements = () => {
     return (
-        <>
+        <>      
             {/* EV-themed Gradient Mesh - Green to Blue */}
             <div className="absolute inset-0 opacity-40">
                 {/* Main EV gradient - Green to Blue */}
@@ -57,6 +57,18 @@ const BackgroundElements = () => {
                         {/* Lightning symbol on station */}
                         <path d="M 50 50 L 45 65 L 52 65 L 48 80 L 55 65 L 48 65 Z" fill="#2962FF" opacity="0.6" />
                     </svg>
+                </div>
+
+                {/* Dynamic Floating Elements - EV themed colors */}
+                <div className="absolute top-10 right-10 w-4 h-4 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full animate-bounce opacity-60"></div>
+                <div className="absolute bottom-20 left-10 w-3 h-3 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full animate-pulse opacity-40"></div>
+                <div className="absolute top-1/3 right-1/4 w-2 h-2 bg-gradient-to-br from-teal-400 to-cyan-400 rounded-full animate-ping opacity-50"></div>
+                <div 
+                    className="absolute top-2/3 left-1/3 w-3 h-3 bg-gradient-to-br from-green-300 to-blue-400 rounded-full"
+                    style={{ 
+                        animation: 'bounce 3s ease-in-out infinite' 
+                    }}
+                >
                 </div>
             </div>
         </>
