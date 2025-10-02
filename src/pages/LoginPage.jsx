@@ -32,7 +32,6 @@ const LoginPage = ({ onLoginSuccess }) => {
         // No OTP required, proceed to dashboard
         saveLoginToken(user, formData.rememberMe);
         setUserRole(user);
-        setShowSuccess(true);
         
         setTimeout(() => {
           navigateToRoleBasedDashboard(user.role);
@@ -58,7 +57,6 @@ const LoginPage = ({ onLoginSuccess }) => {
 
     try {
       await sendResetPasswordLink(data.email, data.method);
-      alert(`Password reset link sent via ${data.method === 'email' ? 'email' : 'SMS'}: ${data.email}`);
       setShowForgotPassword(false);
     } catch (error) {
       setLoginError('An error occurred. Please try again.');
