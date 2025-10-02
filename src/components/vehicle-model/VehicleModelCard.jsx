@@ -27,7 +27,32 @@ const VehicleModelCard = ({model, onEdit, onDelete }) => {
                     <p className="text-gray-600 text-sm mb-4">
                     {model.manufacturer} • {model.yearOfManufacture}
                     </p>
+
+                    {/* Specs */}
+                    <div className="grid grid-cols-2 gap-3 text-sm mb-4">
+                        <div>
+                            <span className="text-gray-500">Battery:</span>
+                            <p className="font-semibold text-gray-700">
+                            {model.batteryCapacity} kWh
+                            </p>
+                        </div>
+                        <div>
+                            <span className="text-gray-500">Range:</span>
+                            <p className="font-semibold text-gray-700">{model.range} km</p>
+                        </div>
+                        <div>
+                            <span className="text-gray-500">Power:</span>
+                            <p className="font-semibold text-gray-700">{model.motorPower} HP</p>
+                        </div>
+                        <div>
+                            <span className="text-gray-500">Seats:</span>
+                            <p className="font-semibold text-gray-700">
+                            {model.seatingCapacity}
+                            </p>
+                        </div>
+                    </div>
             </div>
+            
 
 
         </NeumorphismCard>
