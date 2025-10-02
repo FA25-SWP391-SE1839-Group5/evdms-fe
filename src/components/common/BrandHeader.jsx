@@ -26,19 +26,19 @@ const BrandHeader = () => {
             {/* Features List */}
             <div className="space-y-3 text-gray-700">
                 <div className="flex items-center space-x-3">
-                   <i class="ri-arrow-right-line"></i>
+                   <i className="ri-arrow-right-line"></i>
                     <span className="text-base text-gray-700 font-medium">Smart inventory management</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                    <i class="ri-arrow-right-line"></i>
+                    <i className="ri-arrow-right-line"></i>
                     <span className="text-base text-gray-700 font-medium">Real-time sales tracking</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                    <i class="ri-arrow-right-line"></i>
+                    <i className="ri-arrow-right-line"></i>
                     <span className="text-base text-gray-700 font-medium">Detailed analytics & reporting</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                    <i class="ri-arrow-right-line"></i>
+                    <i className="ri-arrow-right-line"></i>
                     <span className="text-base text-gray-700 font-medium">Multi-platform integration</span>
                 </div>
             </div>

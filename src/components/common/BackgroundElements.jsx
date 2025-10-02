@@ -46,10 +46,19 @@ const BackgroundElements = () => {
                         <path d="M 100 35 L 95 50 L 105 50 L 100 65 L 108 50 L 98 50 Z" fill="#00C853" opacity="0.6" />
                     </svg>
                 </div>
+
+                {/* Charging station */}
+                <div className="absolute bottom-1/4 left-1/4 w-48 h-48 transform -rotate-12">
+                    <svg viewBox="0 0 100 150" className="w-full h-full">
+                        {/* Station pole */}
+                        <rect x="35" y="30" width="30" height="100" rx="5" fill="currentColor" />
+                        {/* Charging cable */}
+                        <path d="M 50 90 Q 30 100 20 120" stroke="currentColor" strokeWidth="3" fill="none" />
+                        {/* Lightning symbol on station */}
+                        <path d="M 50 50 L 45 65 L 52 65 L 48 80 L 55 65 L 48 65 Z" fill="#2962FF" opacity="0.6" />
+                    </svg>
+                </div>
             </div>
-
-
-            
         </>
     );
 };
