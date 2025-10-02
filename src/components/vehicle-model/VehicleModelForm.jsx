@@ -64,12 +64,24 @@ const VehicleModelForm = ({ initialData, onSubmit, onCancel }) => {
                 />
             </div>
 
+            {/* Brand */}
+            <div>
+                <label className="block text-sm font-medium text-gray-700">Brand</label>
+                <input
+                type="text"
+                name="brand"
+                value={formData.brand}
+                onChange={handleChange}
+                required
+                className="w-full border rounded-xl px-3 py-2 mt-1 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                />
+            </div>
 
 
 
 
 
-            
+
         </form>
     );
 };
