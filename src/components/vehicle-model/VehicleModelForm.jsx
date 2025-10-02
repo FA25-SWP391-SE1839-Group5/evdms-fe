@@ -50,6 +50,26 @@ const VehicleModelForm = ({ initialData, onSubmit, onCancel }) => {
             <h2 className="text-xl font-semibold text-gray-800 mb-4">
                 {initialData ? "Edit Vehicle Model" : "Add Vehicle Model"}
             </h2>
+
+            {/* Name */}
+            <div>
+                <label className="block text-sm font-medium text-gray-700">Model Name</label>
+                <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                className="w-full border rounded-xl px-3 py-2 mt-1 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                />
+            </div>
+
+
+
+
+
+
+            
         </form>
     );
 };
