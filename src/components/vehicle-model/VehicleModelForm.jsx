@@ -103,8 +103,41 @@ const VehicleModelForm = ({ initialData, onSubmit, onCancel }) => {
                 />
             </div>
 
+            {/* Image Upload */}
+            <div>
+                <label className="block text-sm font-medium text-gray-700">Image</label>
+                <div className="mt-2 flex items-center gap-4">
+                    {formData.image ? (
+                        <div className="relative w-24 h-24">
+                            <img
+                                src={formData.image}
+                                alt="Preview"
+                                className="w-full h-full object-cover rounded-xl border"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setFormData((prev) => ({ ...prev, image: null }))}
+                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                            >
+                            </button>
+                        </div>
+                    ) : (
+                        <label className="flex items-center justify-center w-24 h-24 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50">
+                        <Upload className="w-6 h-6 text-gray-400" />
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="hidden"
+                        />
+                        </label>
+                    )}
+                    </div>
+                </div>
 
-
+                    )}
+                </div>
+            </div>
 
 
         </form>
