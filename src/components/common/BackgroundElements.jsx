@@ -2,7 +2,63 @@ import React from 'react';
 
 const BackgroundElements = () => {
     return (
-        <>      
+        <>
+        {/* Background Images Layer */}
+            <div className="absolute inset-0 opacity-[0.15]">
+                {/* Tesla-style EV Image 1 - Top Right */}
+                <div 
+                    className="absolute top-10 right-10 w-[600px] h-[400px] rounded-3xl overflow-hidden shadow-2xl transform rotate-6"
+                    style={{
+                        animation: 'float 20s ease-in-out infinite',
+                        animationDelay: '0s'
+                    }}
+                >
+                    <img 
+                        src="src/assets/images/bg_2.jpg" 
+                        alt="EV Background"
+                        className="w-full h-full object-cover"
+                        style={{
+                            filter: 'blur(2px) brightness(1.2)'
+                        }}
+                    />
+                </div>
+
+                {/* BMW-style EV Image 2 - Bottom Left */}
+                <div 
+                    className="absolute bottom-20 left-10 w-[500px] h-[350px] rounded-3xl overflow-hidden shadow-2xl transform -rotate-3"
+                    style={{
+                        animation: 'float 25s ease-in-out infinite',
+                        animationDelay: '5s'
+                    }}
+                >
+                    <img 
+                        src="src/assets/images/bg_1.jpg" 
+                        alt="EV Background"
+                        className="w-full h-full object-cover"
+                        style={{
+                            filter: 'blur(2px) brightness(1.1)'
+                        }}
+                    />
+                </div>
+
+                {/* Audi-style EV Image 3 - Center */}
+                <div 
+                    className="absolute top-1/3 left-1/3 w-[450px] h-[300px] rounded-3xl overflow-hidden shadow-2xl transform rotate-12"
+                    style={{
+                        animation: 'float 30s ease-in-out infinite',
+                        animationDelay: '10s'
+                    }}
+                >
+                    <img 
+                        src="src/assets/images/bg_2.jpg" 
+                        alt="EV Background"
+                        className="w-full h-full object-cover"
+                        style={{
+                            filter: 'blur(2px) brightness(1.15)'
+                        }}
+                    />
+                </div>
+            </div>      
             {/* EV-themed Gradient Mesh - Green to Blue */}
             <div className="absolute inset-0 opacity-40">
                 {/* Main EV gradient - Green to Blue */}
