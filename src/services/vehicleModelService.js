@@ -23,3 +23,13 @@ export const getVehicleModelById = async (id) => {
     throw error;
   }
 };
+
+export const createVehicleModel = async (modelData) => {
+  try {
+    const response = await api.post('/vehicle-models', modelData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating vehicle model:', error);
+    throw error;
+  }
+};
