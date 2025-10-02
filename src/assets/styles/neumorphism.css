@@ -130,3 +130,32 @@
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
+
+/* Utility class for fade in animation */
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0) translateX(0) rotate(6deg);
+  }
+  25% { 
+    transform: translateY(-20px) translateX(10px) rotate(8deg);
+  }
+  50% { 
+    transform: translateY(-10px) translateX(-10px) rotate(4deg);
+  }
+  75% { 
+    transform: translateY(-30px) translateX(5px) rotate(7deg);
+  }
+}
+
+@keyframes gradientShift {
+  0%, 100% { 
+    filter: hue-rotate(0deg);
+  }
+  50% { 
+    filter: hue-rotate(20deg);
+  }
+}
