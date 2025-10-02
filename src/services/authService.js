@@ -16,11 +16,11 @@ export const roleRoutes = {
 let authToken = null;
 let currentUser = null;
 
-export const saveLoginToken = (userData, rememberMe = false) => {
+export const saveLoginToken = (userData) => {
   const tokenData = {
     token: userData.token || `jwt_${Math.random().toString(36).substr(2, 9)}`,
     user: userData,
-    expiresAt: new Date(Date.now() + (rememberMe ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000))
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
   };
   
   // Lưu vào memory 
