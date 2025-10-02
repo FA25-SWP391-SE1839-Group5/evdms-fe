@@ -68,11 +68,37 @@ export const uploadVehicleImage = async (file) => {
         'Content-Type': 'multipart/form-data',
       },
     });
-    
+
     // Response structure: { success: true, imageUrl: "...", message: "..." }
     return response.data;
   } catch (error) {
     console.error('Error uploading image:', error);
     throw error;
   }
+};
+
+// ============================================
+// VALIDATION
+// ============================================
+
+export const validateImageFile = (file) => {
+  const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
+  const maxSize = 5 * 1024 * 1024; // 5MB
+
+  if (!file) {
+    return 'No file selected';
+  }
+
+  const fileName = file.name.toLowerCase();
+  const fileExtension = fileName.split('.').pop();
+
+  if (!allowedExtensions.includes(fileExtension)) {
+    return `Only ${allowedExtensions.join(', ')} files are allowed`;
+  }
+
+  if (file.size > maxSize) {
+    return 'File size must be less than 5MB';
+  }
+
+  return null; // Valid
 };
