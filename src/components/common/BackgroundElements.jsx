@@ -31,6 +31,25 @@ const BackgroundElements = () => {
                 >
                 </div>
             </div>
+            
+            {/* EV Icon Illustration (Subtle) */}
+            <div className="absolute inset-0 opacity-[0.08] pointer-events-none">
+                {/* Simple EV car silhouette using CSS */}
+                <div className="absolute top-1/4 right-1/4 w-64 h-32 transform rotate-12">
+                    <svg viewBox="0 0 200 100" className="w-full h-full">
+                        {/* Car body */}
+                        <path d="M 20 60 Q 20 40 40 40 L 60 40 L 70 20 L 130 20 L 140 40 L 160 40 Q 180 40 180 60 L 180 80 Q 180 85 175 85 L 165 85 Q 165 95 155 95 Q 145 95 145 85 L 55 85 Q 55 95 45 95 Q 35 95 35 85 L 25 85 Q 20 85 20 80 Z" fill="currentColor" />
+                        {/* Wheels */}
+                        <circle cx="50" cy="85" r="12" fill="currentColor" />
+                        <circle cx="150" cy="85" r="12" fill="currentColor" />
+                        {/* Lightning bolt (EV symbol) */}
+                        <path d="M 100 35 L 95 50 L 105 50 L 100 65 L 108 50 L 98 50 Z" fill="#00C853" opacity="0.6" />
+                    </svg>
+                </div>
+            </div>
+
+
+            
         </>
     );
 };
