@@ -1,7 +1,7 @@
 import { Edit, Trash2, Image as ImageIcon } from "lucide-react";
 import NeumorphismCard from "../ui/NeumorphismCard";
 
-const VehicleModelCard = ({model, onEdit, onDelete }) => {
+const VehicleModelCard = ({ model, onEdit, onDelete }) => {
     return (
         <NeumorphismCard className="p-0 overflow-hidden">
             {/* Images */}
