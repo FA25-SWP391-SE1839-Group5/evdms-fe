@@ -18,6 +18,18 @@ const VehicleModelCard = ({model, onEdit, onDelete }) => {
                     </div>
                 )}
             </div>
+
+            {/* Content */}
+            <div>
+                <h3 className="text-xl font-bold text-gray-800 mb-1">
+                    {model.modelName}
+                    </h3>
+                    <p className="text-gray-600 text-sm mb-4">
+                    {model.manufacturer} • {model.yearOfManufacture}
+                    </p>
+            </div>
+
+
         </NeumorphismCard>
     );
 };
