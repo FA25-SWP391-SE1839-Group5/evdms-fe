@@ -123,6 +123,19 @@ const LoginForm = ({ onSubmit, onForgotPassword, isLoading, loginError }) => {
 
             {/* Password Input with Caps Lock Warning */}
             <div className="relative">
+                <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                        
+                    </label>
+                    <button
+                        type="button"
+                        onClick={onForgotPassword}
+                        className="text-xs text-gray-500 hover:text-blue-600 transition-colors font-medium"
+                    >
+                        Forgot Password?
+                    </button>
+                </div>
+
                 <NeumorphismInput
                     ref={passwordRef}
                     icon={Lock}
@@ -183,17 +196,6 @@ const LoginForm = ({ onSubmit, onForgotPassword, isLoading, loginError }) => {
                         ></div>
                     </div>
                 )}
-            </div>
-
-            {/* Remember Me & Forgot Password */}
-            <div className="flex items-center justify-between text-sm">
-                <button
-                    type="button"
-                    onClick={onForgotPassword}
-                    className="text-gray-500 hover:text-blue-600 transition-colors font-medium"
-                >
-                    Forgot password?
-                </button>
             </div>
 
             {/* Sign In Button */}
