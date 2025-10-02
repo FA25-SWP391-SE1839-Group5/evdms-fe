@@ -77,6 +77,18 @@ const VehicleModelForm = ({ initialData, onSubmit, onCancel }) => {
                 />
             </div>
 
+            {/* Year */}
+            <div>
+                <label className="block text-sm font-medium text-gray-700">Year</label>
+                <input
+                type="number"
+                name="year"
+                value={formData.year}
+                onChange={handleChange}
+                required
+                className="w-full border rounded-xl px-3 py-2 mt-1 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                />
+            </div>
 
 
 
