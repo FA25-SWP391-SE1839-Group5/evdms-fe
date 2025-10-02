@@ -33,3 +33,13 @@ export const createVehicleModel = async (modelData) => {
     throw error;
   }
 };
+
+export const updateVehicleModel = async (id, modelData) => {
+  try {
+    const response = await api.put(`/vehicle-models/${id}`, modelData);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating vehicle model:', error);
+    throw error;
+  }
+};
