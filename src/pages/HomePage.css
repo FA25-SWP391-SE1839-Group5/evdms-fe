@@ -1,4 +1,4 @@
-/* HomePage.css */
+cd D:\Fall2025\swp\pj1\evdms-fe/* HomePage.css */
 
 /* CSS Reset */
 * {
@@ -250,5 +250,12 @@ html, body {
   opacity: 0.8;
   text-transform: uppercase;
   letter-spacing: 1px;
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
 }
 
