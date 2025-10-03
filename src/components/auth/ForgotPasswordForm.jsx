@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, ChevronRight, Check } from 'lucide-react';
+import { Mail, ChevronRight } from 'lucide-react';
 import NeumorphismButton from '../ui/NeumorphismButton';
 import NeumorphismInput from '../ui/NeumorphismInput';
 

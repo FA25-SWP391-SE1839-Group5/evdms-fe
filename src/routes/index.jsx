@@ -2,7 +2,8 @@ export const ROUTES = {
     LOGIN: 'login',
     CATALOG: 'catalog',
     DETAIL: 'detail',
-    DASHBOARD: 'dashboard'
+    DASHBOARD: 'dashboard',
+    VEHICLE_MODELS: 'vehicle_models'
 };
 
 export const initialState = {
@@ -28,6 +29,12 @@ export const routeReducer = (state, action) => {
                 currentPage: ROUTES.CATALOG, // Sau khi login thành công -> đi vào Catalog
                 user: action.payload,
                 isAuthenticated: true
+            };
+            
+        case 'NAVIGATE_TO_VEHICLE_MODELS':
+            return {
+                ...state,
+                currentPage: ROUTES.VEHICLE_MODELS
             };
             
         case 'LOGOUT':
