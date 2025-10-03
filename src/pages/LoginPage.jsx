@@ -135,7 +135,6 @@ const LoginPage = ({ onLoginSuccess }) => {
 
             </div>
           </div>
-
         </div>
       </div>
     </div>
