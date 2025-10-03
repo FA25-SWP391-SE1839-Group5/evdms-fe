@@ -39,7 +39,6 @@ const HomePage = () => {
                         </p>
                         <div className="hero-buttons">
                             <button className="btn-primary" onClick={() => navigate('/login')}>Login to System</button>
-                            <button className="btn-outline" onClick={() => navigate('/register')}>Become a Dealer</button>
                         </div>
                     </div>
                     <div className="hero-image">
@@ -224,7 +223,7 @@ const HomePage = () => {
                     <div className="cta-content">
                         <h2>Become a Partner</h2>
                         <h3>Join Our Leading Dealer Network.</h3>
-                        <p>Register now to become a dealer and grow your electric vehicle business with us</p>
+                        <p>Access our comprehensive dealer management platform and grow your electric vehicle business with us</p>
                         <button className="btn-primary" onClick={() => navigate('/register')}>Register Now</button>
                     </div>
                     <div className="cta-image">
@@ -248,7 +247,6 @@ const HomePage = () => {
                         <div className="footer-section">
                             <h4>Dealers</h4>
                             <ul>
-                                <li><a href="#" onClick={() => navigate('/register')}>Become a Dealer</a></li>
                                 <li><a href="#" onClick={() => navigate('/login')}>Login</a></li>
                                 <li><a href="#">Support</a></li>
                             </ul>
