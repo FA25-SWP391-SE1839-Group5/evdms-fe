@@ -259,3 +259,24 @@ html, body {
   padding: 0 2rem;
 }
 
+/* Innovation Section */
+.innovation-section {
+  padding: 100px 0;
+  background: #f8f9fa;
+}
+
+.innovation-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.innovation-text h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #333;
+  line-height: 1.3;
+}
+
