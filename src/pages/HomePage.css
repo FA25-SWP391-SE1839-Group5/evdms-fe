@@ -411,3 +411,23 @@ html, body {
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
 }
 
+/* Home Future Section */
+.home-future-section {
+  padding: 100px 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.future-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.future-text h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
