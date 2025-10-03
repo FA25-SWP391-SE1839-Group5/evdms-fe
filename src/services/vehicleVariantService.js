@@ -63,3 +63,44 @@ export const deleteVehicleVariant = async (id) => {
     throw error;
   }
 };
+
+// ============================================
+// VALIDATION
+// ============================================
+
+export const validateVariantData = (data) => {
+  const errors = {};
+
+  if (!data.vehicleModelId) {
+    errors.vehicleModelId = 'Vehicle model is required';
+  }
+
+  if (!data.variantName || data.variantName.trim() === '') {
+    errors.variantName = 'Variant name is required';
+  }
+
+  if (!data.price || data.price <= 0) {
+    errors.price = 'Price must be greater than 0';
+  }
+
+  if (!data.range || data.range <= 0) {
+    errors.range = 'Range must be greater than 0';
+  }
+
+  if (!data.accelerationTime || data.accelerationTime <= 0) {
+    errors.accelerationTime = 'Acceleration time must be greater than 0';
+  }
+
+  if (!data.topSpeed || data.topSpeed <= 0) {
+    errors.topSpeed = 'Top speed must be greater than 0';
+  }
+
+  if (!data.motorPower || data.motorPower <= 0) {
+    errors.motorPower = 'Motor power must be greater than 0';
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors
+  };
+};
