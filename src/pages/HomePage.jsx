@@ -15,12 +15,12 @@ const HomePage = () => {
                     </div>
                     <ul className="nav-menu">
                         <li><a href="/" className="nav-link active">HOME</a></li>
-                        <li><button onClick={() => navigate('/catalog')} className="nav-link">VEHICLES</button></li>
-                        <li><a href="#" className="nav-link">SERVICES</a></li>
-                        <li><a href="#" className="nav-link">ABOUT</a></li>
+                        <li><button onClick={() => navigate('/catalog')} className="nav-link">EV CATALOG</button></li>
+                        <li><a href="#" className="nav-link">DEALER PORTAL</a></li>
+                        <li><a href="#" className="nav-link">SUPPORT</a></li>
                     </ul>
                     <div className="nav-actions">
-                        <button className="btn-secondary">Sign In</button>
+                        <button className="btn-secondary" onClick={() => navigate('/login')}>Dealer Login</button>
                     </div>
                 </div>
             </nav>
@@ -71,12 +71,12 @@ const HomePage = () => {
                 <div className="container">
                     <div className="innovation-content">
                         <div className="innovation-text">
-                            <h2>Comprehensive Management System: Optimize Dealer Operations and Enhance Business Efficiency.</h2>
+                            <h2>Empower Your Dealership: Complete EV Sales & Inventory Management Platform.</h2>
                             <p>
-                                We provide modern electric vehicle dealer management solutions
-                                that optimize sales processes, customer management, and revenue reporting.
-                                Our system is designed to enhance business efficiency and deliver
-                                the best experience for both dealers and customers.
+                                Streamline your electric vehicle dealership with our comprehensive platform.
+                                Manage inventory, track customer leads, process sales orders, generate reports,
+                                and coordinate with manufacturers - all from one unified dashboard designed
+                                specifically for EV dealers and staff.
                             </p>
                             <button className="btn-primary">Learn More</button>
                         </div>
@@ -120,14 +120,14 @@ const HomePage = () => {
             {/* Smart Mobility Section */}
             <section className="smart-mobility-section">
                 <div className="container">
-                    <h2>Smart Management. Efficient Business.</h2>
+                    <h2>Advanced Dealer Tools. Proven Results.</h2>
                     <div className="mobility-grid">
                         <div className="mobility-card">
-                            <h3>Simple. Efficient. Comprehensive.</h3>
+                            <h3>Inventory. Sales. Analytics.</h3>
                             <p>
-                                Our dealer management system combines modern technology
-                                with user-friendly interfaces to create comprehensive management solutions
-                                that optimize business operations and increase sales performance.
+                                Real-time inventory tracking, automated sales pipeline management,
+                                customer relationship tools, and detailed performance analytics.
+                                Everything your dealership needs to excel in the EV market.
                             </p>
                             <button className="btn-outline">Learn More</button>
                         </div>
@@ -143,11 +143,12 @@ const HomePage = () => {
                 <div className="container">
                     <div className="future-content">
                         <div className="future-text">
-                            <h2>The Future of EV Business, Today.</h2>
+                            <h2>Dealership Management Reimagined.</h2>
                             <p>
-                                Integrate your dealership seamlessly with our advanced management
-                                system. Control inventory, monitor sales performance, and optimize
-                                your business operations all from one intelligent platform.
+                                Connect with manufacturers, manage multi-location inventories,
+                                track customer financing, schedule service appointments, and
+                                generate compliance reports - all integrated into one powerful
+                                dealer management ecosystem.
                             </p>
                             <button className="btn-primary">Learn More</button>
                         </div>
@@ -161,26 +162,26 @@ const HomePage = () => {
             {/* Customer Reviews Section */}
             <section className="customer-reviews-section">
                 <div className="container">
-                    <h2>Loved by Customers, Built for the Future</h2>
+                    <h2>Trusted by Leading EV Dealers Nationwide</h2>
                     <div className="reviews-grid">
                         <div className="review-card">
                             <div className="review-image">
-                                <img src="/src/assets/images/car-4.jpg" alt="Customer Vehicle" />
+                                <img src="/src/assets/images/car-4.jpg" alt="Dealer Showroom" />
                             </div>
                             <div className="review-content">
-                                <h3>Built For Any Planet</h3>
+                                <h3>Streamlined Operations</h3>
                                 <div className="review-stats">
                                     <div className="stat">
-                                        <span className="number">11,000</span>
-                                        <span className="label">Miles Driven</span>
+                                        <span className="number">300%</span>
+                                        <span className="label">Sales Increase</span>
                                     </div>
                                     <div className="stat">
-                                        <span className="number">300</span>
-                                        <span className="label">Charging Sessions</span>
+                                        <span className="number">45%</span>
+                                        <span className="label">Time Saved</span>
                                     </div>
                                     <div className="stat">
-                                        <span className="number">2.5</span>
-                                        <span className="label">Years Owned</span>
+                                        <span className="number">98%</span>
+                                        <span className="label">Accuracy Rate</span>
                                     </div>
                                 </div>
                             </div>
@@ -202,15 +203,15 @@ const HomePage = () => {
                             </p>
                             <div className="journey-features">
                                 <div className="feature">
-                                    <h4>Efficient Management</h4>
-                                    <p>Easy. Fast. Accurate. Optimize every operation.</p>
+                                    <h4>Complete Dealer Solution</h4>
+                                    <p>Inventory tracking, sales pipeline, customer CRM, reporting dashboard.</p>
                                 </div>
                             </div>
                         </div>
                         <div className="journey-image">
                             <div className="charging-card">
-                                <h3>Charging Made Simple</h3>
-                                <p>Fast, convenient, and accessible charging network</p>
+                                <h3>Dealer Success Made Simple</h3>
+                                <p>Comprehensive tools, real-time insights, dedicated support</p>
                             </div>
                         </div>
                     </div>
