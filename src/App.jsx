@@ -1,15 +1,35 @@
-import React, { useReducer, useState } from 'react';
+import React, { useReducer, useState, useEffect } from 'react';
 import LoginPage from './pages/LoginPage';
 import CatalogPage from './pages/CatalogPage';
 import EVDetailPage from './pages/EVDetailPage';
 import VehicleModelPage from './pages/VehicleModelPage';
 import { routeReducer, initialState, ROUTES } from './routes';
-import { logout } from './services/authService';
+import { logout, getStoredToken, navigateToRoleBasedDashboard } from './services/authService';
 
 const App = () => {
   const [routeState, dispatch] = useReducer(routeReducer, initialState);
   const [favorites, setFavorites] = useState(new Set());
   const [compareList, setCompareList] = useState([]);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+
+  // Check token khi app mount
+  useEffect(() => {
+    const checkAuth = () => {
+      const stored = getStoredToken();
+      if (stored && stored.user) {
+        // User đã login, restore session
+        dispatch({
+          type: 'LOGIN_SUCCESS',
+          payload: stored.user
+        });
+      }
+      setIsCheckingAuth(false);
+    };
+
+    checkAuth();
+  }, []);
+
 
   // ============================================
   // AUTHENTICATION HANDLERS
