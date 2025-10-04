@@ -40,7 +40,7 @@ const LoginPage = ({ onLoginSuccess }) => {
       setTimeout(() => {
         // Call App.jsx callback to trigger route change
         onLoginSuccess(userData.user);
-      }, 1500);
+      }, 500);
       
     } catch (error) {
       setLoginError(error.message || 'Invalid email or password. Please try again.');
