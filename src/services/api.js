@@ -36,7 +36,15 @@ api.interceptors.response.use(
             const message = error.response.data?.message || error.message;
 
             switch (status) {
-                case 401:
+                case 401: {
+                    // CHỈ redirect khi KHÔNG phải login request
+                    const isLoginRequest = originalRequest.url?.includes('/auth/login');
+                    
+                    if (isLoginRequest) {
+                        // KHÔNG redirect nếu đang login - chỉ throw error
+                        return Promise.reject(error);
+                    }
+
                     // Unauthorized - try to refresh token
                     if (!originalRequest._retry) {
                         originalRequest._retry = true;
@@ -72,6 +80,7 @@ api.interceptors.response.use(
                     localStorage.removeItem('evdms_user');
                     window.location.href = '/';
                     break;
+                }
 
                 case 403:
                     console.error('Forbidden - insufficient permissions');

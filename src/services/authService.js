@@ -134,7 +134,6 @@ export const validateLogin = async (email, password) => {
       throw new Error(response.data.message || 'Login failed');
     }
   } catch (error) {
-    console.error('Login error:', error);
     throw new Error(error.response?.data?.message || 'Invalid credentials');
   }
 };

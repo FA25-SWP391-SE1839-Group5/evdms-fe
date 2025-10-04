@@ -28,7 +28,8 @@ const LoginPage = ({ onLoginSuccess }) => {
     try {
       // API returns: { accessToken, refreshToken, user: { id, email, name, role } }
       const userData = await validateLogin(formData.email, formData.password);
-  
+      
+      
       // Save token to localStorage
       saveLoginToken(userData);
       
@@ -39,7 +40,7 @@ const LoginPage = ({ onLoginSuccess }) => {
       setTimeout(() => {
         // Call App.jsx callback to trigger route change
         onLoginSuccess(userData.user);
-      }, 2500);
+      }, 1500);
       
     } catch (error) {
       setLoginError(error.message || 'Invalid email or password. Please try again.');
