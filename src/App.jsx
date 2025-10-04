@@ -1,14 +1,44 @@
-import React, { useReducer, useState } from 'react';
+import React, { useReducer, useState, useEffect } from 'react';
 import LoginPage from './pages/LoginPage';
 import CatalogPage from './pages/CatalogPage';
 import EVDetailPage from './pages/EVDetailPage';
+import VehicleModelPage from './pages/VehicleModelPage';
 import { routeReducer, initialState, ROUTES } from './routes';
-import { logout } from './services/authService';
+import { logout, getStoredToken, navigateToRoleBasedDashboard } from './services/authService';
 
 const App = () => {
   const [routeState, dispatch] = useReducer(routeReducer, initialState);
   const [favorites, setFavorites] = useState(new Set());
   const [compareList, setCompareList] = useState([]);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+
+  // ✅ Check token khi app mount
+  useEffect(() => {
+    const checkAuth = () => {
+      try {
+        const stored = getStoredToken();
+        if (stored && stored.user && stored.user.role) {
+          // User đã login, restore session
+          dispatch({
+            type: 'LOGIN_SUCCESS',
+            payload: stored.user
+          });
+        } else {
+          // Token invalid hoặc không đủ data
+          dispatch({ type: 'LOGOUT' });
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        dispatch({ type: 'LOGOUT' });
+      } finally {
+        setIsCheckingAuth(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
 
   // ============================================
   // AUTHENTICATION HANDLERS
@@ -65,7 +95,7 @@ const App = () => {
       } else if (prev.length < 3) {
         return [...prev, vehicleId];
       } else {
-        alert('Chỉ có thể so sánh tối đa 3 xe');
+        alert('Only compare to 3 cars');
         return prev;
       }
     });
@@ -79,6 +109,14 @@ const App = () => {
       {/* LOGIN PAGE */}
       {routeState.currentPage === ROUTES.LOGIN && (
         <LoginPage onLoginSuccess={handleLoginSuccess} />
+      )}
+
+      {/* VEHICLE MODELS PAGE */}
+      {routeState.currentPage === ROUTES.VEHICLE_MODELS && (
+        <VehicleModelPage
+          user={routeState.user}
+          onLogout={handleLogout}
+        />
       )}
       
       {/* CATALOG PAGE */}
