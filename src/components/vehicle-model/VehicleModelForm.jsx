@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Upload, X } from "lucide-react";
-import { uploadVehicleImage, validateImageFile } from "lucide-react";
+import { uploadVehicleImage, validateImageFile } from "../../services/vehicleModelService";
 const VehicleModelForm = ({ initialData, onSubmit, onCancel }) => {
     const [formData, setFormData] = useState({
         modelName: "",
