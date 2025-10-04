@@ -125,7 +125,7 @@ const LoginForm = ({ onSubmit, onForgotPassword, isLoading, loginError }) => {
             <div className="relative">
                 <div className="flex items-center justify-between mb-2">
                     <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                        
+                        Password
                     </label>
                     <button
                         type="button"
@@ -147,7 +147,7 @@ const LoginForm = ({ onSubmit, onForgotPassword, isLoading, loginError }) => {
                         value={formData.password}
                         onChange={handleInputChange}
                         onBlur={() => handleInputBlur('password')}
-                        placeholder="Password"
+                        placeholder="••••••"
                         className="flex-1 bg-transparent text-gray-700 placeholder-gray-500 outline-none text-sm font-medium"
                     />
                     <NeumorphismButton
