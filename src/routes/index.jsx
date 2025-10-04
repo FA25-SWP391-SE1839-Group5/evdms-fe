@@ -26,6 +26,17 @@ export const routeReducer = (state, action) => {
         case 'LOGIN_SUCCESS': {
             // ✅ Route dựa theo role
             const user = action.payload;
+            
+            // ✅ Safety check - nếu không có user data thì về login
+            if (!user || !user.role) {
+                return {
+                    ...state,
+                    currentPage: ROUTES.LOGIN,
+                    user: null,
+                    isAuthenticated: false
+                };
+            }
+            
             let targetPage = ROUTES.CATALOG;
             
             if (user.role === 'evm_staff') {
