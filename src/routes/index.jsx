@@ -7,7 +7,7 @@ export const ROUTES = {
 };
 
 export const initialState = {
-    currentPage: ROUTES.LOGIN, // BẮT ĐẦU TỪ LOGIN
+    currentPage: ROUTES.LOGIN,
     selectedVehicle: null,
     user: null,
     isAuthenticated: false
@@ -23,13 +23,24 @@ export const routeReducer = (state, action) => {
                 isAuthenticated: false
             };
             
-        case 'LOGIN_SUCCESS':
+        case 'LOGIN_SUCCESS': {
+            // ✅ Route dựa theo role
+            const user = action.payload;
+            let targetPage = ROUTES.CATALOG;
+            
+            if (user.role === 'evm_staff') {
+                targetPage = ROUTES.VEHICLE_MODELS;
+            } else if (user.role === 'admin' || user.role === 'dealer_manager' || user.role === 'dealer_staff') {
+                targetPage = ROUTES.CATALOG;
+            }
+            
             return {
                 ...state,
-                currentPage: ROUTES.CATALOG, // Sau khi login thành công -> đi vào Catalog
-                user: action.payload,
+                currentPage: targetPage,
+                user: user,
                 isAuthenticated: true
             };
+        }
             
         case 'NAVIGATE_TO_VEHICLE_MODELS':
             return {
