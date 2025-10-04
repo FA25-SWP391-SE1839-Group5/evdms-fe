@@ -10,7 +10,6 @@ import {
   validateLogin,  
   sendResetPasswordLink, 
   saveLoginToken,
-  navigateToRoleBasedDashboard, 
 } from '../services/authService';
 import '../assets/styles/neumorphism.css';
 
@@ -27,19 +26,23 @@ const LoginPage = ({ onLoginSuccess }) => {
     setLoginError('');
 
     try {
-      const user = await validateLogin(formData.email, formData.password);
+      // API returns: { accessToken, refreshToken, user: { id, email, name, role } }
+      const userData = await validateLogin(formData.email, formData.password);
   
-        // No OTP required, proceed to dashboard
-        saveLoginToken(user, formData.rememberMe);
-        setUserRole(user);
-        
-        setTimeout(() => {
-          navigateToRoleBasedDashboard(user.role);
-          // GỌI CALLBACK ĐỂ CHUYỂN TRANG
-          onLoginSuccess(user);
-        }, 2500);
+      // Save token to localStorage
+      saveLoginToken(userData);
+      
+      setUserRole(userData.user);
+      setShowSuccess(true);
+      
+      // Delay redirect để show success message
+      setTimeout(() => {
+        // Call App.jsx callback to trigger route change
+        onLoginSuccess(userData.user);
+      }, 2500);
+      
     } catch (error) {
-      setLoginError('Invalid email or password. Please try again.');
+      setLoginError(error.message || 'Invalid email or password. Please try again.');
     } finally {
       setIsLoading(false);
     }
