@@ -7,7 +7,7 @@ export const roleRoutes = {
   admin: '/admin/dashboard',
   dealer_manager: '/manager/dashboard', 
   dealer_staff: '/staff/dashboard',
-  evm_staff: '/vehicle-models' // 
+  evm_staff: '/vehicle-models'
 };
 
 // ============================================
@@ -18,6 +18,12 @@ const USER_KEY = 'evdms_user';
 const REFRESH_KEY = 'evdms_refresh_token';
 
 export const saveLoginToken = (userData) => {
+  // ✅ Validate userData structure
+  if (!userData || !userData.user || !userData.accessToken) {
+    console.error('Invalid userData structure:', userData);
+    throw new Error('Invalid login data');
+  }
+
   const tokenData = {
     accessToken: userData.accessToken,
     refreshToken: userData.refreshToken,
@@ -44,6 +50,14 @@ export const getStoredToken = () => {
   
   try {
     const user = JSON.parse(userStr);
+
+    // Validate user object có đủ fields không
+    if (!user || !user.role || !user.email) {
+      console.warn('Invalid user data in localStorage');
+      clearToken();
+      return null;
+    }
+
     // Set lại header khi reload
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     return { token, user };

@@ -13,18 +13,27 @@ const App = () => {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
 
-  // Check token khi app mount
+  // ✅ Check token khi app mount
   useEffect(() => {
     const checkAuth = () => {
-      const stored = getStoredToken();
-      if (stored && stored.user) {
-        // User đã login, restore session
-        dispatch({
-          type: 'LOGIN_SUCCESS',
-          payload: stored.user
-        });
+      try {
+        const stored = getStoredToken();
+        if (stored && stored.user && stored.user.role) {
+          // User đã login, restore session
+          dispatch({
+            type: 'LOGIN_SUCCESS',
+            payload: stored.user
+          });
+        } else {
+          // Token invalid hoặc không đủ data
+          dispatch({ type: 'LOGOUT' });
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        dispatch({ type: 'LOGOUT' });
+      } finally {
+        setIsCheckingAuth(false);
       }
-      setIsCheckingAuth(false);
     };
 
     checkAuth();
