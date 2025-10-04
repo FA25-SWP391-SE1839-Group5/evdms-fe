@@ -158,7 +158,9 @@ export const sendResetPasswordLink = async (email, method) => {
 // ============================================
 export const logout = async () => {
   try {
-    await api.post('/auth/logout');
+    await api.post('/auth/logout', {
+      refreshToken: getRefreshToken(),
+    });
   } catch (error) {
     console.error('Logout error:', error);
   } finally {

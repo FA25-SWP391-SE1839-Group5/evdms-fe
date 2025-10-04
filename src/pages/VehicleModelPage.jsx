@@ -28,9 +28,15 @@ const VehicleModelPage = ({ user, onLogout }) => {
         setError(null);
         try {
             const response = await getAllVehicleModels();
-            if (response.success) {
-                setModels(response.data || []);
-            }
+
+            // Chuẩn hoá dữ liệu để luôn là array
+            const data = Array.isArray(response)
+            ? response
+            : Array.isArray(response.data)
+                ? response.data
+                : [];
+
+            setModels(data);
         } catch (err) {
             console.error('Error fetching models:', err);
             setError(err.response?.data?.message || 'Failed to load vehicle models');

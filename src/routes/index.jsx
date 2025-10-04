@@ -42,7 +42,7 @@ export const routeReducer = (state, action) => {
             if (user.role === 'evm_staff') {
                 targetPage = ROUTES.VEHICLE_MODELS;
             } else if (user.role === 'admin' || user.role === 'dealer_manager' || user.role === 'dealer_staff') {
-                targetPage = ROUTES.CATALOG;
+                targetPage = ROUTES.VEHICLE_MODELS;
             }
             
             return {
