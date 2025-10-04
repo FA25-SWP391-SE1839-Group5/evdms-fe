@@ -2,7 +2,7 @@ export const ROUTES = {
     LOGIN: 'login',
     CATALOG: 'catalog',
     DETAIL: 'detail',
-    DASHBOARD: 'dashboard',
+    ADMIN_DASHBOARD: 'admin_dashboard',
     VEHICLE_MODELS: 'vehicle_models'
 };
 
@@ -24,10 +24,10 @@ export const routeReducer = (state, action) => {
             };
             
         case 'LOGIN_SUCCESS': {
-            // ✅ Route dựa theo role
+            // Route dựa theo role
             const user = action.payload;
             
-            // ✅ Safety check - nếu không có user data thì về login
+            // Safety check - nếu không có user data thì về login
             if (!user || !user.role) {
                 return {
                     ...state,
@@ -39,9 +39,14 @@ export const routeReducer = (state, action) => {
             
             let targetPage = ROUTES.CATALOG;
             
-            if (user.role === 'evm_staff') {
-                targetPage = ROUTES.VEHICLE_MODELS;
-            } else if (user.role === 'admin' || user.role === 'dealer_manager' || user.role === 'dealer_staff') {
+            // Route based on role
+            if (user.role === 'admin') {
+                targetPage = ROUTES.ADMIN_DASHBOARD;
+            } else if (user.role === 'dealer_manager') {
+                targetPage = ROUTES.ADMIN_DASHBOARD;
+            } else if (user.role === 'dealer_staff') {
+                targetPage = ROUTES.ADMIN_DASHBOARD;
+            } else if (user.role === 'evm_staff') {
                 targetPage = ROUTES.VEHICLE_MODELS;
             }
             
@@ -52,7 +57,13 @@ export const routeReducer = (state, action) => {
                 isAuthenticated: true
             };
         }
-            
+        
+        case 'NAVIGATE_TO_ADMIN_DASHBOARD':
+            return {
+                ...state,
+                currentPage: ROUTES.ADMIN_DASHBOARD
+            };
+        
         case 'NAVIGATE_TO_VEHICLE_MODELS':
             return {
                 ...state,
@@ -80,12 +91,6 @@ export const routeReducer = (state, action) => {
                 ...state,
                 currentPage: ROUTES.DETAIL,
                 selectedVehicle: action.payload
-            };
-            
-        case 'NAVIGATE_TO_DASHBOARD':
-            return {
-                ...state,
-                currentPage: ROUTES.DASHBOARD
             };
             
         default:
