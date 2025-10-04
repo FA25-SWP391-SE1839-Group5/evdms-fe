@@ -140,66 +140,52 @@ const VehicleModelForm = ({ initialData, onSubmit, onCancel }) => {
                 )}
             </div>
 
-            {/* Brand */}
+            {/* Descriptions */}
             <div>
-                <label className="block text-sm font-medium text-gray-700">Brand</label>
-                <input
-                type="text"
-                name="brand"
-                value={formData.brand}
-                onChange={handleChange}
-                required
-                className="w-full border rounded-xl px-3 py-2 mt-1 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                    name="descriptions"
+                    value={formData.descriptions}
+                    onChange={handleChange}
+                    placeholder="Enter detailed description..."
+                    rows="4"
+                    className={`w-full border rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none resize-none ${
+                        errors.descriptions ? 'border-red-500' : ''
+                    }`}
                 />
-            </div>
-
-            {/* Year */}
-            <div>
-                <label className="block text-sm font-medium text-gray-700">Year</label>
-                <input
-                type="number"
-                name="year"
-                value={formData.year}
-                onChange={handleChange}
-                required
-                className="w-full border rounded-xl px-3 py-2 mt-1 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-                />
-            </div>
-
-            {/* Price */}
-            <div>
-                <label className="block text-sm font-medium text-gray-700">Price ($)</label>
-                <input
-                type="number"
-                name="price"
-                value={formData.price}
-                onChange={handleChange}
-                required
-                className="w-full border rounded-xl px-3 py-2 mt-1 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-                />
-            </div>
-
+                {errors.descriptions && (
+                    <p className="text-red-500 text-xs mt-1">{errors.descriptions}</p>
+                )}
+            </div>    
+            
             {/* Image Upload */}
             <div>
-                <label className="block text-sm font-medium text-gray-700">Image</label>
-                <div className="mt-2 flex items-center gap-4">
-                    {formData.image ? (
-                        <div className="relative w-24 h-24">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Image
+                </label>
+                <div className="mt-2 space-y-3">
+                    {imagePreview ? (
+                        <div className="relative w-full h-48 border rounded-xl overflow-hidden">
                             <img
-                                src={formData.image}
+                                src={imagePreview}
                                 alt="Preview"
-                                className="w-full h-full object-cover rounded-xl border"
+                                className="w-full h-full object-cover"
                             />
                             <button
                                 type="button"
-                                onClick={() => setFormData((prev) => ({ ...prev, image: null }))}
-                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                                onClick={handleRemoveImage}
+                                className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600"
                             >
+                                <X className="w-4 h-4" />
                             </button>
                         </div>
                     ) : (
-                        <label className="flex items-center justify-center w-24 h-24 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50">
-                            <Upload className="w-6 h-6 text-gray-400" />
+                        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50">
+                            <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                            <span className="text-sm text-gray-500">Click to upload image</span>
+                            <span className="text-xs text-gray-400">PNG, JPG, GIF up to 5MB</span>
                             <input
                                 type="file"
                                 accept="image/*"
@@ -208,8 +194,43 @@ const VehicleModelForm = ({ initialData, onSubmit, onCancel }) => {
                             />
                         </label>
                     )}
+
+                    {/* Upload Button (nếu có file chưa upload) */}
+                    {imageFile && !formData.imageUrl && (
+                        <button
+                            type="button"
+                            onClick={handleUploadImage}
+                            disabled={uploading}
+                            className="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl disabled:opacity-50"
+                        >
+                            {uploading ? 'Uploading...' : 'Upload Image'}
+                        </button>
+                    )}
+
+                    {formData.imageUrl && (
+                        <p className="text-xs text-green-600">✓ Image uploaded successfully</p>
+                    )}
+
+                    {errors.image && (
+                        <p className="text-red-500 text-xs">{errors.image}</p>
+                    )}
                 </div>
             </div>
+
+            {/* Image URL (hidden field, read-only) */}
+            {formData.imageUrl && (
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Image URL
+                    </label>
+                    <input
+                        type="text"
+                        value={formData.imageUrl}
+                        readOnly
+                        className="w-full border rounded-xl px-3 py-2 bg-gray-50 text-gray-600 text-sm"
+                    />
+                </div>
+            )}
 
             {/* Actions */}
             <div className="flex justify-end gap-3 pt-4">
