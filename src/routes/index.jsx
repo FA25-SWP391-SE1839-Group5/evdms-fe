@@ -3,7 +3,9 @@ export const ROUTES = {
     CATALOG: 'catalog',
     DETAIL: 'detail',
     ADMIN_DASHBOARD: 'admin_dashboard',
-    VEHICLE_MODELS: 'vehicle_models'
+    VEHICLE_MODELS: 'vehicle_models',
+    RESET_PASSWORD: 'reset_password'
+
 };
 
 export const initialState = {
@@ -70,6 +72,12 @@ export const routeReducer = (state, action) => {
                 currentPage: ROUTES.VEHICLE_MODELS
             };
             
+        case 'NAVIGATE_TO_RESET_PASSWORD':
+            return {
+                ...state,
+                currentPage: ROUTES.RESET_PASSWORD,
+        };
+    
         case 'LOGOUT':
             return {
                 ...state,
