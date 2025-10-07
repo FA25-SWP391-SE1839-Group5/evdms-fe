@@ -18,18 +18,16 @@ const USER_KEY = 'evdms_user';
 const REFRESH_KEY = 'evdms_refresh_token';
 
 export const saveLoginToken = (userData) => {
-  // Hỗ trợ dữ liệu phẳng (id, fullName, email, ...)
   if (!userData || !userData.accessToken || !userData.id) {
     console.error('Invalid userData structure:', userData);
     throw new Error('Invalid login data');
   }
 
-  // Chuẩn hoá object user để frontend dễ xử lý
   const user = {
     id: userData.id,
     name: userData.fullName,
     email: userData.email,
-    role: userData.role || 'admin' // fallback nếu backend chưa trả role
+    role: userData.role || 'admin'
   };
 
   const tokenData = {
@@ -39,12 +37,10 @@ export const saveLoginToken = (userData) => {
     expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
   };
 
-  // ✅ Lưu vào localStorage
   localStorage.setItem(TOKEN_KEY, tokenData.accessToken);
   localStorage.setItem(REFRESH_KEY, tokenData.refreshToken);
   localStorage.setItem(USER_KEY, JSON.stringify(user));
 
-  // Set header cho axios
   api.defaults.headers.common['Authorization'] = `Bearer ${tokenData.accessToken}`;
 
   return tokenData.accessToken;
@@ -97,7 +93,6 @@ export const refreshAccessToken = async () => {
   if (!refreshToken) throw new Error('No refresh token');
 
   try {
-    // POST /api/auth/refresh
     const response = await api.post('/auth/refresh', { refreshToken });
     
     if (response.data.success) {
@@ -129,14 +124,12 @@ export const navigateToRoleBasedDashboard = (role) => {
 // ============================================
 export const validateLogin = async (email, password) => {
   try {
-    // POST /api/auth/login
     const response = await api.post('/auth/login', { 
       email, 
       password 
     });
     
     if (response.data.success) {
-      // Backend trả về: { id, fullName, email, role, accessToken, refreshToken }
       return response.data.data;
     } else {
       throw new Error(response.data.message || 'Login failed');
@@ -151,7 +144,6 @@ export const validateLogin = async (email, password) => {
 // ============================================
 export const sendResetPasswordLink = async (email) => {
   try {
-    // POST /api/auth/request-password-reset
     const response = await api.post('/auth/request-password-reset', { 
       email 
     });
@@ -172,13 +164,12 @@ export const sendResetPasswordLink = async (email) => {
 // ============================================
 // API CALLS - RESET PASSWORD
 // ============================================
-export const resetPassword = async (token, oldPassword, newPassword, confirmNewPassword) => {
+export const resetPassword = async (token, newPassword, confirmNewPassword) => {
   try {
-    // POST /api/auth/reset-password
     const response = await api.post(`/auth/reset-password?token=${token}`, {
-      oldPassword, // Backend có thể yêu cầu field này
+      oldPassword: "Dummy@123", // Dummy password with uppercase, lowercase, number, special char - min 6 chars
       newPassword,
-      confirmNewPassword,
+      confirmNewPassword
     });
 
     if (response.data.success) {
@@ -188,14 +179,11 @@ export const resetPassword = async (token, oldPassword, newPassword, confirmNewP
   } catch (error) {
     console.error("Reset password error:", error);
     
-    // Xử lý các error message từ backend
     const errorMessage = error.response?.data?.message || error.message;
     
-    if (errorMessage.includes('expired')) {
-      throw new Error("Reset link has expired. Please request a new one.");
-    } else if (errorMessage.includes('invalid')) {
-      throw new Error("Invalid reset link. Please request a new one.");
-    } else if (errorMessage.includes('password')) {
+    if (errorMessage.toLowerCase().includes('expired') || errorMessage.toLowerCase().includes('invalid token')) {
+      throw new Error("Reset link has expired or is invalid. Please request a new one.");
+    } else if (errorMessage.toLowerCase().includes('password')) {
       throw new Error(errorMessage);
     } else {
       throw new Error("Unable to reset password. Please try again later.");
@@ -208,7 +196,6 @@ export const resetPassword = async (token, oldPassword, newPassword, confirmNewP
 // ============================================
 export const logout = async () => {
   try {
-    // POST /api/auth/logout
     await api.post('/auth/logout', {
       refreshToken: getRefreshToken(),
     });

@@ -10,18 +10,30 @@ const ResetPasswordPage = () => {
   const [loading, setLoading] = useState(false);
   const [countdown, setCountdown] = useState(3);
 
-  // Extract token from URL
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const resetToken = urlParams.get("token");
-    
-    if (!resetToken) {
+  // Extract and hide token from URL
+useEffect(() => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const resetToken = urlParams.get("token");
+
+  if (resetToken) {
+    // Lưu vào sessionStorage
+    sessionStorage.setItem("resetToken", resetToken);
+
+    // Xóa token khỏi URL mà không reload trang
+    window.history.replaceState({}, document.title, window.location.pathname);
+
+    setToken(resetToken);
+  } else {
+    // Nếu không có token trong URL hoặc storage thì báo lỗi
+    const storedToken = sessionStorage.getItem("resetToken");
+    if (storedToken) {
+      setToken(storedToken);
+    } else {
       setMessageType("error");
       setMessage("Invalid reset link. Please request a new password reset.");
-    } else {
-      setToken(resetToken);
     }
-  }, []);
+  }
+}, []);
 
   // Countdown for redirect
   useEffect(() => {
@@ -61,8 +73,8 @@ const ResetPasswordPage = () => {
     setMessage("");
     
     try {
-      await resetPassword(token, newPassword, confirmPassword);
-      setMessageType("success");
+      const savedToken = token || sessionStorage.getItem("resetToken");
+      await resetPassword(savedToken, newPassword, confirmPassword);
       setMessage("Password reset successfully! Redirecting to login...");
     } catch (err) {
       setMessageType("error");
