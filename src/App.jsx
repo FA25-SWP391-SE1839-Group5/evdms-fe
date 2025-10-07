@@ -14,10 +14,21 @@ const App = () => {
   const [compareList, setCompareList] = useState([]);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  // Check token when app mounts
   useEffect(() => {
-    const checkAuth = () => {
+    const checkAuthOrReset = () => {
       try {
+        // Check if URL has reset token parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const resetToken = urlParams.get('token');
+        
+        if (resetToken) {
+          // User is trying to reset password
+          dispatch({ type: 'NAVIGATE_TO_RESET_PASSWORD' });
+          setIsCheckingAuth(false);
+          return;
+        }
+
+        // Otherwise, check authentication
         const stored = getStoredToken();
         if (stored && stored.user && stored.user.role) {
           // User is logged in, restore session
@@ -37,13 +48,22 @@ const App = () => {
       }
     };
 
-    checkAuth();
+    checkAuthOrReset();
   }, []);
 
+  // Sync logout across tabs
   useEffect(() => {
-    if (window.location.pathname.includes("reset-password")) {
-      dispatch({ type: "NAVIGATE_TO_RESET_PASSWORD" });
-    }
+    const handleStorageChange = (e) => {
+      if (e.key === 'evdms_auth_token' && !e.newValue) {
+        // Token was cleared in another tab
+        dispatch({ type: 'LOGOUT' });
+        setFavorites(new Set());
+        setCompareList([]);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   // ============================================
