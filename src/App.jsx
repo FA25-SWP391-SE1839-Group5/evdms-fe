@@ -4,6 +4,7 @@ import CatalogPage from './pages/CatalogPage';
 import EVDetailPage from './pages/EVDetailPage';
 import VehicleModelPage from './pages/VehicleModelPage';
 import AdminDashboard from './pages/AdminDashboard';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import { routeReducer, initialState, ROUTES } from './routes';
 import { logout, getStoredToken } from './services/authService';
 
@@ -37,6 +38,12 @@ const App = () => {
     };
 
     checkAuth();
+  }, []);
+
+  useEffect(() => {
+    if (window.location.pathname.includes("reset-password")) {
+      dispatch({ type: "NAVIGATE_TO_RESET_PASSWORD" });
+    }
   }, []);
 
   // ============================================
@@ -136,6 +143,11 @@ const App = () => {
           user={routeState.user}
           onLogout={handleLogout}
         />
+      )}
+
+      {/* RESET PASSWORD PAGE */}
+      {routeState.currentPage === ROUTES.RESET_PASSWORD && (
+        <ResetPasswordPage />
       )}
       
       {/* CATALOG PAGE */}
