@@ -97,7 +97,9 @@ export const refreshAccessToken = async () => {
   if (!refreshToken) throw new Error('No refresh token');
 
   try {
+    // POST /api/auth/refresh
     const response = await api.post('/auth/refresh', { refreshToken });
+    
     if (response.data.success) {
       const { accessToken, id, fullName, email, role } = response.data.data;
 
@@ -127,9 +129,15 @@ export const navigateToRoleBasedDashboard = (role) => {
 // ============================================
 export const validateLogin = async (email, password) => {
   try {
-    const response = await api.post('/auth/login', { email, password });
+    // POST /api/auth/login
+    const response = await api.post('/auth/login', { 
+      email, 
+      password 
+    });
+    
     if (response.data.success) {
-      return response.data.data; // dạng phẳng: { id, fullName, email, accessToken, refreshToken }
+      // Backend trả về: { id, fullName, email, role, accessToken, refreshToken }
+      return response.data.data;
     } else {
       throw new Error(response.data.message || 'Login failed');
     }
@@ -141,34 +149,57 @@ export const validateLogin = async (email, password) => {
 // ============================================
 // API CALLS - FORGOT PASSWORD
 // ============================================
-export const sendResetPasswordLink = async (email, method) => {
+export const sendResetPasswordLink = async (email) => {
   try {
-    const response = await api.post('/auth/request-password-reset', { email, method });
-    if (response.data.success) return response.data;
+    // POST /api/auth/request-password-reset
+    const response = await api.post('/auth/request-password-reset', { 
+      email 
+    });
+    
+    if (response.data.success) {
+      return response.data;
+    }
     throw new Error(response.data.message || 'Failed to send reset link');
   } catch (error) {
     console.error('Forgot password error:', error);
-    throw new Error(error.response?.data?.message || 'Unable to send password reset link');
+    throw new Error(
+      error.response?.data?.message || 
+      'Unable to send password reset link. Please try again.'
+    );
   }
 };
 
 // ============================================
 // API CALLS - RESET PASSWORD
 // ============================================
-export const resetPassword = async (token, newPassword, confirmNewPassword) => {
+export const resetPassword = async (token, oldPassword, newPassword, confirmNewPassword) => {
   try {
-    const response = await api.post("/auth/reset-password", {
-      token: token, // bắt buộc gửi token
-      oldPassword: "placeholder", // tránh lỗi min length 6
+    // POST /api/auth/reset-password
+    const response = await api.post(`/auth/reset-password?token=${token}`, {
+      oldPassword, // Backend có thể yêu cầu field này
       newPassword,
       confirmNewPassword,
     });
 
-    if (response.data.success) return response.data;
+    if (response.data.success) {
+      return response.data;
+    }
     throw new Error(response.data.message || "Password reset failed");
   } catch (error) {
     console.error("Reset password error:", error);
-    throw new Error(error.response?.data?.message || "Unable to reset password");
+    
+    // Xử lý các error message từ backend
+    const errorMessage = error.response?.data?.message || error.message;
+    
+    if (errorMessage.includes('expired')) {
+      throw new Error("Reset link has expired. Please request a new one.");
+    } else if (errorMessage.includes('invalid')) {
+      throw new Error("Invalid reset link. Please request a new one.");
+    } else if (errorMessage.includes('password')) {
+      throw new Error(errorMessage);
+    } else {
+      throw new Error("Unable to reset password. Please try again later.");
+    }
   }
 };
 
@@ -177,6 +208,7 @@ export const resetPassword = async (token, newPassword, confirmNewPassword) => {
 // ============================================
 export const logout = async () => {
   try {
+    // POST /api/auth/logout
     await api.post('/auth/logout', {
       refreshToken: getRefreshToken(),
     });
