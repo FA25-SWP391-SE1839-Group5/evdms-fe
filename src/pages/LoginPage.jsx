@@ -30,13 +30,21 @@ const LoginPage = ({ onLoginSuccess }) => {
       // Save token to localStorage
       saveLoginToken(userData);
 
+      // Normalize user data for display
+      const user = {
+        id: userData.id,
+        name: userData.fullName,
+        email: userData.email,
+        role: userData.role
+      };
+
       setUserRole(userData.user);
       setShowSuccess(true);
 
       // Delay redirect để show success message
       setTimeout(() => {
-        onLoginSuccess(userData.user);
-      }, 500);
+        onLoginSuccess(user);
+      }, 1500);
     } catch (error) {
       setLoginError(error.message || "Invalid email or password. Please try again.");
     } finally {
@@ -60,7 +68,7 @@ const LoginPage = ({ onLoginSuccess }) => {
       setForgotMessage("✅ Password reset link has been sent! Please check your email.");
       setTimeout(() => {
         setShowForgotPassword(false);
-      }, 2000);;
+      }, 3000);;
     } catch (e) {
       setLoginError(e.message || "An error occurred. Please try again.");
     } finally {
