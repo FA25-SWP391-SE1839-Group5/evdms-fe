@@ -143,12 +143,32 @@ export const validateLogin = async (email, password) => {
 // ============================================
 export const sendResetPasswordLink = async (email, method) => {
   try {
-    const response = await api.post('/auth/forgot-password', { email, method });
+    const response = await api.post('/auth/request-password-reset', { email, method });
     if (response.data.success) return response.data;
     throw new Error(response.data.message || 'Failed to send reset link');
   } catch (error) {
     console.error('Forgot password error:', error);
     throw new Error(error.response?.data?.message || 'Unable to send password reset link');
+  }
+};
+
+// ============================================
+// API CALLS - RESET PASSWORD
+// ============================================
+export const resetPassword = async (token, newPassword, confirmNewPassword) => {
+  try {
+    const response = await api.post("/auth/reset-password", {
+      token: token, // bắt buộc gửi token
+      oldPassword: "placeholder", // tránh lỗi min length 6
+      newPassword,
+      confirmNewPassword,
+    });
+
+    if (response.data.success) return response.data;
+    throw new Error(response.data.message || "Password reset failed");
+  } catch (error) {
+    console.error("Reset password error:", error);
+    throw new Error(error.response?.data?.message || "Unable to reset password");
   }
 };
 
