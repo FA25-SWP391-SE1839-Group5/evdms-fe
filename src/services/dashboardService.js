@@ -429,50 +429,96 @@ export const deletePromotion = async (id) => {
 // ============================================
 export const getAllUsers = async () => {
   try {
+    console.log('📡 API Call: GET /api/users');
     const response = await api.get('/users');
+    console.log('📥 Response:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error fetching users:', error);
+    console.error('❌ getAllUsers error:', error.response?.data || error.message);
     throw error;
   }
 };
 
 export const getUserById = async (id) => {
   try {
+    console.log(`📡 API Call: GET /api/users/${id}`);
     const response = await api.get(`/users/${id}`);
+    console.log('📥 Response:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error fetching user:', error);
+    console.error(`❌ getUserById(${id}) error:`, error.response?.data || error.message);
     throw error;
   }
 };
 
 export const createUser = async (userData) => {
   try {
+    console.log('📡 API Call: POST /api/users');
+    console.log('📤 Request body:', userData);
+
+    // Validate required fields
+    if (!userData.fullName || !userData.email || !userData.password) {
+      throw new Error('Missing required fields: fullName, email, password');
+    }
+
     const response = await api.post('/users', userData);
+    console.log('✅ User created successfully:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error creating user:', error);
+    console.error('❌ createUser error:', error.response?.data || error.message);
     throw error;
   }
 };
 
 export const updateUser = async (id, userData) => {
   try {
+    console.log(`📡 API Call: PUT /api/users/${id}`);
+    console.log('📤 Request body:', userData);
+
     const response = await api.put(`/users/${id}`, userData);
+    console.log('✅ User updated successfully:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error updating user:', error);
+    console.error(`❌ updateUser(${id}) error:`, error.response?.data || error.message);
     throw error;
   }
 };
 
 export const deleteUser = async (id) => {
   try {
+    console.log(`📡 API Call: DELETE /api/users/${id}`);
     const response = await api.delete(`/users/${id}`);
-    return response.data;
+    console.log('✅ User deleted successfully from database:', response.data);
+    return response;
   } catch (error) {
-    console.error('Error deleting user:', error);
+    console.error(`❌ deleteUser(${id}) error:`, error.response?.data || error.message);
     throw error;
   }
 };
+
+export const patchUser = async (id, userData) => {
+  try {
+    console.log(`📡 API Call: PATCH /api/users/${id}`);
+    console.log('📤 Request body:', userData);
+
+    const response = await api.patch(`/users/${id}`, userData);
+    console.log('✅ User patched successfully:', response.data);
+    return response;
+  } catch (error) {
+    console.error(`❌ patchUser(${id}) error:`, error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const getCurrentUser = async () => {
+  try {
+    console.log('📡 API Call: GET /api/users/me');
+    const response = await api.get('/users/me');
+    console.log('📥 Current user:', response.data);
+    return response;
+  } catch (error) {
+    console.error('❌ getCurrentUser error:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
