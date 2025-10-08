@@ -38,8 +38,12 @@ const Sidebar = ({ isOpen, activeSection, onSectionChange }) => {
     <aside className="w-64 bg-white border-r border-gray-200 fixed h-screen overflow-y-auto">
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-indigo-600 rounded-lg"></div>
-          <span className="text-xl font-bold text-indigo-600">EV Dealer</span>
+          <img
+            src="src/assets/images/elecar_logo.svg"   // 👉 thay đường dẫn này bằng ảnh của bạn
+            alt="Logo"
+            className="w-10 h-16 rounded-lg object-cover"
+          />
+          <span className="text-xl font-bold text-indigo-600">EVDMS</span>
         </div>
       </div>
       
