@@ -161,4 +161,157 @@ console.log("Error status:", err.response?.status);
     setPagination(prev => ({ ...prev, pageSize: newPageSize, page: 1 }));
   };
 
- 
+  // SORTING
+  const handleSort = (field) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">Vehicle Variants</h1>
+            {user && (
+              <p className="text-sm text-gray-500 mt-1">
+                Welcome, {user.name || user.email} ({user.role})
+              </p>
+            )}
+          </div>
+          <div className="flex items-center gap-4">
+            {onNavigateToModels && (
+              <button
+                onClick={onNavigateToModels}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors"
+              >
+                <Settings size={18} />
+                Vehicle Models
+              </button>
+            )}
+            {!(showForm && editVariant === null) && (
+              <button
+                onClick={() => {
+                  setEditVariant(null);
+                  setShowForm(true);
+                  setError(null);
+                }}
+                className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-colors"
+              >
+                <Plus size={18} />
+                Add Variant
+              </button>
+            )}
+            <button 
+              onClick={onLogout} 
+              className="flex items-center gap-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-colors"
+            >
+              <LogOut size={18} />
+              Logout
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
+            <p className="font-medium">Error</p>
+            <p className="text-sm">{error}</p>
+          </div>
+        )}
+
+        {/* Search and Filters (only if not showing form) */}
+        {!showForm && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <VehicleVariantSearch 
+                value={search} 
+                onChange={setSearch}
+                onSearch={() => fetchVariants()}
+              />
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <label className="text-sm text-gray-600">Sort by:</label>
+                  <select 
+                    value={sortBy} 
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="px-3 py-1 border border-gray-300 rounded-lg text-sm"
+                  >
+                    <option value="name">Name</option>
+                    <option value="basePrice">Price</option>
+                    <option value="createdAt">Created Date</option>
+                  </select>
+                  <button
+                    onClick={() => handleSort(sortBy)}
+                    className="p-1 hover:bg-gray-100 rounded"
+                  >
+                    {sortOrder === "asc" ? "↑" : "↓"}
+                  </button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="text-sm text-gray-600">Per page:</label>
+                  <select 
+                    value={pagination.pageSize} 
+                    onChange={(e) => handlePageSizeChange(parseInt(e.target.value))}
+                    className="px-3 py-1 border border-gray-300 rounded-lg text-sm"
+                  >
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={50}>50</option>
+                  </select>
+                </div>
+                <p className="text-sm text-gray-500">
+                  {pagination.totalItems} variant(s) found
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Form or List */}
+        {showForm ? (
+          <VehicleVariantForm
+            initialData={
+              editVariant
+                ? {
+                    modelId: editVariant.modelId,
+                    name: editVariant.name,
+                    basePrice: editVariant.basePrice,
+                    specs: editVariant.specs || {},
+                    features: editVariant.features || {}
+                  }
+                : null
+            }
+            models={models}
+            onSubmit={handleSubmit}
+            onCancel={() => {
+              setShowForm(false);
+              setEditVariant(null);
+              setError(null);
+            }}
+          />
+        ) : (
+          <VehicleVariantList 
+            variants={filteredVariants} 
+            onEdit={handleEdit} 
+            onDelete={handleDelete} 
+            loading={loading}
+            pagination={pagination}
+            onPageChange={handlePageChange}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default VehicleVariantPage;
