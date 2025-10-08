@@ -29,4 +29,65 @@ const VehicleVariantPage = ({ user, onLogout, onNavigateToModels }) => {
   const [sortBy, setSortBy] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
 
+  // Fetch variants and models when component mounts
+  useEffect(() => {
+    fetchVariants();
+    fetchModels();
+  }, [pagination.page, pagination.pageSize, sortBy, sortOrder, search]);
 
+  const fetchVariants = async () => {
+  setLoading(true);
+  setError(null);
+  try {
+    const params = {
+      page: pagination.page,
+      pageSize: pagination.pageSize,
+      sortBy,
+      sortOrder,
+      search: search || null
+    };
+
+    const response = await getAllVehicleVariants(params);
+    console.log("Vehicle variants response:", response);
+
+    // ✅ An toàn cho mọi trường hợp (có thể response.data hoặc response.data.data)
+    const data = response.data?.data || response.data || {};
+    const items = data.items || [];
+    const totalItems = data.totalResults || data.totalItems || items.length;
+    const totalPages = data.totalPages || Math.ceil(totalItems / pagination.pageSize);
+
+    if (items.length > 0) {
+      setVariants(items);
+      setPagination(prev => ({
+        ...prev,
+        totalItems,
+        totalPages
+      }));
+    } else {
+      setVariants([]);
+    }
+  } catch (err) {
+    console.error("Error fetching variants:", err);
+    console.log("Error message:", err.message);
+console.log("Error response data:", err.response?.data);
+console.log("Error status:", err.response?.status);
+
+    setError(err.response?.data?.message || "Failed to load vehicle variants");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
+  const fetchModels = async () => {
+    try {
+      const response = await getAllVehicleModels();
+      const data = Array.isArray(response) ? response : Array.isArray(response.data) ? response.data : [];
+      setModels(data);
+    } catch (err) {
+      console.error("Error fetching models:", err);
+    }
+  };
+
+  
