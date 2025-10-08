@@ -90,4 +90,75 @@ console.log("Error status:", err.response?.status);
     }
   };
 
-  
+   // Filter variants by search
+  const filteredVariants = variants.filter((v) => 
+    v.name.toLowerCase().includes(search.toLowerCase()) ||
+    (v.modelName && v.modelName.toLowerCase().includes(search.toLowerCase()))
+  );
+
+  // CREATE or UPDATE
+  const handleSubmit = async (data) => {
+    setError(null);
+
+    try {
+      if (editVariant) {
+        // UPDATE
+        const response = await updateVehicleVariant(editVariant.id, data);
+        if (response.success && response.data) {
+          setVariants((prev) => prev.map((v) => (v.id === editVariant.id ? response.data : v)));
+          alert("Vehicle variant updated successfully!");
+        }
+      } else {
+        // CREATE
+        const response = await createVehicleVariant(data);
+        if (response.success) {
+          setVariants((prev) => [...prev, response.data]);
+          alert("Vehicle variant created successfully!");
+        }
+      }
+      setShowForm(false);
+      setEditVariant(null);
+      fetchVariants(); // Refresh the list
+    } catch (err) {
+      console.error("Error submitting variant:", err);
+      setError(err.response?.data?.message || "Failed to save vehicle variant");
+    }
+  };
+
+  // EDIT
+  const handleEdit = (variant) => {
+    setEditVariant(variant);
+    setShowForm(true);
+    setError(null);
+  };
+
+  // DELETE
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this variant?")) {
+      return;
+    }
+
+    setError(null);
+    try {
+      const response = await deleteVehicleVariant(id);
+      if (response.success) {
+        setVariants((prev) => prev.filter((v) => v.id !== id));
+        alert("Vehicle variant deleted successfully!");
+        fetchVariants(); // Refresh the list
+      }
+    } catch (err) {
+      console.error("Error deleting variant:", err);
+      setError(err.response?.data?.message || "Failed to delete vehicle variant");
+    }
+  };
+
+  // PAGINATION
+  const handlePageChange = (newPage) => {
+    setPagination(prev => ({ ...prev, page: newPage }));
+  };
+
+  const handlePageSizeChange = (newPageSize) => {
+    setPagination(prev => ({ ...prev, pageSize: newPageSize, page: 1 }));
+  };
+
+ 
