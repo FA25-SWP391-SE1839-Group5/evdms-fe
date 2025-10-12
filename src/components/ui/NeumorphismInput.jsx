@@ -1,7 +1,6 @@
-import { Icon } from "lucide-react";
 import React, { forwardRef } from "react";
 
-const NeumorphismInput = forwardRef (({
+const NeumorphismInput = forwardRef(({
     icon: Icon,
     error,
     children,
@@ -12,6 +11,7 @@ const NeumorphismInput = forwardRef (({
         <div>
             <div
                 ref={ref}
+                {...props}
                 className={`neu-input rounded-2xl p-4 transition-all duration-300 ${error ? 'error' : ''} ${className}`}
             >
                 <div className="flex items-center space-x-3">
@@ -30,4 +30,4 @@ const NeumorphismInput = forwardRef (({
 
 NeumorphismInput.displayName = 'NeumorphismInput';
 
-export default NeumorphismInput
+export default NeumorphismInput;

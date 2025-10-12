@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import Sidebar from '../components/admin-dashboard/SideBar';
+import Sidebar from '../components/admin-dashboard/Sidebar';
 import Navbar from '../components/admin-dashboard/NavBar';
 import StatsCards from '../components/admin-dashboard/StatsCards';
 import RecentOrders from '../components/admin-dashboard/RecentOrders';
 import TestDrivesList from '../components/admin-dashboard/TestDriveList';
 import APIStatus from '../components/admin-dashboard/APIStatus';
 import UserManagement from '../components/admin-dashboard/UserManagement';
+import DealerManagement from '../components/admin-dashboard/dealer/DealerManagement';
 import api from '../services/api';
 
 const AdminDashboard = ({ user, onLogout }) => {
@@ -15,7 +16,7 @@ const AdminDashboard = ({ user, onLogout }) => {
     vehicles: 0,
     orders: 0
   });
-  
+
   const [recentOrders, setRecentOrders] = useState([]);
   const [testDrives, setTestDrives] = useState([]);
   const [apiStatus, setApiStatus] = useState([]);
@@ -40,7 +41,7 @@ const AdminDashboard = ({ user, onLogout }) => {
 
   const loadDashboardData = async () => {
     setLoading(true);
-    
+
     try {
       // Fetch all data in parallel
       const [dealers, customers, inventory, orders, drives] = await Promise.all([
@@ -100,6 +101,7 @@ const AdminDashboard = ({ user, onLogout }) => {
             responseTime: `${responseTime}ms`
           };
         } catch (error) {
+          console.error(`API status check failed for ${endpoint.path}:`, error);
           return {
             name: endpoint.name,
             path: endpoint.path,
@@ -118,15 +120,10 @@ const AdminDashboard = ({ user, onLogout }) => {
     switch (activeSection) {
       case 'users':
         return <UserManagement />;
-      
+
       case 'dealers':
-        return (
-          <div>
-            <h2 className="text-2xl font-bold mb-6">Dealer Management</h2>
-            <p className="text-gray-600">Dealer management page - Coming soon...</p>
-          </div>
-        );
-      
+        return <DealerManagement />;
+
       case 'customers':
         return (
           <div>
@@ -134,7 +131,7 @@ const AdminDashboard = ({ user, onLogout }) => {
             <p className="text-gray-600">Customer management page - Coming soon...</p>
           </div>
         );
-      
+
       case 'inventory':
         return (
           <div>
@@ -142,14 +139,14 @@ const AdminDashboard = ({ user, onLogout }) => {
             <p className="text-gray-600">Inventory management page - Coming soon...</p>
           </div>
         );
-      
+
       case 'dashboard':
       default:
         return (
           <>
             <h2 className="text-2xl font-bold mb-6">Dashboard Overview</h2>
             <StatsCards stats={stats} loading={loading} />
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
               <div className="lg:col-span-2">
                 <RecentOrders orders={recentOrders} loading={loading} />
@@ -158,7 +155,7 @@ const AdminDashboard = ({ user, onLogout }) => {
                 <TestDrivesList testDrives={testDrives} loading={loading} />
               </div>
             </div>
-            
+
             <APIStatus apiStatus={apiStatus} />
           </>
         );

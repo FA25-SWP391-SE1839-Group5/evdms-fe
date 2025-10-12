@@ -3,9 +3,21 @@ import api from './api';
 // ============================================
 // DEALERS
 // ============================================
-export const getAllDealers = async () => {
+const sanitizeParams = (params = {}) => {
+  const cleaned = {};
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      cleaned[key] = value;
+    }
+  });
+  return cleaned;
+};
+
+export const getAllDealers = async (params = {}) => {
   try {
-    const response = await api.get('/dealers');
+    const response = await api.get('/dealers', {
+      params: sanitizeParams(params)
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching dealers:', error);
@@ -43,12 +55,88 @@ export const updateDealer = async (id, dealerData) => {
   }
 };
 
+export const patchDealer = async (id, dealerData) => {
+  try {
+    const response = await api.patch(`/dealers/${id}`, dealerData);
+    return response.data;
+  } catch (error) {
+    console.error('Error partially updating dealer:', error);
+    throw error;
+  }
+};
+
 export const deleteDealer = async (id) => {
   try {
     const response = await api.delete(`/dealers/${id}`);
     return response.data;
   } catch (error) {
     console.error('Error deleting dealer:', error);
+    throw error;
+  }
+};
+
+// ============================================
+// DEALER CONTRACTS
+// ============================================
+
+export const getAllDealerContracts = async (params = {}) => {
+  try {
+    const response = await api.get('/dealer-contracts', {
+      params: sanitizeParams(params)
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching dealer contracts:', error);
+    throw error;
+  }
+};
+
+export const getDealerContractById = async (id) => {
+  try {
+    const response = await api.get(`/dealer-contracts/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching dealer contract:', error);
+    throw error;
+  }
+};
+
+export const createDealerContract = async (payload) => {
+  try {
+    const response = await api.post('/dealer-contracts', payload);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating dealer contract:', error);
+    throw error;
+  }
+};
+
+export const updateDealerContract = async (id, payload) => {
+  try {
+    const response = await api.put(`/dealer-contracts/${id}`, payload);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating dealer contract:', error);
+    throw error;
+  }
+};
+
+export const patchDealerContract = async (id, payload) => {
+  try {
+    const response = await api.patch(`/dealer-contracts/${id}`, payload);
+    return response.data;
+  } catch (error) {
+    console.error('Error partially updating dealer contract:', error);
+    throw error;
+  }
+};
+
+export const deleteDealerContract = async (id) => {
+  try {
+    const response = await api.delete(`/dealer-contracts/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting dealer contract:', error);
     throw error;
   }
 };
@@ -521,4 +609,3 @@ export const getCurrentUser = async () => {
     throw error;
   }
 };
-

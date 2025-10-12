@@ -200,19 +200,24 @@ export const formatPrice = (price) => {
 };
 
 export const getAvailabilityBadge = (availability) => {
-    const badges = {
-        'in-stock': 'bg-green-100 text-green-800 border-green-200',
-        'pre-order': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-        'out-of-stock': 'bg-red-100 text-red-800 border-red-200'
-    };
+  const badges = {
+    'in-stock': 'bg-green-100 text-green-800 border-green-200',
+    'pre-order': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    'out-of-stock': 'bg-red-100 text-red-800 border-red-200'
+  };
 
-    const labels = {
-        'in-stock': 'Có sẵn',
-        'pre-order': 'Đặt trước',
-        'out-of-stock': 'Hết hàng',
-    };
+  const labels = {
+    'in-stock': 'Có sẵn',
+    'pre-order': 'Đặt trước',
+    'out-of-stock': 'Hết hàng'
+  };
 
-    return {badges, labels};
+  const key = availability && badges[availability] ? availability : 'out-of-stock';
+
+  return {
+    badgeClass: badges[key],
+    label: labels[key]
+  };
 };
 
 export const filterVehicles = (vehicles, searchTerm, filters) => {
