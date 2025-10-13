@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../assets/styles/neumorphism.css";
+import "../asset/styles/neumorphism.css";
 import ForgotPasswordForm from "../components/auth/ForgotPasswordForm";
 import LoginAvatar from "../components/auth/LoginAvatar";
 import LoginForm from "../components/auth/LoginForm";
