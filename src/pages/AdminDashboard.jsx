@@ -173,7 +173,7 @@ const AdminDashboard = ({ currentPage = 'dashboard' }) => {
       case 'dashboard':
       default:
         return (
-          <>
+          <div className="container-xxl flex-grow-1 container-p-y">
             <div className="row">
               {/* Welcome Card */}
               <WelcomeCard userName="John" percentage={72} />
@@ -213,7 +213,7 @@ const AdminDashboard = ({ currentPage = 'dashboard' }) => {
               {/* Transactions */}
               <TransactionsList />
             </div>
-          </>
+          </div>
         );
     }
   };
