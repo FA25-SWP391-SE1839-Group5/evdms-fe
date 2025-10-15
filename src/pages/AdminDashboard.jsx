@@ -7,7 +7,7 @@ const AdminDashboard = ({ currentPage = 'dashboard' }) => {
     switch (currentPage) {
       case 'users':
         return <UserManagement />;
-      
+
       case 'dealers':
         return (
           <>
@@ -31,7 +31,7 @@ const AdminDashboard = ({ currentPage = 'dashboard' }) => {
             </div>
           </>
         );
-      
+
       case 'inventory':
         return (
           <>
