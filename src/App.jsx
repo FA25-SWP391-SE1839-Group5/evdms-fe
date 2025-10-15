@@ -4,7 +4,7 @@ import CatalogPage from './pages/CatalogPage';
 import EVDetailPage from './pages/EVDetailPage';
 import VehicleModelPage from './pages/VehicleModelPage';
 import AdminDashboard from './pages/AdminDashboard';
-import ResetPasswordPage from './pages/ResetPasswordPage';
+import Layout from './components/admin-dashboard/layout/Layout';
 import { routeReducer, initialState, ROUTES } from './routes';
 import { logout, getStoredToken } from './services/authService';
 
@@ -13,6 +13,27 @@ const App = () => {
   const [favorites, setFavorites] = useState(new Set());
   const [compareList, setCompareList] = useState([]);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    const scripts = [
+      "/assets/vendor/js/helpers.js",
+      "/assets/js/config.js",
+      "/assets/vendor/libs/jquery/jquery.js",
+      "/assets/vendor/js/bootstrap.js",
+      "/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js",
+      "/assets/vendor/js/menu.js",
+      "/assets/vendor/libs/apex-charts/apexcharts.js",
+      "/assets/js/main.js",
+      "/assets/js/dashboards-analytics.js",
+    ];
+
+    scripts.forEach(src => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.async = false; // đảm bảo load theo thứ tự
+      document.body.appendChild(script);
+    });
+  }, []);
 
   useEffect(() => {
     const checkAuthOrReset = () => {
@@ -151,10 +172,9 @@ const App = () => {
 
       {/* ADMIN DASHBOARD */}
       {routeState.currentPage === ROUTES.ADMIN_DASHBOARD && (
-        <AdminDashboard
-          user={routeState.user}
-          onLogout={handleLogout}
-        />
+        <Layout initialPage="dashboard">
+          <AdminDashboard />
+        </Layout>
       )}
 
       {/* VEHICLE MODELS PAGE */}

@@ -516,15 +516,19 @@ export const deletePromotion = async (id) => {
 // USERS
 // ============================================
 export const getAllUsers = async () => {
-  try {
-    console.log('📡 API Call: GET /api/users');
-    const response = await api.get('/users');
-    console.log('📥 Response:', response.data);
-    return response.data;
-  } catch (error) {
-    console.error('❌ getAllUsers error:', error.response?.data || error.message);
-    throw error;
-  }
+  console.log('📡 API Call: GET /api/users');
+  const response = await api.get('/users');
+  console.log('📥 Raw Response:', response.data);
+
+  const resData = response.data;
+  // 👉 Lấy mảng users từ data.items
+  const users = resData?.data?.items || [];
+
+  return {
+    success: resData.success ?? true,
+    data: users,
+    message: resData.message ?? null
+  };
 };
 
 export const getUserById = async (id) => {

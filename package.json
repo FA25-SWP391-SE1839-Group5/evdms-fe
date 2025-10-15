@@ -11,11 +11,13 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.13",
+    "apexcharts": "^5.3.5",
     "axios": "^1.12.2",
-    "date-fns": "^4.1.0",
+    "highlight.js": "^11.11.1",
     "lucide-react": "^0.544.0",
-    "prop-types": "^15.8.1",
+    "perfect-scrollbar": "^1.5.6",
     "react": "^19.1.1",
+    "react-apexcharts": "^1.7.0",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.3"
   },

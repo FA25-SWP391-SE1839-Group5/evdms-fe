@@ -4,8 +4,7 @@ export const ROUTES = {
     DETAIL: 'detail',
     ADMIN_DASHBOARD: 'admin_dashboard',
     VEHICLE_MODELS: 'vehicle_models',
-    RESET_PASSWORD: 'reset_password'
-
+    RESET_PASSWORD: 'reset_password',
 };
 
 export const initialState = {
