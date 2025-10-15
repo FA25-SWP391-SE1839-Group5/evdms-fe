@@ -10,6 +10,11 @@
   100% { transform: scale(1); opacity: 1; }
 }
 
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(-10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -159,3 +164,18 @@
     filter: hue-rotate(20deg);
   }
 }
+
+/* Password strength indicator colors */
+.text-red-500 { color: #ef4444; }
+.text-orange-500 { color: #f97316; }
+.text-yellow-500 { color: #eab308; }
+.text-blue-500 { color: #3b82f6; }
+.text-green-500 { color: #22c55e; }
+.text-green-600 { color: #16a34a; }
+
+.bg-red-500 { background-color: #ef4444; }
+.bg-orange-500 { background-color: #f97316; }
+.bg-yellow-500 { background-color: #eab308; }
+.bg-blue-500 { background-color: #3b82f6; }
+.bg-green-500 { background-color: #22c55e; }
+.bg-green-600 { background-color: #16a34a; }

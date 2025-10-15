@@ -3,8 +3,10 @@ import LoginPage from './pages/LoginPage';
 import CatalogPage from './pages/CatalogPage';
 import EVDetailPage from './pages/EVDetailPage';
 import VehicleModelPage from './pages/VehicleModelPage';
+import AdminDashboard from './pages/AdminDashboard';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import { routeReducer, initialState, ROUTES } from './routes';
-import { logout, getStoredToken, navigateToRoleBasedDashboard } from './services/authService';
+import { logout, getStoredToken } from './services/authService';
 
 const App = () => {
   const [routeState, dispatch] = useReducer(routeReducer, initialState);
@@ -12,20 +14,30 @@ const App = () => {
   const [compareList, setCompareList] = useState([]);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-
-  // ✅ Check token khi app mount
   useEffect(() => {
-    const checkAuth = () => {
+    const checkAuthOrReset = () => {
       try {
+        // Check if URL has reset token parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const resetToken = urlParams.get('token');
+        
+        if (resetToken) {
+          // User is trying to reset password
+          dispatch({ type: 'NAVIGATE_TO_RESET_PASSWORD' });
+          setIsCheckingAuth(false);
+          return;
+        }
+
+        // Otherwise, check authentication
         const stored = getStoredToken();
         if (stored && stored.user && stored.user.role) {
-          // User đã login, restore session
+          // User is logged in, restore session
           dispatch({
             type: 'LOGIN_SUCCESS',
             payload: stored.user
           });
         } else {
-          // Token invalid hoặc không đủ data
+          // Invalid token or insufficient data
           dispatch({ type: 'LOGOUT' });
         }
       } catch (error) {
@@ -36,9 +48,23 @@ const App = () => {
       }
     };
 
-    checkAuth();
+    checkAuthOrReset();
   }, []);
 
+  // Sync logout across tabs
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'evdms_auth_token' && !e.newValue) {
+        // Token was cleared in another tab
+        dispatch({ type: 'LOGOUT' });
+        setFavorites(new Set());
+        setCompareList([]);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   // ============================================
   // AUTHENTICATION HANDLERS
@@ -101,6 +127,18 @@ const App = () => {
     });
   };
 
+  // Show loading screen while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   // ============================================
   // RENDER PAGES
   // ============================================
@@ -111,12 +149,25 @@ const App = () => {
         <LoginPage onLoginSuccess={handleLoginSuccess} />
       )}
 
+      {/* ADMIN DASHBOARD */}
+      {routeState.currentPage === ROUTES.ADMIN_DASHBOARD && (
+        <AdminDashboard
+          user={routeState.user}
+          onLogout={handleLogout}
+        />
+      )}
+
       {/* VEHICLE MODELS PAGE */}
       {routeState.currentPage === ROUTES.VEHICLE_MODELS && (
         <VehicleModelPage
           user={routeState.user}
           onLogout={handleLogout}
         />
+      )}
+
+      {/* RESET PASSWORD PAGE */}
+      {routeState.currentPage === ROUTES.RESET_PASSWORD && (
+        <ResetPasswordPage />
       )}
       
       {/* CATALOG PAGE */}
@@ -144,4 +195,5 @@ const App = () => {
     </div>
   );
 };
+
 export default App;

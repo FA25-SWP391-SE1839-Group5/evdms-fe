@@ -15,6 +15,8 @@ const LoginPage = ({ onLoginSuccess }) => {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [userRole, setUserRole] = useState(null);
+  const [forgotMessage, setForgotMessage] = useState('');
+
 
   // Handle main login
   const handleLogin = async (formData) => {
@@ -28,14 +30,21 @@ const LoginPage = ({ onLoginSuccess }) => {
       // Save token to localStorage
       saveLoginToken(userData);
 
+      // Normalize user data for display
+      const user = {
+        id: userData.id,
+        name: userData.fullName,
+        email: userData.email,
+        role: userData.role
+      };
+
       setUserRole(userData.user);
       setShowSuccess(true);
 
       // Delay redirect để show success message
       setTimeout(() => {
-        onLoginSuccess(userData.user);
-        window.location.reload(); // Forces a reload, not recommended for SPA
-      }, 500);
+        onLoginSuccess(user);
+      }, 1500);
     } catch (error) {
       setLoginError(error.message || "Invalid email or password. Please try again.");
     } finally {
@@ -52,12 +61,16 @@ const LoginPage = ({ onLoginSuccess }) => {
 
     setIsLoading(true);
     setLoginError("");
+    setForgotMessage("");
 
     try {
       await sendResetPasswordLink(data.email, data.method);
-      setShowForgotPassword(false);
+      setForgotMessage("✅ Password reset link has been sent! Please check your email.");
+      setTimeout(() => {
+        setShowForgotPassword(false);
+      }, 3000);;
     } catch (e) {
-      setLoginError(e + "An error occurred. Please try again.");
+      setLoginError(e.message || "An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -88,7 +101,15 @@ const LoginPage = ({ onLoginSuccess }) => {
                 {!showSuccess ? (
                   <>
                     {showForgotPassword ? (
+                    <div className="flex flex-col items-center">
                       <ForgotPasswordForm onSubmit={handleForgotPassword} onBack={() => setShowForgotPassword(false)} isLoading={isLoading} />
+                      {forgotMessage && (
+                        <p className="text-green-600 text-sm mt-4 text-center">{forgotMessage}</p>
+                      )}
+                      {loginError && (
+                        <p className="text-red-500 text-sm mt-4 text-center">{loginError}</p>
+                      )}
+                    </div>
                     ) : (
                       <>
                         <LoginAvatar />
