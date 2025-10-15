@@ -1,55 +1,114 @@
 import React, { useState } from 'react';
+import WelcomeCard from '../dashboard/WelcomeCard';
+import CardProfit from '../dashboard/StatCard/CardProfit';
+import CardSales from '../dashboard/StatCard/CardSales';
+import CardPayment from '../dashboard/StatCard/CardPayment';
+import CardTransactions from '../dashboard/StatCard/CardTransactionS';
+import TotalRevenue from '../dashboard/TotalRevenue';
+import ProfileReport from '../dashboard/ProfileReport';
+import OrderStatistics from '../dashboard/OrderStatistics';
+import ExpenseOverview from '../dashboard/ExpenseOverview';
+import TransactionsList from '../dashboard/TransactionList';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 
-const Layout = ({ children, initialPage = 'dashboard' }) => {
+const Layout = ({ children, initialPage  = 'dashboard' }) => {
   const [currentPage, setCurrentPage] = useState(initialPage);
 
-  const handleNavigation = (pageKey) => {
-    console.log('📍 Navigating to:', pageKey);
-    setCurrentPage(pageKey);
+  const handleNavigate = (page) => {
+    setCurrentPage(page);
   };
 
   return (
-    <div className="layout-wrapper layout-content-navbar">
-      <div className="layout-container">
-        {/* Sidebar */}
-        <Sidebar currentPage={currentPage} onNavigate={handleNavigation} />
+    <>
+      {/* Layout wrapper */}
+      <div className="layout-wrapper layout-content-navbar">
+        <div className="layout-container">
 
-        {/* Layout Container */}
-        <div className="layout-page">
-          {/* Navbar */}
-          <Navbar />
+          {/* Sidebar */}
+          <Sidebar currentPage={currentPage} onNavigate={handleNavigate}/>
+          
+          {/* Layout page */}
+          <div className="layout-page">
+            {/* Navbar */}
+            <Navbar />
+          
+            {/* Content wrapper */}
+            <div className="content-wrapper">
+              {/* Content */}
+              <div className="container-xxl flex-grow-1 container-p-y">
+                <div className="row">
+                  <div className="col-lg-8 mb-4 order-0">
+                    <WelcomeCard />
+                  </div>
+                  <div className="col-lg-4 col-md-4 order-1">
+                    <div className="row">
+                      {/* Profit */}
+                      <div className="col-lg-6 col-md-12 col-6 mb-4">
+                        <CardProfit />
+                      </div>
 
-          {/* Content wrapper */}
-          <div className="content-wrapper">
-            {/* Content */}
-            <div className="container-xxl flex-grow-1 container-p-y">
-              {React.cloneElement(children, { currentPage, onNavigate: handleNavigation })}
-            </div>
+                      {/* Sales */}
+                      <div className="col-lg-6 col-md-12 col-6 mb-4">
+                        <CardSales />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Total Revenue */}
+                  <div className="col-12 col-lg-8 order-2 order-md-3 order-lg-2 mb-4">
+                    <TotalRevenue />
+                  </div>
 
-            {/* Footer */}
-            <footer className="content-footer footer bg-footer-theme">
-              <div className="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
-                <div className="mb-2 mb-md-0">
-                  © {new Date().getFullYear()}, made with ❤️ by <strong>EVDMS Team</strong>
+                  {/*/ Total Revenue */}
+                  <div className="col-12 col-md-8 col-lg-4 order-3 order-md-2">
+                    <div className="row">
+                      {/* Payment */}
+                      <div className="col-6 mb-4">
+                        <CardPayment />
+                      </div>
+
+                      {/* Transaction */}
+                      <div className="col-6 mb-4">
+                        <CardTransactions />
+                      </div>
+
+                      {/* Profile Report */}
+                      <div className="col-12 mb-4">
+                        <ProfileReport />
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <a href="#" className="footer-link me-4">License</a>
-                  <a href="#" className="footer-link me-4">Documentation</a>
-                  <a href="#" className="footer-link">Support</a>
+
+                <div className="row">
+                  {/* Order Statistics */}
+                  <div className="col-md-6 col-lg-4 col-xl-4 order-0 mb-4">
+                    <OrderStatistics />
+                  </div>
+
+                  {/* Expense Overview */}
+                  <div className="col-md-6 col-lg-4 order-1 mb-4">
+                    <ExpenseOverview />
+                  </div>
+                
+                  {/* Transactions */}
+                  <div className="col-md-6 col-lg-4 order-2 mb-4">
+                    <TransactionsList />
+                  </div>
                 </div>
+                {/* Render children with currentPage prop */}
+                {React.cloneElement(children, { currentPage, onNavigate: handleNavigate })}
               </div>
-            </footer>
 
-            <div className="content-backdrop fade" />
+              {/* Footer */}
+              <div className="content-backdrop fade" />
+            </div>
           </div>
         </div>
+        <div className="layout-overlay layout-menu-toggle" />
       </div>
-
-      {/* Overlay */}
-      <div className="layout-overlay layout-menu-toggle" />
-    </div>
+    </>
   );
 };
 

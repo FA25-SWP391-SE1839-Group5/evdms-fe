@@ -1,4 +1,3 @@
-// hooks/useCharts.js
 import { useEffect } from 'react';
 
 const useCharts = (chartId, chartConfig) => {
