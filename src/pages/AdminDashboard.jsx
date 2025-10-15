@@ -1,4 +1,5 @@
 import React from 'react';
+import DashboardPage from '../components/admin-dashboard/pages/DashboardPage';
 import UserManagement from '../components/admin-dashboard/users/UserManagement';
 
 const AdminDashboard = ({ currentPage = 'dashboard' }) => {
@@ -127,8 +128,9 @@ const AdminDashboard = ({ currentPage = 'dashboard' }) => {
           </>
         );
       
+      case 'dashboard':
       default:
-        return;
+        return <DashboardPage />;
     }
   };
 
