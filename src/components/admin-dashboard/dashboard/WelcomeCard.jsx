@@ -9,14 +9,21 @@ const WelcomeCard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchUserData = () => {
       try {
         setLoading(true);
-        const response = await getCurrentUser();
-
-        if (response.data.success && response.data.data) {
+        
+        // Get user from localStorage (immediate display)
+        const user = getCurrentUser();
+        
+        if (user && user.name) {
           setUserData({
-            name: response.data.data.fullName || 'User',
+            name: user.name,
+            percentage: 72
+          });
+        } else {
+          setUserData({
+            name: 'User',
             percentage: 72
           });
         }
@@ -34,18 +41,28 @@ const WelcomeCard = () => {
     fetchUserData();
   }, []);
 
+  // Get first name from full name
+  const getFirstName = (fullName) => {
+    if (!fullName) return 'User';
+    const parts = fullName.trim().split(' ');
+    return parts[0];
+  };
+
   return (
     <div className="card">
       <div className="d-flex align-items-end row">
         <div className="col-sm-7">
           <div className="card-body">
             <h5 className="card-title text-primary">
-              Congratulations John! 🎉
+              {loading ? (
+                'Loading...'
+              ) : (
+                <>Congratulations {getFirstName(userData.name)}! 🎉</>
+              )}
             </h5>
             <p className="mb-4">
-              You have done <span className="fw-bold">72%</span>{" "}
-              more sales today. Check your new badge in your
-              profile.
+              You have done <span className="fw-bold">{userData.percentage}%</span>{" "}
+              more sales today. Check your new badge in your profile.
             </p>
             <a
               href="javascript:;"
@@ -62,6 +79,7 @@ const WelcomeCard = () => {
               height={140}
               className="img-fluid ms-5"
               style={{ maxHeight: '140px', objectFit: 'contain' }}
+              alt="Congratulations illustration"
               data-app-dark-img="illustrations/man-with-laptop-dark.png"
               data-app-light-img="illustrations/man-with-laptop-light.png"
             />
