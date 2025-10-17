@@ -50,6 +50,31 @@ export default function UserModal({ show, onClose, onSubmit, user, formData, onF
                     )}
                   </div>
 
+                  {/* Password */}
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Password {editingUser ? '(leave blank to keep current)' : '*'}
+                    </label>
+                    <input
+                      type="password"
+                      className={`form-control ${validationErrors.password ? 'is-invalid' : ''}`}
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      placeholder={editingUser ? 'Enter new password' : 'Min 6 characters'}
+                      required={!editingUser}
+                    />
+                    {validationErrors.password && (
+                      <div className="invalid-feedback">{validationErrors.password}</div>
+                    )}
+                    {!editingUser && (
+                      <small className="form-text text-muted">
+                        Must contain: uppercase, lowercase, number, special character
+                      </small>
+                    )}
+                  </div>
+
+
                   
             </div>
         </div>
