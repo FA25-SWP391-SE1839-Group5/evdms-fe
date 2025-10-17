@@ -12,24 +12,24 @@ export default function UserModal({ show, onClose, onSubmit, user, formData, onF
                     <h5 className="modal-title">
                         {user ? 'Edit User' : 'Add New User'}
                     </h5>
-                    <button type="button" className="btn-close" onClick={handleCloseModal}></button>
+                    <button type="button" className="btn-close" onClick={onClose}></button>
                 </div>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={onSubmit}>
                 <div className="modal-body">
                   {/* Full Name */}
                   <div className="mb-3">
                     <label className="form-label">Full Name *</label>
                     <input
                       type="text"
-                      className={`form-control ${validationErrors.fullName ? 'is-invalid' : ''}`}
+                      className={`form-control ${errors.fullName ? 'is-invalid' : ''}`}
                       name="fullName"
                       value={formData.fullName}
-                      onChange={handleChange}
+                      onChange={onFormChange}
                       placeholder="Enter full name"
                       required
                     />
-                    {validationErrors.fullName && (
-                      <div className="invalid-feedback">{validationErrors.fullName}</div>
+                    {errors.fullName && (
+                      <div className="invalid-feedback">{errors.fullName}</div>
                     )}
                   </div>
 
@@ -38,36 +38,36 @@ export default function UserModal({ show, onClose, onSubmit, user, formData, onF
                     <label className="form-label">Email *</label>
                     <input
                       type="email"
-                      className={`form-control ${validationErrors.email ? 'is-invalid' : ''}`}
+                      className={`form-control ${errors.email ? 'is-invalid' : ''}`}
                       name="email"
                       value={formData.email}
-                      onChange={handleChange}
+                      onChange={onFormChange}
                       placeholder="user@example.com"
                       required
                     />
-                    {validationErrors.email && (
-                      <div className="invalid-feedback">{validationErrors.email}</div>
+                    {errors.email && (
+                      <div className="invalid-feedback">{errors.email}</div>
                     )}
                   </div>
 
                   {/* Password */}
                   <div className="mb-3">
                     <label className="form-label">
-                      Password {editingUser ? '(leave blank to keep current)' : '*'}
+                      Password {user ? '(leave blank to keep current)' : '*'}
                     </label>
                     <input
                       type="password"
-                      className={`form-control ${validationErrors.password ? 'is-invalid' : ''}`}
+                      className={`form-control ${errors.password ? 'is-invalid' : ''}`}
                       name="password"
                       value={formData.password}
-                      onChange={handleChange}
-                      placeholder={editingUser ? 'Enter new password' : 'Min 6 characters'}
-                      required={!editingUser}
+                      onChange={onFormChange}
+                      placeholder={user ? 'Enter new password' : 'Min 6 characters'}
+                      required={!user}
                     />
-                    {validationErrors.password && (
-                      <div className="invalid-feedback">{validationErrors.password}</div>
+                    {errors.password && (
+                      <div className="invalid-feedback">{errors.password}</div>
                     )}
-                    {!editingUser && (
+                    {!user && (
                       <small className="form-text text-muted">
                         Must contain: uppercase, lowercase, number, special character
                       </small>
@@ -81,7 +81,7 @@ export default function UserModal({ show, onClose, onSubmit, user, formData, onF
                       className="form-select"
                       name="role"
                       value={formData.role}
-                      onChange={handleChange}
+                      onChange={onFormChange}
                       required
                     >
                       <option value="Admin">Admin</option>
@@ -98,13 +98,22 @@ export default function UserModal({ show, onClose, onSubmit, user, formData, onF
                       type="checkbox"
                       name="isActive"
                       checked={formData.isActive}
-                      onChange={handleChange}
+                      onChange={onFormChange}
                     />
                     <label className="form-check-label">
                       Active {!formData.isActive && <span className="text-danger">(User cannot login)</span>}
                     </label>
                   </div>
-
+                  <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={onClose}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary">
+                    {user ? 'Update User' : 'Create User'}
+                  </button>
+                </div>
+                </div>
+              </form>
 
                   
             </div>
