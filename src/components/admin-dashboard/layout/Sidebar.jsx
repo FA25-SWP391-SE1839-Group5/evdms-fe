@@ -27,19 +27,14 @@ const Sidebar = ({ currentPage }) => {
   const userManagementMenu = [
     {
       id: 'users-account',
-      label: 'Account',
+      label: 'User Accounts',
       page: 'users'
     },
     {
       id: 'users-notifications',
-      label: 'Notifications',
+      label: 'Add User',
       page: 'users/notifications'
     },
-    {
-      id: 'users-connections',
-      label: 'Connections',
-      page: 'users/connections'
-    }
   ];
 
   const vehicleMenu = [
