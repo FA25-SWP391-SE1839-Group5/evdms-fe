@@ -10,12 +10,6 @@ const Sidebar = ({ currentPage }) => {
       page: 'dashboard'
     },
     {
-      id: 'users',
-      label: 'User Management',
-      icon: 'bx-user',
-      page: 'users'
-    },
-    {
       id: 'dealers',
       label: 'Dealers',
       icon: 'bx-store',
@@ -26,6 +20,25 @@ const Sidebar = ({ currentPage }) => {
       label: 'Customers',
       icon: 'bx-group',
       page: 'customers'
+    }
+  ];
+
+  // User Management submenu
+  const userManagementMenu = [
+    {
+      id: 'users-account',
+      label: 'Account',
+      page: 'users'
+    },
+    {
+      id: 'users-notifications',
+      label: 'Notifications',
+      page: 'users/notifications'
+    },
+    {
+      id: 'users-connections',
+      label: 'Connections',
+      page: 'users/connections'
     }
   ];
 
@@ -97,7 +110,7 @@ const Sidebar = ({ currentPage }) => {
     return (
       <li key={item.id} className={`menu-item ${isActive ? 'active' : ''}`}>
         <a 
-          href="/${item.page}" 
+          href={`/${item.page}`} 
           className="menu-link"
           onClick={(e) => handleMenuClick(e, item.page)}
         >
@@ -108,6 +121,22 @@ const Sidebar = ({ currentPage }) => {
     );
   };
 
+  const renderSubmenuItem = (item) => {
+    const isActive = currentPage === item.page;
+    
+    return (
+      <li key={item.id} className={`menu-item ${isActive ? 'active' : ''}`}>
+        <a 
+          href={`/${item.page}`}
+          className="menu-link"
+          onClick={(e) => handleMenuClick(e, item.page)}
+        >
+          <div data-i18n={item.label}>{item.label}</div>
+        </a>
+      </li>
+    );
+  };
+  
   return (
     <aside
       id="layout-menu"
@@ -141,7 +170,22 @@ const Sidebar = ({ currentPage }) => {
       {/* Menu Items */}
       <ul className="menu-inner py-1">
         {/* Main Menu */}
-        {menuItems.map(renderMenuItem)}
+        {renderMenuItem(menuItems.find(item => item.id === 'dashboard'))}
+
+        {/* User Management with Submenu */}
+        <li className="menu-item">
+          <a href="javascript:void(0);" className="menu-link menu-toggle">
+            <i className="menu-icon tf-icons bx bx-user" />
+            <div data-i18n="User Management">User Management</div>
+          </a>
+          <ul className="menu-sub">
+            {userManagementMenu.map(renderSubmenuItem)}
+          </ul>
+        </li>
+
+        {menuItems
+          .filter(item => item.id !== 'dashboard')
+          .map(renderMenuItem)}
 
         {/* Vehicle Management Section */}
         <li className="menu-header small text-uppercase">
