@@ -12,7 +12,7 @@ const UserManagement = () => {
     fullName: '',
     email: '',
     password: '',
-    phoneNumber: '',
+    // phoneNumber: '',
     role: 'DealerStaff',
     isActive: true
   });
@@ -76,15 +76,15 @@ const UserManagement = () => {
     }
 
     // Phone validation (optional but must be valid if provided)
-    if (formData.phoneNumber && formData.phoneNumber.trim() !== '') {
-      const phoneRegex = /^[0-9]{10,15}$/;
-      if (!phoneRegex.test(formData.phoneNumber.replace(/[\s-]/g, ''))) {
-        errors.phoneNumber = 'Phone number must be 10-15 digits';
-      }
-    }
+    // if (formData.phoneNumber && formData.phoneNumber.trim() !== '') {
+    //   const phoneRegex = /^[0-9]{10,15}$/;
+    //   if (!phoneRegex.test(formData.phoneNumber.replace(/[\s-]/g, ''))) {
+    //     errors.phoneNumber = 'Phone number must be 10-15 digits';
+    //   }
+    // }
 
-    setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
+    // setValidationErrors(errors);
+    // return Object.keys(errors).length === 0;
   };
 
   const handleChange = (e) => {
@@ -205,7 +205,7 @@ const UserManagement = () => {
       fullName: user.fullName || '',
       email: user.email || '',
       password: '', // Always empty for security
-      phoneNumber: user.phoneNumber || '',
+      // phoneNumber: user.phoneNumber || '',
       role: user.role || 'DealerStaff',
       isActive: user.isActive !== undefined ? user.isActive : true
     });
@@ -221,7 +221,7 @@ const UserManagement = () => {
       fullName: '',
       email: '',
       password: '',
-      phoneNumber: '',
+      // phoneNumber: '',
       role: 'DealerStaff',
       isActive: true
     });
@@ -265,10 +265,9 @@ const UserManagement = () => {
   }
 
   return (
-    <div className="container-xxl flex-grow-1 container-p-y">
+   <>
       <h4 className="fw-bold py-3 mb-4">
-        User Management
-        <small className="text-muted ms-2">({users.length} users in database)</small>
+        <span className="text-muted fw-light">User Management /</span> User Accounts
       </h4>
 
       {/* Alert messages */}
@@ -289,16 +288,16 @@ const UserManagement = () => {
 
       {/* Card */}
       <div className="card">
-        <div className="card-header d-flex justify-content-between align-items-center">
-          <h5 className="mb-0">Users List</h5>
-          <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+        <div className="d-flex justify-content-between align-items-center">
+          <h5 className="card-header">User Accounts</h5>
+          {/* <button className="btn btn-primary me-3" onClick={() => setShowModal(true)}>
             <Plus size={16} className="me-1" />
             Add User
-          </button>
+          </button> */}
         </div>
 
         {/* Search */}
-        <div className="card-body">
+        <div className="card-body pt-0">
           <div className="input-group mb-3">
             <span className="input-group-text">
               <Search size={16} />
@@ -313,23 +312,23 @@ const UserManagement = () => {
           </div>
 
           {/* Table */}
-          <div className="table-responsive">
-            <table className="table table-hover">
+          <div className="table-responsive text-nowrap">
+            <table className="table">
               <thead>
                 <tr>
                   <th>Full Name</th>
                   <th>Email</th>
-                  <th>Phone</th>
+                  {/* <th>Phone</th> */}
                   <th>Role</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="table-border-bottom-0">
                 {filteredUsers.length === 0 ? (
                   <tr>
                     <td colSpan="6" className="text-center py-4">
-                      {searchTerm ? 'No users match your search' : 'No users found in database'}
+                      {searchTerm ? 'No users match your search' : 'No users found'}
                     </td>
                   </tr>
                 ) : (
@@ -337,7 +336,7 @@ const UserManagement = () => {
                     <tr key={user.id}>
                       <td>{user.fullName || 'N/A'}</td>
                       <td>{user.email || 'N/A'}</td>
-                      <td>{user.phoneNumber || 'N/A'}</td>
+                      {/* <td>{user.phoneNumber || 'N/A'}</td> */}
                       <td>
                         <span className={`badge bg-label-${getRoleBadgeClass(user.role)}`}>
                           {formatRoleDisplay(user.role)}
@@ -349,20 +348,23 @@ const UserManagement = () => {
                         </span>
                       </td>
                       <td>
-                        <button 
-                          className="btn btn-sm btn-icon btn-outline-primary me-2"
-                          onClick={() => handleEdit(user)}
-                          title="Edit user"
-                        >
-                          <Edit2 size={16} />
-                        </button>
-                        <button 
-                          className="btn btn-sm btn-icon btn-outline-danger"
-                          onClick={() => handleDelete(user.id, user.fullName)}
-                          title="Delete user permanently from database"
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        <div className="dropdown">
+                          <button 
+                            type="button"
+                            className="btn p-0 dropdown-toggle hide-arrow"
+                            data-bs-toggle="dropdown"
+                          >
+                            <i className="bx bx-dots-vertical-rounded" />
+                          </button>
+                          <div className="dropdown-menu">
+                            <button type="button" className="dropdown-item" onClick={() => handleEdit(user)}>
+                              <i className="bx bx-edit-alt me-2" /> Edit
+                            </button>
+                            <button type="button" className="dropdown-item" onClick={() => handleDelete(user.id, user.fullName)}>
+                              <i className="bx bx-trash me-2" /> Delete
+                            </button>
+                          </div>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -418,11 +420,6 @@ const UserManagement = () => {
                     {validationErrors.email && (
                       <div className="invalid-feedback">{validationErrors.email}</div>
                     )}
-                    {!editingUser && (
-                      <small className="form-text text-muted">
-                        This email will be used for login
-                      </small>
-                    )}
                   </div>
 
                   {/* Password */}
@@ -436,7 +433,7 @@ const UserManagement = () => {
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
-                      placeholder={editingUser ? 'Enter new password to change' : 'Min 6 chars with uppercase, lowercase, number, special char'}
+                      placeholder={editingUser ? 'Enter new password' : 'Min 6 characters'}
                       required={!editingUser}
                     />
                     {validationErrors.password && (
@@ -444,13 +441,13 @@ const UserManagement = () => {
                     )}
                     {!editingUser && (
                       <small className="form-text text-muted">
-                        Must contain: uppercase, lowercase, number, special character (@$!%*?&#)
+                        Must contain: uppercase, lowercase, number, special character
                       </small>
                     )}
                   </div>
 
                   {/* Phone Number */}
-                  <div className="mb-3">
+                  {/* <div className="mb-3">
                     <label className="form-label">Phone Number</label>
                     <input
                       type="text"
@@ -463,7 +460,7 @@ const UserManagement = () => {
                     {validationErrors.phoneNumber && (
                       <div className="invalid-feedback">{validationErrors.phoneNumber}</div>
                     )}
-                  </div>
+                  </div> */}
 
                   {/* Role */}
                   <div className="mb-3">
@@ -495,22 +492,12 @@ const UserManagement = () => {
                       Active {!formData.isActive && <span className="text-danger">(User cannot login)</span>}
                     </label>
                   </div>
-
-                  {!editingUser && (
-                    <div className="alert alert-info mb-0">
-                      <small>
-                        <strong>Note:</strong> After creating this user, they can immediately login with their email and password.
-                      </small>
-                    </div>
-                  )}
                 </div>
                 <div className="modal-footer">
                   <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>
-                    <X size={16} className="me-1" />
                     Cancel
                   </button>
                   <button type="submit" className="btn btn-primary">
-                    <Save size={16} className="me-1" />
                     {editingUser ? 'Update User' : 'Create User'}
                   </button>
                 </div>
@@ -519,7 +506,7 @@ const UserManagement = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
