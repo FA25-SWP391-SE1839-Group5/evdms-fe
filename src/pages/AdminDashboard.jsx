@@ -211,7 +211,7 @@ const AdminDashboard = ({ currentPage = 'dashboard' }) => {
                   </div>
                 </div>
               </div>
-    </>
+          </>
         );
     }
   };
