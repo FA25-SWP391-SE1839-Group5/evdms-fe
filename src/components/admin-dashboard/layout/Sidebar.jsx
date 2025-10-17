@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Sidebar = ({ currentPage, onNavigate }) => {
+const Sidebar = ({ currentPage }) => {
   // Main menu items for EVDMS
   const menuItems = [
     {
@@ -88,9 +88,7 @@ const Sidebar = ({ currentPage, onNavigate }) => {
 
   const handleMenuClick = (e, page) => {
     e.preventDefault();
-    if (onNavigate) {
-      onNavigate(page);
-    }
+    window.location.href = `/${page}`;
   };
 
   const renderMenuItem = (item) => {
@@ -99,7 +97,7 @@ const Sidebar = ({ currentPage, onNavigate }) => {
     return (
       <li key={item.id} className={`menu-item ${isActive ? 'active' : ''}`}>
         <a 
-          href="#" 
+          href="/${item.page}" 
           className="menu-link"
           onClick={(e) => handleMenuClick(e, item.page)}
         >
