@@ -269,7 +269,8 @@ const UserManagement = () => {
   return (
    <>
       <h4 className="fw-bold py-3 mb-4">
-        <span className="text-muted fw-light">User Management /</span> User Accounts
+        <span className="text-muted fw-light">User Management /</span> 
+        {activeTab === 'roles' ? ' Roles & Permissions ' : ' User Accounts '}
       </h4>
 
       {/* Tab Navigation */}
