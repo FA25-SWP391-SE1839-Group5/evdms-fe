@@ -123,7 +123,7 @@ const Sidebar = ({ currentPage, onNavigate }) => {
               src="/assets/images/elecar_logo.svg"
               alt="EVDMS Logo"
               className="img-fluid"
-              style={{ maxHeight: '40px' }}
+              style={{ maxHeight: '56px' }}
             />
           </span>
           <span className="app-brand-text demo menu-text fw-bolder ms-2">
