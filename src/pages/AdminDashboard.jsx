@@ -211,9 +211,6 @@ const AdminDashboard = ({ currentPage = 'dashboard' }) => {
                   </div>
                 </div>
               </div>
-    
-        
-        <div className="layout-overlay layout-menu-toggle" />
     </>
         );
     }
