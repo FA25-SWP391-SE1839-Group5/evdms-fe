@@ -1,6 +1,10 @@
 import React from "react";
 
 const OrderStatistics = () => {
+  const handleViewMore = () => {
+    alert("Viewing more details about Order Statistics.");
+  }
+
   return (
     <div className="card h-100">
                   <div className="card-header d-flex align-items-center justify-content-between pb-0">
@@ -23,13 +27,13 @@ const OrderStatistics = () => {
                         className="dropdown-menu dropdown-menu-end"
                         aria-labelledby="orederStatistics"
                       >
-                        <a className="dropdown-item" href="javascript:void(0);">
+                        <a className="dropdown-item" onClick={handleViewMore} style={{cursor: 'pointer'}}>
                           Select All
                         </a>
-                        <a className="dropdown-item" href="javascript:void(0);">
+                        <a className="dropdown-item" onClick={handleViewMore} style={{cursor: 'pointer'}}>
                           Refresh
                         </a>
-                        <a className="dropdown-item" href="javascript:void(0);">
+                        <a className="dropdown-item" onClick={handleViewMore} style={{cursor: 'pointer'}}>
                           Share
                         </a>
                       </div>
