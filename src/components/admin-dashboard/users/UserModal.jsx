@@ -91,6 +91,20 @@ export default function UserModal({ show, onClose, onSubmit, user, formData, onF
                     </select>
                   </div>
 
+                  {/* Active Status */}
+                  <div className="form-check form-switch mb-3">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      name="isActive"
+                      checked={formData.isActive}
+                      onChange={handleChange}
+                    />
+                    <label className="form-check-label">
+                      Active {!formData.isActive && <span className="text-danger">(User cannot login)</span>}
+                    </label>
+                  </div>
+
 
                   
             </div>
