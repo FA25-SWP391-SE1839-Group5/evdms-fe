@@ -85,8 +85,8 @@ const UserManagement = () => {
     //   }
     // }
 
-    // setValidationErrors(errors);
-    // return Object.keys(errors).length === 0;
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleChange = (e) => {
@@ -417,52 +417,15 @@ const UserManagement = () => {
       )}
 
       {/* Modal */}
-      {showModal && (
-        
-          
-              
-
-                  {/* Email */}
-                  <div className="mb-3">
-                    <label className="form-label">Email *</label>
-                    <input
-                      type="email"
-                      className={`form-control ${validationErrors.email ? 'is-invalid' : ''}`}
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      placeholder="user@example.com"
-                      required
-                    />
-                    {validationErrors.email && (
-                      <div className="invalid-feedback">{validationErrors.email}</div>
-                    )}
-                  </div>
-
-                  {/* Password */}
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Password {editingUser ? '(leave blank to keep current)' : '*'}
-                    </label>
-                    <input
-                      type="password"
-                      className={`form-control ${validationErrors.password ? 'is-invalid' : ''}`}
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      placeholder={editingUser ? 'Enter new password' : 'Min 6 characters'}
-                      required={!editingUser}
-                    />
-                    {validationErrors.password && (
-                      <div className="invalid-feedback">{validationErrors.password}</div>
-                    )}
-                    {!editingUser && (
-                      <small className="form-text text-muted">
-                        Must contain: uppercase, lowercase, number, special character
-                      </small>
-                    )}
-                  </div>
-
+      <UserModal
+        show={showModal}
+        onClose={handleCloseModal}
+        onSubmit={handleSubmit}
+        user={editingUser}
+        formData={formData || {}}
+        onFormChange={handleChange}
+        errors={validationErrors}
+      />
                   {/* Phone Number */}
                   {/* <div className="mb-3">
                     <label className="form-label">Phone Number</label>
@@ -478,48 +441,6 @@ const UserManagement = () => {
                       <div className="invalid-feedback">{validationErrors.phoneNumber}</div>
                     )}
                   </div> */}
-
-                  {/* Role */}
-                  <div className="mb-3">
-                    <label className="form-label">Role *</label>
-                    <select
-                      className="form-select"
-                      name="role"
-                      value={formData.role}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="Admin">Admin</option>
-                      <option value="DealerManager">Dealer Manager</option>
-                      <option value="DealerStaff">Dealer Staff</option>
-                      <option value="EVMStaff">EVM Staff</option>
-                    </select>
-                  </div>
-
-                  {/* Active Status */}
-                  <div className="form-check form-switch mb-3">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      name="isActive"
-                      checked={formData.isActive}
-                      onChange={handleChange}
-                    />
-                    <label className="form-check-label">
-                      Active {!formData.isActive && <span className="text-danger">(User cannot login)</span>}
-                    </label>
-                  </div>
-                </div>
-                <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-primary">
-                    {editingUser ? 'Update User' : 'Create User'}
-                  </button>
-                </div>
-              </form>
-      )}
     </>
   );
 };

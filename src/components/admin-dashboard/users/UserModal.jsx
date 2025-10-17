@@ -114,8 +114,6 @@ export default function UserModal({ show, onClose, onSubmit, user, formData, onF
                 </div>
                 </div>
               </form>
-
-                  
             </div>
         </div>
     </div>
