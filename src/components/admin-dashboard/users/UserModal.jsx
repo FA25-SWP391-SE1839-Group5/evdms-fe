@@ -74,6 +74,23 @@ export default function UserModal({ show, onClose, onSubmit, user, formData, onF
                     )}
                   </div>
 
+                  {/* Role */}
+                  <div className="mb-3">
+                    <label className="form-label">Role *</label>
+                    <select
+                      className="form-select"
+                      name="role"
+                      value={formData.role}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="Admin">Admin</option>
+                      <option value="DealerManager">Dealer Manager</option>
+                      <option value="DealerStaff">Dealer Staff</option>
+                      <option value="EVMStaff">EVM Staff</option>
+                    </select>
+                  </div>
+
 
                   
             </div>
