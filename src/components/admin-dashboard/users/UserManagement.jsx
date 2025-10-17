@@ -3,6 +3,7 @@ import { Plus, Edit2, Trash2, X, Save, Search, AlertCircle, CheckCircle } from '
 import { getAllUsers, createUser, updateUser, deleteUser } from '../../../services/dashboardService';
 
 const UserManagement = () => {
+  const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -270,6 +271,32 @@ const UserManagement = () => {
         <span className="text-muted fw-light">User Management /</span> User Accounts
       </h4>
 
+      {/* Tab Navigation */}
+      <div className="row">
+        <div className="col-md-12">
+          <ul className="nav nav-pills flex-column flex-md-row mb-3">
+            <li className="nav-item">
+              <a 
+                className={`nav-link ${activeTab === 'users' ? 'active' : ''}`}
+                href="javascript:void(0);"
+                onClick={() => setActiveTab('users')}
+              >
+                <i className="bx bx-user me-1" /> Users List
+              </a>
+            </li>
+            <li className="nav-item">
+              <a 
+                className={`nav-link ${activeTab === 'roles' ? 'active' : ''}`}
+                href="javascript:void(0);"
+                onClick={() => setActiveTab('roles')}
+              >
+                <i className="bx bx-lock-alt me-1" /> Roles & Permissions
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
       {/* Alert messages */}
       {error && (
         <div className="alert alert-danger alert-dismissible d-flex align-items-center" role="alert">
@@ -287,93 +314,106 @@ const UserManagement = () => {
       )}
 
       {/* Card */}
-      <div className="card">
-        <div className="d-flex justify-content-between align-items-center">
-          <h5 className="card-header">User Accounts</h5>
-          {/* <button className="btn btn-primary me-3" onClick={() => setShowModal(true)}>
-            <Plus size={16} className="me-1" />
-            Add User
-          </button> */}
-        </div>
-
-        {/* Search */}
-        <div className="card-body pt-0">
-          <div className="input-group mb-3">
-            <span className="input-group-text">
-              <Search size={16} />
-            </span>
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Search by name or email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+      {activeTab === 'users' ? (
+        <div className="card">
+          <div className="card-header d-flex justify-content-between align-items-center pe-3">
+            <h5 className="mb-0">User Accounts</h5>
+            <button
+              type="button"
+              className="btn btn-primary rounded-pill d-flex align-items-center px-3 py-2"
+              onClick={() => setShowModal(true)}
+            >
+              <Plus size={18} className="me-2" />
+              <span className="fw-semibold">Add User</span>
+            </button>
           </div>
 
-          {/* Table */}
-          <div className="table-responsive text-nowrap">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Full Name</th>
-                  <th>Email</th>
-                  {/* <th>Phone</th> */}
-                  <th>Role</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody className="table-border-bottom-0">
-                {filteredUsers.length === 0 ? (
+          {/* Search */}
+          <div className="card-body pt-0">
+            <div className="input-group mb-3">
+              <span className="input-group-text">
+                <Search size={16} />
+              </span>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search by name or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            {/* Table */}
+            <div className="table-responsive text-nowrap">
+              <table className="table">
+                <thead>
                   <tr>
-                    <td colSpan="6" className="text-center py-4">
-                      {searchTerm ? 'No users match your search' : 'No users found'}
-                    </td>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    {/* <th>Phone</th> */}
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                   </tr>
-                ) : (
-                  filteredUsers.map(user => (
-                    <tr key={user.id}>
-                      <td>{user.fullName || 'N/A'}</td>
-                      <td>{user.email || 'N/A'}</td>
-                      {/* <td>{user.phoneNumber || 'N/A'}</td> */}
-                      <td>
-                        <span className={`badge bg-label-${getRoleBadgeClass(user.role)}`}>
-                          {formatRoleDisplay(user.role)}
-                        </span>
-                      </td>
-                      <td>
-                        <span className={`badge bg-label-${user.isActive ? 'success' : 'secondary'}`}>
-                          {user.isActive ? 'Active' : 'Inactive'}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="dropdown">
-                          <button 
-                            type="button"
-                            className="btn p-0 dropdown-toggle hide-arrow"
-                            data-bs-toggle="dropdown"
-                          >
-                            <i className="bx bx-dots-vertical-rounded" />
-                          </button>
-                          <div className="dropdown-menu">
-                            <button type="button" className="dropdown-item" onClick={() => handleEdit(user)}>
-                              <i className="bx bx-edit-alt me-2" /> Edit
-                            </button>
-                            <button type="button" className="dropdown-item" onClick={() => handleDelete(user.id, user.fullName)}>
-                              <i className="bx bx-trash me-2" /> Delete
-                            </button>
-                          </div>
-                        </div>
+                </thead>
+                <tbody className="table-border-bottom-0">
+                  {filteredUsers.length === 0 ? (
+                    <tr>
+                      <td colSpan="6" className="text-center py-4">
+                        {searchTerm ? 'No users match your search' : 'No users found'}
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : (
+                    filteredUsers.map(user => (
+                      <tr key={user.id}>
+                        <td>{user.fullName || 'N/A'}</td>
+                        <td>{user.email || 'N/A'}</td>
+                        {/* <td>{user.phoneNumber || 'N/A'}</td> */}
+                        <td>
+                          <span className={`badge bg-label-${getRoleBadgeClass(user.role)}`}>
+                            {formatRoleDisplay(user.role)}
+                          </span>
+                        </td>
+                        <td>
+                          <span className={`badge bg-label-${user.isActive ? 'success' : 'secondary'}`}>
+                            {user.isActive ? 'Active' : 'Inactive'}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="dropdown">
+                            <button 
+                              type="button"
+                              className="btn p-0 dropdown-toggle hide-arrow"
+                              data-bs-toggle="dropdown"
+                            >
+                              <i className="bx bx-dots-vertical-rounded" />
+                            </button>
+                            <div className="dropdown-menu">
+                              <button type="button" className="dropdown-item" onClick={() => handleEdit(user)}>
+                                <i className="bx bx-edit-alt me-2" /> Edit
+                              </button>
+                              <button type="button" className="dropdown-item" onClick={() => handleDelete(user.id, user.fullName)}>
+                                <i className="bx bx-trash me-2" /> Delete
+                              </button>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="card">
+          <h5 className="card-header">Roles & Permissions</h5>
+          <div className="card-body">
+            <p className="mb-0">Roles and permissions management - Coming soon...</p>
+          </div>
+        </div>
+      )}
 
       {/* Modal */}
       {showModal && (

@@ -32,7 +32,7 @@ const Sidebar = ({ currentPage }) => {
     },
     {
       id: 'users-notifications',
-      label: 'Add User',
+      label: 'Roles & Permissions',
       page: 'users/notifications'
     },
   ];
