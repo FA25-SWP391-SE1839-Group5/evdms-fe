@@ -7,6 +7,22 @@ export const ROUTES = {
     RESET_PASSWORD: 'reset_password',
 };
 
+// Admin Dashboard sub-pages
+const ADMIN_PAGES = {
+  DASHBOARD: 'dashboard',
+  USERS: 'users',
+  DEALERS: 'dealers',
+  CUSTOMERS: 'customers',
+  INVENTORY: 'inventory',
+  QUOTATIONS: 'quotations',
+  ORDERS: 'orders',
+  TESTDRIVES: 'testdrives',
+  PAYMENTS: 'payments',
+  PROMOTIONS: 'promotions',
+  AUDIT: 'audit',
+  FEEDBACK: 'feedback',
+};
+
 export const initialState = {
     currentPage: ROUTES.LOGIN,
     selectedVehicle: null,
