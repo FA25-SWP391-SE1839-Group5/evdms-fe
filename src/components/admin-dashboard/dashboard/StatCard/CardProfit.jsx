@@ -18,6 +18,7 @@ const CardProfit = () => {
                         type="button"
                         id="cardOpt3"
                         data-bs-toggle="dropdown"
+                        data-bs-offset="0,8"
                         aria-haspopup="true"
                         aria-expanded="false"
                     >
