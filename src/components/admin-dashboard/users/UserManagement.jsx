@@ -420,24 +420,7 @@ const UserManagement = () => {
       {showModal && (
         
           
-              <form onSubmit={handleSubmit}>
-                <div className="modal-body">
-                  {/* Full Name */}
-                  <div className="mb-3">
-                    <label className="form-label">Full Name *</label>
-                    <input
-                      type="text"
-                      className={`form-control ${validationErrors.fullName ? 'is-invalid' : ''}`}
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleChange}
-                      placeholder="Enter full name"
-                      required
-                    />
-                    {validationErrors.fullName && (
-                      <div className="invalid-feedback">{validationErrors.fullName}</div>
-                    )}
-                  </div>
+              
 
                   {/* Email */}
                   <div className="mb-3">

@@ -10,10 +10,30 @@ export default function UserModal({ show, onClose, onSubmit, user, formData, onF
             <div className="modal-content">
                 <div className="modal-header">
                     <h5 className="modal-title">
-                        {editingUser ? 'Edit User' : 'Add New User'}
+                        {user ? 'Edit User' : 'Add New User'}
                     </h5>
                     <button type="button" className="btn-close" onClick={handleCloseModal}></button>
                 </div>
+                <form onSubmit={handleSubmit}>
+                <div className="modal-body">
+                  {/* Full Name */}
+                  <div className="mb-3">
+                    <label className="form-label">Full Name *</label>
+                    <input
+                      type="text"
+                      className={`form-control ${validationErrors.fullName ? 'is-invalid' : ''}`}
+                      name="fullName"
+                      value={formData.fullName}
+                      onChange={handleChange}
+                      placeholder="Enter full name"
+                      required
+                    />
+                    {validationErrors.fullName && (
+                      <div className="invalid-feedback">{validationErrors.fullName}</div>
+                    )}
+                  </div>
+
+                  
             </div>
         </div>
     </div>
