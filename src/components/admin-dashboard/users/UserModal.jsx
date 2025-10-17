@@ -33,6 +33,23 @@ export default function UserModal({ show, onClose, onSubmit, user, formData, onF
                     )}
                   </div>
 
+                  {/* Email */}
+                  <div className="mb-3">
+                    <label className="form-label">Email *</label>
+                    <input
+                      type="email"
+                      className={`form-control ${validationErrors.email ? 'is-invalid' : ''}`}
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="user@example.com"
+                      required
+                    />
+                    {validationErrors.email && (
+                      <div className="invalid-feedback">{validationErrors.email}</div>
+                    )}
+                  </div>
+
                   
             </div>
         </div>
