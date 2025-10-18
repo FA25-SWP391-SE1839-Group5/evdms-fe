@@ -102,7 +102,7 @@ export default function DealerManagement() {
             </span>
         );
     };
-    
+
     // --- Loading State ---
     if (loading) {
         return (
@@ -114,8 +114,11 @@ export default function DealerManagement() {
         );
     }
     return (
-    <div>
-
-    </div>
+    <>
+        {/* TODO: Thêm Breadcrumb nếu cần */}
+        <h4 className="fw-bold py-3 mb-4">
+            <span className="text-muted fw-light">Management /</span> Dealers
+        </h4>
+    </>
   )
 }
