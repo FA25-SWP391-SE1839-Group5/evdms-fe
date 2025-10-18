@@ -66,3 +66,13 @@ export const updateDealer = (dealerId, dealerData) => {
   // Gửi toàn bộ dữ liệu hoặc chỉ các trường thay đổi tùy thuộc vào API (PUT thường gửi toàn bộ)
   return api.put(`/dealers/${dealerId}`, dealerData); 
 };
+
+/**
+ * DELETE Dealer
+ * @param {string|number} dealerId - ID của Dealer cần xóa
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const deleteDealer = (dealerId) => {
+  console.log(`📡 API Call: DELETE /api/dealers/${dealerId}`);
+  return api.delete(`/dealers/${dealerId}`);
+};
