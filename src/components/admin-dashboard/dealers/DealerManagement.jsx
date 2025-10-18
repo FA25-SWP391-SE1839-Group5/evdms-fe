@@ -92,6 +92,17 @@ export default function DealerManagement() {
         // }
     };
 
+    // --- Render Status Badge (Ví dụ) ---
+    const renderStatusBadge = (status) => {
+        // Giả sử API trả về 'active' hoặc 'inactive'
+        const isActive = status === 'active'; // Điều chỉnh logic này theo API của bạn
+        return (
+            <span className={`badge bg-label-${isActive ? 'success' : 'secondary'}`}>
+                {isActive ? 'Active' : 'Inactive'}
+            </span>
+        );
+    };
+
     return (
     <div>
 
