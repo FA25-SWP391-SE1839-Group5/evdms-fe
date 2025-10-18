@@ -20,6 +20,9 @@ const UserManagement = () => {
   const [filterPlan, setFilterPlan] = useState(''); 
   const [filterStatus, setFilterStatus] = useState(''); 
 
+  const [pageSize, setPageSize] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -123,7 +126,7 @@ const UserManagement = () => {
         const response = await updateUser(editingUser.id, updateData);
         
         if (response.success) {
-          setSuccess(`User "${formData.fullName}" updated successfully in database`);
+          setSuccess(`User "${formData.fullName}" updated successfully`);
           await fetchUsers();
           handleCloseModal();
         } else {
@@ -173,7 +176,7 @@ const UserManagement = () => {
         throw new Error('Delete operation failed');
       }
     } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Failed to delete user from database';
+      const errorMsg = err.response?.data?.message || 'Failed to delete user';
       setError(errorMsg);
     }
   };
@@ -247,6 +250,20 @@ const UserManagement = () => {
     });
   }, [users, searchTerm, filterRole, filterStatus, filterPlan]);
 
+  // START: Logic Phân trang
+  // Tính toán tổng số trang
+  const totalPages = Math.ceil(filteredUsers.length / pageSize);
+
+  // Tính toán mảng user để hiển thị cho trang hiện tại
+  const paginatedUsers = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    return filteredUsers.slice(startIndex, startIndex + pageSize);
+  }, [filteredUsers, currentPage, pageSize]);
+
+  // Tính toán thông tin hiển thị (ví dụ: "Showing 1 to 10 of 50")
+  const startEntry = filteredUsers.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+  const endEntry = Math.min(currentPage * pageSize, filteredUsers.length);
+  // END: Logic Phân trang
 
   const getRoleBadgeClass = (role) => {
     const roleMap = {
@@ -447,7 +464,6 @@ const UserManagement = () => {
             </div>
             
             <div className="card-datatable table-responsive">
-                
                 <div className="row m-2 justify-content-between">
                     <div className="col-md-2">
                         <select className="form-select">
