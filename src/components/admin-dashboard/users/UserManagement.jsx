@@ -466,13 +466,21 @@ const UserManagement = () => {
             <div className="card-datatable table-responsive">
                 <div className="row m-2 justify-content-between">
                     <div className="col-md-2">
-                        <select className="form-select">
+                        <select 
+                          className="form-select"
+                          value={pageSize}
+                          onChange={(e) => {
+                            setPageSize(Number(e.target.value));
+                            setCurrentPage(1); // Reset về trang 1 khi đổi
+                          }}
+                        >
                             <option value="10">10</option>
                             <option value="25">25</option>
                             <option value="50">50</option>
                             <option value="100">100</option>
                         </select>
                     </div>
+                    
                     <div className="col-md-10 d-flex align-items-center justify-content-end gap-2">
                         <input
                             type="search"
