@@ -263,7 +263,44 @@ const UserManagement = () => {
     });
   }, [users, searchTerm, filterRole, filterStatus, filterPlan]);
 
-  // START: Logic Phân trang
+  // CẬP NHẬT LOGIC: SẮP XẾP SAU KHI LỌC
+  const sortedAndFilteredUsers = useMemo(() => {
+    const sortableUsers = [...filteredUsers]; // Tạo bản sao để không ảnh hưởng mảng gốc
+
+    sortableUsers.sort((a, b) => {
+      let aValue = a[sortColumn];
+      let bValue = b[sortColumn];
+
+      // Xử lý giá trị null/undefined hoặc các trường hợp đặc biệt
+      if (aValue == null) aValue = ''; 
+      if (bValue == null) bValue = '';
+
+      let comparison = 0;
+      // So sánh string (không phân biệt hoa thường)
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        comparison = aValue.toLowerCase().localeCompare(bValue.toLowerCase());
+      } 
+      // So sánh boolean (true > false)
+      else if (typeof aValue === 'boolean' && typeof bValue === 'boolean') {
+        comparison = aValue === bValue ? 0 : aValue ? 1 : -1; 
+      } 
+      // Có thể thêm logic cho số nếu cần
+      // else if (typeof aValue === 'number' && typeof bValue === 'number') {
+      //   comparison = aValue - bValue;
+      // }
+       else {
+        // Trường hợp khác (hoặc type khác nhau), cố gắng so sánh như string
+        comparison = String(aValue).toLowerCase().localeCompare(String(bValue).toLowerCase());
+      }
+
+      // Đảo ngược kết quả nếu sortDirection là 'desc'
+      return sortDirection === 'asc' ? comparison : comparison * -1;
+    });
+
+    return sortableUsers;
+  }, [filteredUsers, sortColumn, sortDirection]); // Phụ thuộc vào dữ liệu đã lọc và state sort
+
+  // Logic Phân trang
   // Tính toán tổng số trang
   const totalPages = Math.ceil(filteredUsers.length / pageSize);
 
@@ -276,7 +313,6 @@ const UserManagement = () => {
   // Tính toán thông tin hiển thị (ví dụ: "Showing 1 to 10 of 50")
   const startEntry = filteredUsers.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
   const endEntry = Math.min(currentPage * pageSize, filteredUsers.length);
-  // END: Logic Phân trang
 
   const getRoleBadgeClass = (role) => {
     const roleMap = {
