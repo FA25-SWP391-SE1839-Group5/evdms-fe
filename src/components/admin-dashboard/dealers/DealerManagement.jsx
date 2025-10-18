@@ -44,6 +44,16 @@ export default function DealerManagement() {
         );
     }, [dealers, searchTerm]);
 
+    // --- Pagination ---
+    const totalPages = Math.ceil(filteredDealers.length / pageSize);
+    const paginatedDealers = useMemo(() => {
+        const startIndex = (currentPage - 1) * pageSize;
+        return filteredDealers.slice(startIndex, startIndex + pageSize);
+    }, [filteredDealers, currentPage, pageSize]);
+
+    const startEntry = filteredDealers.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+    const endEntry = Math.min(currentPage * pageSize, filteredDealers.length);
+
     return (
     <div>
 
