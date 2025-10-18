@@ -77,14 +77,6 @@ const UserManagement = () => {
       }
     }
 
-    // Phone validation (optional but must be valid if provided)
-    // if (formData.phoneNumber && formData.phoneNumber.trim() !== '') {
-    //   const phoneRegex = /^[0-9]{10,15}$/;
-    //   if (!phoneRegex.test(formData.phoneNumber.replace(/[\s-]/g, ''))) {
-    //     errors.phoneNumber = 'Phone number must be 10-15 digits';
-    //   }
-    // }
-
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -122,20 +114,15 @@ const UserManagement = () => {
         // UPDATE USER
         const updateData = { ...formData };
         
-        // Remove password if empty (keep existing password)
         if (!updateData.password || updateData.password.trim() === '') {
           delete updateData.password;
         }
         
-        console.log('🔄 Updating user in DB:', editingUser.id);
-        console.log('📤 Update data:', { ...updateData, password: updateData.password ? '***' : 'unchanged' });
-        
         const response = await updateUser(editingUser.id, updateData);
         
         if (response.success) {
-          console.log('✅ User updated successfully in database');
           setSuccess(`User "${formData.fullName}" updated successfully in database`);
-          await fetchUsers(); // Refresh from DB
+          await fetchUsers();
           handleCloseModal();
         } else {
           throw new Error(response.message || 'Update failed');
@@ -147,15 +134,11 @@ const UserManagement = () => {
           return;
         }
         
-        console.log('➕ Creating new user in DB');
-        console.log('📤 User data:', { ...formData, password: '***' });
-        
         const response = await createUser(formData);
         
         if (response.success) {
-          console.log('✅ New user created in database:', response.data);
           setSuccess(`User "${formData.fullName}" created successfully! They can now login with their credentials.`);
-          await fetchUsers(); // Refresh from DB
+          await fetchUsers();
           handleCloseModal();
         } else {
           throw new Error(response.message || 'Creation failed');
@@ -164,9 +147,7 @@ const UserManagement = () => {
     } catch (err) {
       const errorMsg = err.response?.data?.message || err.message || 'Operation failed';
       setError(`Database operation failed: ${errorMsg}`);
-      console.error('❌ Submit error:', err);
       
-      // Handle specific error cases
       if (errorMsg.toLowerCase().includes('email') && errorMsg.toLowerCase().includes('exists')) {
         setValidationErrors({ email: 'This email is already registered' });
       }
@@ -177,37 +158,30 @@ const UserManagement = () => {
     const confirmMessage = `⚠️ DELETE USER FROM DATABASE?\n\nUser: ${userName}\n\nThis will permanently remove the user from the database.\nThey will NOT be able to login anymore.\n\nAre you absolutely sure?`;
     
     if (!window.confirm(confirmMessage)) {
-      console.log('🚫 Delete cancelled by user');
       return;
     }
 
     try {
-      console.log('🗑️ Deleting user from database:', userId);
-      
       const response = await deleteUser(userId);
       
       if (response.data?.success) {
-        console.log('✅ User permanently deleted from database');
         setSuccess(`User "${userName}" has been permanently deleted from database. They can no longer login.`);
-        await fetchUsers(); // Refresh from DB
+        await fetchUsers();
       } else {
         throw new Error('Delete operation failed');
       }
     } catch (err) {
       const errorMsg = err.response?.data?.message || 'Failed to delete user from database';
       setError(errorMsg);
-      console.error('❌ Delete error:', err);
     }
   };
 
   const handleEdit = (user) => {
-    console.log('✏️ Editing user:', user);
     setEditingUser(user);
     setFormData({
       fullName: user.fullName || '',
       email: user.email || '',
-      password: '', // Always empty for security
-      // phoneNumber: user.phoneNumber || '',
+      password: '',
       role: user.role || 'DealerStaff',
       isActive: user.isActive !== undefined ? user.isActive : true
     });
@@ -223,7 +197,6 @@ const UserManagement = () => {
       fullName: '',
       email: '',
       password: '',
-      // phoneNumber: '',
       role: 'DealerStaff',
       isActive: true
     });
@@ -280,8 +253,8 @@ const UserManagement = () => {
             <li className="nav-item">
               <a 
                 className={`nav-link ${activeTab === 'users' ? 'active' : ''}`}
-                href="javascript:void(0);"
-                onClick={() => setActiveTab('users')}
+                href="#"
+                onClick={(e) => { e.preventDefault(); setActiveTab('users'); }}
               >
                 <i className="bx bx-user me-1" /> Users List
               </a>
@@ -289,8 +262,8 @@ const UserManagement = () => {
             <li className="nav-item">
               <a 
                 className={`nav-link ${activeTab === 'roles' ? 'active' : ''}`}
-                href="javascript:void(0);"
-                onClick={() => setActiveTab('roles')}
+                href="#"
+                onClick={(e) => { e.preventDefault(); setActiveTab('roles'); }}
               >
                 <i className="bx bx-lock-alt me-1" /> Roles & Permissions
               </a>
@@ -318,33 +291,67 @@ const UserManagement = () => {
       {/* Card */}
       {activeTab === 'users' ? (
         <div className="card">
-          <div className="card-header d-flex justify-content-between align-items-center pe-3">
-            <h5 className="mb-0">User Accounts</h5>
-            <button
-              type="button"
-              className="btn btn-primary rounded-pill d-flex align-items-center px-3 py-2"
-              onClick={() => setShowModal(true)}
-            >
-              <Plus size={18} className="me-2" />
-              <span className="fw-semibold">Add User</span>
-            </button>
-          </div>
-
-          {/* Search */}
-          <div className="card-body pt-0">
-            <div className="input-group mb-3">
-              <span className="input-group-text">
-                <Search size={16} />
-              </span>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Search by name or email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+            <div className="card-header border-bottom">
+                <h5 className="card-title mb-3">Search Filters</h5>
+                <div className="d-flex justify-content-between align-items-center row pb-2 gap-3 gap-md-0">
+                    <div className="col-md-4">
+                        <select className="form-select">
+                            <option value="">Select Role</option>
+                            <option value="Admin">Admin</option>
+                            <option value="DealerManager">Dealer Manager</option>
+                            <option value="DealerStaff">Dealer Staff</option>
+                            <option value="EVMStaff">EVM Staff</option>
+                        </select>
+                    </div>
+                    <div className="col-md-4">
+                        <select className="form-select">
+                            <option value="">Select Plan</option>
+                            {/* Bạn có thể thêm các option cho Plan ở đây */}
+                        </select>
+                    </div>
+                    <div className="col-md-4">
+                        <select className="form-select">
+                            <option value="">Select Status</option>
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
+            <div className="card-datatable table-responsive">
+                <div className="row m-2 justify-content-between">
+                    <div className="col-md-2">
+                        <select className="form-select">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                    <div className="col-md-10 d-flex align-items-center justify-content-end gap-2">
+                        <input
+                            type="search"
+                            className="form-control w-50"
+                            placeholder="Search User"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <button className="btn btn-secondary">
+                           <i className='bx bx-export me-1'></i> Export
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-primary rounded-pill d-flex align-items-center px-3 py-2"
+                          onClick={() => setShowModal(true)}
+                        >
+                          <Plus size={18} className="me-2" />
+                          <span className="fw-semibold">Add User</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
             {/* Table */}
             <div className="table-responsive text-nowrap">
               <table className="table">
@@ -352,7 +359,6 @@ const UserManagement = () => {
                   <tr>
                     <th>Full Name</th>
                     <th>Email</th>
-                    {/* <th>Phone</th> */}
                     <th>Role</th>
                     <th>Status</th>
                     <th>Actions</th>
@@ -361,7 +367,7 @@ const UserManagement = () => {
                 <tbody className="table-border-bottom-0">
                   {filteredUsers.length === 0 ? (
                     <tr>
-                      <td colSpan="6" className="text-center py-4">
+                      <td colSpan="5" className="text-center py-4">
                         {searchTerm ? 'No users match your search' : 'No users found'}
                       </td>
                     </tr>
@@ -370,7 +376,6 @@ const UserManagement = () => {
                       <tr key={user.id}>
                         <td>{user.fullName || 'N/A'}</td>
                         <td>{user.email || 'N/A'}</td>
-                        {/* <td>{user.phoneNumber || 'N/A'}</td> */}
                         <td>
                           <span className={`badge bg-label-${getRoleBadgeClass(user.role)}`}>
                             {formatRoleDisplay(user.role)}
@@ -407,7 +412,6 @@ const UserManagement = () => {
               </table>
             </div>
           </div>
-        </div>
       ) : (
         <div className="card">
           <h5 className="card-header">Roles & Permissions</h5>
@@ -427,21 +431,6 @@ const UserManagement = () => {
         onFormChange={handleChange}
         errors={validationErrors}
       />
-                  {/* Phone Number */}
-                  {/* <div className="mb-3">
-                    <label className="form-label">Phone Number</label>
-                    <input
-                      type="text"
-                      className={`form-control ${validationErrors.phoneNumber ? 'is-invalid' : ''}`}
-                      name="phoneNumber"
-                      value={formData.phoneNumber}
-                      onChange={handleChange}
-                      placeholder="0123456789"
-                    />
-                    {validationErrors.phoneNumber && (
-                      <div className="invalid-feedback">{validationErrors.phoneNumber}</div>
-                    )}
-                  </div> */}
     </>
   );
 };
