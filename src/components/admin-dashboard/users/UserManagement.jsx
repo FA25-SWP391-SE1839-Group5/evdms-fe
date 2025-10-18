@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Plus, Edit2, Trash2, X, Save, Search, AlertCircle, CheckCircle } from 'lucide-react';
+import { Plus, AlertCircle, CheckCircle } from 'lucide-react';
 import { getAllUsers, createUser, updateUser, deleteUser } from '../../../services/dashboardService';
 import UserModal from './UserModal';
 
-
+// Import các thư viện export
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
@@ -178,6 +178,33 @@ const UserManagement = () => {
     }
   };
 
+  // START: HÀM MỚI ĐỂ SUSPEND/ACTIVATE USER
+  const handleToggleSuspend = async (userToToggle) => {
+    const actionText = userToToggle.isActive ? 'suspend' : 'activate';
+    const confirmMessage = `Are you sure you want to ${actionText} the user "${userToToggle.fullName}"?`;
+    
+    if (!window.confirm(confirmMessage)) {
+      return;
+    }
+
+    try {
+      // Chúng ta chỉ cập nhật trạng thái 'isActive'
+      const updateData = { isActive: !userToToggle.isActive };
+      const response = await updateUser(userToToggle.id, updateData);
+
+      if (response.success) {
+        setSuccess(`User "${userToToggle.fullName}" has been ${actionText}d.`);
+        await fetchUsers(); // Tải lại danh sách
+      } else {
+        throw new Error(response.message || 'Toggle status failed');
+      }
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || `Failed to ${actionText} user.`;
+      setError(errorMsg);
+    }
+  };
+  // END: HÀM MỚI
+
   const handleEdit = (user) => {
     setEditingUser(user);
     setFormData({
@@ -241,9 +268,7 @@ const UserManagement = () => {
     return roleDisplayMap[role] || role;
   };
 
-  // START: Logic cho nút Export (ĐÃ SỬA LỖI)
   const handleExport = (format) => {
-    // 1. Chuẩn bị dữ liệu
     const exportData = filteredUsers.map(user => ({
       "Full Name": user.fullName,
       "Email": user.email,
@@ -251,12 +276,10 @@ const UserManagement = () => {
       "Status": user.isActive ? 'Active' : 'Inactive'
     }));
 
-    // 2. Xử lý theo từng định dạng
     switch (format) {
       case 'pdf': {
         const doc = new jsPDF();
         doc.text("User List", 14, 16);
-        // SỬA LỖI: Gọi autoTable như một hàm riêng
         autoTable(doc, { 
           head: [["Full Name", "Email", "Role", "Status"]],
           body: exportData.map(Object.values),
@@ -292,7 +315,6 @@ const UserManagement = () => {
       case 'print': {
         const doc = new jsPDF();
         doc.text("User List", 14, 16);
-        // SỬA LỖI: Gọi autoTable như một hàm riêng
         autoTable(doc, { 
           head: [["Full Name", "Email", "Role", "Status"]],
           body: exportData.map(Object.values),
@@ -321,7 +343,7 @@ const UserManagement = () => {
         break;
     }
   };
-  // END: Logic cho nút Export
+
 
   if (loading) {
     return (
@@ -444,7 +466,6 @@ const UserManagement = () => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                         
-                        {/* START: Cập nhật nút Export Dropdown */}
                         <div className="btn-group">
                           <button
                             type="button"
@@ -455,7 +476,6 @@ const UserManagement = () => {
                             <i className='bx bx-export me-1'></i> Export
                           </button>
                           <ul className="dropdown-menu">
-                            {/* Thay <a> bằng <button> để xử lý onClick */}
                             <li>
                               <button type="button" className="dropdown-item" onClick={() => handleExport('print')}>
                                 <i className='bx bx-printer me-2'></i> Print
@@ -484,7 +504,6 @@ const UserManagement = () => {
                             </li>
                           </ul>
                         </div>
-                        {/* END: Cập nhật nút Export Dropdown */}
 
                         <button
                           type="button"
@@ -529,25 +548,57 @@ const UserManagement = () => {
                                 {user.isActive ? 'Active' : 'Inactive'}
                                 </span>
                             </td>
+
+                            {/* START: CỘT ACTIONS MỚI */}
                             <td>
-                                <div className="dropdown">
-                                <button 
-                                    type="button"
-                                    className="btn p-0 dropdown-toggle hide-arrow"
-                                    data-bs-toggle="dropdown"
-                                >
-                                    <i className="bx bx-dots-vertical-rounded" />
-                                </button>
-                                <div className="dropdown-menu">
-                                    <button type="button" className="dropdown-item" onClick={() => handleEdit(user)}>
-                                    <i className="bx bx-edit-alt me-2" /> Edit
+                                <div className="d-flex align-items-center">
+                                  {/* 1. Nút Xóa (Thùng rác) */}
+                                  <button 
+                                    type="button" 
+                                    className="btn btn-icon btn-text-secondary rounded-pill btn-sm"
+                                    data-bs-toggle="tooltip" 
+                                    title="Delete"
+                                    onClick={() => handleDelete(user.id, user.fullName)}
+                                  >
+                                    <i className="bx bx-trash" />
+                                  </button>
+
+                                  {/* 2. Nút Xem (Con mắt) - Chưa có logic */}
+                                  <button 
+                                    type="button" 
+                                    className="btn btn-icon btn-text-secondary rounded-pill btn-sm"
+                                    data-bs-toggle="tooltip" 
+                                    title="View"
+                                  >
+                                    <i className="bx bx-show" /> 
+                                  </button>
+
+                                  {/* 3. Nút Menu (Ba chấm) */}
+                                  <div className="dropdown">
+                                    <button 
+                                      type="button" 
+                                      className="btn p-0 dropdown-toggle hide-arrow btn-sm" 
+                                      data-bs-toggle="dropdown"
+                                    >
+                                      <i className="bx bx-dots-vertical-rounded" />
                                     </button>
-                                    <button type="button" className="dropdown-item" onClick={() => handleDelete(user.id, user.fullName)}>
-                                    <i className="bx bx-trash me-2" /> Delete
-                                    </button>
+                                    <div className="dropdown-menu">
+                                      <button type="button" className="dropdown-item" onClick={() => handleEdit(user)}>
+                                        <i className="bx bx-edit-alt me-2" /> Edit
+                                      </button>
+                                      
+                                      <button type="button" className="dropdown-item" onClick={() => handleToggleSuspend(user)}>
+                                        {user.isActive 
+                                          ? <><i className="bx bx-block me-2" /> Suspend</>
+                                          : <><i className="bx bx-check-circle me-2" /> Activate</>
+                                        }
+                                      </button>
+                                    </div>
+                                  </div>
                                 </div>
-                                </div>
-                            </td>
+                              </td>
+                            {/* END: CỘT ACTIONS MỚI */}
+
                             </tr>
                         ))
                         )}
