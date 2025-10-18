@@ -32,6 +32,18 @@ export default function DealerManagement() {
         }
     };
 
+    // --- Filtering ---
+    const filteredDealers = useMemo(() => {
+        if (!Array.isArray(dealers)) return []; // Đảm bảo dealers là mảng
+        
+        return dealers.filter(dealer => 
+        (dealer.name && dealer.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (dealer.email && dealer.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (dealer.region && dealer.region.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (dealer.address && dealer.address.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+    }, [dealers, searchTerm]);
+
     return (
     <div>
 
