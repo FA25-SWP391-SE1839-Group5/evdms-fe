@@ -71,6 +71,27 @@ export default function DealerManagement() {
         }
     };
 
+    // --- Placeholder Action Handlers ---
+    const handleEdit = (dealerId) => {
+        console.log("Edit dealer:", dealerId);
+        // TODO: Implement edit logic (e.g., open modal)
+    };
+
+    const handleDelete = async (dealerId, dealerName) => {
+        console.log("Delete dealer:", dealerId);
+        // const confirmMessage = `Are you sure you want to delete the dealer "${dealerName}"?`;
+        // if (window.confirm(confirmMessage)) {
+        //   try {
+        //     await deleteDealer(dealerId);
+        //     // TODO: Add success message
+        //     fetchDealers(); // Refresh list
+        //   } catch (err) {
+        //      console.error("❌ Delete Dealer Error:", err);
+        //      setError(err.response?.data?.message || err.message || 'Failed to delete dealer');
+        //   }
+        // }
+    };
+
     return (
     <div>
 
