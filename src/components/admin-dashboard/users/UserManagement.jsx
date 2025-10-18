@@ -514,7 +514,7 @@ const UserManagement = () => {
                           value={filterPlan}
                           onChange={(e) => setFilterPlan(e.target.value)}
                         >
-                            <option value="">Select Plan</option>
+                            <option value="">Select Dealer</option>
                         </select>
                     </div>
                     <div className="col-md-4">
