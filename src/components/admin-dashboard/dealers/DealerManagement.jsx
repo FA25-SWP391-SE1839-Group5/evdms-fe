@@ -226,6 +226,46 @@ export default function DealerManagement() {
                     )}
                 </tbody>
             </table>
+
+            {/* Bottom Row: Info + Pagination */}
+            <div className="row m-2 justify-content-between align-items-center">
+                <div className="col-md-6">
+                    <small className="text-muted">
+                        Showing {startEntry} to {endEntry} of {filteredDealers.length} entries
+                    </small>
+                </div>
+                <div className="col-md-6">
+                    <nav aria-label="Page navigation">
+                        <ul className="pagination pagination-sm justify-content-end mb-0">
+                            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                                <button className="page-link" onClick={() => handlePageChange(currentPage - 1)}>
+                                    &laquo; {/* Previous */}
+                                </button>
+                            </li>
+                            
+                            {/* Simple Pagination - Chỉ hiển thị trang hiện tại (có thể nâng cấp sau) */}
+                            {/* Hoặc tạo ra các nút số trang nếu muốn */}
+                             <li className="page-item active" aria-current="page">
+                                <span className="page-link">{currentPage}</span>
+                             </li>
+                            {/* Ví dụ tạo các nút số trang (nâng cao hơn) */}
+                            {/* {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                                <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
+                                    <button className="page-link" onClick={() => handlePageChange(page)}>
+                                        {page}
+                                    </button>
+                                </li>
+                            ))} */}
+
+                            <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
+                                <button className="page-link" onClick={() => handlePageChange(currentPage + 1)}>
+                                     &raquo; {/* Next */}
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
         </div>
     </div>
                     
