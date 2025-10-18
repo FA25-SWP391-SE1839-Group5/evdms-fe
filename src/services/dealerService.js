@@ -53,3 +53,16 @@ export const createDealer = (dealerData) => {
   };
   return api.post('/dealers', dataToSend);
 };
+
+/**
+ * UPDATE Dealer
+ * @param {string|number} dealerId - ID của Dealer cần cập nhật
+ * @param {object} dealerData - Dữ liệu cập nhật (chỉ chứa các trường cần thay đổi)
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const updateDealer = (dealerId, dealerData) => {
+  console.log(`📡 API Call: PUT /api/dealers/${dealerId}`); // Hoặc PATCH nếu API hỗ trợ
+  console.log("📤 Sending update data:", dealerData);
+  // Gửi toàn bộ dữ liệu hoặc chỉ các trường thay đổi tùy thuộc vào API (PUT thường gửi toàn bộ)
+  return api.put(`/dealers/${dealerId}`, dealerData); 
+};
