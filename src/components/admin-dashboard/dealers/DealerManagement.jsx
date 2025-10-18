@@ -136,23 +136,35 @@ export default function DealerManagement() {
         <div className="card-datatable table-responsive">
             {/* Top Row: Entries + Search */}
             <div className="row m-2 justify-content-between align-items-center">
-            <div className="col-md-2">
-                <label className="d-flex align-items-center">
-                    Show&nbsp;
-                    <select 
-                        className="form-select"
-                        value={pageSize}
-                        onChange={handlePageSizeChange}
-                        style={{ width: '140px' }}
-                    >
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                    &nbsp;entries
-                </label>
-            </div>
+                <div className="col-md-2">
+                    <label className="d-flex align-items-center">
+                        Show&nbsp;
+                        <select 
+                            className="form-select"
+                            value={pageSize}
+                            onChange={handlePageSizeChange}
+                            style={{ width: '140px' }}
+                        >
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        &nbsp;entries
+                    </label>
+                </div>
+                <div className="col-md-10 d-flex align-items-center justify-content-end gap-2">
+                    <label className="d-flex align-items-center">
+                        Search:&nbsp;
+                        <input
+                            type="search"
+                            className="form-control"
+                            placeholder="Search dealers..."
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                        />
+                    </label>
+                </div>
             </div>
         </div>
     </div>
