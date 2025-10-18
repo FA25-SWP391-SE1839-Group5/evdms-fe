@@ -334,6 +334,18 @@ const UserManagement = () => {
     return roleDisplayMap[role] || role;
   };
 
+  // HÀM MỚI ĐỂ HIỂN THỊ ICON SORT
+  const renderSortIcon = (columnKey) => {
+    if (sortColumn !== columnKey) {
+      // Hiển thị icon trung tính nếu không phải cột đang sort
+      return <i className="bx bx-sort text-muted ms-1 opacity-50 small"></i>; 
+    }
+    // Hiển thị icon lên/xuống tùy theo hướng
+    return sortDirection === 'asc'
+      ? <i className="bx bx-sort-up text-primary ms-1 small"></i>
+      : <i className="bx bx-sort-down text-primary ms-1 small"></i>;
+  };
+
   const handleExport = (format) => {
     const exportData = filteredUsers.map(user => ({
       "Full Name": user.fullName,
