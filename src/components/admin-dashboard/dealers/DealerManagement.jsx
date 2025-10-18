@@ -54,6 +54,23 @@ export default function DealerManagement() {
     const startEntry = filteredDealers.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
     const endEntry = Math.min(currentPage * pageSize, filteredDealers.length);
 
+    // --- Handlers ---
+    const handlePageSizeChange = (e) => {
+        setPageSize(Number(e.target.value));
+        setCurrentPage(1); // Reset về trang 1
+    };
+
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1); // Reset về trang 1
+    };
+
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+        setCurrentPage(newPage);
+        }
+    };
+
     return (
     <div>
 
