@@ -558,7 +558,7 @@ const UserManagement = () => {
                             </td>
                         </tr>
                         ) : (
-                        filteredUsers.map(user => (
+                        paginatedUsers.map(user => (
                             <tr key={user.id}>
                             <td>{user.fullName || 'N/A'}</td>
                             <td>{user.email || 'N/A'}</td>
@@ -621,10 +621,8 @@ const UserManagement = () => {
                                   </div>
                                 </div>
                               </td>
-                            {/* END: CỘT ACTIONS MỚI */}
-
                             </tr>
-                        ))
+                          ))
                         )}
                     </tbody>
                 </table>
