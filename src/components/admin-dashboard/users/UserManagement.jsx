@@ -5,7 +5,7 @@ import UserModal from './UserModal';
 
 
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
 const UserManagement = () => {
@@ -241,10 +241,9 @@ const UserManagement = () => {
     return roleDisplayMap[role] || role;
   };
 
-  // START: Logic cho nút Export
+  // START: Logic cho nút Export (ĐÃ SỬA LỖI)
   const handleExport = (format) => {
     // 1. Chuẩn bị dữ liệu
-    // Lấy dữ liệu đã được lọc (giống hệt dữ liệu đang hiển thị trên bảng)
     const exportData = filteredUsers.map(user => ({
       "Full Name": user.fullName,
       "Email": user.email,
@@ -257,7 +256,8 @@ const UserManagement = () => {
       case 'pdf': {
         const doc = new jsPDF();
         doc.text("User List", 14, 16);
-        doc.autoTable({
+        // SỬA LỖI: Gọi autoTable như một hàm riêng
+        autoTable(doc, { 
           head: [["Full Name", "Email", "Role", "Status"]],
           body: exportData.map(Object.values),
           startY: 20,
@@ -292,22 +292,22 @@ const UserManagement = () => {
       case 'print': {
         const doc = new jsPDF();
         doc.text("User List", 14, 16);
-        doc.autoTable({
+        // SỬA LỖI: Gọi autoTable như một hàm riêng
+        autoTable(doc, { 
           head: [["Full Name", "Email", "Role", "Status"]],
           body: exportData.map(Object.values),
           startY: 20,
         });
-        doc.autoPrint(); // Mở hộp thoại in
-        doc.output('dataurlnewwindow'); // Mở PDF trong tab mới để in
+        doc.autoPrint();
+        doc.output('dataurlnewwindow');
         break;
       }
         
       case 'copy': {
-        // Chuyển dữ liệu thành chuỗi (tab-separated) để dán vào Excel
         const textToCopy = [
-          Object.keys(exportData[0]).join('\t'), // Dòng tiêu đề
-          ...exportData.map(row => Object.values(row).join('\t')) // Các dòng dữ liệu
-        ].join('\n'); // Nối các dòng bằng ký tự xuống dòng
+          Object.keys(exportData[0]).join('\t'),
+          ...exportData.map(row => Object.values(row).join('\t'))
+        ].join('\n');
 
         navigator.clipboard.writeText(textToCopy).then(() => {
           setSuccess('Đã sao chép dữ liệu vào clipboard!');
@@ -322,7 +322,6 @@ const UserManagement = () => {
     }
   };
   // END: Logic cho nút Export
-
 
   if (loading) {
     return (
