@@ -135,7 +135,7 @@ export default function DealerManagement() {
         <h5 className="card-header pb-0">Dealer List</h5>
         <div className="card-datatable table-responsive">
             {/* Top Row: Entries + Search */}
-            <div className="row m-2 justify-content-between align-items-center">
+            <div className="row m-2 justify-content-between align-items-center border-bottom pb-2">
                 <div className="col-md-2">
                     <label className="d-flex align-items-center">
                         Show&nbsp;
@@ -166,6 +166,23 @@ export default function DealerManagement() {
                     </label>
                 </div>
             </div>
+
+            {/* Table */}
+            <table className="dt-responsive table"> {/* Bỏ class table-bordered nếu không muốn viền */}
+                <thead>
+                    <tr>
+                        {/* Các cột phù hợp với Dealer */}
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Region</th>
+                        <th>Address</th>
+                        {/* <th>Contact Person</th> */}
+                        {/* <th>Phone</th> */}
+                        <th>Status</th> 
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+            </table>
         </div>
     </div>
                     
