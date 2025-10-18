@@ -119,6 +119,16 @@ export default function DealerManagement() {
         <h4 className="fw-bold py-3 mb-4">
             <span className="text-muted fw-light">Management /</span> Dealers
         </h4>
+        
+        {/* Alert messages */}
+        {error && (
+            <div className="alert alert-danger alert-dismissible d-flex align-items-center" role="alert">
+            <AlertCircle size={20} className="me-2" />
+            <div className="flex-grow-1">{error}</div>
+            <button type="button" className="btn-close" onClick={() => setError('')}></button>
+            </div>
+        )}
+        {/* TODO: Add Success Alert if needed */}
     </>
   )
 }
