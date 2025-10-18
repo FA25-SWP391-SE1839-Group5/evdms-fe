@@ -3,6 +3,11 @@ import { Plus, Edit2, Trash2, X, Save, Search, AlertCircle, CheckCircle } from '
 import { getAllUsers, createUser, updateUser, deleteUser } from '../../../services/dashboardService';
 import UserModal from './UserModal';
 
+
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import * as XLSX from 'xlsx';
+
 const UserManagement = () => {
   const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState([]);
@@ -12,7 +17,7 @@ const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   
   const [filterRole, setFilterRole] = useState('');
-  const [filterPlan, setFilterPlan] = useState('');
+  const [filterPlan, setFilterPlan] = useState(''); 
   const [filterStatus, setFilterStatus] = useState(''); 
 
   const [formData, setFormData] = useState({
@@ -236,6 +241,89 @@ const UserManagement = () => {
     return roleDisplayMap[role] || role;
   };
 
+  // START: Logic cho nút Export
+  const handleExport = (format) => {
+    // 1. Chuẩn bị dữ liệu
+    // Lấy dữ liệu đã được lọc (giống hệt dữ liệu đang hiển thị trên bảng)
+    const exportData = filteredUsers.map(user => ({
+      "Full Name": user.fullName,
+      "Email": user.email,
+      "Role": formatRoleDisplay(user.role),
+      "Status": user.isActive ? 'Active' : 'Inactive'
+    }));
+
+    // 2. Xử lý theo từng định dạng
+    switch (format) {
+      case 'pdf': {
+        const doc = new jsPDF();
+        doc.text("User List", 14, 16);
+        doc.autoTable({
+          head: [["Full Name", "Email", "Role", "Status"]],
+          body: exportData.map(Object.values),
+          startY: 20,
+        });
+        doc.save('users-list.pdf');
+        break;
+      }
+        
+      case 'excel': {
+        const ws = XLSX.utils.json_to_sheet(exportData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Users");
+        XLSX.writeFile(wb, "users-list.xlsx");
+        break;
+      }
+
+      case 'csv': {
+        const ws = XLSX.utils.json_to_sheet(exportData);
+        const csv = XLSX.utils.sheet_to_csv(ws);
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'users-list.csv');
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        break;
+      }
+
+      case 'print': {
+        const doc = new jsPDF();
+        doc.text("User List", 14, 16);
+        doc.autoTable({
+          head: [["Full Name", "Email", "Role", "Status"]],
+          body: exportData.map(Object.values),
+          startY: 20,
+        });
+        doc.autoPrint(); // Mở hộp thoại in
+        doc.output('dataurlnewwindow'); // Mở PDF trong tab mới để in
+        break;
+      }
+        
+      case 'copy': {
+        // Chuyển dữ liệu thành chuỗi (tab-separated) để dán vào Excel
+        const textToCopy = [
+          Object.keys(exportData[0]).join('\t'), // Dòng tiêu đề
+          ...exportData.map(row => Object.values(row).join('\t')) // Các dòng dữ liệu
+        ].join('\n'); // Nối các dòng bằng ký tự xuống dòng
+
+        navigator.clipboard.writeText(textToCopy).then(() => {
+          setSuccess('Đã sao chép dữ liệu vào clipboard!');
+        }, (err) => {
+          setError('Không thể sao chép dữ liệu.');
+        });
+        break;
+      }
+
+      default:
+        break;
+    }
+  };
+  // END: Logic cho nút Export
+
+
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
@@ -336,12 +424,9 @@ const UserManagement = () => {
                     </div>
                 </div>
             </div>
-
-            {/* START: ĐÂY LÀ KHỐI ĐÃ SỬA LẠI */}
-            {/* Thẻ div này sẽ bao bọc cả nút bấm VÀ bảng */}
+            
             <div className="card-datatable table-responsive">
                 
-                {/* Hàng chứa các nút bấm và tìm kiếm */}
                 <div className="row m-2 justify-content-between">
                     <div className="col-md-2">
                         <select className="form-select">
@@ -360,6 +445,7 @@ const UserManagement = () => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                         
+                        {/* START: Cập nhật nút Export Dropdown */}
                         <div className="btn-group">
                           <button
                             type="button"
@@ -370,14 +456,36 @@ const UserManagement = () => {
                             <i className='bx bx-export me-1'></i> Export
                           </button>
                           <ul className="dropdown-menu">
-                            <li><a className="dropdown-item" href="#"><i className='bx bx-printer me-2'></i> Print</a></li>
-                            <li><a className="dropdown-item" href="#"><i className='bx bx-file me-2'></i> Csv</a></li>
-                            <li><a className="dropdown-item" href="#"><i className='bx bx-file-blank me-2'></i> Excel</a></li>
-                            <li><a className="dropdown-item" href="#"><i className='bx bxs-file-pdf me-2'></i> Pdf</a></li>
+                            {/* Thay <a> bằng <button> để xử lý onClick */}
+                            <li>
+                              <button type="button" className="dropdown-item" onClick={() => handleExport('print')}>
+                                <i className='bx bx-printer me-2'></i> Print
+                              </button>
+                            </li>
+                            <li>
+                              <button type="button" className="dropdown-item" onClick={() => handleExport('csv')}>
+                                <i className='bx bx-file me-2'></i> Csv
+                              </button>
+                            </li>
+                            <li>
+                              <button type="button" className="dropdown-item" onClick={() => handleExport('excel')}>
+                                <i className='bx bx-file-blank me-2'></i> Excel
+                              </button>
+                            </li>
+                            <li>
+                              <button type="button" className="dropdown-item" onClick={() => handleExport('pdf')}>
+                                <i className='bx bxs-file-pdf me-2'></i> Pdf
+                              </button>
+                            </li>
                             <li><hr className="dropdown-divider" /></li>
-                            <li><a className="dropdown-item" href="#"><i className='bx bx-copy me-2'></i> Copy</a></li>
+                            <li>
+                              <button type="button" className="dropdown-item" onClick={() => handleExport('copy')}>
+                                <i className='bx bx-copy me-2'></i> Copy
+                              </button>
+                            </li>
                           </ul>
                         </div>
+                        {/* END: Cập nhật nút Export Dropdown */}
 
                         <button
                           type="button"
@@ -390,7 +498,6 @@ const UserManagement = () => {
                     </div>
                 </div>
             
-                {/* Bảng được chuyển vào BÊN TRONG div này */}
                 <table className="table">
                     <thead>
                         <tr>
@@ -448,7 +555,6 @@ const UserManagement = () => {
                     </tbody>
                 </table>
             </div>
-            {/* END: KHỐI ĐÃ SỬA LẠI */}
 
           </div>
       ) : (
