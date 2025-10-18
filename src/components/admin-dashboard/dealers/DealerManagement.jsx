@@ -1,149 +1,144 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { getAllDealers /*, addDealer, updateDealer, deleteDealer */ } from '../../../services/dealerService';
-import { AlertCircle, Search } from 'lucide-react';
+// Giả định bạn có service cho dealers
+import { getAllDealers /*, deleteDealer */ } from '../../../services/dealerService';
+import { AlertCircle, Search } from 'lucide-react'; // Thêm icon Search nếu cần
 
-export default function DealerManagement() {
-    const [dealers, setDealers] = useState([]); // State cho danh sách dealers
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const [searchTerm, setSearchTerm] = useState('');
-    const [pageSize, setPageSize] = useState(10); 
-    const [currentPage, setCurrentPage] = useState(1);
-    
-    // --- Fetch Data ---
-    useEffect(() => {
-        fetchDealers();
-    }, []);
+const DealerManagement = () => {
+  const [dealers, setDealers] = useState([]); // State cho danh sách dealers
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [pageSize, setPageSize] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
 
-    const fetchDealers = async () => {
-        try {
-            setLoading(true);
-            setError(''); // Reset lỗi trước khi fetch
-            const response = await getAllDealers();
-            // Kiểm tra cấu trúc response API của bạn và điều chỉnh nếu cần
-            setDealers(response.data || []); 
-            console.log("📥 Raw Dealer Response:", response.data); // Log dữ liệu nhận được
-        } catch (err) {
-            console.error("❌ Fetch Dealers Error:", err);
-            setError(err.response?.data?.message || err.message || 'Failed to load dealers');
-            setDealers([]); // Đảm bảo dealers là mảng rỗng khi có lỗi
-        } finally {
-            setLoading(false);
-        }
-    };
+  // --- Fetch Data ---
+  useEffect(() => {
+    fetchDealers();
+  }, []);
 
-    // --- Filtering ---
-    const filteredDealers = useMemo(() => {
-        if (!Array.isArray(dealers)) return []; // Đảm bảo dealers là mảng
-        
-        return dealers.filter(dealer => 
-        (dealer.name && dealer.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (dealer.email && dealer.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (dealer.region && dealer.region.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (dealer.address && dealer.address.toLowerCase().includes(searchTerm.toLowerCase()))
-        );
-    }, [dealers, searchTerm]);
-
-    // --- Pagination ---
-    const totalPages = Math.ceil(filteredDealers.length / pageSize);
-    const paginatedDealers = useMemo(() => {
-        const startIndex = (currentPage - 1) * pageSize;
-        return filteredDealers.slice(startIndex, startIndex + pageSize);
-    }, [filteredDealers, currentPage, pageSize]);
-
-    const startEntry = filteredDealers.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
-    const endEntry = Math.min(currentPage * pageSize, filteredDealers.length);
-
-    // --- Handlers ---
-    const handlePageSizeChange = (e) => {
-        setPageSize(Number(e.target.value));
-        setCurrentPage(1); // Reset về trang 1
-    };
-
-    const handleSearchChange = (e) => {
-        setSearchTerm(e.target.value);
-        setCurrentPage(1); // Reset về trang 1
-    };
-
-    const handlePageChange = (newPage) => {
-        if (newPage >= 1 && newPage <= totalPages) {
-        setCurrentPage(newPage);
-        }
-    };
-
-    // --- Placeholder Action Handlers ---
-    const handleEdit = (dealerId) => {
-        console.log("Edit dealer:", dealerId);
-        // TODO: Implement edit logic (e.g., open modal)
-    };
-
-    const handleDelete = async (dealerId, dealerName) => {
-        console.log("Delete dealer:", dealerId);
-        // const confirmMessage = `Are you sure you want to delete the dealer "${dealerName}"?`;
-        // if (window.confirm(confirmMessage)) {
-        //   try {
-        //     await deleteDealer(dealerId);
-        //     // TODO: Add success message
-        //     fetchDealers(); // Refresh list
-        //   } catch (err) {
-        //      console.error("❌ Delete Dealer Error:", err);
-        //      setError(err.response?.data?.message || err.message || 'Failed to delete dealer');
-        //   }
-        // }
-    };
-
-    // --- Render Status Badge (Ví dụ) ---
-    const renderStatusBadge = (status) => {
-        // Giả sử API trả về 'active' hoặc 'inactive'
-        const isActive = status === 'active'; // Điều chỉnh logic này theo API của bạn
-        return (
-            <span className={`badge bg-label-${isActive ? 'success' : 'secondary'}`}>
-                {isActive ? 'Active' : 'Inactive'}
-            </span>
-        );
-    };
-
-    // --- Loading State ---
-    if (loading) {
-        return (
-        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
-            <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading dealers...</span>
-            </div>
-        </div>
-        );
+  const fetchDealers = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      const response = await getAllDealers();
+      // Lấy dữ liệu từ response.data.data.items
+      setDealers(response.data?.data?.items || []);
+      console.log("📥 Raw Dealer Response:", response.data);
+    } catch (err) {
+      console.error("❌ Fetch Dealers Error:", err);
+      setError(err.response?.data?.message || err.message || 'Failed to load dealers');
+      setDealers([]);
+    } finally {
+      setLoading(false);
     }
-    return (
-    <>
-        {/* TODO: Thêm Breadcrumb nếu cần */}
-        <h4 className="fw-bold py-3 mb-4">
-            <span className="text-muted fw-light">Management /</span> Dealers
-        </h4>
-        
-        {/* Alert messages */}
-        {error && (
-            <div className="alert alert-danger alert-dismissible d-flex align-items-center" role="alert">
-            <AlertCircle size={20} className="me-2" />
-            <div className="flex-grow-1">{error}</div>
-            <button type="button" className="btn-close" onClick={() => setError('')}></button>
-            </div>
-        )}
-        {/* TODO: Add Success Alert if needed */}
+  };
 
-       {/* Responsive Datatable Card */}
+  // --- Filtering ---
+  const filteredDealers = useMemo(() => {
+    if (!Array.isArray(dealers)) return [];
+
+    return dealers.filter(dealer =>
+      (dealer.name && dealer.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (dealer.email && dealer.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (dealer.region && dealer.region.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (dealer.address && dealer.address.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  }, [dealers, searchTerm]);
+
+  // --- Pagination ---
+  const totalPages = Math.ceil(filteredDealers.length / pageSize);
+  const paginatedDealers = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    return filteredDealers.slice(startIndex, startIndex + pageSize);
+  }, [filteredDealers, currentPage, pageSize]);
+
+  const startEntry = filteredDealers.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+  const endEntry = Math.min(currentPage * pageSize, filteredDealers.length);
+
+  // --- Handlers ---
+  const handlePageSizeChange = (e) => {
+    setPageSize(Number(e.target.value));
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  // --- Placeholder Action Handlers ---
+  const handleEdit = (dealerId) => {
+    console.log("Edit dealer:", dealerId);
+    // TODO: Implement edit logic
+  };
+
+  const handleDelete = async (dealerId, dealerName) => {
+     console.log("Delete dealer:", dealerId);
+    // const confirmMessage = `Are you sure you want to delete the dealer "${dealerName}"?`;
+    // if (window.confirm(confirmMessage)) {
+    //   try {
+    //     await deleteDealer(dealerId);
+    //     fetchDealers();
+    //   } catch (err) {
+    //      setError(err.response?.data?.message || err.message || 'Failed to delete dealer');
+    //   }
+    // }
+  };
+
+  // --- Render Status Badge ---
+  const renderStatusBadge = (status) => {
+      // Tạm thời giả định status là boolean isActive nếu API chưa có status riêng
+      const isActive = typeof status === 'boolean' ? status : true; // Cần điều chỉnh theo API thực tế
+      return (
+          <span className={`badge bg-label-${isActive ? 'success' : 'secondary'}`}>
+              {isActive ? 'Active' : 'Inactive'}
+          </span>
+      );
+  };
+
+  // --- Loading State ---
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading dealers...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // --- Main Render ---
+  return (
+    <>
+      {/* Alert messages */}
+      {error && (
+        <div className="alert alert-danger alert-dismissible d-flex align-items-center" role="alert">
+          <AlertCircle size={20} className="me-2" />
+          <div className="flex-grow-1">{error}</div>
+          <button type="button" className="btn-close" onClick={() => setError('')}></button>
+        </div>
+      )}
+
+      {/* Responsive Datatable Card */}
       <div className="card">
         <h5 className="card-header pb-0">Dealer List</h5>
         <div className="card-datatable table-responsive">
             {/* Top Row: Entries + Search */}
             <div className="row m-2 justify-content-between align-items-center border-bottom pb-2">
-                <div className="col-md-2">
+                <div className="col-md-auto">
                     <label className="d-flex align-items-center">
                         Show&nbsp;
-                        <select 
-                            className="form-select"
-                            value={pageSize}
-                            onChange={handlePageSizeChange}
-                            style={{ width: '140px' }}
+                        <select
+                          className="form-select form-select-sm mx-1"
+                          value={pageSize}
+                          onChange={handlePageSizeChange}
+                          style={{ width: 'auto' }}
                         >
                             <option value="10">10</option>
                             <option value="25">25</option>
@@ -153,12 +148,12 @@ export default function DealerManagement() {
                         &nbsp;entries
                     </label>
                 </div>
-                <div className="col-md-10 d-flex align-items-center justify-content-end gap-2">
+                <div className="col-md-auto">
                     <label className="d-flex align-items-center">
                         Search:&nbsp;
                         <input
                             type="search"
-                            className="form-control"
+                            className="form-control form-control-sm"
                             placeholder="Search dealers..."
                             value={searchTerm}
                             onChange={handleSearchChange}
@@ -167,67 +162,52 @@ export default function DealerManagement() {
                 </div>
             </div>
 
-            {/* Table */}
-            <table className="dt-responsive table"> {/* Bỏ class table-bordered nếu không muốn viền */}
-                <thead>
-                    <tr>
-                        {/* Các cột phù hợp với Dealer */}
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Region</th>
-                        <th>Address</th>
-                        {/* <th>Contact Person</th> */}
-                        {/* <th>Phone</th> */}
-                        <th>Status</th> 
-                        <th>Actions</th>
+            {/* Table: Removed extra whitespace */}
+            <table className="dt-responsive table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Region</th>
+                  <th>Address</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedDealers.length === 0 ? (
+                  <tr><td colSpan="6" className="text-center py-4">{filteredDealers.length === 0 && !searchTerm ? 'No dealers found' : 'No dealers match your search'}</td></tr>
+                ) : (
+                  paginatedDealers.map(dealer => (
+                    <tr key={dealer.id}>
+                      <td>{dealer.name || 'N/A'}</td>
+                      <td>{dealer.email || 'N/A'}</td>
+                      <td>{dealer.region || 'N/A'}</td>
+                      <td>{dealer.address || 'N/A'}</td>
+                      <td>{renderStatusBadge(dealer.isActive)}</td>
+                      <td>
+                        <button
+                          className="btn btn-sm btn-icon btn-text-secondary rounded-pill me-1"
+                          onClick={() => handleEdit(dealer.id)}
+                          title="Edit"
+                        >
+                          <i className="bx bx-edit"></i>
+                        </button>
+                        <button
+                          className="btn btn-sm btn-icon btn-text-secondary rounded-pill"
+                          onClick={() => handleDelete(dealer.id, dealer.name)}
+                          title="Delete"
+                        >
+                          <i className="bx bx-trash"></i>
+                        </button>
+                      </td>
                     </tr>
-                </thead>
-                <tbody>
-                    {paginatedDealers.length === 0 ? (
-                        <tr>
-                            {/* Điều chỉnh colSpan cho đúng số cột */}
-                            <td colSpan="6" className="text-center py-4"> 
-                                {filteredDealers.length === 0 && !searchTerm 
-                                    ? 'No dealers found' 
-                                    : 'No dealers match your search'}
-                            </td>
-                        </tr>
-                    ) : (
-                        paginatedDealers.map(dealer => (
-                            <tr key={dealer.id}> 
-                                {/* Đảm bảo key là duy nhất, thường là dealer.id */}
-                                <td>{dealer.name || 'N/A'}</td>
-                                <td>{dealer.email || 'N/A'}</td>
-                                <td>{dealer.region || 'N/A'}</td>
-                                <td>{dealer.address || 'N/A'}</td>
-                                {/* <td>{dealer.contactPerson || 'N/A'}</td> */}
-                                {/* <td>{dealer.phone || 'N/A'}</td> */}
-                                <td>{renderStatusBadge(dealer.status)}</td> {/* Gọi hàm render badge */}
-                                <td>
-                                    {/* Actions: Edit, Delete - Thêm icon nếu muốn */}
-                                    <button 
-                                        className="btn btn-sm btn-icon btn-text-secondary rounded-pill me-1" 
-                                        onClick={() => handleEdit(dealer.id)}
-                                        title="Edit"
-                                     >
-                                        <i className="bx bx-edit"></i>
-                                    </button>
-                                    <button 
-                                        className="btn btn-sm btn-icon btn-text-secondary rounded-pill" 
-                                        onClick={() => handleDelete(dealer.id, dealer.name)}
-                                        title="Delete"
-                                     >
-                                        <i className="bx bx-trash"></i>
-                                    </button>
-                                    {/* Thêm các nút action khác nếu cần */}
-                                </td>
-                            </tr>
-                        ))
-                    )}
-                </tbody>
+                  ))
+                )}
+              </tbody>
             </table>
 
-            {/* Bottom Row: Info + Pagination */}
+             {/* Bottom Row: Info + Pagination */}
             <div className="row m-2 justify-content-between align-items-center">
                 <div className="col-md-6">
                     <small className="text-muted">
@@ -239,27 +219,15 @@ export default function DealerManagement() {
                         <ul className="pagination pagination-sm justify-content-end mb-0">
                             <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
                                 <button className="page-link" onClick={() => handlePageChange(currentPage - 1)}>
-                                    &laquo; {/* Previous */}
+                                    &laquo;
                                 </button>
                             </li>
-                            
-                            {/* Simple Pagination - Chỉ hiển thị trang hiện tại (có thể nâng cấp sau) */}
-                            {/* Hoặc tạo ra các nút số trang nếu muốn */}
                              <li className="page-item active" aria-current="page">
                                 <span className="page-link">{currentPage}</span>
                              </li>
-                            {/* Ví dụ tạo các nút số trang (nâng cao hơn) */}
-                            {/* {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                                <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
-                                    <button className="page-link" onClick={() => handlePageChange(page)}>
-                                        {page}
-                                    </button>
-                                </li>
-                            ))} */}
-
                             <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
                                 <button className="page-link" onClick={() => handlePageChange(currentPage + 1)}>
-                                     &raquo; {/* Next */}
+                                     &raquo;
                                 </button>
                             </li>
                         </ul>
@@ -267,10 +235,9 @@ export default function DealerManagement() {
                 </div>
             </div>
         </div>
-    </div>
-                    
-
-
+      </div>
     </>
-  )
-}
+  );
+};
+
+export default DealerManagement;
