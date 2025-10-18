@@ -182,6 +182,49 @@ export default function DealerManagement() {
                         <th>Actions</th>
                     </tr>
                 </thead>
+                <tbody>
+                    {paginatedDealers.length === 0 ? (
+                        <tr>
+                            {/* Điều chỉnh colSpan cho đúng số cột */}
+                            <td colSpan="6" className="text-center py-4"> 
+                                {filteredDealers.length === 0 && !searchTerm 
+                                    ? 'No dealers found' 
+                                    : 'No dealers match your search'}
+                            </td>
+                        </tr>
+                    ) : (
+                        paginatedDealers.map(dealer => (
+                            <tr key={dealer.id}> 
+                                {/* Đảm bảo key là duy nhất, thường là dealer.id */}
+                                <td>{dealer.name || 'N/A'}</td>
+                                <td>{dealer.email || 'N/A'}</td>
+                                <td>{dealer.region || 'N/A'}</td>
+                                <td>{dealer.address || 'N/A'}</td>
+                                {/* <td>{dealer.contactPerson || 'N/A'}</td> */}
+                                {/* <td>{dealer.phone || 'N/A'}</td> */}
+                                <td>{renderStatusBadge(dealer.status)}</td> {/* Gọi hàm render badge */}
+                                <td>
+                                    {/* Actions: Edit, Delete - Thêm icon nếu muốn */}
+                                    <button 
+                                        className="btn btn-sm btn-icon btn-text-secondary rounded-pill me-1" 
+                                        onClick={() => handleEdit(dealer.id)}
+                                        title="Edit"
+                                     >
+                                        <i className="bx bx-edit"></i>
+                                    </button>
+                                    <button 
+                                        className="btn btn-sm btn-icon btn-text-secondary rounded-pill" 
+                                        onClick={() => handleDelete(dealer.id, dealer.name)}
+                                        title="Delete"
+                                     >
+                                        <i className="bx bx-trash"></i>
+                                    </button>
+                                    {/* Thêm các nút action khác nếu cần */}
+                                </td>
+                            </tr>
+                        ))
+                    )}
+                </tbody>
             </table>
         </div>
     </div>
