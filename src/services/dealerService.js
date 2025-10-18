@@ -76,3 +76,15 @@ export const deleteDealer = (dealerId) => {
   console.log(`📡 API Call: DELETE /api/dealers/${dealerId}`);
   return api.delete(`/dealers/${dealerId}`);
 };
+
+// ============================================
+// CÁC API KHÁC LIÊN QUAN ĐẾN DEALER (nếu cần)
+// Ví dụ: DealerContract, DealerOrder, DealerPayment
+// Bạn có thể thêm các hàm tương tự ở đây
+// ============================================
+
+// Ví dụ cho DealerContract:
+// export const getAllDealerContracts = (dealerId) => {
+//   console.log(`📡 API Call: GET /api/dealer-contracts?dealerId=${dealerId}`); // Giả sử có query param
+//   return api.get('/dealer-contracts', { params: { dealerId } });
+// };
