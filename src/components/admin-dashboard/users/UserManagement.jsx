@@ -23,6 +23,9 @@ const UserManagement = () => {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
+  const [sortColumn, setSortColumn] = useState('fullName'); 
+  const [sortDirection, setSortDirection] = useState('asc');
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -236,7 +239,7 @@ const UserManagement = () => {
     setValidationErrors({});
   };
 
-  // HÀM MỚI ĐỂ XỬ LÝ SẮP XẾP
+  // HÀM ĐỂ XỬ LÝ SẮP XẾP
   const handleSort = (columnKey) => {
     if (sortColumn === columnKey) {
       // Đảo ngược hướng nếu bấm vào cột đang sort
@@ -261,7 +264,7 @@ const UserManagement = () => {
       
       return matchesSearch && matchesRole && matchesStatus; // && matchesPlan;
     });
-  }, [users, searchTerm, filterRole, filterStatus, filterPlan]);
+  }, [users, searchTerm, filterRole, filterStatus]); // filterPlan
 
   // CẬP NHẬT LOGIC: SẮP XẾP SAU KHI LỌC
   const sortedAndFilteredUsers = useMemo(() => {
@@ -272,8 +275,9 @@ const UserManagement = () => {
       let bValue = b[sortColumn];
 
       // Xử lý giá trị null/undefined hoặc các trường hợp đặc biệt
-      if (aValue == null) aValue = ''; 
-      if (bValue == null) bValue = '';
+      if (aValue == null && bValue == null) return 0; // Cả hai null, coi như bằng nhau
+      if (aValue == null) return sortDirection === 'asc' ? 1 : -1; // A null, đẩy A về cuối (asc) / đầu (desc)
+      if (bValue == null) return sortDirection === 'asc' ? -1 : 1; // B null, đẩy B về cuối (asc) / đầu (desc)
 
       let comparison = 0;
       // So sánh string (không phân biệt hoa thường)
@@ -347,7 +351,7 @@ const UserManagement = () => {
   };
 
   const handleExport = (format) => {
-    const exportData = filteredUsers.map(user => ({
+    const exportData = sortedAndFilteredUsers.map(user => ({
       "Full Name": user.fullName,
       "Email": user.email,
       "Role": formatRoleDisplay(user.role),
@@ -404,6 +408,10 @@ const UserManagement = () => {
       }
         
       case 'copy': {
+        if (exportData.length === 0) {
+            setError("No data to copy."); // Handle empty data case
+            return;
+        }
         const textToCopy = [
           Object.keys(exportData[0]).join('\t'),
           ...exportData.map(row => Object.values(row).join('\t'))
@@ -422,7 +430,6 @@ const UserManagement = () => {
     }
   };
 
-
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
@@ -436,8 +443,8 @@ const UserManagement = () => {
   return (
    <>
       <h4 className="fw-bold py-3 mb-4">
-        <span className="text-muted fw-light">User Management /</span> 
-        {activeTab === 'roles' ? ' Roles & Permissions ' : ' User Accounts '}
+        <span className="text-muted fw-light">Users /</span> 
+        {activeTab === 'roles' ? ' Roles & Permissions ' : ' List '}
       </h4>
 
       {/* Tab Navigation */}
@@ -450,7 +457,7 @@ const UserManagement = () => {
                 href="#"
                 onClick={(e) => { e.preventDefault(); setActiveTab('users'); }}
               >
-                <i className="bx bx-user me-1" /> Users List
+                <i className="bx bx-user me-1" /> List
               </a>
             </li>
             <li className="nav-item">
@@ -604,10 +611,34 @@ const UserManagement = () => {
                 <table className="table">
                     <thead>
                         <tr>
-                        <th>Full Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Status</th>
+                        <th
+                          onClick={() => handleSort('fullName')} 
+                          style={{ cursor: 'pointer' }}
+                          className="sorting"
+                        >
+                          Full Name {renderSortIcon('fullName')}
+                        </th>
+                        <th
+                          onClick={() => handleSort('email')} 
+                          style={{ cursor: 'pointer' }}
+                          className="sorting"
+                        >
+                          Email {renderSortIcon('email')}
+                        </th>
+                        <th
+                          onClick={() => handleSort('role')} 
+                          style={{ cursor: 'pointer' }}
+                          className="sorting"
+                        >
+                          Role {renderSortIcon('role')}
+                        </th>
+                        <th
+                          onClick={() => handleSort('isActive')} 
+                          style={{ cursor: 'pointer' }}
+                          className="sorting"
+                        >
+                          Status
+                        </th>
                         <th>Actions</th>
                         </tr>
                     </thead>
@@ -615,7 +646,7 @@ const UserManagement = () => {
                         {filteredUsers.length === 0 ? (
                         <tr>
                             <td colSpan="5" className="text-center py-4">
-                            {searchTerm ? 'No users match your search' : 'No users found'}
+                            {filteredUsers.length === 0 && !searchTerm && !filterRole && !filterStatus ? 'No users found' : 'No users match your filters/search'}
                             </td>
                         </tr>
                         ) : (
@@ -687,10 +718,10 @@ const UserManagement = () => {
                     </tbody>
                 </table>
 
-                {/* JSX CHO THANH PHÂN TRANG */}
+                {/* THANH PHÂN TRANG */}
                 <div className="d-flex justify-content-between align-items-center p-3">
                   <small className="text-muted">
-                    Showing {startEntry} to {endEntry} of {filteredUsers.length} entries
+                    Showing {startEntry} to {endEntry} of {sortedAndFilteredUsers.length} entries
                   </small>
                   <nav>
                     <ul className="pagination pagination-sm mb-0">
