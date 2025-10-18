@@ -27,7 +27,7 @@ const Sidebar = ({ currentPage }) => {
   const userManagementMenu = [
     {
       id: 'users-account',
-      label: 'User Accounts',
+      label: 'List',
       page: 'users'
     },
     {
@@ -171,7 +171,7 @@ const Sidebar = ({ currentPage }) => {
         <li className="menu-item">
           <a href="javascript:void(0);" className="menu-link menu-toggle">
             <i className="menu-icon tf-icons bx bx-user" />
-            <div data-i18n="User Management">User Management</div>
+            <div data-i18n="User Management">Users</div>
           </a>
           <ul className="menu-sub">
             {userManagementMenu.map(renderSubmenuItem)}
