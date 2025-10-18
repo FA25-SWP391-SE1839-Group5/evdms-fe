@@ -236,6 +236,19 @@ const UserManagement = () => {
     setValidationErrors({});
   };
 
+  // HÀM MỚI ĐỂ XỬ LÝ SẮP XẾP
+  const handleSort = (columnKey) => {
+    if (sortColumn === columnKey) {
+      // Đảo ngược hướng nếu bấm vào cột đang sort
+      setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      // Chuyển sang cột mới, mặc định là tăng dần
+      setSortColumn(columnKey);
+      setSortDirection('asc');
+    }
+    setCurrentPage(1); // Reset về trang 1 khi sort
+  };
+
   const filteredUsers = useMemo(() => {
     return users.filter(user => {
       const matchesSearch = (
