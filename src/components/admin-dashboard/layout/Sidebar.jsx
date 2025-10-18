@@ -168,7 +168,9 @@ const Sidebar = ({ currentPage }) => {
         {renderMenuItem(menuItems.find(item => item.id === 'dashboard'))}
 
         {/* User Management with Submenu */}
-        <li className="menu-item">
+        <li 
+          className={`menu-item ${ currentPage.startsWith('users') ? 'active open' : '' }`}
+        >
           <a href="javascript:void(0);" className="menu-link menu-toggle">
             <i className="menu-icon tf-icons bx bx-user" />
             <div data-i18n="User Management">Users</div>
