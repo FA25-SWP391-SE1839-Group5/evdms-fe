@@ -205,6 +205,32 @@ export default function DealerContractForm() {
                                             />
                                         </div>
                                     </div>
+
+                                    {/* Field 4: Sales Target */}
+                                    <div className="mb-3">
+                                        <label className="form-label" htmlFor="salesTarget">
+                                            Sales Target (VND)
+                                        </label>
+                                        <div className="input-group input-group-merge">
+                                            <span id="icon-sales-target" className="input-group-text">
+                                                <i className="bx bx-dollar" />
+                                            </span>
+                                            <input
+                                                type="number"
+                                                id="salesTarget"
+                                                name="salesTarget"
+                                                className="form-control"
+                                                placeholder="0"
+                                                value={formData.salesTarget}
+                                                onChange={handleChange}
+                                                aria-label="Sales Target"
+                                                aria-describedby="icon-sales-target"
+                                            />
+                                        </div>
+                                        <div className="form-text">
+                                            Enter the total sales target for the contract period.
+                                        </div>
+                                    </div>
                                 </form>
                             </div>
                         </div>
