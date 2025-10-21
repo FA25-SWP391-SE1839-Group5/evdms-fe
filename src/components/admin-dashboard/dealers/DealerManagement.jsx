@@ -251,16 +251,16 @@ const DealerManagement = () => {
  };
 
   const handleDelete = async (dealerId, dealerName) => {
-     console.log("Delete dealer:", dealerId);
-    // const confirmMessage = `Are you sure you want to delete the dealer "${dealerName}"?`;
-    // if (window.confirm(confirmMessage)) {
-    //   try {
-    //     await deleteDealer(dealerId);
-    //     fetchDealers();
-    //   } catch (err) {
-    //      setError(err.response?.data?.message || err.message || 'Failed to delete dealer');
-    //   }
-    // }
+    const confirmMessage = `Are you sure you want to delete the dealer "${dealerName}"? This action cannot be undone.`;
+   if (window.confirm(confirmMessage)) {
+     try {
+       await deleteDealer(dealerId);
+       setSuccess(`Dealer "${dealerName}" deleted successfully.`);
+       fetchDealers(); // Tải lại danh sách
+     } catch (err) {
+        setError(err.response?.data?.message || err.message || 'Failed to delete dealer');
+     }
+   }
   };
 
   // --- Render Status Badge ---
