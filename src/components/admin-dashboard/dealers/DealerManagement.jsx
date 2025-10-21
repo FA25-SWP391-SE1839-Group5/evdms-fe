@@ -449,7 +449,7 @@ const DealerManagement = () => {
                       <td>
                         <button
                           className="btn btn-sm btn-icon btn-text-secondary rounded-pill me-1"
-                          onClick={() => handleEdit(dealer.id)}
+                          onClick={() => handleEdit(dealer)}
                           title="Edit"
                         >
                           <i className="bx bx-edit"></i>
