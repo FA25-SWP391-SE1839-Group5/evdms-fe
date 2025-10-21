@@ -224,12 +224,7 @@ export default function DealerContractManagement() {
 
    return (
         <>
-            {/* Tiêu đề trang */}
-            <h4 className="fw-bold py-3 mb-4">
-              <span className="text-muted fw-light">Dealers /</span> Dealer Contracts
-            </h4>
-
-            {/* Thông báo */}
+            {/* Alert Message */}
             {error && (
               <div className="alert alert-danger alert-dismissible d-flex align-items-center mb-4" role="alert">
                 <AlertCircle size={20} className="me-2" />
@@ -247,7 +242,8 @@ export default function DealerContractManagement() {
 
             {/* Card Table */}
             <div className="card">
-                {/* === START: CẬP NHẬT CARD HEADER === */}
+                <h5 className="card-header pb-0">Dealer Contracts</h5>
+                {/* HEADER */}
                 <div className="card-header border-bottom">
                     <div className="d-flex justify-content-between align-items-center row pb-2 gap-3 gap-md-0">
                         {/* "Show X entries" */}
@@ -268,7 +264,8 @@ export default function DealerContractManagement() {
                                 &nbsp;entries
                             </label>
                         </div>
-                        {/* Nút "Add Contract" */}
+
+                        {/* Add Contract */}
                         <div className="col-md-auto ms-auto">
                             <button
                               type="button"
@@ -280,9 +277,7 @@ export default function DealerContractManagement() {
                             </button>
                         </div>
                     </div>
-                </div>
-                {/* === END: CẬP NHẬT CARD HEADER === */}
-                
+                </div>              
                 <div className="card-datatable table-responsive">
                     <table className="table table-hover">
                         <thead>
@@ -294,7 +289,7 @@ export default function DealerContractManagement() {
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
-                            {/* === START: DÒNG FILTER MỚI === */}
+                            {/* FILTER */}
                             <tr className="filters">
                                 <th>
                                     <input
@@ -351,7 +346,6 @@ export default function DealerContractManagement() {
                                 </th>
                                 <th>{/* Actions column has no filter */}</th>
                             </tr>
-                            {/* === END: DÒNG FILTER MỚI === */}
                         </thead>
                         <tbody className="table-border-bottom-0">
                             {paginatedContracts.length === 0 ? (
@@ -364,7 +358,6 @@ export default function DealerContractManagement() {
                                 </td>
                             </tr>
                             ) : (
-                            // Dùng paginatedContracts
                             paginatedContracts.map(contract => (
                                 <tr key={contract.id}>
                                     <td>
@@ -408,7 +401,7 @@ export default function DealerContractManagement() {
                     </table>
                 </div>
 
-                {/* === START: THANH PHÂN TRANG MỚI === */}
+                {/* PAGING */}
                 <div className="d-flex justify-content-between align-items-center p-3">
                   <small className="text-muted">
                     Showing {startEntry} to {endEntry} of {filteredContracts.length} entries
@@ -424,7 +417,7 @@ export default function DealerContractManagement() {
                           &laquo; Previous
                         </button>
                       </li>
-                      {/* Bạn có thể thêm logic render số trang ở đây nếu muốn */}
+                      {/* Thêm logic render số trang ở đây nếu muốn */}
                       <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
                         <button 
                           className="page-link" 
@@ -437,7 +430,6 @@ export default function DealerContractManagement() {
                     </ul>
                   </nav>
                 </div>
-                {/* === END: THANH PHÂN TRANG MỚI === */}
             </div>
             
             {/* FORM */}
@@ -445,11 +437,11 @@ export default function DealerContractManagement() {
                 show={showFormModal}
                 onClose={() => {
                     setShowFormModal(false);
-                    setContractToEdit(null); // Reset khi đóng
+                    setContractToEdit(null); 
                 }}
                 onSaveSuccess={handleSaveSuccess}
                 dealers={dealers} 
-                contractToEdit={contractToEdit} // <-- Truyền contract cần edit
+                contractToEdit={contractToEdit}
             />
         </>
     )
