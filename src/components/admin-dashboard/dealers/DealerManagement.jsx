@@ -173,7 +173,7 @@ const DealerManagement = () => {
         <div className="card-header border-bottom">
           <h6 className="card-title mb-3">Advanced Search</h6>
           <div className="row g-3">
-            <div className="col-md-3">
+            <div className="col-md-4">
               <label htmlFor="filterName" className="form-label">Name</label>
               <input
                 type="text"
@@ -185,7 +185,7 @@ const DealerManagement = () => {
                 onChange={handleFilterChange}
               />
             </div>
-            <div className="col-md-3">
+            <div className="col-md-4">
               <label htmlFor="filterEmail" className="form-label">Email</label>
               <input
                 type="email"
@@ -197,7 +197,7 @@ const DealerManagement = () => {
                 onChange={handleFilterChange}
               />
             </div>
-            <div className="col-md-3">
+            <div className="col-md-4">
               <label htmlFor="filterRegion" className="form-label">Region</label>
               <input
                 type="text"
@@ -209,7 +209,19 @@ const DealerManagement = () => {
                 onChange={handleFilterChange}
               />
             </div>
-            <div className="col-md-3">
+            <div className="col-md-8">
+              <label htmlFor="filterAddress" className="form-label">Address</label>
+              <input
+                type="text"
+                className="form-control"
+                id="filterAddress"
+                name="filterAddress"
+                placeholder="E.g., 100 Nguyen Van Cu"
+                value={filterAddress}
+                onChange={handleFilterChange}
+              />
+            </div>
+            <div className="col-md-4">
               <label htmlFor="filterStatus" className="form-label">Status</label>
               <select
                 id="filterStatus"
