@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { getAllDealers, createDealer, updateDealer, deleteDealer } from '../../../services/dealerService';
 import { AlertCircle, CheckCircle, Plus } from 'lucide-react';
 import DealerDetailsModal from './DealerDetailsModal';
+import DealerModal from './DealerModal';
 
 const DealerManagement = () => {
   const [dealers, setDealers] = useState([]); // State cho danh sách dealers
@@ -505,6 +506,17 @@ const DealerManagement = () => {
         dealer={viewingDealer}
         renderStatusBadge={renderStatusBadge}
       />
+
+      {/* MODAL EDIT/CREATE DEALER */}
+       <DealerModal
+         show={showModal}
+         onClose={handleCloseModal}
+         onSubmit={handleSubmit}
+         dealer={editingDealer}
+         formData={formData}
+         onFormChange={handleChange}
+         errors={validationErrors}
+       />
     </>
   );
 };
