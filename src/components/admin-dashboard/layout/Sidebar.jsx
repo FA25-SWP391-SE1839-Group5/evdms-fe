@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Sidebar = ({ currentPage, onNavigate }) => {
+const Sidebar = ({ currentPage }) => {
   // Main menu items for EVDMS
   const menuItems = [
     {
@@ -8,12 +8,6 @@ const Sidebar = ({ currentPage, onNavigate }) => {
       label: 'Dashboard',
       icon: 'bx-home-circle',
       page: 'dashboard'
-    },
-    {
-      id: 'users',
-      label: 'User Management',
-      icon: 'bx-user',
-      page: 'users'
     },
     {
       id: 'dealers',
@@ -26,6 +20,44 @@ const Sidebar = ({ currentPage, onNavigate }) => {
       label: 'Customers',
       icon: 'bx-group',
       page: 'customers'
+    }
+  ];
+
+  // User Management submenu
+  const userManagementMenu = [
+    {
+      id: 'users-account',
+      label: 'List',
+      page: 'users'
+    },
+    {
+      id: 'users-notifications',
+      label: 'Roles & Permissions',
+      page: 'users/notifications'
+    },
+  ];
+
+  // Dealer Management submenu
+  const dealerMenu = [
+    {
+      id: 'dealer-list',
+      label: 'Dealer List',
+      page: 'dealers' 
+    },
+    {
+      id: 'dealer-contracts',
+      label: 'Dealer Contracts',
+      page: 'dealer-contracts' 
+    },
+    {
+      id: 'dealer-orders',
+      label: 'Dealer Orders',
+      page: 'dealer-orders' 
+    },
+    {
+      id: 'dealer-payments',
+      label: 'Dealer Payments',
+      page: 'dealer-payments' 
     }
   ];
 
@@ -88,9 +120,7 @@ const Sidebar = ({ currentPage, onNavigate }) => {
 
   const handleMenuClick = (e, page) => {
     e.preventDefault();
-    if (onNavigate) {
-      onNavigate(page);
-    }
+    window.location.href = `/${page}`;
   };
 
   const renderMenuItem = (item) => {
@@ -99,7 +129,7 @@ const Sidebar = ({ currentPage, onNavigate }) => {
     return (
       <li key={item.id} className={`menu-item ${isActive ? 'active' : ''}`}>
         <a 
-          href="#" 
+          href={`/${item.page}`} 
           className="menu-link"
           onClick={(e) => handleMenuClick(e, item.page)}
         >
@@ -110,6 +140,22 @@ const Sidebar = ({ currentPage, onNavigate }) => {
     );
   };
 
+  const renderSubmenuItem = (item) => {
+    const isActive = currentPage === item.page;
+    
+    return (
+      <li key={item.id} className={`menu-item ${isActive ? 'active' : ''}`}>
+        <a 
+          href={`/${item.page}`}
+          className="menu-link"
+          onClick={(e) => handleMenuClick(e, item.page)}
+        >
+          <div data-i18n={item.label}>{item.label}</div>
+        </a>
+      </li>
+    );
+  };
+  
   return (
     <aside
       id="layout-menu"
@@ -123,7 +169,7 @@ const Sidebar = ({ currentPage, onNavigate }) => {
               src="/assets/images/elecar_logo.svg"
               alt="EVDMS Logo"
               className="img-fluid"
-              style={{ maxHeight: '40px' }}
+              style={{ maxHeight: '56px' }}
             />
           </span>
           <span className="app-brand-text demo menu-text fw-bolder ms-2">
@@ -143,7 +189,37 @@ const Sidebar = ({ currentPage, onNavigate }) => {
       {/* Menu Items */}
       <ul className="menu-inner py-1">
         {/* Main Menu */}
-        {menuItems.map(renderMenuItem)}
+        {renderMenuItem(menuItems.find(item => item.id === 'dashboard'))}
+
+        {/* User Management with Submenu */}
+        <li 
+          className={`menu-item ${ currentPage.startsWith('users') ? 'active open' : '' }`}
+        >
+          <a href="javascript:void(0);" className="menu-link menu-toggle">
+            <i className="menu-icon tf-icons bx bx-user" />
+            <div data-i18n="User Management">Users</div>
+          </a>
+          <ul className="menu-sub">
+            {userManagementMenu.map(renderSubmenuItem)}
+          </ul>
+        </li>
+
+        {/* Dealer Management with Submenu */}
+        <li 
+          className={`menu-item ${ currentPage.startsWith('dealer') ? 'active open' : '' }`}
+        >
+          <a href="javascript:void(0);" className="menu-link menu-toggle">
+            <i className="menu-icon tf-icons bx bx-store" />
+            <div data-i18n="Dealers">Dealers</div>
+          </a>
+          <ul className="menu-sub">
+            {dealerMenu.map(renderSubmenuItem)}
+          </ul>
+        </li>
+
+        {menuItems
+          .filter(item => item.id !== 'dashboard' && item.id !== 'dealers')
+          .map(renderMenuItem)}
 
         {/* Vehicle Management Section */}
         <li className="menu-header small text-uppercase">

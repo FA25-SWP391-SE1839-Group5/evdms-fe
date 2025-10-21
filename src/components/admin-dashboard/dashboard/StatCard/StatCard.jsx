@@ -8,6 +8,10 @@ const StatCard = ({
   icon,
   colClass = "col-lg-6 col-md-12 col-6 mb-4"
 }) => {
+  const handleViewMore = () => {
+    alert(`Viewing more details about ${title}.`);
+  }
+  
   return (
     <div className={colClass}>
       <div className="card">
@@ -31,10 +35,10 @@ const StatCard = ({
                 <i className="bx bx-dots-vertical-rounded" />
               </button>
               <div className="dropdown-menu dropdown-menu-end">
-                <a className="dropdown-item" href="javascript:void(0);">
+                <a className="dropdown-item" onClick={handleViewMore} style={{cursor: 'pointer'}}>
                   View More
                 </a>
-                <a className="dropdown-item" href="javascript:void(0);">
+                <a className="dropdown-item" onClick={handleViewMore} style={{cursor: 'pointer'}}>
                   Delete
                 </a>
               </div>

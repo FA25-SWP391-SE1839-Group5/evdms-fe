@@ -1,6 +1,10 @@
 import React from "react";
 
 const CardSales = () => {
+    const handleViewMore = () => {
+        alert("Viewing more details about Sales.");
+    }
+
   return (
     <div className="card">
         <div className="card-body">
@@ -29,13 +33,13 @@ const CardSales = () => {
                     >
                         <a
                             className="dropdown-item"
-                            href="javascript:void(0);"
+                            onClick={handleViewMore} style={{cursor: 'pointer'}}
                         >
                             View More
                         </a>
                         <a
                             className="dropdown-item"
-                            href="javascript:void(0);"
+                            onClick={handleViewMore} style={{cursor: 'pointer'}}
                         >
                             Delete
                         </a>

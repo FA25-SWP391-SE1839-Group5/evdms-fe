@@ -1,6 +1,10 @@
 import React from "react";
 
 const CardProfit = () => {
+    const handleViewMore = () => {
+        alert("Viewing more details about Profit.");
+    }
+
   return (
     <div className="card">
         <div className="card-body">
@@ -18,6 +22,7 @@ const CardProfit = () => {
                         type="button"
                         id="cardOpt3"
                         data-bs-toggle="dropdown"
+                        data-bs-offset="0,8"
                         aria-haspopup="true"
                         aria-expanded="false"
                     >
@@ -29,13 +34,13 @@ const CardProfit = () => {
                     >
                     <a
                         className="dropdown-item"
-                        href="javascript:void(0);"
+                        onClick={handleViewMore} style={{cursor: 'pointer'}}
                     >
                         View More
                     </a>
                     <a
                         className="dropdown-item"
-                        href="javascript:void(0);"
+                        onClick={handleViewMore} style={{cursor: 'pointer'}}
                     >
                         Delete
                     </a>

@@ -1,6 +1,10 @@
 import React from "react";
 
 const TransactionsList = () => {
+  const handleViewMore = () => {
+    alert("Viewing more details about Transactions.");
+  }
+
   return (
     <div className="card h-100">
                   <div className="card-header d-flex align-items-center justify-content-between">
@@ -20,13 +24,13 @@ const TransactionsList = () => {
                         className="dropdown-menu dropdown-menu-end"
                         aria-labelledby="transactionID"
                       >
-                        <a className="dropdown-item" href="javascript:void(0);">
+                        <a className="dropdown-item" onClick={handleViewMore} style={{cursor: 'pointer'}}>
                           Last 28 Days
                         </a>
-                        <a className="dropdown-item" href="javascript:void(0);">
+                        <a className="dropdown-item" onClick={handleViewMore} style={{cursor: 'pointer'}}>
                           Last Month
                         </a>
-                        <a className="dropdown-item" href="javascript:void(0);">
+                        <a className="dropdown-item" onClick={handleViewMore} style={{cursor: 'pointer'}}>
                           Last Year
                         </a>
                       </div>

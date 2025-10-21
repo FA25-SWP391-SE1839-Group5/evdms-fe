@@ -72,6 +72,33 @@ const App = () => {
     checkAuthOrReset();
   }, []);
 
+  useEffect(() => {
+    const path = window.location.pathname.replace('/', '');
+
+    if (!path) return;
+
+    switch (path) {
+      case 'users':
+        dispatch({ type: 'NAVIGATE', payload: 'users' });
+        break;
+      case 'dealers':
+        dispatch({ type: 'NAVIGATE', payload: 'dealers' });
+        break;
+      case 'customers':
+        dispatch({ type: 'NAVIGATE', payload: 'customers' });
+        break;
+      default:
+        dispatch({ type: 'NAVIGATE', payload: 'dashboard' });
+        break;
+    }
+  }, []);
+
+  const getInitialAdminPage = () => {
+  const path = window.location.pathname.replace('/', '');
+    if (!path) return 'dashboard';
+    return path;
+  };
+
   // Sync logout across tabs
   useEffect(() => {
     const handleStorageChange = (e) => {
@@ -172,7 +199,7 @@ const App = () => {
 
       {/* ADMIN DASHBOARD */}
       {routeState.currentPage === ROUTES.ADMIN_DASHBOARD && (
-        <Layout initialPage="dashboard">
+        <Layout initialPage={getInitialAdminPage()}>
           <AdminDashboard />
         </Layout>
       )}
