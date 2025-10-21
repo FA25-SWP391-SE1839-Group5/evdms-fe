@@ -46,6 +46,14 @@ export default function UserDetailsModal({ show, onClose, user, getRoleBadgeClas
                                             </span>
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td className="ps-0"><strong>Status:</strong></td>
+                                        <td>
+                                            <span className={`badge bg-label-${user.isActive ? 'success' : 'secondary'}`}>
+                                                {user.isActive ? 'Active' : 'Inactive'}
+                                            </span>
+                                        </td>
+                                    </tr>
                 </div>
         </>
     )
