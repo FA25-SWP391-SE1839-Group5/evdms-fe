@@ -37,6 +37,30 @@ const Sidebar = ({ currentPage }) => {
     },
   ];
 
+  // Dealer Management submenu
+  const dealerMenu = [
+    {
+      id: 'dealer-list',
+      label: 'Dealer List',
+      page: 'dealers' 
+    },
+    {
+      id: 'dealer-contracts',
+      label: 'Dealer Contracts',
+      page: 'dealer-contracts' 
+    },
+    {
+      id: 'dealer-orders',
+      label: 'Dealer Orders',
+      page: 'dealer-orders' 
+    },
+    {
+      id: 'dealer-payments',
+      label: 'Dealer Payments',
+      page: 'dealer-payments' 
+    }
+  ];
+
   const vehicleMenu = [
     {
       id: 'inventory',
@@ -180,8 +204,21 @@ const Sidebar = ({ currentPage }) => {
           </ul>
         </li>
 
+        {/* Dealer Management with Submenu */}
+        <li 
+          className={`menu-item ${ currentPage.startsWith('dealer') ? 'active open' : '' }`}
+        >
+          <a href="javascript:void(0);" className="menu-link menu-toggle">
+            <i className="menu-icon tf-icons bx bx-store" />
+            <div data-i18n="Dealers">Dealers</div>
+          </a>
+          <ul className="menu-sub">
+            {dealerMenu.map(renderSubmenuItem)}
+          </ul>
+        </li>
+
         {menuItems
-          .filter(item => item.id !== 'dashboard')
+          .filter(item => item.id !== 'dashboard' && item.id !== 'dealers')
           .map(renderMenuItem)}
 
         {/* Vehicle Management Section */}
