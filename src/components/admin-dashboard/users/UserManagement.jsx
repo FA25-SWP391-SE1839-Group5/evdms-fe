@@ -699,6 +699,7 @@ const UserManagement = () => {
                                     className="btn btn-icon btn-text-secondary rounded-pill btn-sm"
                                     data-bs-toggle="tooltip" 
                                     title="View"
+                                    onClick={() => handleView(user)}
                                   >
                                     <i className="bx bx-show" /> 
                                   </button>
