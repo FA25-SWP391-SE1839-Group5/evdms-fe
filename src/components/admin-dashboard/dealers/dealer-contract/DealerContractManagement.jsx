@@ -134,8 +134,11 @@ export default function DealerContractManagement() {
     }
 
     return (
-        <div>
-            
-        </div>
+        <>
+            {/* Header */}
+            <h4 className="fw-bold py-3 mb-4">
+              <span className="text-muted fw-light">Dealers /</span> Dealer Contracts
+            </h4>
+        </>
     )
 }
