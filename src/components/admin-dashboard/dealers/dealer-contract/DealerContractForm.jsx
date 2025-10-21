@@ -231,6 +231,18 @@ export default function DealerContractForm() {
                                             Enter the total sales target for the contract period.
                                         </div>
                                     </div>
+
+                                    {/* Nút Submit */}
+                                    <button type="submit" className="btn btn-primary" disabled={loading}>
+                                        {loading ? (
+                                            <>
+                                                <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                                Saving...
+                                            </>
+                                        ) : (
+                                          'Create Contract'
+                                        )}
+                                    </button>
                                 </form>
                             </div>
                         </div>
