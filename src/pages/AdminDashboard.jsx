@@ -10,7 +10,7 @@ import OrderStatistics from '../components/admin-dashboard/dashboard/OrderStatis
 import ExpenseOverview from '../components/admin-dashboard/dashboard/ExpenseOverview';
 import TransactionsList from '../components/admin-dashboard/dashboard/TransactionList';
 import UserManagement from '../components/admin-dashboard/users/UserManagement';
-import DealerManagement from '../components/admin-dashboard/dealers/DealerManagement';
+import DealerManagement from '../components/admin-dashboard/dealers/dealer-list/DealerManagement';
 
 const AdminDashboard = ({ currentPage = 'dashboard' }) => {
   const renderPageContent = () => {
