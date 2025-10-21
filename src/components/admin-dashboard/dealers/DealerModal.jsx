@@ -85,9 +85,25 @@ export default function DealerModal({ show, onClose, onSubmit, dealer, formData,
                                         {formData.isActive ? 'Active' : 'Inactive'}
                                     </label>
                                 </div>
-                            </div>
-                        </div>
+                                <div className="modal-footer">
+                                    <button 
+                                        type="button" 
+                                        className="btn btn-outline-secondary" 
+                                        onClick={onClose}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button 
+                                        type="submit" 
+                                        className="btn btn-primary"
+                                    >
+                                        {dealer ? 'Update Dealer' : 'Create Dealer'}
+                                    </button>
+                                </div>
+                            </div>    
+                        </form>
                     </div>
+                </div>
             </div>
         </>
     )
