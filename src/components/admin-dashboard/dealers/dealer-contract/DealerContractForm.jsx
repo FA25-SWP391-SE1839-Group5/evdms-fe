@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { AlertCircle, CheckCircle } from 'lucide-react';
 import { getAllDealers, createDealerContract } from '../../../../services/dealerService';
 
@@ -105,9 +105,6 @@ export default function DealerContractForm() {
     return (
         <div className="content-wrapper">
             <div className="container-xxl flex-grow-1 container-p-y">
-                <h4 className="fw-bold py-3 mb-4">
-                    <span className="text-muted fw-light">Dealers /</span> Create Contract
-                </h4>
 
                 {/* Alert Message */}
                 {error && (
