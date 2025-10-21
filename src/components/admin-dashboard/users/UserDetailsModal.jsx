@@ -38,6 +38,14 @@ export default function UserDetailsModal({ show, onClose, user, getRoleBadgeClas
                                         <td className="ps-0"><strong>Email:</strong></td>
                                         <td>{user.email || 'N/A'}</td>
                                     </tr>
+                                    <tr>
+                                        <td className="ps-0"><strong>Role:</strong></td>
+                                        <td>
+                                            <span className={`badge bg-label-${getBadgeClass(user.role)}`}>
+                                                {formatRole(user.role)}
+                                            </span>
+                                        </td>
+                                    </tr>
                 </div>
         </>
     )
