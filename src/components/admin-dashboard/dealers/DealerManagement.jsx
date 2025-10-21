@@ -8,12 +8,13 @@ const DealerManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filterName, setFilterName] = useState('');
-  const [filterEmail, setFilterEmail] = useState('');
   const [filterRegion, setFilterRegion] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [filterAddress, setFilterAddress] = useState('');
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [viewingDealer, setViewingDealer] = useState(null);
 
   // --- Fetch Data ---
   useEffect(() => {
@@ -55,9 +56,6 @@ const DealerManagement = () => {
       const matchesName = filterName === '' || 
         (dealer.name && dealer.name.toLowerCase().includes(filterName.toLowerCase()));
       
-      const matchesEmail = filterEmail === '' ||
-        (dealer.email && dealer.email.toLowerCase().includes(filterEmail.toLowerCase()));
-        
       const matchesRegion = filterRegion === '' ||
         (dealer.region && dealer.region.toLowerCase().includes(filterRegion.toLowerCase()));
 
@@ -66,12 +64,11 @@ const DealerManagement = () => {
         (dealer.address && dealer.address.toLowerCase().includes(filterAddress.toLowerCase()));
         
       // Trả về true CHỈ KHI tất cả điều kiện đều match
-      return matchesName && matchesEmail && matchesRegion && matchesStatus && matchesAddress; // <-- Thêm matchesAddress
+      return matchesName && matchesRegion && matchesStatus && matchesAddress; // <-- Thêm matchesAddress
     });
   }, [
     dealers, 
     filterName, 
-    filterEmail, 
     filterRegion, 
     filterStatus, 
     filterAddress // <-- Thêm filterAddress vào dependencies
@@ -100,9 +97,6 @@ const DealerManagement = () => {
       case 'filterName':
         setFilterName(value);
         break;
-      case 'filterEmail':
-        setFilterEmail(value);
-        break;
       case 'filterRegion':
         setFilterRegion(value);
         break;
@@ -124,6 +118,11 @@ const DealerManagement = () => {
       setCurrentPage(newPage);
     }
   };
+
+  const handleViewDetails = (dealer) => {
+    setViewingDealer(dealer);
+    setShowDetailsModal(true);
+  }
 
   // --- Placeholder Action Handlers ---
   const handleEdit = (dealerId) => {
@@ -185,8 +184,8 @@ const DealerManagement = () => {
         <div className="card-header border-bottom">
           <h6 className="card-title mb-3">Advanced Search</h6>
           <div className="row g-3">
-            <div className="col-md-4">
-              <label htmlFor="filterName" className="form-label">Name</label>
+            <div className="col-md-3">
+              <label htmlFor="filterName" className="form-label">Name:</label>
               <input
                 type="text"
                 className="form-control"
@@ -197,20 +196,9 @@ const DealerManagement = () => {
                 onChange={handleFilterChange}
               />
             </div>
-            <div className="col-md-4">
-              <label htmlFor="filterEmail" className="form-label">Email</label>
-              <input
-                type="email"
-                className="form-control"
-                id="filterEmail"
-                name="filterEmail"
-                placeholder="E.g., demo@example.com"
-                value={filterEmail}
-                onChange={handleFilterChange}
-              />
-            </div>
-            <div className="col-md-4">
-              <label htmlFor="filterRegion" className="form-label">Region</label>
+            
+            <div className="col-md-3">
+              <label htmlFor="filterRegion" className="form-label">Region:</label>
               <input
                 type="text"
                 className="form-control"
@@ -221,8 +209,8 @@ const DealerManagement = () => {
                 onChange={handleFilterChange}
               />
             </div>
-            <div className="col-md-8">
-              <label htmlFor="filterAddress" className="form-label">Address</label>
+            <div className="col-md-3">
+              <label htmlFor="filterAddress" className="form-label">Address:</label>
               <input
                 type="text"
                 className="form-control"
@@ -233,8 +221,8 @@ const DealerManagement = () => {
                 onChange={handleFilterChange}
               />
             </div>
-            <div className="col-md-4">
-              <label htmlFor="filterStatus" className="form-label">Status</label>
+            <div className="col-md-3">
+              <label htmlFor="filterStatus" className="form-label">Status:</label>
               <select
                 id="filterStatus"
                 name="filterStatus"
@@ -277,7 +265,6 @@ const DealerManagement = () => {
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>Email</th>
                   <th>Region</th>
                   <th>Address</th>
                   <th>Status</th>
@@ -291,7 +278,6 @@ const DealerManagement = () => {
                   paginatedDealers.map(dealer => (
                     <tr key={dealer.id}>
                       <td>{dealer.name || 'N/A'}</td>
-                      <td>{dealer.email || 'N/A'}</td>
                       <td>{dealer.region || 'N/A'}</td>
                       <td>{dealer.address || 'N/A'}</td>
                       <td>{renderStatusBadge(dealer.isActive)}</td>
