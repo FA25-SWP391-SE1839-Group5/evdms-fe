@@ -283,11 +283,11 @@ export default function DealerContractManagement() {
                         <thead>
                             <tr>
                                 <th>Dealer</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
-                                <th>Sales Target</th>
-                                <th>Status</th>
-                                <th>Actions</th>
+                                <th className="border-start">Start Date</th>
+                                <th className="border-start">End Date</th>
+                                <th className="border-start">Sales Target</th>
+                                <th className="border-start">Status</th>
+                                <th className="border-start">Actions</th>
                             </tr>
                             {/* FILTER */}
                             <tr className="filters">
@@ -301,7 +301,7 @@ export default function DealerContractManagement() {
                                         onChange={handleFilterChange}
                                     />
                                 </th>
-                                <th>
+                                <th className="border-start">
                                     <input
                                         type="text"
                                         name="filterStartDate"
@@ -311,7 +311,7 @@ export default function DealerContractManagement() {
                                         onChange={handleFilterChange}
                                     />
                                 </th>
-                                <th>
+                                <th className="border-start">
                                     <input
                                         type="text"
                                         name="filterEndDate"
@@ -321,7 +321,7 @@ export default function DealerContractManagement() {
                                         onChange={handleFilterChange}
                                     />
                                 </th>
-                                <th>
+                                <th className="border-start">
                                     <input
                                         type="text"
                                         name="filterSalesTarget"
@@ -331,7 +331,7 @@ export default function DealerContractManagement() {
                                         onChange={handleFilterChange}
                                     />
                                 </th>
-                                <th>
+                                <th className="border-start">
                                     <select
                                         name="filterStatus"
                                         className="form-select"
@@ -344,7 +344,7 @@ export default function DealerContractManagement() {
                                         <option value="expired">Expired</option>
                                     </select>
                                 </th>
-                                <th>{/* Actions column has no filter */}</th>
+                                <th className="border-start">{/* Actions column has no filter */}</th>
                             </tr>
                         </thead>
                         <tbody className="table-border-bottom-0">
