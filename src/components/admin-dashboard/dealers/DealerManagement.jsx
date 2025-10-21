@@ -156,6 +156,100 @@ const DealerManagement = () => {
     // TODO: Implement edit logic
   };
 
+  // --- MODAL & FORM ---
+
+ // 1. Close modal and reset form
+ const handleCloseModal = () => {
+   setShowModal(false);
+   setEditingDealer(null);
+   setFormData({
+     name: '',
+     region: '',
+     address: '',
+     isActive: true
+   });
+   setError(''); // Xóa lỗi validation cũ
+   setValidationErrors({});
+ };
+
+ // 2. Updatde state formData when typing
+ const handleChange = (e) => {
+   const { name, value, type, checked } = e.target;
+   setFormData(prev => ({
+     ...prev,
+     [name]: type === 'checkbox' ? checked : value
+   }));
+   
+   if (validationErrors[name]) {
+     setValidationErrors(prev => {
+       const newErrors = { ...prev };
+       delete newErrors[name];
+       return newErrors;
+     });
+   }
+ };
+
+ // 3. Validate form
+ const validateForm = () => {
+   const errors = {};
+   if (!formData.name || formData.name.trim().length < 2) {
+     errors.name = 'Name must be at least 2 characters';
+   }
+   if (!formData.region || formData.region.trim().length < 2) {
+     errors.region = 'Region is required';
+   }
+   if (!formData.address || formData.address.trim().length < 5) {
+     errors.address = 'Address must be at least 5 characters';
+   }
+   setValidationErrors(errors);
+   return Object.keys(errors).length === 0;
+ };
+
+ // 4. Open modal to CREATE A NEW ONE
+ const handleAdd = () => {
+   handleCloseModal(); // Reset form
+   setShowModal(true);
+ };
+
+ // 5. Submit 
+ const handleSubmit = async (e) => {
+   e.preventDefault();
+   setError('');
+   setSuccess('');
+
+   if (!validateForm()) {
+     setError('Please fix the validation errors');
+     return;
+   }
+
+   try {
+     if (editingDealer) {
+       // --- UPDATE ---
+       const response = await updateDealer(editingDealer.id, formData);
+       if (response.data?.success) {
+         setSuccess(`Dealer "${formData.name}" updated successfully`);
+         await fetchDealers();
+         handleCloseModal();
+       } else {
+         throw new Error(response.data?.message || 'Update failed');
+       }
+     } else {
+       // --- CREATE ---
+       const response = await createDealer(formData);
+       if (response.data?.success) {
+         setSuccess(`Dealer "${formData.name}" created successfully`);
+         await fetchDealers();
+         handleCloseModal();
+       } else {
+         throw new Error(response.data?.message || 'Creation failed');
+       }
+     }
+   } catch (err) {
+     const errorMsg = err.response?.data?.message || err.message || 'Operation failed';
+     setError(`Database operation failed: ${errorMsg}`);
+   }
+ };
+
   const handleDelete = async (dealerId, dealerName) => {
      console.log("Delete dealer:", dealerId);
     // const confirmMessage = `Are you sure you want to delete the dealer "${dealerName}"?`;
