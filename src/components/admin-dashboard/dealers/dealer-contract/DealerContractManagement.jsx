@@ -156,10 +156,25 @@ export default function DealerContractManagement() {
                 </div>
             )}
 
+            {/* Card Table */}
+            <div className="card">
+                <div className="card-header border-bottom">
+                    <div className="d-flex justify-content-between align-items-center row pb-2 gap-3 gap-md-0">
+                        <div className="col-md-4">
+                            <input
+                                type="search"
+                                className="form-control"
+                                placeholder="Search by Dealer Name..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
 
 
 
-            
         </>
     )
 }
