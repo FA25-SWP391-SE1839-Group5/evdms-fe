@@ -78,6 +78,56 @@ export const deleteDealer = (dealerId) => {
 };
 
 // ============================================
+// API CALLS - DEALER CONTRACTS (MỚI)
+// ============================================
+
+/**
+ * Get All Dealer Contracts
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const getAllDealerContracts = () => {
+    console.log("📡 API Call: GET /api/dealer-contracts");
+    return api.get('/dealer-contracts');
+};
+
+/**
+ * CREATE Dealer Contract
+ * @param {object} contractData - Dữ liệu của Hợp đồng mới
+ * @param {string} contractData.dealerId
+ * @param {string} contractData.startDate
+ * @param {string} contractData.endDate
+ * @param {number} contractData.salesTarget
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const createDealerContract = (contractData) => {
+  console.log("📡 API Call: POST /api/dealer-contracts");
+  console.log("📤 Sending data:", contractData);
+  return api.post('/dealer-contracts', contractData);
+};
+
+/**
+ * UPDATE Dealer Contract
+ * @param {string|number} contractId
+ * @param {object} contractData
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const updateDealerContract = (contractId, contractData) => {
+  console.log(`📡 API Call: PUT /api/dealer-contracts/${contractId}`);
+  console.log("📤 Sending update data:", contractData);
+  return api.put(`/dealer-contracts/${contractId}`, contractData);
+};
+
+/**
+ * DELETE Dealer Contract
+ * @param {string|number} contractId
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const deleteDealerContract = (contractId) => {
+  console.log(`📡 API Call: DELETE /api/dealer-contracts/${contractId}`);
+  return api.delete(`/dealer-contracts/${contractId}`);
+};
+
+// ============================================
 // CÁC API KHÁC LIÊN QUAN ĐẾN DEALER (nếu cần)
 // Ví dụ: DealerContract, DealerOrder, DealerPayment
 // Bạn có thể thêm các hàm tương tự ở đây

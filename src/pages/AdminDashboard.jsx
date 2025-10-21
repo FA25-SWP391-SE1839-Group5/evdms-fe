@@ -10,7 +10,8 @@ import OrderStatistics from '../components/admin-dashboard/dashboard/OrderStatis
 import ExpenseOverview from '../components/admin-dashboard/dashboard/ExpenseOverview';
 import TransactionsList from '../components/admin-dashboard/dashboard/TransactionList';
 import UserManagement from '../components/admin-dashboard/users/UserManagement';
-import DealerManagement from '../components/admin-dashboard/dealers/DealerManagement';
+import DealerManagement from '../components/admin-dashboard/dealers/dealer-list/DealerManagement';
+import DealerContractManagement from '../components/admin-dashboard/dealers/dealer-contract/DealerContractManagement';
 
 const AdminDashboard = ({ currentPage = 'dashboard' }) => {
   const renderPageContent = () => {
@@ -29,6 +30,37 @@ const AdminDashboard = ({ currentPage = 'dashboard' }) => {
           </div>
         );
       
+      case 'dealer-contracts':
+        return (
+          <div className="container-xxl flex-grow-1 container-p-y">
+            <DealerContractManagement />
+          </div>
+        );
+
+      case 'dealer-orders':
+        return (
+          <div className="container-xxl flex-grow-1 container-p-y">
+            <h4 className="fw-bold py-3 mb-4">Dealer Orders</h4>
+            <div className="card">
+              <div className="card-body">
+                <p>Dealer Orders page - Coming soon...</p>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'dealer-payments':
+        return (
+          <div className="container-xxl flex-grow-1 container-p-y">
+            <h4 className="fw-bold py-3 mb-4">Dealer Payments</h4>
+            <div className="card">
+              <div className="card-body">
+                <p>Dealer Payments page - Coming soon...</p>
+              </div>
+            </div>
+          </div>
+        );
+
       case 'customers':
         return (
           <div className="container-xxl flex-grow-1 container-p-y">

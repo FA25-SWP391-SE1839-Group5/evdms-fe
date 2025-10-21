@@ -1,25 +1,26 @@
 import React from 'react'
 
-export default function DealerDetailsModal({ show, onClose, dealer, renderStatusBadge }) {
+export default function DealerContractDetailsModal({ show, onClose, dealer, renderStatusBadge }) {
     if (!show || !dealer) {
         return null;
     }
 
+    // renderStatusBadge là hàm được truyền từ component cha
     const renderBadge = renderStatusBadge || ((status) => <span>{status ? 'Active' : 'Inactive'}</span>);
 
     return (
         <>
-            <div 
-                className={`modal fade ${show ? 'show' : ''}`} 
-                style={{ display: show ? 'block' : 'none' }}
-                tabIndex="-1" 
+            <div
+                className={`modal fade ${show ? 'show' : ''}`}
+                style={{ display: show ? 'block' : 'none' }} 
+                tabIndex="-1"
                 role="dialog"
             >
                 <div className="modal-dialog modal-dialog-centered" role="document">
                     <div className="modal-content">
                         <div className="modal-header">
                             <h5 className="modal-title">Details of {dealer.name}</h5>
-                            <button 
+                            <button
                                 type="button"
                                 className="btn-close"
                                 onClick={onClose}
@@ -55,9 +56,9 @@ export default function DealerDetailsModal({ show, onClose, dealer, renderStatus
                             </table>
                         </div>
                         <div className="modal-footer">
-                            <button 
-                                type="button" 
-                                className="btn btn-secondary" 
+                            <button
+                                type="button"
+                                className="btn btn-outline-secondary"
                                 onClick={onClose}
                             >
                                 Close
@@ -66,7 +67,7 @@ export default function DealerDetailsModal({ show, onClose, dealer, renderStatus
                     </div>
                 </div>
             </div>
-            
+
             {/* Modal Backdrop */}
             {show && <div className="modal-backdrop fade show"></div>}
         </>
