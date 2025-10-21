@@ -90,6 +90,21 @@ export const getAllDealerContracts = () => {
     return api.get('/dealer-contracts');
 };
 
+/**
+ * CREATE Dealer Contract
+ * @param {object} contractData - Dữ liệu của Hợp đồng mới
+ * @param {string} contractData.dealerId
+ * @param {string} contractData.startDate
+ * @param {string} contractData.endDate
+ * @param {number} contractData.salesTarget
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const createDealerContract = (contractData) => {
+  console.log("📡 API Call: POST /api/dealer-contracts");
+  console.log("📤 Sending data:", contractData);
+  return api.post('/dealer-contracts', contractData);
+};
+
 
 
 
