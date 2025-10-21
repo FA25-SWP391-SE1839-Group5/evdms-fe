@@ -42,7 +42,16 @@ const DealerManagement = () => {
     if (!Array.isArray(dealers)) return [];
 
     return dealers.filter(dealer => {
-      // Kiểm tra từng điều kiện. Nếu filter rỗng, coi như match (true).
+      
+      // SỬA LỖI LOGIC STATUS
+      const isDealerConsideredActive = typeof dealer.isActive === 'boolean' 
+        ? dealer.isActive 
+        : true; 
+      const matchesStatus = filterStatus === '' || 
+        (filterStatus === 'true' && isDealerConsideredActive) ||
+        (filterStatus === 'false' && !isDealerConsideredActive);
+
+      // CÁC FILTER CÒN LẠI
       const matchesName = filterName === '' || 
         (dealer.name && dealer.name.toLowerCase().includes(filterName.toLowerCase()));
       
@@ -51,19 +60,22 @@ const DealerManagement = () => {
         
       const matchesRegion = filterRegion === '' ||
         (dealer.region && dealer.region.toLowerCase().includes(filterRegion.toLowerCase()));
-      
-      const isDealerConsideredActive = typeof dealer.isActive === 'boolean' 
-        ? dealer.isActive 
-        : true; 
-        
-      const matchesStatus = filterStatus === '' || 
-        (filterStatus === 'true' && isDealerConsideredActive) || 
-        (filterStatus === 'false' && !isDealerConsideredActive); 
+
+      // THÊM LOGIC FILTER ADDRESS
+      const matchesAddress = filterAddress === '' ||
+        (dealer.address && dealer.address.toLowerCase().includes(filterAddress.toLowerCase()));
         
       // Trả về true CHỈ KHI tất cả điều kiện đều match
-      return matchesName && matchesEmail && matchesRegion && matchesStatus;
+      return matchesName && matchesEmail && matchesRegion && matchesStatus && matchesAddress; // <-- Thêm matchesAddress
     });
-  }, [dealers, filterName, filterEmail, filterRegion, filterStatus]); // Thêm dependencies mới
+  }, [
+    dealers, 
+    filterName, 
+    filterEmail, 
+    filterRegion, 
+    filterStatus, 
+    filterAddress // <-- Thêm filterAddress vào dependencies
+  ]);
 
   // --- Pagination ---
   const totalPages = Math.ceil(filteredDealers.length / pageSize);
