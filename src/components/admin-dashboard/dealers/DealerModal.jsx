@@ -26,7 +26,20 @@ export default function DealerModal({ show, onClose, onSubmit, dealer, formData,
                                 ></button>
                             </div>
                             <div className="modal-body">
-                                
+                                {/* Form Group: Name */}
+                                <div className="mb-3">
+                                    <label htmlFor="name" className="form-label">Dealer Name *</label>
+                                    <input
+                                        type="text"
+                                        className={`form-control ${errors?.name ? 'is-invalid' : ''}`}
+                                        id="name"
+                                        name="name"
+                                        value={formData.name || ''}
+                                        onChange={onFormChange}
+                                        placeholder="E.g., EV Motors Saigon"
+                                    />
+                                    {errors?.name && <div className="invalid-feedback">{errors.name}</div>}
+                                </div>
                             </div>
                         </div>
                     </div>
