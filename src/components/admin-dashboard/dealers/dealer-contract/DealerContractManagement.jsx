@@ -41,7 +41,8 @@ export default function DealerContractManagement() {
     const [success, setSuccess] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
 
-    const [showAddModal, setShowAddModal] = useState(false);
+    const [showFormModal, setShowFormModal] = useState(false);
+    const [contractToEdit, setContractToEdit] = useState(null);
 
     // State phân trang (nếu bạn muốn, tạm thời tôi làm đơn giản)
     // const [pageSize, setPageSize] = useState(10);
@@ -102,28 +103,23 @@ export default function DealerContractManagement() {
 
     // 4. Handlers
     const handleAdd = () => {
-        setShowAddModal(true);
+        setContractToEdit(null); // Không có contract nào đang edit
+        setShowFormModal(true);
     };
 
-    // 5. Method to handle when add contract successfully
-    const handleContractAdded = async () => {
-        setShowAddModal(false); // Đóng modal
-        setSuccess('Contract added successfully!'); // Hiển thị thông báo
-        
-        // Tải lại danh sách contracts
-        try {
-            const contractsRes = await getAllDealerContracts();
-            setContracts(contractsRes.data?.data?.items || []);
-        } catch (err) {
-            setError(err.message || 'Failed to reload contracts');
-        }
+    // 3. Cập nhật hàm xử lý khi LƯU thành công
+    const handleSaveSuccess = async (isEdit) => {
+        setShowFormModal(false); // Đóng modal
+        setContractToEdit(null); // Reset contract
+        setSuccess(isEdit ? 'Contract updated successfully!' : 'Contract added successfully!');
     };
 
     const handleEdit = (contractId) => {
-        // TODO: Xây dựng logic
-        console.log("Edit contract:", contractId);
-        alert("Chức năng Edit Contract chưa được xây dựng!");
-        // (Bạn sẽ cần 1 route mới '/dealer-contracts/edit/:id' và 1 form tương tự)
+        const contract = contracts.find(c => c.id === contractId);
+        if (contract) {
+            setContractToEdit(contract);
+            setShowFormModal(true);
+        }
     };
 
     const handleDelete = async (contractId, dealerName) => {
@@ -260,11 +256,15 @@ export default function DealerContractManagement() {
             </div>
             
             {/* FORM */}
-            <DealerContractForm
-                show={showAddModal}
-                onClose={() => setShowAddModal(false)}
-                onContractAdded={handleContractAdded}
-                dealers={dealers}
+           <DealerContractForm
+                show={showFormModal}
+                onClose={() => {
+                    setShowFormModal(false);
+                    setContractToEdit(null); // Reset khi đóng
+                }}
+                onSaveSuccess={handleSaveSuccess}
+                dealers={dealers} 
+                contractToEdit={contractToEdit} // <-- Truyền contract cần edit
             />
         </>
     )
