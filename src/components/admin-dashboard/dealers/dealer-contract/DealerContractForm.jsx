@@ -184,6 +184,27 @@ export default function DealerContractForm() {
                                             />
                                         </div>
                                     </div>
+
+                                    {/* Field 3: End Date */}
+                                    <div className="mb-3">
+                                        <label className="form-label" htmlFor="endDate">
+                                            End Date *
+                                        </label>
+                                        <div className="input-group input-group-merge">
+                                            <span id="icon-end-date" className="input-group-text">
+                                                <i className="bx bx-calendar-check" />
+                                            </span>
+                                            <input
+                                                type="datetime-local"
+                                                className="form-control"
+                                                id="endDate"
+                                                name="endDate"
+                                                value={formData.endDate}
+                                                onChange={handleChange}
+                                                aria-describedby="icon-end-date"
+                                            />
+                                        </div>
+                                    </div>
                                 </form>
                             </div>
                         </div>
