@@ -66,6 +66,9 @@ export default function DealerDetailsModal({ show, onClose, dealer, renderStatus
                     </div>
                 </div>
             </div>
+            
+            {/* Modal Backdrop */}
+            {show && <div className="modal-backdrop fade show"></div>}
         </>
     )
 }
