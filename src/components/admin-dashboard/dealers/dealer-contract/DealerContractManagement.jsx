@@ -123,6 +123,16 @@ export default function DealerContractManagement() {
         }
     };
 
+    if (loading) {
+        return (
+          <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading contracts...</span>
+            </div>
+          </div>
+        );
+    }
+
     return (
         <div>
             
