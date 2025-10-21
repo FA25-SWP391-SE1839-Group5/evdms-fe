@@ -34,7 +34,10 @@ export default function UserDetailsModal({ show, onClose, user, getRoleBadgeClas
                                         <td className="ps-0" style={{width: '30%'}}><strong>Name:</strong></td>
                                         <td>{user.fullName || 'N/A'}</td>
                                     </tr>
-                                    
+                                    <tr>
+                                        <td className="ps-0"><strong>Email:</strong></td>
+                                        <td>{user.email || 'N/A'}</td>
+                                    </tr>
                 </div>
         </>
     )
