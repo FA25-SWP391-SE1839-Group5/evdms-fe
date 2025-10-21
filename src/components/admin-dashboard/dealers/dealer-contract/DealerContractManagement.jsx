@@ -39,14 +39,18 @@ export default function DealerContractManagement() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    const [searchTerm, setSearchTerm] = useState('');
 
     const [showFormModal, setShowFormModal] = useState(false);
     const [contractToEdit, setContractToEdit] = useState(null);
 
-    // State phân trang (nếu bạn muốn, tạm thời tôi làm đơn giản)
-    // const [pageSize, setPageSize] = useState(10);
-    // const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const [filterDealerName, setFilterDealerName] = useState('');
+    const [filterStartDate, setFilterStartDate] = useState('');
+    const [filterEndDate, setFilterEndDate] = useState('');
+    const [filterSalesTarget, setFilterSalesTarget] = useState('');
+    const [filterStatus, setFilterStatus] = useState('');
 
     // 1. Fetch dữ liệu khi component mount
     useEffect(() => {
@@ -96,10 +100,81 @@ export default function DealerContractManagement() {
     // 3. Logic Filter 
     const filteredContracts = useMemo(() => {
         return contracts.filter(contract => {
-            const dealerName = dealerMap[contract.dealerId] || '';
-            return dealerName.toLowerCase().includes(searchTerm.toLowerCase());
+            const dealerName = (dealerMap[contract.dealerId] || '').toLowerCase();
+            const startDate = formatDate(contract.startDate).toLowerCase();
+            const endDate = formatDate(contract.endDate).toLowerCase();
+            const salesTarget = String(contract.salesTarget).toLowerCase();
+
+            // Lấy text của status
+            const now = new Date();
+            const start = new Date(contract.startDate);
+            const end = new Date(contract.endDate);
+            let status = '';
+            if (now > end) {
+                status = 'expired';
+            } else if (now < start) {
+                status = 'pending';
+            } else {
+                status = 'active';
+            }
+
+            // So sánh với từng filter
+            const matchesDealer = dealerName.includes(filterDealerName.toLowerCase());
+            const matchesStart = startDate.includes(filterStartDate.toLowerCase());
+            const matchesEnd = endDate.includes(filterEndDate.toLowerCase());
+            const matchesTarget = salesTarget.includes(filterSalesTarget.toLowerCase());
+            const matchesStatus = filterStatus === '' || status === filterStatus;
+
+            return matchesDealer && matchesStart && matchesEnd && matchesTarget && matchesStatus;
         });
-    }, [contracts, dealerMap, searchTerm]);
+    }, [
+        contracts, 
+        dealerMap, 
+        filterDealerName, 
+        filterStartDate, 
+        filterEndDate, 
+        filterSalesTarget, 
+        filterStatus
+    ]);
+
+    // Logic phân trang
+    const totalPages = Math.ceil(filteredContracts.length / pageSize);
+    const paginatedContracts = useMemo(() => {
+        const startIndex = (currentPage - 1) * pageSize;
+        return filteredContracts.slice(startIndex, startIndex + pageSize);
+    }, [filteredContracts, currentPage, pageSize]);
+
+    const startEntry = filteredContracts.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+    const endEntry = Math.min(currentPage * pageSize, filteredContracts.length);
+
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setCurrentPage(1); // Reset về trang 1 khi filter
+        switch (name) {
+            case 'filterDealerName':
+                setFilterDealerName(value);
+                break;
+            case 'filterStartDate':
+                setFilterStartDate(value);
+                break;
+            case 'filterEndDate':
+                setFilterEndDate(value);
+                break;
+            case 'filterSalesTarget':
+                setFilterSalesTarget(value);
+                break;
+            case 'filterStatus':
+                setFilterStatus(value);
+                break;
+            default:
+                break;
+        }
+    };
+
+    const handlePageSizeChange = (e) => {
+        setPageSize(Number(e.target.value));
+        setCurrentPage(1);
+    };
 
     // 4. Handlers
     const handleAdd = () => {
@@ -147,72 +222,150 @@ export default function DealerContractManagement() {
         );
     }
 
-    return (
-        <>          
-            {/* Alert Message */}
+   return (
+        <>
+            {/* Tiêu đề trang */}
+            <h4 className="fw-bold py-3 mb-4">
+              <span className="text-muted fw-light">Dealers /</span> Dealer Contracts
+            </h4>
+
+            {/* Thông báo */}
             {error && (
-                <div className="alert alert-danger alert-dismissible d-flex align-items-center mb-4" role="alert">
-                    <AlertCircle size={20} className="me-2" />
-                    <div className="flex-grow-1">{error}</div>
-                    <button type="button" className="btn-close" onClick={() => setError('')}></button>
-                </div>
+              <div className="alert alert-danger alert-dismissible d-flex align-items-center mb-4" role="alert">
+                <AlertCircle size={20} className="me-2" />
+                <div className="flex-grow-1">{error}</div>
+                <button type="button" className="btn-close" onClick={() => setError('')}></button>
+              </div>
             )}
             {success && (
-                <div className="alert alert-success alert-dismissible d-flex align-items-center mb-4" role="alert">
-                    <CheckCircle size={20} className="me-2" />
-                    <div className="flex-grow-1">{success}</div>
-                    <button type="button" className="btn-close" onClick={() => setSuccess('')}></button>
-                </div>
+              <div className="alert alert-success alert-dismissible d-flex align-items-center mb-4" role="alert">
+                <CheckCircle size={20} className="me-2" />
+                <div className="flex-grow-1">{success}</div>
+                <button type="button" className="btn-close" onClick={() => setSuccess('')}></button>
+              </div>
             )}
 
             {/* Card Table */}
             <div className="card">
+                {/* === START: CẬP NHẬT CARD HEADER === */}
                 <div className="card-header border-bottom">
                     <div className="d-flex justify-content-between align-items-center row pb-2 gap-3 gap-md-0">
-                        <div className="col-md-4">
-                            <input
-                                type="search"
-                                className="form-control"
-                                placeholder="Search by Dealer Name..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
+                        {/* "Show X entries" */}
+                        <div className="col-md-auto">
+                            <label className="d-flex align-items-center">
+                                Show&nbsp;
+                                <select
+                                  className="form-select"
+                                  value={pageSize}
+                                  onChange={handlePageSizeChange}
+                                  style={{ width: 'auto' }}
+                                >
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                                &nbsp;entries
+                            </label>
+                        </div>
+                        {/* Nút "Add Contract" */}
+                        <div className="col-md-auto ms-auto">
+                            <button
+                              type="button"
+                              className="btn btn-primary rounded-pill d-flex align-items-center"
+                              onClick={handleAdd}
+                            >
+                              <Plus size={18} className="me-2" />
+                              <span className="fw-semibold">Add Contract</span>
+                            </button>
                         </div>
                     </div>
-                    <div className="col-md-4 ms-auto text-end">
-                        <button
-                            type="button"
-                            className="btn btn-primary rounded-pill d-flex align-items-center ms-auto"
-                            onClick={handleAdd}
-                        >
-                            <Plus size={18} className="me-2" />
-                            <span className="fw-semibold">Add Contract</span>
-                        </button>
-                    </div>
                 </div>
-            </div>
-
-            <div className="card-datatable table-responsive">
-                <table className="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Dealer</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                            <th>Sales Target</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="table-border-bottom-0">
-                            {filteredContracts.length === 0 ? (
+                {/* === END: CẬP NHẬT CARD HEADER === */}
+                
+                <div className="card-datatable table-responsive">
+                    <table className="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Dealer</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Sales Target</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                            {/* === START: DÒNG FILTER MỚI === */}
+                            <tr className="filters">
+                                <th>
+                                    <input
+                                        type="text"
+                                        name="filterDealerName"
+                                        className="form-control"
+                                        placeholder="Search Dealer"
+                                        value={filterDealerName}
+                                        onChange={handleFilterChange}
+                                    />
+                                </th>
+                                <th>
+                                    <input
+                                        type="text"
+                                        name="filterStartDate"
+                                        className="form-control"
+                                        placeholder="Search Date"
+                                        value={filterStartDate}
+                                        onChange={handleFilterChange}
+                                    />
+                                </th>
+                                <th>
+                                    <input
+                                        type="text"
+                                        name="filterEndDate"
+                                        className="form-control"
+                                        placeholder="Search Date"
+                                        value={filterEndDate}
+                                        onChange={handleFilterChange}
+                                    />
+                                </th>
+                                <th>
+                                    <input
+                                        type="text"
+                                        name="filterSalesTarget"
+                                        className="form-control"
+                                        placeholder="Search Target"
+                                        value={filterSalesTarget}
+                                        onChange={handleFilterChange}
+                                    />
+                                </th>
+                                <th>
+                                    <select
+                                        name="filterStatus"
+                                        className="form-select"
+                                        value={filterStatus}
+                                        onChange={handleFilterChange}
+                                    >
+                                        <option value="">All</option>
+                                        <option value="active">Active</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="expired">Expired</option>
+                                    </select>
+                                </th>
+                                <th>{/* Actions column has no filter */}</th>
+                            </tr>
+                            {/* === END: DÒNG FILTER MỚI === */}
+                        </thead>
+                        <tbody className="table-border-bottom-0">
+                            {paginatedContracts.length === 0 ? (
                             <tr>
                                 <td colSpan="6" className="text-center py-4">
-                                    No contracts found.
+                                    {/* Cập nhật thông báo rỗng */}
+                                    {filteredContracts.length === 0 && !filterDealerName && !filterStartDate && !filterEndDate && !filterSalesTarget && !filterStatus
+                                        ? 'No contracts found'
+                                        : 'No contracts match your filters'}
                                 </td>
                             </tr>
                             ) : (
-                              filteredContracts.map(contract => (
+                            // Dùng paginatedContracts
+                            paginatedContracts.map(contract => (
                                 <tr key={contract.id}>
                                     <td>
                                         <span className="fw-semibold">
@@ -250,9 +403,41 @@ export default function DealerContractManagement() {
                                     </td>
                                 </tr>
                             ))
-                         )}
-                    </tbody>
-                </table>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* === START: THANH PHÂN TRANG MỚI === */}
+                <div className="d-flex justify-content-between align-items-center p-3">
+                  <small className="text-muted">
+                    Showing {startEntry} to {endEntry} of {filteredContracts.length} entries
+                  </small>
+                  <nav>
+                    <ul className="pagination pagination-sm mb-0">
+                      <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                        <button 
+                          className="page-link" 
+                          onClick={() => setCurrentPage(p => p - 1)}
+                          disabled={currentPage === 1}
+                        >
+                          &laquo; Previous
+                        </button>
+                      </li>
+                      {/* Bạn có thể thêm logic render số trang ở đây nếu muốn */}
+                      <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
+                        <button 
+                          className="page-link" 
+                          onClick={() => setCurrentPage(p => p + 1)}
+                          disabled={currentPage === totalPages || totalPages === 0}
+                        >
+                          Next &raquo;
+                        </button>
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
+                {/* === END: THANH PHÂN TRANG MỚI === */}
             </div>
             
             {/* FORM */}
