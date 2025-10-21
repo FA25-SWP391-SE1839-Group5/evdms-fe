@@ -7,7 +7,10 @@ const DealerManagement = () => {
   const [dealers, setDealers] = useState([]); // State cho danh sách dealers
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [filterName, setFilterName] = useState('');
+  const [filterEmail, setFilterEmail] = useState('');
+  const [filterRegion, setFilterRegion] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -37,13 +40,24 @@ const DealerManagement = () => {
   const filteredDealers = useMemo(() => {
     if (!Array.isArray(dealers)) return [];
 
-    return dealers.filter(dealer =>
-      (dealer.name && dealer.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (dealer.email && dealer.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (dealer.region && dealer.region.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (dealer.address && dealer.address.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
-  }, [dealers, searchTerm]);
+    return dealers.filter(dealer => {
+      // Kiểm tra từng điều kiện. Nếu filter rỗng, coi như match (true).
+      const matchesName = filterName === '' || 
+        (dealer.name && dealer.name.toLowerCase().includes(filterName.toLowerCase()));
+      
+      const matchesEmail = filterEmail === '' ||
+        (dealer.email && dealer.email.toLowerCase().includes(filterEmail.toLowerCase()));
+        
+      const matchesRegion = filterRegion === '' ||
+        (dealer.region && dealer.region.toLowerCase().includes(filterRegion.toLowerCase()));
+        
+      const matchesStatus = filterStatus === '' ||
+        (dealer.isActive === (filterStatus === 'true')); // 'true' hoặc 'false'
+        
+      // Trả về true CHỈ KHI tất cả điều kiện đều match
+      return matchesName && matchesEmail && matchesRegion && matchesStatus;
+    });
+  }, [dealers, filterName, filterEmail, filterRegion, filterStatus]); // Thêm dependencies mới
 
   // --- Pagination ---
   const totalPages = Math.ceil(filteredDealers.length / pageSize);
@@ -131,11 +145,11 @@ const DealerManagement = () => {
         <div className="card-datatable table-responsive">
             {/* Top Row: Entries + Search */}
             <div className="row m-2 justify-content-between align-items-center border-bottom pb-2">
-                <div className="col-md-auto">
+                <div className="col-md-2">
                     <label className="d-flex align-items-center">
                         Show&nbsp;
                         <select
-                          className="form-select form-select-sm mx-1"
+                          className="form-select"
                           value={pageSize}
                           onChange={handlePageSizeChange}
                           style={{ width: 'auto' }}
@@ -149,16 +163,19 @@ const DealerManagement = () => {
                     </label>
                 </div>
                 <div className="col-md-auto">
-                    <label className="d-flex align-items-center">
-                        Search:&nbsp;
+                    <div className="input-group"> 
+                        <span className="input-group-text"> 
+                            <i className="bx bx-search"></i> 
+                        </span>
                         <input
                             type="search"
-                            className="form-control form-control-sm"
+                            className="form-control"
                             placeholder="Search dealers..."
+                            aria-label="Search dealers"
                             value={searchTerm}
                             onChange={handleSearchChange}
                         />
-                    </label>
+                    </div>
                 </div>
             </div>
 
