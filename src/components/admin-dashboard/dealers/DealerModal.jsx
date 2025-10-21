@@ -70,6 +70,21 @@ export default function DealerModal({ show, onClose, onSubmit, dealer, formData,
                                     />
                                     {errors?.address && <div className="invalid-feedback">{errors.address}</div>}
                                 </div>
+
+                                {/* Form Group: Status (isActive) */}
+                                <div className="form-check form-switch mb-3">
+                                    <input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        id="isActive"
+                                        name="isActive"
+                                        checked={formData.isActive || false}
+                                        onChange={onFormChange}
+                                    />
+                                    <label className="form-check-label" htmlFor="isActive">
+                                        {formData.isActive ? 'Active' : 'Inactive'}
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
