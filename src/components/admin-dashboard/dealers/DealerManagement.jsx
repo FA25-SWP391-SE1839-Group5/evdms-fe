@@ -124,6 +124,11 @@ const DealerManagement = () => {
     setShowDetailsModal(true);
   }
 
+  const handleCloseDetailsModal = () => {
+   setShowDetailsModal(false);
+   setViewingDealer(null);
+};
+
   // --- Placeholder Action Handlers ---
   const handleEdit = (dealerId) => {
     console.log("Edit dealer:", dealerId);
