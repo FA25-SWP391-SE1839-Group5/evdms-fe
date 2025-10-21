@@ -55,6 +55,21 @@ export default function DealerModal({ show, onClose, onSubmit, dealer, formData,
                                     />
                                     {errors?.region && <div className="invalid-feedback">{errors.region}</div>}
                                 </div>
+
+                                {/* Form Group: Address */}
+                                <div className="mb-3">
+                                    <label htmlFor="address" className="form-label">Address *</label>
+                                    <input
+                                        type="text"
+                                        className={`form-control ${errors?.address ? 'is-invalid' : ''}`}
+                                        id="address"
+                                        name="address"
+                                        value={formData.address || ''}
+                                        onChange={onFormChange}
+                                        placeholder="E.g., 100 Nguyen Van Cu, District 1"
+                                    />
+                                    {errors?.address && <div className="invalid-feedback">{errors.address}</div>}
+                                </div>
                             </div>
                         </div>
                     </div>
