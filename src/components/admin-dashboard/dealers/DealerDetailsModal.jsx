@@ -20,7 +20,7 @@ export default function DealerDetailsModal({ show, onClose, dealer, renderStatus
                         <div className="modal-header">
                             <h5 className="modal-title">Details of {dealer.name}</h5>
                             <button 
-                                type="button"https://icons8.com/icon/132/search
+                                type="button"
                                 className="btn-close"
                                 onClick={onClose}
                                 aria-label="Close"
