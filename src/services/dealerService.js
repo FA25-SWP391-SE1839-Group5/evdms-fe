@@ -78,6 +78,24 @@ export const deleteDealer = (dealerId) => {
 };
 
 // ============================================
+// API CALLS - DEALER CONTRACTS (MỚI)
+// ============================================
+
+/**
+ * Get All Dealer Contracts
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const getAllDealerContracts = () => {
+    console.log("📡 API Call: GET /api/dealer-contracts");
+    return api.get('/dealer-contracts');
+};
+
+
+
+
+
+
+// ============================================
 // CÁC API KHÁC LIÊN QUAN ĐẾN DEALER (nếu cần)
 // Ví dụ: DealerContract, DealerOrder, DealerPayment
 // Bạn có thể thêm các hàm tương tự ở đây
