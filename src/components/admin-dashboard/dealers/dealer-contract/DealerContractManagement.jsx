@@ -31,8 +31,50 @@ const formatDate = (isoString) => {
     return new Date(isoString).toLocaleDateString('vi-VN');
 };
 
-
 export default function DealerContractManagement() {
+    const [contracts, setContracts] = useState([]);
+    const [dealerMap, setDealerMap] = useState({}); // Để lưu { dealerId: dealerName }
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+
+    // State phân trang (nếu bạn muốn, tạm thời tôi làm đơn giản)
+    // const [pageSize, setPageSize] = useState(10);
+    // const [currentPage, setCurrentPage] = useState(1);
+
+    // 1. Fetch dữ liệu khi component mount
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                
+                // Tải song song cả 2 API
+                const [contractsRes, dealersRes] = await Promise.all([
+                    getAllDealerContracts(),
+                    getAllDealers()
+                ]);
+
+                // 1. Set Contracts
+                setContracts(contractsRes.data?.data?.items || []);
+
+                // 2. Tạo Map cho Dealers
+                const dealers = dealersRes.data?.data?.items || [];
+                const map = dealers.reduce((acc, dealer) => {
+                    acc[dealer.id] = dealer.name;
+                    return acc;
+                }, {});
+                setDealerMap(map);
+
+            } catch (err) {
+                setError(err.message || 'Failed to load data');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
+    
     return (
         <div>
             
