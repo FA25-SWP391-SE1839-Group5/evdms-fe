@@ -27,6 +27,14 @@ export default function UserDetailsModal({ show, onClose, user, getRoleBadgeClas
                                 aria-label="Close"
                             ></button>
                         </div>
+                        <div className="modal-body">
+                            <table className="table table-borderless">
+                                <tbody>
+                                    <tr>
+                                        <td className="ps-0" style={{width: '30%'}}><strong>Name:</strong></td>
+                                        <td>{user.fullName || 'N/A'}</td>
+                                    </tr>
+                                    
                 </div>
         </>
     )
