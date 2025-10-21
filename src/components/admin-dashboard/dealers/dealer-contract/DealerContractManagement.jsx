@@ -25,10 +25,17 @@ const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 };
 
+// Hàm helper để format ngày
+const formatDate = (isoString) => {
+    if (!isoString) return 'N/A';
+    return new Date(isoString).toLocaleDateString('vi-VN');
+};
+
+
 export default function DealerContractManagement() {
-  return (
-    <div>
-        
-    </div>
-  )
+    return (
+        <div>
+            
+        </div>
+    )
 }
