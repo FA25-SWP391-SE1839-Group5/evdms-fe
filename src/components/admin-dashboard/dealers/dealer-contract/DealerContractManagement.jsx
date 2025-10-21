@@ -381,7 +381,11 @@ export default function DealerContractManagement() {
                             paginatedContracts.map(contract => (
                                 <tr key={contract.id}>
                                     <td>
-                                        <span className="fw-semibold">
+                                        <span 
+                                            type="button"
+                                            onClick={() => handleShowDealerDetails(contract.dealerId)}
+                                            title="View details"
+                                        >
                                             {dealerMap[contract.dealerId] || 'Loading...'}
                                         </span>
                                     </td>
@@ -453,7 +457,7 @@ export default function DealerContractManagement() {
             </div>
             
             {/* FORM */}
-           <DealerContractForm
+            <DealerContractForm
                 show={showFormModal}
                 onClose={() => {
                     setShowFormModal(false);
@@ -463,6 +467,14 @@ export default function DealerContractManagement() {
                 dealers={dealers} 
                 contractToEdit={contractToEdit}
             />
+            
+             {/* DETAILS FORM */}
+            <DealerContractDetailsModal
+               show={showDealerDetailsModal}
+               onClose={() => setShowDealerDetailsModal(false)}
+               dealer={viewingDealer}
+               renderStatusBadge={renderDealerStatusBadge} // Dùng hàm render badge bạn đã có
+           />
         </>
     )
 }
