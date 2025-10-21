@@ -57,6 +57,20 @@ export default function DealerContractForm() {
         }));
     };
 
+    // 4. Handler submit
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+        setSuccess('');
+
+        // Validate
+        if (!formData.dealerId || !formData.startDate || !formData.endDate) {
+        setError('Please select a dealer and set start/end dates.');
+        setLoading(false);
+        return;
+        }
+
     return (
         <>
             
