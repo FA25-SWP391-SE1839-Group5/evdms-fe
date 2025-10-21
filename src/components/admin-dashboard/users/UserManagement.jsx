@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, AlertCircle, CheckCircle } from 'lucide-react';
 import { getAllUsers, createUser, updateUser, deleteUser } from '../../../services/dashboardService';
 import UserModal from './UserModal';
+import UserDetailsModal from './UserDetailsModal';
 
 // Import các thư viện export
 import jsPDF from 'jspdf';
@@ -783,6 +784,15 @@ const UserManagement = () => {
         formData={formData || {}}
         onFormChange={handleChange}
         errors={validationErrors}
+      />
+
+      {/* Details Modal */}
+      <UserDetailsModal
+        show={showDetailsModal}
+        onClose={handleCloseDetailsModal}
+        user={viewingUser}
+        getRoleBadgeClass={getRoleBadgeClass}
+        formatRoleDisplay={formatRoleDisplay}
       />
     </>
   );
