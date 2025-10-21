@@ -26,6 +26,9 @@ const UserManagement = () => {
   const [sortColumn, setSortColumn] = useState('fullName'); 
   const [sortDirection, setSortDirection] = useState('asc');
 
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [viewingUser, setViewingUser] = useState(null);
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -210,6 +213,18 @@ const UserManagement = () => {
     }
   };
   // END: HÀM MỚI
+
+
+  // HÀM ĐỂ XEM CHI TIẾT
+  const handleView = (user) => {
+    setViewingUser(user);
+    setShowDetailsModal(true);
+  };
+
+  const handleCloseDetailsModal = () => {
+    setShowDetailsModal(false);
+    setViewingUser(null);
+  };
 
   const handleEdit = (user) => {
     setEditingUser(user);
