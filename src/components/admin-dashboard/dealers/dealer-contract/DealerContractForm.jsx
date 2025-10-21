@@ -48,6 +48,15 @@ export default function DealerContractForm() {
         }
     }, [error, success]);
 
+    // 3. Handler cho form
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+        ...prev,
+        [name]: value
+        }));
+    };
+
     return (
         <>
             
