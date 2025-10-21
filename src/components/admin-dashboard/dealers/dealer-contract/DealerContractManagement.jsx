@@ -101,6 +101,15 @@ export default function DealerContractManagement() {
         window.location.href = '/dealer-contracts/new';
     };
 
+    const handleEdit = (contractId) => {
+        // TODO: Xây dựng logic
+        console.log("Edit contract:", contractId);
+        alert("Chức năng Edit Contract chưa được xây dựng!");
+        // (Bạn sẽ cần 1 route mới '/dealer-contracts/edit/:id' và 1 form tương tự)
+    };
+
+
+    
     return (
         <div>
             
