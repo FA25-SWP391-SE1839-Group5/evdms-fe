@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
 // Giả định bạn có service cho dealers
-import { getAllDealers /*, deleteDealer */ } from '../../../services/dealerService';
-import { AlertCircle, Search } from 'lucide-react'; // Thêm icon Search nếu cần
+import { getAllDealers, createDealer, updateDealer, deleteDealer } from '../../../services/dealerService';
+import { AlertCircle, CheckCircle, Plus } from 'lucide-react';
+import DealerDetailsModal from './DealerDetailsModal';
 
 const DealerManagement = () => {
   const [dealers, setDealers] = useState([]); // State cho danh sách dealers
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [filterName, setFilterName] = useState('');
   const [filterRegion, setFilterRegion] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
@@ -14,12 +16,31 @@ const DealerManagement = () => {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [editingDealer, setEditingDealer] = useState(null);
+  const [formData, setFormData] = useState({
+   name: '',
+   region: '',
+   address: '',
+   isActive: true
+  });
+  const [validationErrors, setValidationErrors] = useState({});
   const [viewingDealer, setViewingDealer] = useState(null);
 
   // --- Fetch Data ---
   useEffect(() => {
     fetchDealers();
   }, []);
+
+  useEffect(() => {
+   if (error || success) {
+     const timer = setTimeout(() => {
+       setError('');
+       setSuccess('');
+     }, 5000);
+     return () => clearTimeout(timer);
+   }
+ }, [error, success]);
 
   const fetchDealers = async () => {
     try {
@@ -187,7 +208,6 @@ const DealerManagement = () => {
         <h5 className="card-header pb-0">Dealer List</h5>
         {/*  ADVANCED SEARCH */}
         <div className="card-header border-bottom">
-          <h6 className="card-title mb-3">Advanced Search</h6>
           <div className="row g-3">
             <div className="col-md-3">
               <label htmlFor="filterName" className="form-label">Name:</label>
@@ -355,7 +375,7 @@ const DealerManagement = () => {
         </div>
       </div>
 
-      {/* START: MODAL CHI TIẾT DEALER (MỚI) */}
+      {/* MODAL DETAILS DEALER */}
       <DealerDetailsModal
         show={showDetailsModal}
         onClose={handleCloseDetailsModal}
