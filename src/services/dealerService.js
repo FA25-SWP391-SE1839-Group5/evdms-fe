@@ -117,8 +117,15 @@ export const updateDealerContract = (contractId, contractData) => {
   return api.put(`/dealer-contracts/${contractId}`, contractData);
 };
 
-
-
+/**
+ * DELETE Dealer Contract
+ * @param {string|number} contractId
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const deleteDealerContract = (contractId) => {
+  console.log(`📡 API Call: DELETE /api/dealer-contracts/${contractId}`);
+  return api.delete(`/dealer-contracts/${contractId}`);
+};
 
 // ============================================
 // CÁC API KHÁC LIÊN QUAN ĐẾN DEALER (nếu cần)
