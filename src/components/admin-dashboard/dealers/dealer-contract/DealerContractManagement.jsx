@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { AlertCircle, CheckCircle, Plus, Edit, Trash } from 'lucide-react';
 import { getAllDealers, getAllDealerContracts, deleteDealerContract } from '../../../../services/dealerService';
+import DealerContractForm from './DealerContractForm';
 
 // Hàm helper để render status badge
 const RenderContractStatus = ({ startDate, endDate }) => {
@@ -33,11 +34,14 @@ const formatDate = (isoString) => {
 
 export default function DealerContractManagement() {
     const [contracts, setContracts] = useState([]);
+    const [dealers, setDealers] = useState([]);
     const [dealerMap, setDealerMap] = useState({}); // Để lưu { dealerId: dealerName }
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
+
+    const [showAddModal, setShowAddModal] = useState(false);
 
     // State phân trang (nếu bạn muốn, tạm thời tôi làm đơn giản)
     // const [pageSize, setPageSize] = useState(10);
@@ -58,9 +62,11 @@ export default function DealerContractManagement() {
                 // 1. Set Contracts
                 setContracts(contractsRes.data?.data?.items || []);
 
+                const dealerList = dealersRes.data?.data?.items || [];
+                setDealers(dealerList);
+
                 // 2. Tạo Map cho Dealers
-                const dealers = dealersRes.data?.data?.items || [];
-                const map = dealers.reduce((acc, dealer) => {
+                const map = dealerList.reduce((acc, dealer) => {
                     acc[dealer.id] = dealer.name;
                     return acc;
                 }, {});
@@ -96,9 +102,21 @@ export default function DealerContractManagement() {
 
     // 4. Handlers
     const handleAdd = () => {
-        // Chuyển đến trang form tạo mới
-        // Dùng logic giống Sidebar.jsx
-        window.location.href = '/dealer-contracts/new';
+        setShowAddModal(true);
+    };
+
+    // 5. Method to handle when add contract successfully
+    const handleContractAdded = async () => {
+        setShowAddModal(false); // Đóng modal
+        setSuccess('Contract added successfully!'); // Hiển thị thông báo
+        
+        // Tải lại danh sách contracts
+        try {
+            const contractsRes = await getAllDealerContracts();
+            setContracts(contractsRes.data?.data?.items || []);
+        } catch (err) {
+            setError(err.message || 'Failed to reload contracts');
+        }
     };
 
     const handleEdit = (contractId) => {
@@ -134,12 +152,7 @@ export default function DealerContractManagement() {
     }
 
     return (
-        <>
-            {/* Header */}
-            <h4 className="fw-bold py-3 mb-4">
-                <span className="text-muted fw-light">Dealers /</span> Dealer Contracts
-            </h4>
-
+        <>          
             {/* Alert Message */}
             {error && (
                 <div className="alert alert-danger alert-dismissible d-flex align-items-center mb-4" role="alert">
@@ -245,6 +258,14 @@ export default function DealerContractManagement() {
                     </tbody>
                 </table>
             </div>
+            
+            {/* FORM */}
+            <DealerContractForm
+                show={showAddModal}
+                onClose={() => setShowAddModal(false)}
+                onContractAdded={handleContractAdded}
+                dealers={dealers}
+            />
         </>
     )
 }
