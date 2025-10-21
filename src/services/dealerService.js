@@ -105,7 +105,17 @@ export const createDealerContract = (contractData) => {
   return api.post('/dealer-contracts', contractData);
 };
 
-
+/**
+ * UPDATE Dealer Contract
+ * @param {string|number} contractId
+ * @param {object} contractData
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const updateDealerContract = (contractId, contractData) => {
+  console.log(`📡 API Call: PUT /api/dealer-contracts/${contractId}`);
+  console.log("📤 Sending update data:", contractData);
+  return api.put(`/dealer-contracts/${contractId}`, contractData);
+};
 
 
 
