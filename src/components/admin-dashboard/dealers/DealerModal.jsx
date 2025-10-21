@@ -40,6 +40,21 @@ export default function DealerModal({ show, onClose, onSubmit, dealer, formData,
                                     />
                                     {errors?.name && <div className="invalid-feedback">{errors.name}</div>}
                                 </div>
+
+                                {/* Form Group: Region */}
+                                <div className="mb-3">
+                                    <label htmlFor="region" className="form-label">Region *</label>
+                                    <input
+                                        type="text"
+                                        className={`form-control ${errors?.region ? 'is-invalid' : ''}`}
+                                        id="region"
+                                        name="region"
+                                        value={formData.region || ''}
+                                        onChange={onFormChange}
+                                        placeholder="E.g., Ho Chi Minh City"
+                                    />
+                                    {errors?.region && <div className="invalid-feedback">{errors.region}</div>}
+                                </div>
                             </div>
                         </div>
                     </div>
