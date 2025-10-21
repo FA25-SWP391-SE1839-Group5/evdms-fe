@@ -108,8 +108,21 @@ export default function DealerContractManagement() {
         // (Bạn sẽ cần 1 route mới '/dealer-contracts/edit/:id' và 1 form tương tự)
     };
 
+    const handleDelete = async (contractId, dealerName) => {
+        const confirmMessage = `Are you sure you want to delete the contract for "${dealerName}"?`;
+        if (!window.confirm(confirmMessage)) return;
 
-    
+        try {
+            await deleteDealerContract(contractId);
+            setSuccess('Contract deleted successfully.');
+            // Tải lại danh sách
+            const contractsRes = await getAllDealerContracts();
+            setContracts(contractsRes.data?.data?.items || []);
+        } catch (err) {
+            setError(err.message || 'Failed to delete contract');
+        }
+    };
+
     return (
         <div>
             
