@@ -269,6 +269,7 @@ const DealerManagement = () => {
             <table className="dt-responsive table">
               <thead>
                 <tr>
+                  <th style={{ width: "1rem" }}></th>
                   <th>Name</th>
                   <th>Region</th>
                   <th>Address</th>
@@ -278,10 +279,26 @@ const DealerManagement = () => {
               </thead>
               <tbody>
                 {paginatedDealers.length === 0 ? (
-                  <tr><td colSpan="6" className="text-center py-4">{filteredDealers.length === 0 && !filterName && !filterRegion && !filterStatus ? 'No dealers found' : 'No dealers match your filters'}</td></tr>
+                  <tr>
+                    <td colSpan="6" className="text-center py-4">
+                      {filteredDealers.length === 0 && !filterName && !filterRegion && !filterStatus 
+                        ? 'No dealers found' 
+                        : 'No dealers match your filters'}
+                    </td>
+                  </tr>
                 ) : (
                   paginatedDealers.map(dealer => (
                     <tr key={dealer.id}>
+                      <td>
+                      <button
+                          type="button"
+                          className="btn btn-icon btn-sm btn-text-primary rounded-pill"
+                          onClick={() => handleViewDetails(dealer)}
+                          title="View Details"
+                        >
+                          <i className="bx bx-plus-circle"></i> 
+                        </button>
+                      </td>
                       <td>{dealer.name || 'N/A'}</td>
                       <td>{dealer.region || 'N/A'}</td>
                       <td>{dealer.address || 'N/A'}</td>
@@ -337,6 +354,14 @@ const DealerManagement = () => {
             </div>
         </div>
       </div>
+
+      {/* START: MODAL CHI TIẾT DEALER (MỚI) */}
+      <DealerDetailsModal
+        show={showDetailsModal}
+        onClose={handleCloseDetailsModal}
+        dealer={viewingDealer}
+        renderStatusBadge={renderStatusBadge}
+      />
     </>
   );
 };
