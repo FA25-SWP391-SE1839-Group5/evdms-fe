@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function DealerDetailsModal({ show, onClose, dealer, renderStatusBadge }) {
+export default function DealerContractDetailsModal({ show, onClose, dealer, renderStatusBadge }) {
     if (!show || !dealer) {
         return null;
     }

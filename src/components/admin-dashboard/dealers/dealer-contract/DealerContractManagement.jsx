@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { AlertCircle, CheckCircle, Plus, Edit, Trash } from 'lucide-react';
 import { getAllDealers, getAllDealerContracts, deleteDealerContract } from '../../../../services/dealerService';
 import DealerContractForm from './DealerContractForm';
+import DealerContractDetailsModal from './DealerContractDetailsModal';
 
 // Hàm helper để render status badge
 const RenderContractStatus = ({ startDate, endDate }) => {
@@ -17,6 +18,15 @@ const RenderContractStatus = ({ startDate, endDate }) => {
     }
     return <span className="badge bg-label-success">Active</span>;
 };
+
+const renderDealerStatusBadge = (status) => {
+    const isActive = typeof status === 'boolean' ? status : true;
+    return (
+        <span className={`badge bg-label-${isActive ? 'success' : 'secondary'}`}>
+            {isActive ? 'Active' : 'Inactive'}
+        </span>
+    );
+ };
 
 // Hàm helper để format tiền
 const formatCurrency = (amount) => {
@@ -42,6 +52,8 @@ export default function DealerContractManagement() {
 
     const [showFormModal, setShowFormModal] = useState(false);
     const [contractToEdit, setContractToEdit] = useState(null);
+    const [showDealerDetailsModal, setShowDealerDetailsModal] = useState(false);
+    const [viewingDealer, setViewingDealer] = useState(null);
 
     const [pageSize, setPageSize] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
@@ -209,6 +221,14 @@ export default function DealerContractManagement() {
             setContracts(contractsRes.data?.data?.items || []);
         } catch (err) {
             setError(err.message || 'Failed to delete contract');
+        }
+    };
+
+    const handleShowDealerDetails = (dealerId) => {
+        const dealer = dealers.find(d => d.id === dealerId);
+        if (dealer) {
+            setViewingDealer(dealer);
+            setShowDealerDetailsModal(true);
         }
     };
 
