@@ -97,7 +97,6 @@ const DealerManagement = () => {
     
     setCurrentPage(1); // Reset về trang 1 khi filter
   };
-  // END: HANDLER MỚI CHO FILTER
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -161,6 +160,63 @@ const DealerManagement = () => {
       {/* Responsive Datatable Card */}
       <div className="card">
         <h5 className="card-header pb-0">Dealer List</h5>
+        {/*  ADVANCED SEARCH */}
+        <div className="card-header border-bottom">
+          <h6 className="card-title mb-3">Advanced Search</h6>
+          <div className="row g-3">
+            <div className="col-md-3">
+              <label htmlFor="filterName" className="form-label">Name</label>
+              <input
+                type="text"
+                className="form-control"
+                id="filterName"
+                name="filterName"
+                placeholder="E.g., Alaric Beslier"
+                value={filterName}
+                onChange={handleFilterChange}
+              />
+            </div>
+            <div className="col-md-3">
+              <label htmlFor="filterEmail" className="form-label">Email</label>
+              <input
+                type="email"
+                className="form-control"
+                id="filterEmail"
+                name="filterEmail"
+                placeholder="E.g., demo@example.com"
+                value={filterEmail}
+                onChange={handleFilterChange}
+              />
+            </div>
+            <div className="col-md-3">
+              <label htmlFor="filterRegion" className="form-label">Region</label>
+              <input
+                type="text"
+                className="form-control"
+                id="filterRegion"
+                name="filterRegion"
+                placeholder="E.g., North, South"
+                value={filterRegion}
+                onChange={handleFilterChange}
+              />
+            </div>
+            <div className="col-md-3">
+              <label htmlFor="filterStatus" className="form-label">Status</label>
+              <select
+                id="filterStatus"
+                name="filterStatus"
+                className="form-select"
+                value={filterStatus}
+                onChange={handleFilterChange}
+              >
+                <option value="">All</option>
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        
         <div className="card-datatable table-responsive">
             {/* Top Row: Entries + Search */}
             <div className="row m-2 justify-content-between align-items-center border-bottom pb-2">
@@ -181,21 +237,6 @@ const DealerManagement = () => {
                         &nbsp;entries
                     </label>
                 </div>
-                <div className="col-md-auto">
-                    <div className="input-group"> 
-                        <span className="input-group-text"> 
-                            <i className="bx bx-search"></i> 
-                        </span>
-                        <input
-                            type="search"
-                            className="form-control"
-                            placeholder="Search dealers..."
-                            aria-label="Search dealers"
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                        />
-                    </div>
-                </div>
             </div>
 
             {/* Table: Removed extra whitespace */}
@@ -212,7 +253,7 @@ const DealerManagement = () => {
               </thead>
               <tbody>
                 {paginatedDealers.length === 0 ? (
-                  <tr><td colSpan="6" className="text-center py-4">{filteredDealers.length === 0 && !searchTerm ? 'No dealers found' : 'No dealers match your search'}</td></tr>
+                  <tr><td colSpan="6" className="text-center py-4">{filteredDealers.length === 0 && !filterName && !filterRegion && !filterStatus ? 'No dealers found' : 'No dealers match your filters'}</td></tr>
                 ) : (
                   paginatedDealers.map(dealer => (
                     <tr key={dealer.id}>
