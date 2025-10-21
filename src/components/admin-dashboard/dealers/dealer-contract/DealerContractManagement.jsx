@@ -94,6 +94,13 @@ export default function DealerContractManagement() {
         });
     }, [contracts, dealerMap, searchTerm]);
 
+    // 4. Handlers
+    const handleAdd = () => {
+        // Chuyển đến trang form tạo mới
+        // Dùng logic giống Sidebar.jsx
+        window.location.href = '/dealer-contracts/new';
+    };
+
     return (
         <div>
             
