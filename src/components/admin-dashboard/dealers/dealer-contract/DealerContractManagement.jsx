@@ -85,7 +85,15 @@ export default function DealerContractManagement() {
           return () => clearTimeout(timer);
         }
     }, [error, success]);
-    
+
+    // 3. Logic Filter 
+    const filteredContracts = useMemo(() => {
+        return contracts.filter(contract => {
+            const dealerName = dealerMap[contract.dealerId] || '';
+            return dealerName.toLowerCase().includes(searchTerm.toLowerCase());
+        });
+    }, [contracts, dealerMap, searchTerm]);
+
     return (
         <div>
             
