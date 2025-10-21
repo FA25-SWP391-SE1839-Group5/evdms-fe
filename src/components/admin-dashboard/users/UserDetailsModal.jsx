@@ -17,7 +17,7 @@ export default function UserDetailsModal({ show, onClose, user, getRoleBadgeClas
                 role="dialog"
             >
                 <div className="modal-dialog modal-dialog-centered" role="document">
-                    <div className="modal-content"></div>
+                    <div className="modal-content">
                         <div className="modal-header">
                             <h5 className="modal-title">Details of {user.fullName}</h5>
                             <button 
@@ -54,7 +54,28 @@ export default function UserDetailsModal({ show, onClose, user, getRoleBadgeClas
                                             </span>
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td className="ps-0"><strong>User ID:</strong></td>
+                                        <td><code className="text-muted">{user.id || 'N/A'}</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="modal-footer">
+                            <button 
+                                type="button" 
+                                className="btn btn-secondary" 
+                                onClick={onClose}
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
                 </div>
+            </div>
+                
+            {/* Modal Backdrop */}
+            {show && <div className="modal-backdrop fade show"></div>}
         </>
     )
 }
