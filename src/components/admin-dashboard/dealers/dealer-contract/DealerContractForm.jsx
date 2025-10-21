@@ -133,6 +133,38 @@ export default function DealerContractForm() {
                                 <h5 className="mb-0">New Contract Details</h5>
                                 <small className="text-muted float-end">Using icon inputs</small>
                             </div>
+                            <div className="card-body">
+
+                                {/* Bắt đầu Form */}
+                                <form onSubmit={handleSubmit}>
+                                    {/* Field 1: Dealer (Select) */}
+                                    <div className="mb-3">
+                                        <label className="form-label" htmlFor="dealerId">
+                                            Dealer *
+                                        </label>
+                                        <div className="input-group input-group-merge">
+                                            <span id="icon-dealer" className="input-group-text">
+                                                <i className="bx bx-store" />
+                                            </span>
+                                            <select
+                                                id="dealerId"
+                                                name="dealerId"
+                                                className="form-select"
+                                                value={formData.dealerId}
+                                                onChange={handleChange}
+                                                aria-describedby="icon-dealer"
+                                            >
+                                                <option value="">-- Select a Dealer --</option>
+                                                {dealers.map(dealer => (
+                                                    <option key={dealer.id} value={dealer.id}>
+                                                        {dealer.name} (ID: ...{dealer.id.slice(-6)})
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
