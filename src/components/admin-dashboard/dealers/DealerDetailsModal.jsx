@@ -25,6 +25,37 @@ export default function DealerDetailsModal({ show, onClose, dealer, renderStatus
                                 onClick={onClose}
                                 aria-label="Close"
                             ></button>
+                        </div>
+                        <div className="modal-body">
+                            <table className="table table-borderless">
+                                <tbody>
+                                    <tr>
+                                        <td className="ps-0" style={{width: '30%'}}><strong>Name:</strong></td>
+                                        <td>{dealer.name || 'N/A'}</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="ps-0"><strong>Region:</strong></td>
+                                        <td>{dealer.region || 'N/A'}</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="ps-0"><strong>Address:</strong></td>
+                                        <td>{dealer.address || 'N/A'}</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="ps-0"><strong>Status:</strong></td>
+                                        <td>
+                                            {renderBadge(dealer.isActive)}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td className="ps-0"><strong>Dealer ID:</strong></td>
+                                        <td><code className="text-muted">{dealer.id || 'N/A'}</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </>
     )
