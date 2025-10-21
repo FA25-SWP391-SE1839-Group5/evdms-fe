@@ -163,6 +163,27 @@ export default function DealerContractForm() {
                                             </select>
                                         </div>
                                     </div>
+
+                                    {/* Field 2: Start Date */}
+                                    <div className="mb-3">
+                                        <label className="form-label" htmlFor="startDate">
+                                            Start Date *
+                                        </label>
+                                        <div className="input-group input-group-merge">
+                                            <span id="icon-start-date" className="input-group-text">
+                                                <i className="bx bx-calendar" />
+                                            </span>
+                                            <input
+                                                type="datetime-local"
+                                                className="form-control"
+                                                id="startDate"
+                                                name="startDate"
+                                                value={formData.startDate}
+                                                onChange={handleChange}
+                                                aria-describedby="icon-start-date"
+                                            />
+                                        </div>
+                                    </div>
                                 </form>
                             </div>
                         </div>
