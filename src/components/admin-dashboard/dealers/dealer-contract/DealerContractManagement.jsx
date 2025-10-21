@@ -195,11 +195,56 @@ export default function DealerContractManagement() {
                             <th>Actions</th>
                         </tr>
                     </thead>
+                    <tbody className="table-border-bottom-0">
+                            {filteredContracts.length === 0 ? (
+                            <tr>
+                                <td colSpan="6" className="text-center py-4">
+                                    No contracts found.
+                                </td>
+                            </tr>
+                            ) : (
+                              filteredContracts.map(contract => (
+                                <tr key={contract.id}>
+                                    <td>
+                                        <span className="fw-semibold">
+                                            {dealerMap[contract.dealerId] || 'Loading...'}
+                                        </span>
+                                    </td>
+                                    <td>{formatDate(contract.startDate)}</td>
+                                    <td>{formatDate(contract.endDate)}</td>
+                                    <td>{formatCurrency(contract.salesTarget)}</td>
+                                    <td>
+                                        <RenderContractStatus 
+                                            startDate={contract.startDate} 
+                                            endDate={contract.endDate} 
+                                        />
+                                    </td>
+                                    <td>
+                                        <div className="d-flex align-items-center">
+                                            <button 
+                                                type="button" 
+                                                className="btn btn-icon btn-text-secondary rounded-pill btn-sm"
+                                                title="Edit"
+                                                onClick={() => handleEdit(contract.id)}
+                                            >
+                                                <Edit size={18} />
+                                            </button>
+                                            <button 
+                                                type="button" 
+                                                className="btn btn-icon btn-text-secondary rounded-pill btn-sm"
+                                                title="Delete"
+                                                onClick={() => handleDelete(contract.id, dealerMap[contract.dealerId])}
+                                            >
+                                                <Trash size={18} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
+                         )}
+                    </tbody>
                 </table>
             </div>
-
-
-
         </>
     )
 }
