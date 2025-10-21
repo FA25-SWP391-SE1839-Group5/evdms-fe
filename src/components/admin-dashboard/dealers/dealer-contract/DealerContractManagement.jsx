@@ -170,6 +170,16 @@ export default function DealerContractManagement() {
                             />
                         </div>
                     </div>
+                    <div className="col-md-4 ms-auto text-end">
+                        <button
+                            type="button"
+                            className="btn btn-primary rounded-pill d-flex align-items-center ms-auto"
+                            onClick={handleAdd}
+                        >
+                            <Plus size={18} className="me-2" />
+                            <span className="fw-semibold">Add Contract</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
