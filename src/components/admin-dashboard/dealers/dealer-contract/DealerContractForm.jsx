@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { AlertCircle, CheckCircle } from 'lucide-react';
-import { getAllDealers, createDealerContract } from '../../../../services/dealerService';
+import { createDealerContract } from '../../../../services/dealerService';
 
 // Hàm helper để format ngày cho input datetime-local
     const toDatetimeLocal = (isoDate) => {
@@ -10,8 +10,7 @@ import { getAllDealers, createDealerContract } from '../../../../services/dealer
         return date.toISOString().slice(0, 16);
     };
 
-export default function DealerContractForm() {
-    const [dealers, setDealers] = useState([]);
+export default function DealerContractForm({ show, onClose, onContractAdded, dealers }) {
     const [formData, setFormData] = useState({
         dealerId: '',
         startDate: toDatetimeLocal(new Date().toISOString()), // Mặc định ngày giờ hiện tại
@@ -24,18 +23,18 @@ export default function DealerContractForm() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    // 1. Tải danh sách dealers khi component mount
+    // 1. Thêm useEffect để reset form khi modal được mở
     useEffect(() => {
-        const fetchDealers = async () => {
-        try {
-            const response = await getAllDealers();
-            setDealers(response.data?.data?.items || []);
-        } catch (err) {
-            setError('Failed to load dealers list.');
+        if (show) {
+        setError('');
+        setFormData({
+            dealerId: '',
+            startDate: toDatetimeLocal(new Date().toISOString()),
+            endDate: '',
+            salesTarget: 0,
+        });
         }
-        };
-        fetchDealers();
-    }, []);
+    }, [show]);
 
     // 2. Tự động ẩn thông báo
     useEffect(() => {
@@ -81,19 +80,12 @@ export default function DealerContractForm() {
         };
 
         try {
-        const response = await createDealerContract(dataToSend);
-        if (response.data?.success) {
-            setSuccess('Dealer contract created successfully!');
-            // Reset form
-            setFormData({
-                dealerId: '',
-                startDate: toDatetimeLocal(new Date().toISOString()),
-                endDate: '',
-                salesTarget: 0,
-            });
-        } else {
-            throw new Error(response.data?.message || 'Failed to create contract');
-        }
+            const response = await createDealerContract(dataToSend);
+            if (response.data?.success) {
+                onContractAdded();
+            } else {
+                throw new Error(response.data?.message || 'Failed to create contract');
+            }
         } catch (err) {
             const errorMsg = err.response?.data?.message || err.message || 'Operation failed';
             setError(`Database operation failed: ${errorMsg}`);
@@ -102,149 +94,139 @@ export default function DealerContractForm() {
         }
     };
 
-    return (
-        <div className="content-wrapper">
-            <div className="container-xxl flex-grow-1 container-p-y">
+    // 5. Thêm check 'show'
+    if (!show) {
+        return null;
+    }
 
-                {/* Alert Message */}
-                {error && (
-                    <div className="alert alert-danger alert-dismissible d-flex align-items-center mb-4" role="alert">
-                        <AlertCircle size={20} className="me-2" />
-                        <div className="flex-grow-1">{error}</div>
-                        <button type="button" className="btn-close" onClick={() => setError('')}></button>
-                    </div>
-                )}
-                {success && (
-                    <div className="alert alert-success alert-dismissible d-flex align-items-center mb-4" role="alert">
-                        <CheckCircle size={20} className="me-2" />
-                        <div className="flex-grow-1">{success}</div>
-                        <button type="button" className="btn-close" onClick={() => setSuccess('')}></button>
-                    </div>
-                )}
+   return (
+    <>
+        <div 
+            className={`modal fade ${show ? 'show' : ''}`} 
+            style={{ display: show ? 'block' : 'none' }} 
+            tabIndex="-1" 
+            role="dialog"
+        >
+            <div className="modal-dialog modal-dialog-centered" role="document">
+                <div className="modal-content">
+                    <form onSubmit={handleSubmit}>
+                        <div className="modal-header">
+                            <h5 className="modal-title">Add New Contract</h5>
+                            <button 
+                                type="button" 
+                                className="btn-close" 
+                                onClick={onClose} 
+                                aria-label="Close"
+                                disabled={loading}
+                            ></button>
+                        </div>
+                        <div className="modal-body">
+                    
+                        {/* Thông báo lỗi (nếu có) */}
+                        {error && (
+                        <div className="alert alert-danger d-flex align-items-center" role="alert">
+                            <AlertCircle size={20} className="me-2" />
+                            <div>{error}</div>
+                        </div>
+                        )}
 
-                {/* Card Form */}
-                <div className="row">
-                    <div className="col-xl">
-                        <div className="card mb-4">
-                            <div className="card-header d-flex justify-content-between align-items-center">
-                                <h5 className="mb-0">New Contract Details</h5>
+                        {/* Field 1: Dealer (Select) */}
+                        <div className="mb-3">
+                            <label className="form-label" htmlFor="modal-dealerId">Dealer *</label>
+                            <div className="input-group input-group-merge">
+                                <span className="input-group-text"><i className="bx bx-store" /></span>
+                                <select
+                                    id="modal-dealerId"
+                                    name="dealerId"
+                                    className="form-select"
+                                    value={formData.dealerId}
+                                    onChange={handleChange}
+                                >
+                                    <option value="">-- Select a Dealer --</option>
+
+                                    {/* 9. Dùng 'dealers' từ props */}
+                                    {dealers && dealers.map(dealer => (
+                                        <option key={dealer.id} value={dealer.id}>
+                                            {dealer.name}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
-                            <div className="card-body">
+                        </div>
 
-                                {/* Bắt đầu Form */}
-                                <form onSubmit={handleSubmit}>
-                                    {/* Field 1: Dealer (Select) */}
-                                    <div className="mb-3">
-                                        <label className="form-label" htmlFor="dealerId">
-                                            Dealer *
-                                        </label>
-                                        <div className="input-group input-group-merge">
-                                            <span id="icon-dealer" className="input-group-text">
-                                                <i className="bx bx-store" />
-                                            </span>
-                                            <select
-                                                id="dealerId"
-                                                name="dealerId"
-                                                className="form-select"
-                                                value={formData.dealerId}
-                                                onChange={handleChange}
-                                                aria-describedby="icon-dealer"
-                                            >
-                                                <option value="">-- Select a Dealer --</option>
-                                                {dealers.map(dealer => (
-                                                    <option key={dealer.id} value={dealer.id}>
-                                                        {dealer.name} (ID: ...{dealer.id.slice(-6)})
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    </div>
+                        {/* Field 2: Start Date */}
+                        <div className="mb-3">
+                            <label className="form-label" htmlFor="modal-startDate">Start Date *</label>
+                            <div className="input-group input-group-merge">
+                                <span className="input-group-text"><i className="bx bx-calendar" /></span>
+                                <input
+                                    type="datetime-local"
+                                    className="form-control"
+                                    id="modal-startDate"
+                                    name="startDate"
+                                    value={formData.startDate}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                        </div>
 
-                                    {/* Field 2: Start Date */}
-                                    <div className="mb-3">
-                                        <label className="form-label" htmlFor="startDate">
-                                            Start Date *
-                                        </label>
-                                        <div className="input-group input-group-merge">
-                                            <span id="icon-start-date" className="input-group-text">
-                                                <i className="bx bx-calendar" />
-                                            </span>
-                                            <input
-                                                type="datetime-local"
-                                                className="form-control"
-                                                id="startDate"
-                                                name="startDate"
-                                                value={formData.startDate}
-                                                onChange={handleChange}
-                                                aria-describedby="icon-start-date"
-                                            />
-                                        </div>
-                                    </div>
+                        {/* Field 3: End Date */}
+                        <div className="mb-3">
+                            <label className="form-label" htmlFor="modal-endDate">End Date *</label>
+                            <div className="input-group input-group-merge">
+                                <span className="input-group-text"><i className="bx bx-calendar-check" /></span>
+                                <input
+                                    type="datetime-local"
+                                    className="form-control"
+                                    id="modal-endDate"
+                                    name="endDate"
+                                    value={formData.endDate}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                        </div>
 
-                                    {/* Field 3: End Date */}
-                                    <div className="mb-3">
-                                        <label className="form-label" htmlFor="endDate">
-                                            End Date *
-                                        </label>
-                                        <div className="input-group input-group-merge">
-                                            <span id="icon-end-date" className="input-group-text">
-                                                <i className="bx bx-calendar-check" />
-                                            </span>
-                                            <input
-                                                type="datetime-local"
-                                                className="form-control"
-                                                id="endDate"
-                                                name="endDate"
-                                                value={formData.endDate}
-                                                onChange={handleChange}
-                                                aria-describedby="icon-end-date"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Field 4: Sales Target */}
-                                    <div className="mb-3">
-                                        <label className="form-label" htmlFor="salesTarget">
-                                            Sales Target (VND)
-                                        </label>
-                                        <div className="input-group input-group-merge">
-                                            <span id="icon-sales-target" className="input-group-text">
-                                                <i className="bx bx-dollar" />
-                                            </span>
-                                            <input
-                                                type="number"
-                                                id="salesTarget"
-                                                name="salesTarget"
-                                                className="form-control"
-                                                placeholder="0"
-                                                value={formData.salesTarget}
-                                                onChange={handleChange}
-                                                aria-label="Sales Target"
-                                                aria-describedby="icon-sales-target"
-                                            />
-                                        </div>
-                                        <div className="form-text">
-                                            Enter the total sales target for the contract period.
-                                        </div>
-                                    </div>
-
-                                    {/* Nút Submit */}
-                                    <button type="submit" className="btn btn-primary" disabled={loading}>
-                                        {loading ? (
-                                            <>
-                                                <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                                                Saving...
-                                            </>
-                                        ) : (
-                                          'Create Contract'
-                                        )}
-                                    </button>
-                                </form>
+                        {/* Field 4: Sales Target */}
+                        <div className="mb-3">
+                            <label className="form-label" htmlFor="modal-salesTarget">Sales Target (VND)</label>
+                            <div className="input-group input-group-merge">
+                                <span className="input-group-text"><i className="bx bx-dollar" /></span>
+                                <input
+                                    type="number"
+                                    id="modal-salesTarget"
+                                    name="salesTarget"
+                                    className="form-control"
+                                    placeholder="0"
+                                    value={formData.salesTarget}
+                                    onChange={handleChange}
+                                />
                             </div>
                         </div>
                     </div>
+                    <div className="modal-footer">
+                        <button 
+                            type="button" 
+                            className="btn btn-outline-secondary" 
+                            onClick={onClose}
+                            disabled={loading}
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            type="submit" 
+                            className="btn btn-primary"
+                            disabled={loading}
+                        >
+                            {loading ? 'Saving...' : 'Create Contract'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
+        
+            {/* Modal Backdrop */}
+            {show && <div className="modal-backdrop fade show"></div>}
+        </>
     )
 }
