@@ -308,6 +308,14 @@ const DealerManagement = () => {
         </div>
       )}
 
+      {success && (
+       <div className="alert alert-success alert-dismissible d-flex align-items-center" role="alert">
+         <CheckCircle size={20} className="me-2" />
+         <div className="flex-grow-1">{success}</div>
+         <button type="button" className="btn-close" onClick={() => setSuccess('')}></button>
+       </div>
+     )}
+
       {/* Responsive Datatable Card */}
       <div className="card">
         <h5 className="card-header pb-0">Dealer List</h5>
@@ -371,7 +379,7 @@ const DealerManagement = () => {
         <div className="card-datatable table-responsive">
             {/* Top Row: Entries + Search */}
             <div className="row m-2 justify-content-between align-items-center border-bottom pb-2">
-                <div className="col-md-2">
+                <div className="col-md-auto">
                     <label className="d-flex align-items-center">
                         Show&nbsp;
                         <select
@@ -387,6 +395,16 @@ const DealerManagement = () => {
                         </select>
                         &nbsp;entries
                     </label>
+                </div>
+                <div className="col-md-auto ms-auto">
+                  <button
+                    type="button"
+                    className="btn btn-primary rounded-pill d-flex align-items-center"
+                    onClick={handleAdd}
+                  >
+                    <Plus size={18} className="me-2" />
+                    <span className="fw-semibold">Add Dealer</span>
+                  </button>
                 </div>
             </div>
 
