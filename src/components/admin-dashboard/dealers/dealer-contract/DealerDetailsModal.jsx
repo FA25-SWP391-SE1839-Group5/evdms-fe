@@ -55,6 +55,15 @@ export default function DealerDetailsModal({ show, onClose, dealer, renderStatus
                                 </tbody>
                             </table>
                         </div>
+                        <div className="modal-footer">
+                            <button
+                                type="button"
+                                className="btn btn-outline-secondary"
+                                onClick={onClose}
+                            >
+                                Close
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
