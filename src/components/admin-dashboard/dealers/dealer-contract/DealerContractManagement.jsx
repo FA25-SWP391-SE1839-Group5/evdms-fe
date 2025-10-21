@@ -74,6 +74,17 @@ export default function DealerContractManagement() {
         };
         fetchData();
     }, []);
+
+    // 2. Tự động ẩn thông báo
+    useEffect(() => {
+        if (error || success) {
+          const timer = setTimeout(() => {
+            setError('');
+            setSuccess('');
+          }, 5000);
+          return () => clearTimeout(timer);
+        }
+    }, [error, success]);
     
     return (
         <div>
