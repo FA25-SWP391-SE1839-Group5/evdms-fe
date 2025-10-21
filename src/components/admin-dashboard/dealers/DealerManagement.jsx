@@ -11,6 +11,7 @@ const DealerManagement = () => {
   const [filterEmail, setFilterEmail] = useState('');
   const [filterRegion, setFilterRegion] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
+  const [filterAddress, setFilterAddress] = useState('');
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -50,9 +51,14 @@ const DealerManagement = () => {
         
       const matchesRegion = filterRegion === '' ||
         (dealer.region && dealer.region.toLowerCase().includes(filterRegion.toLowerCase()));
+      
+      const isDealerConsideredActive = typeof dealer.isActive === 'boolean' 
+        ? dealer.isActive 
+        : true; 
         
-      const matchesStatus = filterStatus === '' ||
-        (dealer.isActive === (filterStatus === 'true')); // 'true' hoặc 'false'
+      const matchesStatus = filterStatus === '' || 
+        (filterStatus === 'true' && isDealerConsideredActive) || 
+        (filterStatus === 'false' && !isDealerConsideredActive); 
         
       // Trả về true CHỈ KHI tất cả điều kiện đều match
       return matchesName && matchesEmail && matchesRegion && matchesStatus;
@@ -90,6 +96,9 @@ const DealerManagement = () => {
         break;
       case 'filterStatus':
         setFilterStatus(value);
+        break;
+      case 'filterAddress':
+        setFilterAddress(value);
         break;
       default:
         break;
@@ -318,3 +327,5 @@ const DealerManagement = () => {
 };
 
 export default DealerManagement;
+
+
