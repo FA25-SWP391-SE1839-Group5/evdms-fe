@@ -183,6 +183,21 @@ export default function DealerContractManagement() {
                 </div>
             </div>
 
+            <div className="card-datatable table-responsive">
+                <table className="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Dealer</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Sales Target</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+
 
 
         </>
