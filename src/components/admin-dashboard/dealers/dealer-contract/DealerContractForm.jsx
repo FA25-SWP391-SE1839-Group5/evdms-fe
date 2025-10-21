@@ -128,7 +128,6 @@ export default function DealerContractForm() {
                         <div className="card mb-4">
                             <div className="card-header d-flex justify-content-between align-items-center">
                                 <h5 className="mb-0">New Contract Details</h5>
-                                <small className="text-muted float-end">Using icon inputs</small>
                             </div>
                             <div className="card-body">
 
