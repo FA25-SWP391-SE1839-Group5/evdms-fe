@@ -150,11 +150,7 @@ const DealerManagement = () => {
    setViewingDealer(null);
 };
 
-  // --- Placeholder Action Handlers ---
-  const handleEdit = (dealerId) => {
-    console.log("Edit dealer:", dealerId);
-    // TODO: Implement edit logic
-  };
+  
 
   // --- MODAL & FORM ---
 
@@ -261,6 +257,21 @@ const DealerManagement = () => {
         setError(err.response?.data?.message || err.message || 'Failed to delete dealer');
      }
    }
+  };
+
+  // 6. EDIT
+  const handleEdit = (dealer) => {
+    setEditingDealer(dealer);
+    setFormData({
+      name: dealer.name || '',
+      region: dealer.region || '',
+      address: dealer.address || '',
+      // Mặc định là true nếu API không trả về
+      isActive: typeof dealer.isActive === 'boolean' ? dealer.isActive : true 
+    });
+    setShowModal(true);
+    setError('');
+    setValidationErrors({});
   };
 
   // --- Render Status Badge ---
