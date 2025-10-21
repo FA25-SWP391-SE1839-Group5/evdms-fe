@@ -75,10 +75,29 @@ const DealerManagement = () => {
     setCurrentPage(1);
   };
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1);
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    
+    switch (name) {
+      case 'filterName':
+        setFilterName(value);
+        break;
+      case 'filterEmail':
+        setFilterEmail(value);
+        break;
+      case 'filterRegion':
+        setFilterRegion(value);
+        break;
+      case 'filterStatus':
+        setFilterStatus(value);
+        break;
+      default:
+        break;
+    }
+    
+    setCurrentPage(1); // Reset về trang 1 khi filter
   };
+  // END: HANDLER MỚI CHO FILTER
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
