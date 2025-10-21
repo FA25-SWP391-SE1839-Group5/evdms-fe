@@ -66,10 +66,41 @@ export default function DealerContractForm() {
 
         // Validate
         if (!formData.dealerId || !formData.startDate || !formData.endDate) {
-        setError('Please select a dealer and set start/end dates.');
-        setLoading(false);
-        return;
+            setError('Please select a dealer and set start/end dates.');
+            setLoading(false);
+            return;
         }
+
+        // Chuyển đổi dữ liệu trước khi gửi
+        const dataToSend = {
+            ...formData,
+            salesTarget: Number(formData.salesTarget) || 0,
+            // Đảm bảo ngày gửi đi là định dạng ISO
+            startDate: new Date(formData.startDate).toISOString(),
+            endDate: new Date(formData.endDate).toISOString(),
+        };
+
+        try {
+        const response = await createDealerContract(dataToSend);
+        if (response.data?.success) {
+            setSuccess('Dealer contract created successfully!');
+            // Reset form
+            setFormData({
+                dealerId: '',
+                startDate: toDatetimeLocal(new Date().toISOString()),
+                endDate: '',
+                salesTarget: 0,
+            });
+        } else {
+            throw new Error(response.data?.message || 'Failed to create contract');
+        }
+        } catch (err) {
+            const errorMsg = err.response?.data?.message || err.message || 'Operation failed';
+            setError(`Database operation failed: ${errorMsg}`);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <>
