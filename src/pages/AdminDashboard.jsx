@@ -10,6 +10,7 @@ import OrderStatistics from '../components/admin-dashboard/dashboard/OrderStatis
 import ExpenseOverview from '../components/admin-dashboard/dashboard/ExpenseOverview';
 import TransactionsList from '../components/admin-dashboard/dashboard/TransactionList';
 import UserManagement from '../components/admin-dashboard/users/UserManagement';
+import DealerManagement from '../components/admin-dashboard/dealers/DealerManagement';
 
 const AdminDashboard = ({ currentPage = 'dashboard' }) => {
   const renderPageContent = () => {
@@ -24,12 +25,7 @@ const AdminDashboard = ({ currentPage = 'dashboard' }) => {
       case 'dealers':
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
-            <h4 className="fw-bold py-3 mb-4">Dealers Management</h4>
-            <div className="card">
-              <div className="card-body">
-                <p>Dealers management page - Coming soon...</p>
-              </div>
-            </div>
+            <DealerManagement />
           </div>
         );
       
