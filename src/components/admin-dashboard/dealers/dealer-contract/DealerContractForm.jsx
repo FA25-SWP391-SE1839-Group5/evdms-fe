@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { AlertCircle, CheckCircle } from 'lucide-react';
-import { createDealerContract } from '../../../../services/dealerService';
+import { AlertCircle } from 'lucide-react';
+import { createDealerContract, updateDealerContract } from '../../../../services/dealerService';
 
 // Hàm helper để format ngày cho input datetime-local
     const toDatetimeLocal = (isoDate) => {
@@ -10,13 +10,15 @@ import { createDealerContract } from '../../../../services/dealerService';
         return date.toISOString().slice(0, 16);
     };
 
-export default function DealerContractForm({ show, onClose, onContractAdded, dealers }) {
+export default function DealerContractForm({ show, onClose, onSaveSuccess, dealers, contractToEdit }) {
+    const isEditMode = Boolean(contractToEdit);
+    const title = isEditMode ? 'Edit Contract' : 'Add New Contract';
+
     const [formData, setFormData] = useState({
         dealerId: '',
         startDate: toDatetimeLocal(new Date().toISOString()), // Mặc định ngày giờ hiện tại
         endDate: '',
         salesTarget: 0,
-        // outstandingDebt không cần khi tạo, backend sẽ tự gán
     });
 
     const [loading, setLoading] = useState(false);
@@ -26,15 +28,26 @@ export default function DealerContractForm({ show, onClose, onContractAdded, dea
     // 1. Thêm useEffect để reset form khi modal được mở
     useEffect(() => {
         if (show) {
-        setError('');
-        setFormData({
-            dealerId: '',
-            startDate: toDatetimeLocal(new Date().toISOString()),
-            endDate: '',
-            salesTarget: 0,
-        });
+            setError('');
+            if (isEditMode && contractToEdit) {
+                // Chế độ Edit: Điền dữ liệu cũ
+                setFormData({
+                    dealerId: contractToEdit.dealerId || '',
+                    startDate: toDatetimeLocal(contractToEdit.startDate),
+                    endDate: toDatetimeLocal(contractToEdit.endDate),
+                    salesTarget: contractToEdit.salesTarget || 0,
+                });
+            } else {
+                // Chế độ Add: Reset form
+                setFormData({
+                    dealerId: '',
+                    startDate: toDatetimeLocal(new Date().toISOString()),
+                    endDate: '',
+                    salesTarget: 0,
+                });
+            }
         }
-    }, [show]);
+    }, [show, contractToEdit, isEditMode]); 
 
     // 2. Tự động ẩn thông báo
     useEffect(() => {
@@ -80,19 +93,27 @@ export default function DealerContractForm({ show, onClose, onContractAdded, dea
         };
 
         try {
-            const response = await createDealerContract(dataToSend);
-            if (response.data?.success) {
-                onContractAdded();
+            let response;
+            if (isEditMode) {
+                // --- CHẠY API UPDATE ---
+                response = await updateDealerContract(contractToEdit.id, dataToSend);
             } else {
-                throw new Error(response.data?.message || 'Failed to create contract');
+                // --- CHẠY API CREATE ---
+                response = await createDealerContract(dataToSend);
             }
-        } catch (err) {
-            const errorMsg = err.response?.data?.message || err.message || 'Operation failed';
-            setError(`Database operation failed: ${errorMsg}`);
-        } finally {
-            setLoading(false);
-        }
-    };
+
+            if (response.data?.success) {
+                onSaveSuccess(isEditMode);
+            } else {
+                throw new Error(response.data?.message || 'Failed to save contract');
+            }
+            } catch (err) {
+                const errorMsg = err.response?.data?.message || err.message || 'Operation failed';
+                setError(`Database operation failed: ${errorMsg}`);
+            } finally {
+                setLoading(false);
+            }
+        };
 
     // 5. Thêm check 'show'
     if (!show) {
@@ -111,7 +132,7 @@ export default function DealerContractForm({ show, onClose, onContractAdded, dea
                 <div className="modal-content">
                     <form onSubmit={handleSubmit}>
                         <div className="modal-header">
-                            <h5 className="modal-title">Add New Contract</h5>
+                            <h5 className="modal-title">{title}</h5>
                             <button 
                                 type="button" 
                                 className="btn-close" 
@@ -123,10 +144,10 @@ export default function DealerContractForm({ show, onClose, onContractAdded, dea
                         <div className="modal-body">         
                             {/* Thông báo lỗi (nếu có) */}
                             {error && (
-                            <div className="alert alert-danger d-flex align-items-center" role="alert">
-                                <AlertCircle size={20} className="me-2" />
-                                <div>{error}</div>
-                            </div>
+                                <div className="alert alert-danger d-flex align-items-center" role="alert">
+                                    <AlertCircle size={20} className="me-2" />
+                                    <div>{error}</div>
+                                </div>
                             )}
 
                             {/* Field 1: Dealer (Select) */}
@@ -140,6 +161,7 @@ export default function DealerContractForm({ show, onClose, onContractAdded, dea
                                         className="form-select"
                                         value={formData.dealerId}
                                         onChange={handleChange}
+                                        disabled={isEditMode}
                                     >
                                         <option value="">-- Select a Dealer --</option>
                                         {dealers && dealers.map(dealer => (
@@ -214,7 +236,7 @@ export default function DealerContractForm({ show, onClose, onContractAdded, dea
                                     className="btn btn-primary"
                                     disabled={loading}
                                 >
-                                    {loading ? 'Saving...' : 'Create Contract'}
+                                    {loading ? 'Saving...' : (isEditMode ? 'Update Contract' : 'Create Contract')}
                                 </button>
                             </div>
                         </form>
