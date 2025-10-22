@@ -142,8 +142,15 @@ export default function DealerOrderModal({ show, onClose, onSaveSuccess, dealers
                                     disabled={loading}
                                 ></button>
                             </div>
+                            <div className="modal-body">
 
-                            
+                                {error && ( /* ... code hiển thị lỗi ... */ 
+                                    <div className="alert alert-danger d-flex align-items-center" role="alert">
+                                        <AlertCircle size={20} className="me-2" />
+                                        <div>{error}</div>
+                                    </div>
+                                )}
+                            </div>
                         </form>
                     </div>
                 </div>
