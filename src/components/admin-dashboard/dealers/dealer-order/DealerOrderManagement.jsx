@@ -372,6 +372,15 @@ export default function DealerOrderManagement() {
                     </nav>
                 </div>
             </div>
+
+            {/* Modal */}
+            <DealerOrderModal
+                show={showFormModal}
+                onClose={() => { setShowFormModal(false); setOrderToEdit(null); }}
+                onSaveSuccess={handleSaveSuccess}
+                dealers={dealers} 
+                orderToEdit={orderToEdit}
+            />
         </>
     )
 }
