@@ -247,98 +247,106 @@ export default function DealerContractManagement() {
     }
 
     const handleExport = (format) => {
-            // Use the currently filtered (and paginated if desired, but usually export all filtered)
-            const exportData = filteredOrders.map(order => ({
-                "Order #": formatOrderId(order.id),
-                "Date": formatDate(order.createdAt || order.updatedAt),
-                "Dealer": dealerMap[order.dealerId] || 'N/A',
-                "Variant": variantMap[order.variantId] || 'N/A',
-                "Qty": order.quantity,
-                "Color": order.color,
-                "Status": order.status || 'N/A'
-            }));
-    
-            if (exportData.length === 0) {
-                setError("No data to export based on current filters.");
-                return;
-            }
-    
-            const header = ["Order #", "Date", "Dealer", "Variant", "Qty", "Color", "Status"];
-    
-            try {
-                switch (format) {
-                    case 'pdf': {
-                        const doc = new jsPDF();
-                        doc.text("Dealer Orders List", 14, 16);
-                        autoTable(doc, {
-                            head: [header],
-                            body: exportData.map(Object.values),
-                            startY: 20,
-                        });
-                        doc.save('dealer-orders.pdf');
-                        break;
-                    }
-                    case 'excel': {
-                        const ws = XLSX.utils.json_to_sheet(exportData, { header: header });
-                        // Rename header row if needed (optional)
-                        // XLSX.utils.sheet_add_aoa(ws, [header], { origin: "A1" });
-                        const wb = XLSX.utils.book_new();
-                        XLSX.utils.book_append_sheet(wb, ws, "Dealer Orders");
-                        XLSX.writeFile(wb, "dealer-orders.xlsx");
-                        break;
-                    }
-                    case 'csv': {
-                        const ws = XLSX.utils.json_to_sheet(exportData, { header: header });
-                        const csv = XLSX.utils.sheet_to_csv(ws);
-                        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                        const link = document.createElement('a');
-                        if (link.download !== undefined) { // Check for download attribute support
-                            const url = URL.createObjectURL(blob);
-                            link.setAttribute('href', url);
-                            link.setAttribute('download', 'dealer-orders.csv');
-                            link.style.visibility = 'hidden';
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                        }
-                        break;
-                    }
-                    case 'print': {
-                        const doc = new jsPDF();
-                        doc.text("Dealer Orders List", 14, 16);
-                        autoTable(doc, {
-                            head: [header],
-                            body: exportData.map(Object.values),
-                            startY: 20,
-                        });
-                        doc.autoPrint();
-                        doc.output('dataurlnewwindow'); // Open print dialog in new window
-                        break;
-                    }
-                    case 'copy': {
-                         const textToCopy = [
-                            header.join('\t'), // Header row
-                            ...exportData.map(row => Object.values(row).join('\t')) // Data rows
-                         ].join('\n');
-    
-                         navigator.clipboard.writeText(textToCopy).then(() => {
-                            setSuccess('Data copied to clipboard!');
-                         }, (err) => {
-                            setError('Failed to copy data.');
-                            console.error('Copy error:', err);
-                         });
-                         break;
-                    }
-                    default:
-                        console.warn('Unknown export format:', format);
-                        break;
-                }
-                setSuccess(`Exported data as ${format.toUpperCase()}.`);
-            } catch (exportError) {
-                 setError(`Failed to export data as ${format.toUpperCase()}.`);
-                 console.error(`Export Error (${format}):`, exportError);
-            }
+        // Helper nhỏ để lấy text status
+        const getStatusText = (startDate, endDate) => {
+            const now = new Date();
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            if (now > end) return 'Expired';
+            if (now < start) return 'Pending';
+            return 'Active';
         };
+
+        // 1. Dùng đúng 'filteredContracts'
+        const exportData = filteredContracts.map(contract => ({
+            "Dealer": dealerMap[contract.dealerId] || 'N/A',
+            "Start Date": formatDate(contract.startDate),
+            "End Date": formatDate(contract.endDate),
+            "Sales Target": formatCurrency(contract.salesTarget), // Dùng hàm format tiền
+            "Status": getStatusText(contract.startDate, contract.endDate)
+        }));
+
+        if (exportData.length === 0) {
+            setError("No data to export based on current filters.");
+            return;
+        }
+
+        // 2. Dùng đúng 'header'
+        const header = ["Dealer", "Start Date", "End Date", "Sales Target", "Status"];
+
+        try {
+            switch (format) {
+                case 'pdf': {
+                    const doc = new jsPDF();
+                    // 3. Sửa lại tiêu đề và tên file
+                    doc.text("Dealer Contracts List", 14, 16);
+                    autoTable(doc, {
+                        head: [header],
+                        body: exportData.map(Object.values),
+                        startY: 20,
+                    });
+                    doc.save('dealer-contracts.pdf');
+                    break;
+                }
+                case 'excel': {
+                    const ws = XLSX.utils.json_to_sheet(exportData, { header: header });
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "Dealer Contracts"); // Sửa tên sheet
+                    XLSX.writeFile(wb, "dealer-contracts.xlsx"); // Sửa tên file
+                    break;
+                }
+                case 'csv': {
+                    const ws = XLSX.utils.json_to_sheet(exportData, { header: header });
+                    const csv = XLSX.utils.sheet_to_csv(ws);
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    if (link.download !== undefined) {
+                        const url = URL.createObjectURL(blob);
+                        link.setAttribute('href', url);
+                        link.setAttribute('download', 'dealer-contracts.csv'); // Sửa tên file
+                        link.style.visibility = 'hidden';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }
+                    break;
+                }
+                case 'print': {
+                    const doc = new jsPDF();
+                    doc.text("Dealer Contracts List", 14, 16); // Sửa tiêu đề
+                    autoTable(doc, {
+                        head: [header],
+                        body: exportData.map(Object.values),
+                        startY: 20,
+                    });
+                    doc.autoPrint();
+                    doc.output('dataurlnewwindow');
+                    break;
+                }
+                case 'copy': {
+                     const textToCopy = [
+                        header.join('\t'),
+                        ...exportData.map(row => Object.values(row).join('\t'))
+                     ].join('\n');
+
+                     navigator.clipboard.writeText(textToCopy).then(() => {
+                        setSuccess('Data copied to clipboard!');
+                     }, (err) => {
+                        setError('Failed to copy data.');
+                        console.error('Copy error:', err);
+                     });
+                    break;
+                }
+                default:
+                    console.warn('Unknown export format:', format);
+                    break;
+            }
+            // setSuccess(`Exported data as ${format.toUpperCase()}.`); // Tùy chọn: bỏ thông báo này nếu đã có thông báo copy
+        } catch (exportError) {
+            setError(`Failed to export data as ${format.toUpperCase()}.`);
+            console.error(`Export Error (${format}):`, exportError);
+        }
+    };
 
    return (
         <>
