@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { AlertCircle, CheckCircle, Plus, Edit, Trash } from 'lucide-react';
+import { AlertCircle, CheckCircle, Plus, Edit, Trash, Upload } from 'lucide-react';
 import { getAllDealers, getAllDealerContracts, deleteDealerContract } from '../../../../services/dealerService';
 import DealerContractForm from './DealerContractForm';
 import DealerContractDetailsModal from './DealerContractDetailsModal';
+
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 
 // Hàm helper để render status badge
 const RenderContractStatus = ({ startDate, endDate }) => {
@@ -242,6 +246,100 @@ export default function DealerContractManagement() {
         );
     }
 
+    const handleExport = (format) => {
+            // Use the currently filtered (and paginated if desired, but usually export all filtered)
+            const exportData = filteredOrders.map(order => ({
+                "Order #": formatOrderId(order.id),
+                "Date": formatDate(order.createdAt || order.updatedAt),
+                "Dealer": dealerMap[order.dealerId] || 'N/A',
+                "Variant": variantMap[order.variantId] || 'N/A',
+                "Qty": order.quantity,
+                "Color": order.color,
+                "Status": order.status || 'N/A'
+            }));
+    
+            if (exportData.length === 0) {
+                setError("No data to export based on current filters.");
+                return;
+            }
+    
+            const header = ["Order #", "Date", "Dealer", "Variant", "Qty", "Color", "Status"];
+    
+            try {
+                switch (format) {
+                    case 'pdf': {
+                        const doc = new jsPDF();
+                        doc.text("Dealer Orders List", 14, 16);
+                        autoTable(doc, {
+                            head: [header],
+                            body: exportData.map(Object.values),
+                            startY: 20,
+                        });
+                        doc.save('dealer-orders.pdf');
+                        break;
+                    }
+                    case 'excel': {
+                        const ws = XLSX.utils.json_to_sheet(exportData, { header: header });
+                        // Rename header row if needed (optional)
+                        // XLSX.utils.sheet_add_aoa(ws, [header], { origin: "A1" });
+                        const wb = XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(wb, ws, "Dealer Orders");
+                        XLSX.writeFile(wb, "dealer-orders.xlsx");
+                        break;
+                    }
+                    case 'csv': {
+                        const ws = XLSX.utils.json_to_sheet(exportData, { header: header });
+                        const csv = XLSX.utils.sheet_to_csv(ws);
+                        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                        const link = document.createElement('a');
+                        if (link.download !== undefined) { // Check for download attribute support
+                            const url = URL.createObjectURL(blob);
+                            link.setAttribute('href', url);
+                            link.setAttribute('download', 'dealer-orders.csv');
+                            link.style.visibility = 'hidden';
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        }
+                        break;
+                    }
+                    case 'print': {
+                        const doc = new jsPDF();
+                        doc.text("Dealer Orders List", 14, 16);
+                        autoTable(doc, {
+                            head: [header],
+                            body: exportData.map(Object.values),
+                            startY: 20,
+                        });
+                        doc.autoPrint();
+                        doc.output('dataurlnewwindow'); // Open print dialog in new window
+                        break;
+                    }
+                    case 'copy': {
+                         const textToCopy = [
+                            header.join('\t'), // Header row
+                            ...exportData.map(row => Object.values(row).join('\t')) // Data rows
+                         ].join('\n');
+    
+                         navigator.clipboard.writeText(textToCopy).then(() => {
+                            setSuccess('Data copied to clipboard!');
+                         }, (err) => {
+                            setError('Failed to copy data.');
+                            console.error('Copy error:', err);
+                         });
+                         break;
+                    }
+                    default:
+                        console.warn('Unknown export format:', format);
+                        break;
+                }
+                setSuccess(`Exported data as ${format.toUpperCase()}.`);
+            } catch (exportError) {
+                 setError(`Failed to export data as ${format.toUpperCase()}.`);
+                 console.error(`Export Error (${format}):`, exportError);
+            }
+        };
+
    return (
         <>
             {/* Alert Message */}
@@ -285,6 +383,48 @@ export default function DealerContractManagement() {
                             </label>
                         </div>
 
+                        {/* Export and Add Contract Buttons */}
+                        <div className="col-md-auto ms-auto d-flex align-items-center gap-2">
+                            {/* Export button */}
+                            <div className="btn-group">
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-secondary dropdown-toggle d-flex align-items-center"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                >
+                                    <i className='bx bx-export me-1'></i> Export
+                                </button>
+                                <ul className="dropdown-menu">
+                                    <li>
+                                    <button type="button" className="dropdown-item" onClick={() => handleExport('print')}>
+                                        <i className='bx bx-printer me-2'></i> Print
+                                    </button>
+                                    </li>
+                                    <li>
+                                    <button type="button" className="dropdown-item" onClick={() => handleExport('csv')}>
+                                        <i className='bx bx-file me-2'></i> Csv
+                                    </button>
+                                    </li>
+                                    <li>
+                                    <button type="button" className="dropdown-item" onClick={() => handleExport('excel')}>
+                                        <i className='bx bx-file-blank me-2'></i> Excel
+                                    </button>
+                                    </li>
+                                    <li>
+                                    <button type="button" className="dropdown-item" onClick={() => handleExport('pdf')}>
+                                        <i className='bx bxs-file-pdf me-2'></i> Pdf
+                                    </button>
+                                    </li>
+                                    <li><hr className="dropdown-divider" /></li>
+                                    <li>
+                                    <button type="button" className="dropdown-item" onClick={() => handleExport('copy')}>
+                                        <i className='bx bx-copy me-2'></i> Copy
+                                    </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        
                         {/* Add Contract */}
                         <div className="col-md-auto ms-auto">
                             <button
@@ -475,6 +615,7 @@ export default function DealerContractManagement() {
                dealer={viewingDealer}
                renderStatusBadge={renderDealerStatusBadge} // Dùng hàm render badge bạn đã có
            />
+           </div>
         </>
     )
 }

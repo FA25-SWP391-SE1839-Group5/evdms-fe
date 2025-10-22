@@ -577,7 +577,7 @@ const UserManagement = () => {
                         <div className="btn-group">
                           <button
                             type="button"
-                            className="btn btn-secondary dropdown-toggle"
+                            className="btn btn-outline-secondary dropdown-toggle d-flex align-items-center"
                             data-bs-toggle="dropdown"
                             aria-expanded="false"
                           >
