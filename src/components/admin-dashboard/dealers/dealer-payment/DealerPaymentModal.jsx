@@ -139,6 +139,23 @@ export default function DealerPaymentModal({ show, onClose, onSaveSuccess, deale
                                         ))}
                                     </select>
                                 </div>
+
+                                {/* Amount */}
+                                <div className="mb-3">
+                                    <label className="form-label" htmlFor="modal-pay-amount">Amount (VND) *</label>
+                                    <input
+                                        type="number"
+                                        id="modal-pay-amount"
+                                        name="amount"
+                                        className="form-control"
+                                        placeholder="e.g., 5000000"
+                                        min="0"
+                                        step="1000"
+                                        value={formData.amount}
+                                        onChange={handleChange}
+                                        disabled={loading}
+                                    />
+                                </div>
                             </div>
                         </form>
                     </div>
