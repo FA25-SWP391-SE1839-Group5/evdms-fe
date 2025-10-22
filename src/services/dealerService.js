@@ -198,13 +198,14 @@ export const getAllVehicleVariants = () => {
 };
 
 // ============================================
-// CÁC API KHÁC LIÊN QUAN ĐẾN DEALER (nếu cần)
-// Ví dụ: DealerContract, DealerOrder, DealerPayment
-// Bạn có thể thêm các hàm tương tự ở đây
+// API CALLS - DEALER PAYMENTS
 // ============================================
 
-// Ví dụ cho DealerContract:
-// export const getAllDealerContracts = (dealerId) => {
-//   console.log(`📡 API Call: GET /api/dealer-contracts?dealerId=${dealerId}`); // Giả sử có query param
-//   return api.get('/dealer-contracts', { params: { dealerId } });
-// };
+/**
+ * Get All Dealer Payments
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const getAllDealerPayments = () => {
+    console.log("📡 API Call: GET /api/dealer-payments");
+    return api.get('/dealer-payments');
+};
