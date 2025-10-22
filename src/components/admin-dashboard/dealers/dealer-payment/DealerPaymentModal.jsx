@@ -172,6 +172,25 @@ export default function DealerPaymentModal({ show, onClose, onSaveSuccess, deale
                                     />
                                     {/* You could change this to a Select if methods are fixed */}
                                 </div>
+
+                            </div>
+
+                            <div className="modal-footer">
+                                <button 
+                                    type="button" 
+                                    className="btn btn-outline-secondary" 
+                                    onClick={onClose} 
+                                    disabled={loading}
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    type="submit" 
+                                    className="btn btn-primary" 
+                                    disabled={loading}
+                                >
+                                    {loading ? 'Saving...' : (isEditMode ? 'Update Payment' : 'Create Payment')}
+                                </button>
                             </div>
                         </form>
                     </div>
