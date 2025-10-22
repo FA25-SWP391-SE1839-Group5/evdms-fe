@@ -251,3 +251,14 @@ export const deleteDealerPayment = (paymentId) => {
   console.log(`📡 API Call: DELETE /api/dealer-payments/${paymentId}`);
   return api.delete(`/dealer-payments/${paymentId}`);
 };
+
+/**
+ * Mark Dealer Payment as PAID
+ * @param {string|number} paymentId
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const markPaymentPaid = (paymentId) => {
+  console.log(`📡 API Call: POST /api/dealer-payments/${paymentId}/mark-paid`);
+  // POST request typically doesn't need a body for this kind of action
+  return api.post(`/dealer-payments/${paymentId}/mark-paid`);
+};
