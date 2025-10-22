@@ -37,7 +37,15 @@ export default function DealerPaymentModal({ show, onClose, onSaveSuccess, deale
         }
     }, [show, paymentToEdit, isEditMode]);
 
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
 
+
+
+
+    
     return (
         <div>
 
