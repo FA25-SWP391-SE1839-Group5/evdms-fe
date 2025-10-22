@@ -156,6 +156,22 @@ export default function DealerPaymentModal({ show, onClose, onSaveSuccess, deale
                                         disabled={loading}
                                     />
                                 </div>
+
+                                {/* Payment Method */}
+                                <div className="mb-3">
+                                    <label className="form-label" htmlFor="modal-pay-paymentMethod">Payment Method *</label>
+                                    <input
+                                        type="text"
+                                        id="modal-pay-paymentMethod"
+                                        name="paymentMethod"
+                                        className="form-control"
+                                        placeholder="e.g., Bank Transfer, Cash"
+                                        value={formData.paymentMethod}
+                                        onChange={handleChange}
+                                        disabled={loading}
+                                    />
+                                    {/* You could change this to a Select if methods are fixed */}
+                                </div>
                             </div>
                         </form>
                     </div>
