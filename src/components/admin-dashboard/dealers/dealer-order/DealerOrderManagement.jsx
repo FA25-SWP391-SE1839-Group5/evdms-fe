@@ -103,6 +103,52 @@ export default function DealerOrderManagement() {
         }
     }, [error, success]);
 
+    // Filter Logic
+    const filteredOrders = useMemo(() => {
+        return orders.filter(order => {
+            const orderId = formatOrderId(order.id).toLowerCase();
+            const date = formatDate(order.createdAt || order.updatedAt).toLowerCase(); // Giả sử có createdAt
+            const dealerName = (dealerMap[order.dealerId] || '').toLowerCase();
+            const status = (order.status || '').toLowerCase();
+            const variantName = (variantMap[order.variantId] || '').toLowerCase();
+            const color = (order.color || '').toLowerCase();
+            const quantity = String(order.quantity || '').toLowerCase();
+
+            // Global search first
+            if (globalSearch) {
+                const searchTermLower = globalSearch.toLowerCase();
+                if (
+                    !orderId.includes(searchTermLower) &&
+                    !date.includes(searchTermLower) &&
+                    !dealerName.includes(searchTermLower) &&
+                    !status.includes(searchTermLower) &&
+                    !variantName.includes(searchTermLower) &&
+                    !color.includes(searchTermLower) &&
+                    !quantity.includes(searchTermLower)
+                ) {
+                    return false; // Skip if global search doesn't match
+                }
+            }
+
+            // Then specific column filters
+            const matchesId = filterOrderId === '' || orderId.includes(filterOrderId.toLowerCase());
+            const matchesDate = filterDate === '' || date.includes(filterDate.toLowerCase());
+            const matchesDealer = filterDealer === '' || dealerName.includes(filterDealer.toLowerCase());
+            const matchesStatus = filterStatus === '' || status === filterStatus.toLowerCase();
+
+            return matchesId && matchesDate && matchesDealer && matchesStatus;
+        });
+    }, [
+        orders, 
+        dealerMap, 
+        variantMap,
+        globalSearch,
+        filterOrderId, 
+        filterDate, 
+        filterDealer, 
+        filterStatus
+    ]);
+
 
 
 
