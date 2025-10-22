@@ -121,6 +121,24 @@ export default function DealerPaymentModal({ show, onClose, onSaveSuccess, deale
                                         <div>{error}</div>
                                     </div>
                                 )}
+
+                                {/* Dealer Select */}
+                                <div className="mb-3">
+                                    <label className="form-label" htmlFor="modal-pay-dealerId">Dealer *</label>
+                                    <select
+                                        id="modal-pay-dealerId"
+                                        name="dealerId"
+                                        className="form-select"
+                                        value={formData.dealerId}
+                                        onChange={handleChange}
+                                        disabled={isEditMode || loading} // Don't change dealer on edit
+                                    >
+                                        <option value="">-- Select Dealer --</option>
+                                        {dealers && dealers.map(dealer => (
+                                            <option key={dealer.id} value={dealer.id}>{dealer.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
                         </form>
                     </div>
