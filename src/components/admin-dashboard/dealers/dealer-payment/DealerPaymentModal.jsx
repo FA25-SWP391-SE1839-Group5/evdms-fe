@@ -88,11 +88,35 @@ export default function DealerPaymentModal({ show, onClose, onSaveSuccess, deale
         }
     };
 
-
+    if (!show) return null;
 
     return (
-        <div>
+        <>
+            <div 
+                className={`modal fade ${show ? 'show' : ''}`} 
+                style={{ display: show ? 'block' : 'none' }} 
+                tabIndex="-1" 
+                role="dialog"
+            >   
+                <div className="modal-dialog modal-dialog-centered" role="document">
+                    <div className="modal-content">
+                        <form onSubmit={handleSubmit}>
+                            <div className="modal-header">
+                                <h5 className="modal-title">{title}</h5>
+                                <button 
+                                    type="button" 
+                                    className="btn-close" 
+                                    onClick={onClose} 
+                                    aria-label="Close" 
+                                    disabled={loading}
+                                ></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
 
-        </div>
+
+        </>
     )
 }
