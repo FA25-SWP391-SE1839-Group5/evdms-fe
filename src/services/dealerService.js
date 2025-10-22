@@ -209,3 +209,19 @@ export const getAllDealerPayments = () => {
     console.log("📡 API Call: GET /api/dealer-payments");
     return api.get('/dealer-payments');
 };
+
+/**
+ * CREATE Dealer Payment
+ * @param {object} paymentData
+ * @param {string} paymentData.dealerId
+ * @param {number} paymentData.amount
+ * @param {string} paymentData.paymentMethod
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const createDealerPayment = (paymentData) => {
+  console.log("📡 API Call: POST /api/dealer-payments");
+  // Ensure amount is a number, status will likely be set by backend (default 'Pending')
+  const dataToSend = { ...paymentData, amount: Number(paymentData.amount) || 0 };
+  console.log("📤 Sending data:", dataToSend);
+  return api.post('/dealer-payments', dataToSend);
+};
