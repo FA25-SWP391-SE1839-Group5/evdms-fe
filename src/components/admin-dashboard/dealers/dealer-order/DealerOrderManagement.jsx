@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { AlertCircle, CheckCircle, Plus, Edit, Trash, FileText } from 'lucide-react';
 import { getAllDealerOrders, deleteDealerOrder, getAllDealers, getAllVehicleVariants } from '../../../../services/dealerService';
 import DealerOrderModal from './DealerOrderModal';
+import OrderStatsCards from './OrdersStatsCards';
 
 // --- Helper Functions ---
 const formatOrderId = (id) => {
@@ -33,7 +34,7 @@ export default function DealerOrderManagement() {
     const [dealerMap, setDealerMap] = useState({});
 
     const [variantMap, setVariantMap] = useState({});
-    const [loadingData, setLoadingData] = useState(true); // Đổi tên state loading chính
+    const [loadingPageData, setLoadingPageData] = useState(true); // Đổi tên state loading chính
 
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -52,7 +53,7 @@ export default function DealerOrderManagement() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setLoadingData(true); 
+                setLoadingPageData(true); 
                 setError(''); 
 
                 // Fetch Orders, Dealers, và Variants
@@ -89,7 +90,7 @@ export default function DealerOrderManagement() {
                      setError(errorMsg);
                 }
             } finally {
-                setLoadingData(false); 
+                setLoadingPageData(false); 
             }
         };
         fetchData();
@@ -213,7 +214,7 @@ export default function DealerOrderManagement() {
         }
     };
 
-    if (loadingData) { /* ... loading spinner ... */ 
+    if (loadingPageData) {
         return <div className="d-flex justify-content-center align-items-center vh-100"><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div></div>;
     }
 
@@ -222,6 +223,9 @@ export default function DealerOrderManagement() {
             <h4 className="fw-bold py-3 mb-4">
               <span className="text-muted fw-light">Dealers /</span> Dealer Orders
             </h4>
+
+            {/* 4. Render component thống kê ở đây */}
+            <OrderStatsCards orders={orders} />
 
             {/* Alert Message */}
             {error && ( /* ... error alert ... */ 
