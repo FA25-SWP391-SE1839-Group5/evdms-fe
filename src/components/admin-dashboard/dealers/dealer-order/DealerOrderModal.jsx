@@ -221,6 +221,25 @@ export default function DealerOrderModal({ show, onClose, onSaveSuccess, dealers
                                         disabled={loading}
                                     />
                                 </div>
+
+                                {/* Status Select */}
+                                <div className="mb-3">
+                                    <label className="form-label" htmlFor="modal-order-status">Status *</label>
+                                    <select
+                                        id="modal-order-status"
+                                        name="status"
+                                        className="form-select"
+                                        value={formData.status}
+                                        onChange={handleChange}
+                                        disabled={loading}
+                                    >
+                                        <option value="Pending">Pending</option>
+                                        <option value="Processing">Processing</option>
+                                        <option value="Shipped">Shipped</option>
+                                        <option value="Delivered">Delivered</option>
+                                        <option value="Cancelled">Cancelled</option>
+                                    </select>
+                                </div>
                             </div>
                         </form>
                     </div>
