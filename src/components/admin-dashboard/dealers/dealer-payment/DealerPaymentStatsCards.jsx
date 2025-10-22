@@ -1,4 +1,3 @@
-import React from 'react'
 import React from 'react';
 import { Clock, CheckCircle, XCircle, DollarSign, FileText } from 'lucide-react';
 
