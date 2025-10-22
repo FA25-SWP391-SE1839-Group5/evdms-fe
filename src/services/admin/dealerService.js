@@ -157,6 +157,22 @@ export const createDealerOrder = (orderData) => {
   return api.post('/dealer-orders', dataToSend);
 };
 
+/**
+ * UPDATE Dealer Order
+ * @param {string|number} orderId
+ * @param {object} orderData - Chỉ chứa các trường cần update
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const updateDealerOrder = (orderId, orderData) => {
+  console.log(`📡 API Call: PUT /api/dealer-orders/${orderId}`);
+  console.log("📤 Sending update data:", orderData);
+  // Ensure quantity is a number if present
+  const dataToSend = orderData.quantity
+      ? { ...orderData, quantity: Number(orderData.quantity) }
+      : orderData;
+  return api.put(`/dealer-orders/${orderId}`, dataToSend);
+};
+
 // ============================================
 // CÁC API KHÁC LIÊN QUAN ĐẾN DEALER (nếu cần)
 // Ví dụ: DealerContract, DealerOrder, DealerPayment
