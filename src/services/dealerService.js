@@ -241,3 +241,13 @@ export const updateDealerPayment = (paymentId, paymentData) => {
   console.log("📤 Sending update data:", dataToSend);
   return api.put(`/dealer-payments/${paymentId}`, dataToSend);
 };
+
+/**
+ * DELETE Dealer Payment
+ * @param {string|number} paymentId
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const deleteDealerPayment = (paymentId) => {
+  console.log(`📡 API Call: DELETE /api/dealer-payments/${paymentId}`);
+  return api.delete(`/dealer-payments/${paymentId}`);
+};
