@@ -196,8 +196,9 @@ export default function DealerPaymentModal({ show, onClose, onSaveSuccess, deale
                     </div>
                 </div>
             </div>
-
-
+            
+            {/* MODAL BACKDROP */}
+            {show && <div className="modal-backdrop fade show"></div>}
         </>
     )
 }
