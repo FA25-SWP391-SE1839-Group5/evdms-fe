@@ -236,6 +236,48 @@ export default function DealerOrderManagement() {
                     <button type="button" className="btn-close" onClick={() => setSuccess('')}></button>
                 </div>
             )}
+
+            <div className="card">
+                {/* Header: Search, Entries, Export, Add */}
+                <div className="card-header border-bottom">
+                    <div className="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
+                        <div className="col-md-4">
+                            <input 
+                                type="search" 
+                                name="globalSearch"
+                                value={globalSearch}
+                                onChange={handleFilterChange}
+                                className="form-control" 
+                                placeholder="Search Order..." 
+                            />
+                        </div>
+                        <div className="col-md-8 d-flex justify-content-end align-items-center gap-3">
+                            <label className="d-flex align-items-center">
+                                Show&nbsp;
+                                <select 
+                                    className="form-select" 
+                                    value={pageSize} 
+                                    onChange={handlePageSizeChange} 
+                                    style={{ width: 'auto' }}
+                                >
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                                &nbsp;entries
+                            </label>
+                            {/* Export Button (Chưa có logic) */}
+                            <button className="btn btn-secondary" type="button">
+                                <FileText size={18} className="me-1"/> Export
+                            </button>
+                            <button className="btn btn-primary" type="button" onClick={handleAdd}>
+                                <Plus size={18} className="me-1"/> Add Order
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </>
     )
 }
