@@ -177,6 +177,42 @@ export default function DealerOrderManagement() {
         setCurrentPage(1);
     };
 
+    const handleAdd = () => {
+        setOrderToEdit(null);
+        setShowFormModal(true);
+    };
+    const handleSaveSuccess = async (isEdit) => {
+        setShowFormModal(false);
+        setOrderToEdit(null);
+        setSuccess(isEdit ? 'Order updated successfully!' : 'Order created successfully!');
+        try {
+            const ordersRes = await getAllDealerOrders();
+            setOrders(ordersRes.data?.data?.items || []);
+        } catch (err) {
+            setError(err.response?.data?.message || err.message || 'Failed to reload orders');
+        }
+    };
+    const handleEdit = (orderId) => {
+        const order = orders.find(o => o.id === orderId);
+        if (order) {
+            setOrderToEdit(order);
+            setShowFormModal(true);
+        }
+    };
+    const handleDelete = async (orderId) => {
+        const orderNum = formatOrderId(orderId);
+        const confirmMessage = `Are you sure you want to delete Order ${orderNum}?`;
+        if (!window.confirm(confirmMessage)) return;
+        try {
+            await deleteDealerOrder(orderId);
+            setSuccess(`Order ${orderNum} deleted successfully.`);
+            const ordersRes = await getAllDealerOrders();
+            setOrders(ordersRes.data?.data?.items || []);
+        } catch (err) {
+            setError(err.response?.data?.message || err.message || 'Failed to delete order');
+        }
+    };
+
 
     return (
         <div>
