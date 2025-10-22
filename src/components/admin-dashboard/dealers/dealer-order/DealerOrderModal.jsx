@@ -206,6 +206,21 @@ export default function DealerOrderModal({ show, onClose, onSaveSuccess, dealers
                                         disabled={loading}
                                     />
                                 </div>
+
+                                {/* Color */}
+                                <div className="mb-3">
+                                    <label className="form-label" htmlFor="modal-order-color">Color *</label>
+                                    <input
+                                        type="text"
+                                        id="modal-order-color"
+                                        name="color"
+                                        className="form-control"
+                                        placeholder="E.g., Red, Blue"
+                                        value={formData.color}
+                                        onChange={handleChange}
+                                        disabled={loading}
+                                    />
+                                </div>
                             </div>
                         </form>
                     </div>
