@@ -241,6 +241,19 @@ export default function DealerOrderModal({ show, onClose, onSaveSuccess, dealers
                                     </select>
                                 </div>
                             </div>
+                            <div className="modal-footer">
+                                <button 
+                                    type="button" 
+                                    className="btn btn-outline-secondary" 
+                                    onClick={onClose} 
+                                    disabled={loading}
+                                >
+                                    Cancel
+                                </button>
+                                <button type="submit" className="btn btn-primary" disabled={loading || loadingVariants}>
+                                    {loading ? 'Saving...' : (isEditMode ? 'Update Order' : 'Create Order')}
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
