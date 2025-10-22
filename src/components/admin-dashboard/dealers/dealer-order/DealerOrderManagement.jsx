@@ -4,6 +4,10 @@ import { getAllDealerOrders, deleteDealerOrder, getAllDealers, getAllVehicleVari
 import DealerOrderModal from './DealerOrderModal';
 import OrderStatsCards from './OrdersStatsCards';
 
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
+
 // --- Helper Functions ---
 const formatOrderId = (id) => {
     // Chỉ hiển thị vài ký tự cuối của ID cho gọn
@@ -43,10 +47,6 @@ export default function DealerOrderManagement() {
 
     const [pageSize, setPageSize] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
-    const [filterOrderId, setFilterOrderId] = useState('');
-    const [filterDate, setFilterDate] = useState('');
-    const [filterDealer, setFilterDealer] = useState('');
-    const [filterStatus, setFilterStatus] = useState('');
     const [globalSearch, setGlobalSearch] = useState('');
 
     // fetchData to load 3 API
@@ -106,48 +106,38 @@ export default function DealerOrderManagement() {
 
     // Filter Logic
     const filteredOrders = useMemo(() => {
-        return orders.filter(order => {
-            const orderId = formatOrderId(order.id).toLowerCase();
-            const date = formatDate(order.createdAt || order.updatedAt).toLowerCase(); // Giả sử có createdAt
-            const dealerName = (dealerMap[order.dealerId] || '').toLowerCase();
-            const status = (order.status || '').toLowerCase();
-            const variantName = (variantMap[order.variantId] || '').toLowerCase();
-            const color = (order.color || '').toLowerCase();
-            const quantity = String(order.quantity || '').toLowerCase();
+        // Start with all orders
+        let filtered = [...orders];
 
-            // Global search first
-            if (globalSearch) {
-                const searchTermLower = globalSearch.toLowerCase();
-                if (
-                    !orderId.includes(searchTermLower) &&
-                    !date.includes(searchTermLower) &&
-                    !dealerName.includes(searchTermLower) &&
-                    !status.includes(searchTermLower) &&
-                    !variantName.includes(searchTermLower) &&
-                    !color.includes(searchTermLower) &&
-                    !quantity.includes(searchTermLower)
-                ) {
-                    return false; // Skip if global search doesn't match
-                }
-            }
+        // Apply global search if present
+        if (globalSearch) {
+            const searchTermLower = globalSearch.toLowerCase();
+            filtered = filtered.filter(order => {
+                const orderId = formatOrderId(order.id).toLowerCase();
+                const date = formatDate(order.createdAt || order.updatedAt).toLowerCase();
+                const dealerName = (dealerMap[order.dealerId] || '').toLowerCase();
+                const status = (order.status || '').toLowerCase();
+                const variantName = (variantMap[order.variantId] || '').toLowerCase();
+                const color = (order.color || '').toLowerCase();
+                const quantity = String(order.quantity || '').toLowerCase();
 
-            // Then specific column filters
-            const matchesId = filterOrderId === '' || orderId.includes(filterOrderId.toLowerCase());
-            const matchesDate = filterDate === '' || date.includes(filterDate.toLowerCase());
-            const matchesDealer = filterDealer === '' || dealerName.includes(filterDealer.toLowerCase());
-            const matchesStatus = filterStatus === '' || status === filterStatus.toLowerCase();
-
-            return matchesId && matchesDate && matchesDealer && matchesStatus;
-        });
+                return (
+                    orderId.includes(searchTermLower) ||
+                    date.includes(searchTermLower) ||
+                    dealerName.includes(searchTermLower) ||
+                    status.includes(searchTermLower) ||
+                    variantName.includes(searchTermLower) ||
+                    color.includes(searchTermLower) ||
+                    quantity.includes(searchTermLower)
+                );
+            });
+        }
+        return filtered;
     }, [
-        orders, 
-        dealerMap, 
+        orders,
+        dealerMap,
         variantMap,
-        globalSearch,
-        filterOrderId, 
-        filterDate, 
-        filterDealer, 
-        filterStatus
+        globalSearch
     ]);
 
     // Pagination Logic
@@ -164,10 +154,6 @@ export default function DealerOrderManagement() {
         const { name, value } = e.target;
         setCurrentPage(1); 
         switch (name) {
-            case 'filterOrderId': setFilterOrderId(value); break;
-            case 'filterDate': setFilterDate(value); break;
-            case 'filterDealer': setFilterDealer(value); break;
-            case 'filterStatus': setFilterStatus(value); break;
             case 'globalSearch': setGlobalSearch(value); break;
             default: break;
         }
@@ -214,17 +200,107 @@ export default function DealerOrderManagement() {
         }
     };
 
+    const handleExport = (format) => {
+        // Use the currently filtered (and paginated if desired, but usually export all filtered)
+        const exportData = filteredOrders.map(order => ({
+            "Order #": formatOrderId(order.id),
+            "Date": formatDate(order.createdAt || order.updatedAt),
+            "Dealer": dealerMap[order.dealerId] || 'N/A',
+            "Variant": variantMap[order.variantId] || 'N/A',
+            "Qty": order.quantity,
+            "Color": order.color,
+            "Status": order.status || 'N/A'
+        }));
+
+        if (exportData.length === 0) {
+            setError("No data to export based on current filters.");
+            return;
+        }
+
+        const header = ["Order #", "Date", "Dealer", "Variant", "Qty", "Color", "Status"];
+
+        try {
+            switch (format) {
+                case 'pdf': {
+                    const doc = new jsPDF();
+                    doc.text("Dealer Orders List", 14, 16);
+                    autoTable(doc, {
+                        head: [header],
+                        body: exportData.map(Object.values),
+                        startY: 20,
+                    });
+                    doc.save('dealer-orders.pdf');
+                    break;
+                }
+                case 'excel': {
+                    const ws = XLSX.utils.json_to_sheet(exportData, { header: header });
+                    // Rename header row if needed (optional)
+                    // XLSX.utils.sheet_add_aoa(ws, [header], { origin: "A1" });
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "Dealer Orders");
+                    XLSX.writeFile(wb, "dealer-orders.xlsx");
+                    break;
+                }
+                case 'csv': {
+                    const ws = XLSX.utils.json_to_sheet(exportData, { header: header });
+                    const csv = XLSX.utils.sheet_to_csv(ws);
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    if (link.download !== undefined) { // Check for download attribute support
+                        const url = URL.createObjectURL(blob);
+                        link.setAttribute('href', url);
+                        link.setAttribute('download', 'dealer-orders.csv');
+                        link.style.visibility = 'hidden';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }
+                    break;
+                }
+                case 'print': {
+                    const doc = new jsPDF();
+                    doc.text("Dealer Orders List", 14, 16);
+                    autoTable(doc, {
+                        head: [header],
+                        body: exportData.map(Object.values),
+                        startY: 20,
+                    });
+                    doc.autoPrint();
+                    doc.output('dataurlnewwindow'); // Open print dialog in new window
+                    break;
+                }
+                case 'copy': {
+                     const textToCopy = [
+                        header.join('\t'), // Header row
+                        ...exportData.map(row => Object.values(row).join('\t')) // Data rows
+                     ].join('\n');
+
+                     navigator.clipboard.writeText(textToCopy).then(() => {
+                        setSuccess('Data copied to clipboard!');
+                     }, (err) => {
+                        setError('Failed to copy data.');
+                        console.error('Copy error:', err);
+                     });
+                     break;
+                }
+                default:
+                    console.warn('Unknown export format:', format);
+                    break;
+            }
+            setSuccess(`Exported data as ${format.toUpperCase()}.`);
+        } catch (exportError) {
+             setError(`Failed to export data as ${format.toUpperCase()}.`);
+             console.error(`Export Error (${format}):`, exportError);
+        }
+    };
+
     if (loadingPageData) {
         return <div className="d-flex justify-content-center align-items-center vh-100"><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div></div>;
     }
 
     return (
         <>
-            <h4 className="fw-bold py-3 mb-4">
-              <span className="text-muted fw-light">Dealers /</span> Dealer Orders
-            </h4>
-
-            {/* 4. Render component thống kê ở đây */}
+            {/* OrderStatsCards */}
             <OrderStatsCards orders={orders} />
 
             {/* Alert Message */}
@@ -242,10 +318,10 @@ export default function DealerOrderManagement() {
             )}
 
             <div className="card">
-                {/* Header: Search, Entries, Export, Add */}
+                {/* Header: Search, Entries, Export, Add */}    
                 <div className="card-header border-bottom">
                     <div className="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
-                        <div className="col-md-4">
+                        <div className="col-md-3">
                             <input 
                                 type="search" 
                                 name="globalSearch"
@@ -255,9 +331,8 @@ export default function DealerOrderManagement() {
                                 placeholder="Search Order..." 
                             />
                         </div>
-                        <div className="col-md-8 d-flex justify-content-end align-items-center gap-3">
+                        <div className="col-md-8 ms-auto d-flex justify-content-end align-items-center gap-3">
                             <label className="d-flex align-items-center">
-                                Show&nbsp;
                                 <select 
                                     className="form-select" 
                                     value={pageSize} 
@@ -269,15 +344,56 @@ export default function DealerOrderManagement() {
                                     <option value="50">50</option>
                                     <option value="100">100</option>
                                 </select>
-                                &nbsp;entries
                             </label>
-                            {/* Export Button (Chưa có logic) */}
-                            <button className="btn btn-secondary" type="button">
-                                <FileText size={18} className="me-1"/> Export
-                            </button>
-                            <button className="btn btn-primary" type="button" onClick={handleAdd}>
-                                <Plus size={18} className="me-1"/> Add Order
-                            </button>
+                            {/* Export Button */}
+                            <div className="btn-group">
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary dropdown-toggle"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                >
+                                    <i className='bx bx-export me-1'></i> Export
+                                </button>
+                                <ul className="dropdown-menu">
+                                    <li>
+                                    <button type="button" className="dropdown-item" onClick={() => handleExport('print')}>
+                                        <i className='bx bx-printer me-2'></i> Print
+                                    </button>
+                                    </li>
+                                    <li>
+                                    <button type="button" className="dropdown-item" onClick={() => handleExport('csv')}>
+                                        <i className='bx bx-file me-2'></i> Csv
+                                    </button>
+                                    </li>
+                                    <li>
+                                    <button type="button" className="dropdown-item" onClick={() => handleExport('excel')}>
+                                        <i className='bx bx-file-blank me-2'></i> Excel
+                                    </button>
+                                    </li>
+                                    <li>
+                                    <button type="button" className="dropdown-item" onClick={() => handleExport('pdf')}>
+                                        <i className='bx bxs-file-pdf me-2'></i> Pdf
+                                    </button>
+                                    </li>
+                                    <li><hr className="dropdown-divider" /></li>
+                                    <li>
+                                    <button type="button" className="dropdown-item" onClick={() => handleExport('copy')}>
+                                        <i className='bx bx-copy me-2'></i> Copy
+                                    </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div className="col-md-auto">
+                                <button
+                                    type="button"
+                                    className="btn btn-primary rounded-pill d-flex align-items-center"
+                                    onClick={handleAdd}
+                                >
+                                    <Plus size={18} className="me-2" />
+                                    <span className="fw-semibold">Add Order</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -295,31 +411,6 @@ export default function DealerOrderManagement() {
                                 <th>Color</th>
                                 <th>Status</th>
                                 <th>Actions</th>
-                            </tr>
-                            <tr className="filters">
-                                <th>
-                                    <input type="text" name="filterOrderId" value={filterOrderId} onChange={handleFilterChange} className="form-control" placeholder="Search #" />
-                                </th>
-                                <th>
-                                    <input type="text" name="filterDate" value={filterDate} onChange={handleFilterChange} className="form-control" placeholder="Search Date" />
-                                </th>
-                                <th>
-                                    <input type="text" name="filterDealer" value={filterDealer} onChange={handleFilterChange} className="form-control" placeholder="Search Dealer" />
-                                </th>
-                                <th>{/* Filter Variant? Maybe later */}</th>
-                                <th>{/* Filter Qty? */}</th>
-                                <th>{/* Filter Color? */}</th>
-                                <th>
-                                    <select name="filterStatus" value={filterStatus} onChange={handleFilterChange} className="form-select">
-                                        <option value="">All</option>
-                                        <option value="pending">Pending</option>
-                                        <option value="processing">Processing</option>
-                                        <option value="shipped">Shipped</option>
-                                        <option value="delivered">Delivered</option>
-                                        <option value="cancelled">Cancelled</option>
-                                    </select>
-                                </th>
-                                <th></th>
                             </tr>
                         </thead>
                         <tbody className="table-border-bottom-0">
