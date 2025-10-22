@@ -351,7 +351,7 @@ export default function DealerContractManagement() {
               </div>
             )}
             {success && (
-              <div className="alert alert-success alert-dismissible d-flex align-items-center mb-4" role="alert">
+            <div className="alert alert-success alert-dismissible d-flex align-items-center mb-4" role="alert">
                 <CheckCircle size={20} className="me-2" />
                 <div className="flex-grow-1">{success}</div>
                 <button type="button" className="btn-close" onClick={() => setSuccess('')}></button>
@@ -425,141 +425,142 @@ export default function DealerContractManagement() {
                                 </ul>
                             </div>
                         
-                        {/* Add Contract */}
-                        <div className="col-md-auto ms-auto">
-                            <button
-                              type="button"
-                              className="btn btn-primary rounded-pill d-flex align-items-center"
-                              onClick={handleAdd}
-                            >
-                              <Plus size={18} className="me-2" />
-                              <span className="fw-semibold">Add Contract</span>
-                            </button>
+                            {/* Add Contract */}
+                            <div className="col-md-auto ms-auto">
+                                <button
+                                type="button"
+                                className="btn btn-primary rounded-pill d-flex align-items-center"
+                                onClick={handleAdd}
+                                >
+                                <Plus size={18} className="me-2" />
+                                <span className="fw-semibold">Add Contract</span>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                </div>              
-                <div className="card-datatable table-responsive">
-                    <table className="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Dealer</th>
-                                <th className="border-start">Start Date</th>
-                                <th className="border-start">End Date</th>
-                                <th className="border-start">Sales Target</th>
-                                <th className="border-start">Status</th>
-                                <th className="border-start">Actions</th>
-                            </tr>
-                            {/* FILTER */}
-                            <tr className="filters">
-                                <th>
-                                    <input
-                                        type="text"
-                                        name="filterDealerName"
-                                        className="form-control"
-                                        placeholder="Search Dealer"
-                                        value={filterDealerName}
-                                        onChange={handleFilterChange}
-                                    />
-                                </th>
-                                <th className="border-start">
-                                    <input
-                                        type="text"
-                                        name="filterStartDate"
-                                        className="form-control"
-                                        placeholder="Search Date"
-                                        value={filterStartDate}
-                                        onChange={handleFilterChange}
-                                    />
-                                </th>
-                                <th className="border-start">
-                                    <input
-                                        type="text"
-                                        name="filterEndDate"
-                                        className="form-control"
-                                        placeholder="Search Date"
-                                        value={filterEndDate}
-                                        onChange={handleFilterChange}
-                                    />
-                                </th>
-                                <th className="border-start">
-                                    <input
-                                        type="text"
-                                        name="filterSalesTarget"
-                                        className="form-control"
-                                        placeholder="Search Target"
-                                        value={filterSalesTarget}
-                                        onChange={handleFilterChange}
-                                    />
-                                </th>
-                                <th className="border-start">
-                                    <select
-                                        name="filterStatus"
-                                        className="form-select"
-                                        value={filterStatus}
-                                        onChange={handleFilterChange}
-                                    >
-                                        <option value="">All</option>
-                                        <option value="active">Active</option>
-                                        <option value="pending">Pending</option>
-                                        <option value="expired">Expired</option>
-                                    </select>
-                                </th>
-                                <th className="border-start">{/* Actions column has no filter */}</th>
-                            </tr>
-                        </thead>
+                    </div>              
+                    <div className="card-datatable table-responsive">
+                        <table className="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Dealer</th>
+                                    <th className="border-start">Start Date</th>
+                                    <th className="border-start">End Date</th>
+                                    <th className="border-start">Sales Target</th>
+                                    <th className="border-start">Status</th>
+                                    <th className="border-start">Actions</th>
+                                </tr>
+
+                                {/* FILTER */}
+                                <tr className="filters">
+                                    <th>
+                                        <input
+                                            type="text"
+                                            name="filterDealerName"
+                                            className="form-control"
+                                            placeholder="Search Dealer"
+                                            value={filterDealerName}
+                                            onChange={handleFilterChange}
+                                        />
+                                    </th>
+                                    <th className="border-start">
+                                        <input
+                                            type="text"
+                                            name="filterStartDate"
+                                            className="form-control"
+                                            placeholder="Search Date"
+                                            value={filterStartDate}
+                                            onChange={handleFilterChange}
+                                        />
+                                    </th>
+                                    <th className="border-start">
+                                        <input
+                                            type="text"
+                                            name="filterEndDate"
+                                            className="form-control"
+                                            placeholder="Search Date"
+                                            value={filterEndDate}
+                                            onChange={handleFilterChange}
+                                        />
+                                    </th>
+                                    <th className="border-start">
+                                        <input
+                                            type="text"
+                                            name="filterSalesTarget"
+                                            className="form-control"
+                                            placeholder="Search Target"
+                                            value={filterSalesTarget}
+                                            onChange={handleFilterChange}
+                                        />
+                                    </th>
+                                    <th className="border-start">
+                                        <select
+                                            name="filterStatus"
+                                            className="form-select"
+                                            value={filterStatus}
+                                            onChange={handleFilterChange}
+                                        >
+                                            <option value="">All</option>
+                                            <option value="active">Active</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="expired">Expired</option>
+                                        </select>
+                                    </th>
+                                    <th className="border-start">{/* Actions column has no filter */}</th>
+                                </tr>
+                            </thead>
                         <tbody className="table-border-bottom-0">
                             {paginatedContracts.length === 0 ? (
-                            <tr>
-                                <td colSpan="6" className="text-center py-4">
-                                    {/* Cập nhật thông báo rỗng */}
-                                    {filteredContracts.length === 0 && !filterDealerName && !filterStartDate && !filterEndDate && !filterSalesTarget && !filterStatus
-                                        ? 'No contracts found'
-                                        : 'No contracts match your filters'}
-                                </td>
-                            </tr>
-                            ) : (
-                            paginatedContracts.map(contract => (
-                                <tr key={contract.id}>
-                                    <td>
-                                        <span 
-                                            type="button"
-                                            onClick={() => handleShowDealerDetails(contract.dealerId)}
-                                            title="View details"
-                                        >
-                                            {dealerMap[contract.dealerId] || 'Loading...'}
-                                        </span>
-                                    </td>
-                                    <td>{formatDate(contract.startDate)}</td>
-                                    <td>{formatDate(contract.endDate)}</td>
-                                    <td>{formatCurrency(contract.salesTarget)}</td>
-                                    <td>
-                                        <RenderContractStatus 
-                                            startDate={contract.startDate} 
-                                            endDate={contract.endDate} 
-                                        />
-                                    </td>
-                                    <td>
-                                        <div className="d-flex align-items-center">
-                                            <button 
-                                                type="button" 
-                                                className="btn btn-icon btn-text-secondary rounded-pill btn-sm"
-                                                title="Edit"
-                                                onClick={() => handleEdit(contract.id)}
-                                            >
-                                                <Edit size={18} />
-                                            </button>
-                                            <button 
-                                                type="button" 
-                                                className="btn btn-icon btn-text-secondary rounded-pill btn-sm"
-                                                title="Delete"
-                                                onClick={() => handleDelete(contract.id, dealerMap[contract.dealerId])}
-                                            >
-                                                <Trash size={18} />
-                                            </button>
-                                        </div>
+                                <tr>
+                                    <td colSpan="6" className="text-center py-4">
+                                        {/* Cập nhật thông báo rỗng */}
+                                        {filteredContracts.length === 0 && !filterDealerName && !filterStartDate && !filterEndDate && !filterSalesTarget && !filterStatus
+                                            ? 'No contracts found'
+                                            : 'No contracts match your filters'}
                                     </td>
                                 </tr>
-                            ))
+                                ) : (
+                                paginatedContracts.map(contract => (
+                                    <tr key={contract.id}>
+                                        <td>
+                                            <span 
+                                                type="button"
+                                                onClick={() => handleShowDealerDetails(contract.dealerId)}
+                                                title="View details"
+                                            >
+                                                {dealerMap[contract.dealerId] || 'Loading...'}
+                                            </span>
+                                        </td>
+                                        <td>{formatDate(contract.startDate)}</td>
+                                        <td>{formatDate(contract.endDate)}</td>
+                                        <td>{formatCurrency(contract.salesTarget)}</td>
+                                        <td>
+                                            <RenderContractStatus 
+                                                startDate={contract.startDate} 
+                                                endDate={contract.endDate} 
+                                            />
+                                        </td>
+                                        <td>
+                                            <div className="d-flex align-items-center">
+                                                <button 
+                                                    type="button" 
+                                                    className="btn btn-icon btn-text-secondary rounded-pill btn-sm"
+                                                    title="Edit"
+                                                    onClick={() => handleEdit(contract.id)}
+                                                >
+                                                    <Edit size={18} />
+                                                </button>
+                                                <button 
+                                                    type="button" 
+                                                    className="btn btn-icon btn-text-secondary rounded-pill btn-sm"
+                                                    title="Delete"
+                                                    onClick={() => handleDelete(contract.id, dealerMap[contract.dealerId])}
+                                                >
+                                                    <Trash size={18} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
                             )}
                         </tbody>
                     </table>
@@ -581,40 +582,41 @@ export default function DealerContractManagement() {
                           &laquo; Previous
                         </button>
                       </li>
-                      {/* Thêm logic render số trang ở đây nếu muốn */}
-                      <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
-                        <button 
-                          className="page-link" 
-                          onClick={() => setCurrentPage(p => p + 1)}
-                          disabled={currentPage === totalPages || totalPages === 0}
-                        >
-                          Next &raquo;
-                        </button>
-                      </li>
-                    </ul>
-                  </nav>
+
+                                {/* Thêm logic render số trang ở đây nếu muốn */}
+                                <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
+                                    <button 
+                                        className="page-link" 
+                                        onClick={() => setCurrentPage(p => p + 1)}
+                                        disabled={currentPage === totalPages || totalPages === 0}
+                                    >
+                                        Next &raquo;
+                                    </button>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
                 </div>
-            </div>
             
-            {/* FORM */}
-            <DealerContractForm
-                show={showFormModal}
-                onClose={() => {
-                    setShowFormModal(false);
-                    setContractToEdit(null); 
-                }}
-                onSaveSuccess={handleSaveSuccess}
-                dealers={dealers} 
-                contractToEdit={contractToEdit}
-            />
+                {/* FORM */}
+                <DealerContractForm
+                    show={showFormModal}
+                    onClose={() => {
+                        setShowFormModal(false);
+                        setContractToEdit(null); 
+                    }}
+                    onSaveSuccess={handleSaveSuccess}
+                    dealers={dealers} 
+                    contractToEdit={contractToEdit}
+                />
             
-             {/* DETAILS FORM */}
-            <DealerContractDetailsModal
-               show={showDealerDetailsModal}
-               onClose={() => setShowDealerDetailsModal(false)}
-               dealer={viewingDealer}
-               renderStatusBadge={renderDealerStatusBadge} // Dùng hàm render badge bạn đã có
-           />
+                {/* DETAILS FORM */}
+                <DealerContractDetailsModal
+                    show={showDealerDetailsModal}
+                    onClose={() => setShowDealerDetailsModal(false)}
+                    dealer={viewingDealer}
+                    renderStatusBadge={renderDealerStatusBadge} // Dùng hàm render badge bạn đã có
+                />
            </div>
         </>
     )
