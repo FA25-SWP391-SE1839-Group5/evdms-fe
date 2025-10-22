@@ -170,6 +170,27 @@ export default function DealerOrderModal({ show, onClose, onSaveSuccess, dealers
                                         ))}
                                     </select>
                                 </div>
+
+                                {/* Variant Select */}
+                                <div className="mb-3">
+                                    <label className="form-label" htmlFor="modal-order-variantId">Vehicle Variant *</label>
+                                    <select
+                                        id="modal-order-variantId"
+                                        name="variantId"
+                                        className="form-select"
+                                        value={formData.variantId}
+                                        onChange={handleChange}
+                                        disabled={loading || loadingVariants} 
+                                    >
+                                        <option value="">-- Select Variant --</option>
+                                        {variants.map(variant => (
+                                            <option key={variant.id} value={variant.id}>
+                                                {variant.name} 
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {loadingVariants && <div className="form-text text-muted">Loading variants...</div>}
+                                </div>
                             </div>
                         </form>
                     </div>
