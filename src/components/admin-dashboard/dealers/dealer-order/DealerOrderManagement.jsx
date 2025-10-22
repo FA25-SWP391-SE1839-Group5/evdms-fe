@@ -158,7 +158,19 @@ export default function DealerOrderManagement() {
     const startEntry = filteredOrders.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
     const endEntry = Math.min(currentPage * pageSize, filteredOrders.length);
 
-
+    // Handlers
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setCurrentPage(1); 
+        switch (name) {
+            case 'filterOrderId': setFilterOrderId(value); break;
+            case 'filterDate': setFilterDate(value); break;
+            case 'filterDealer': setFilterDealer(value); break;
+            case 'filterStatus': setFilterStatus(value); break;
+            case 'globalSearch': setGlobalSearch(value); break;
+            default: break;
+        }
+    };
 
 
 
