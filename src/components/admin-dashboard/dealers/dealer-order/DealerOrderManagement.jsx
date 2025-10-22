@@ -277,6 +277,83 @@ export default function DealerOrderManagement() {
                         </div>
                     </div>
                 </div>
+
+                {/* Table */}
+                <div className="table-responsive text-nowrap">
+                    <table className="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Order</th>
+                                <th>Date</th>
+                                <th>Dealer</th>
+                                <th>Variant</th>
+                                <th>Qty</th>
+                                <th>Color</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                            <tr className="filters">
+                                <th>
+                                    <input type="text" name="filterOrderId" value={filterOrderId} onChange={handleFilterChange} className="form-control" placeholder="Search #" />
+                                </th>
+                                <th>
+                                    <input type="text" name="filterDate" value={filterDate} onChange={handleFilterChange} className="form-control" placeholder="Search Date" />
+                                </th>
+                                <th>
+                                    <input type="text" name="filterDealer" value={filterDealer} onChange={handleFilterChange} className="form-control" placeholder="Search Dealer" />
+                                </th>
+                                <th>{/* Filter Variant? Maybe later */}</th>
+                                <th>{/* Filter Qty? */}</th>
+                                <th>{/* Filter Color? */}</th>
+                                <th>
+                                    <select name="filterStatus" value={filterStatus} onChange={handleFilterChange} className="form-select">
+                                        <option value="">All</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="processing">Processing</option>
+                                        <option value="shipped">Shipped</option>
+                                        <option value="delivered">Delivered</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody className="table-border-bottom-0">
+                            {paginatedOrders.length === 0 ? (
+                                <tr><td colSpan="8" className="text-center py-4">No orders found.</td></tr>
+                            ) : (
+                                paginatedOrders.map(order => (
+                                    <tr key={order.id}>
+                                        <td>
+                                            <span className="fw-semibold text-primary">{formatOrderId(order.id)}</span>
+                                        </td>
+                                        <td>{formatDate(order.createdAt || order.updatedAt)}</td>
+                                        <td>{dealerMap[order.dealerId] || 'N/A'}</td>
+                                        <td>{variantMap[order.variantId] || 'N/A'}</td>
+                                        <td>{order.quantity}</td>
+                                        <td>{order.color}</td>
+                                        <td><RenderOrderStatus status={order.status} /></td>
+                                        <td>
+                                            <div className="dropdown">
+                                                <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                                    <i className="bx bx-dots-vertical-rounded"></i>
+                                                </button>
+                                                <div className="dropdown-menu">
+                                                    <button className="dropdown-item" onClick={() => handleEdit(order.id)}>
+                                                        <Edit size={16} className="me-1"/> Edit
+                                                    </button>
+                                                    <button className="dropdown-item text-danger" onClick={() => handleDelete(order.id)}>
+                                                        <Trash size={16} className="me-1"/> Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </>
     )
