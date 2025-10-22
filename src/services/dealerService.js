@@ -1,4 +1,4 @@
-import api from "../api";
+import api from "./api";
 
 // ============================================
 // API CALLS - DEALERS
@@ -171,6 +171,16 @@ export const updateDealerOrder = (orderId, orderData) => {
       ? { ...orderData, quantity: Number(orderData.quantity) }
       : orderData;
   return api.put(`/dealer-orders/${orderId}`, dataToSend);
+};
+
+/**
+ * DELETE Dealer Order
+ * @param {string|number} orderId
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const deleteDealerOrder = (orderId) => {
+  console.log(`📡 API Call: DELETE /api/dealer-orders/${orderId}`);
+  return api.delete(`/dealer-orders/${orderId}`);
 };
 
 // ============================================

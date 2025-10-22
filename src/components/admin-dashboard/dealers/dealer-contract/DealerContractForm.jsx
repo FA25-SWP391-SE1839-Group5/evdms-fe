@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { AlertCircle } from 'lucide-react';
-import { createDealerContract, updateDealerContract } from '../../../../services/admin/dealerService';
+import { createDealerContract, updateDealerContract } from '../../../../services/dealerService';
 
 // Hàm helper để format ngày cho input datetime-local
     const toDatetimeLocal = (isoDate) => {

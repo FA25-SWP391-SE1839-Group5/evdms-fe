@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AlertCircle, CheckCircle, Plus, Edit, Trash } from 'lucide-react';
-import { getAllDealers, getAllDealerContracts, deleteDealerContract } from '../../../../services/admin/dealerService';
+import { getAllDealers, getAllDealerContracts, deleteDealerContract } from '../../../../services/dealerService';
 import DealerContractForm from './DealerContractForm';
 import DealerContractDetailsModal from './DealerContractDetailsModal';
 
