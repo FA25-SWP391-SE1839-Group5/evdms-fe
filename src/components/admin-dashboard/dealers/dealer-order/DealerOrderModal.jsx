@@ -1,9 +1,7 @@
-import React { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AlertCircle } from 'lucide-react';
 import { createDealerOrder, updateDealerOrder } from '../../../../services/dealerService';
 import { getAllVehicleVariants } from '../../../../services/dealerService';
-import { useState } from 'react';
-import { useEffect } from 'react';
 
 export default function DealerOrderModal({ show, onClose, onSaveSuccess, dealers, orderToEdit }) {
     const isEditMode = Boolean(orderToEdit);
