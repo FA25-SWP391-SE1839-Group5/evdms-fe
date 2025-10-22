@@ -191,6 +191,21 @@ export default function DealerOrderModal({ show, onClose, onSaveSuccess, dealers
                                     </select>
                                     {loadingVariants && <div className="form-text text-muted">Loading variants...</div>}
                                 </div>
+
+                                {/* Quantity */}
+                                <div className="mb-3">
+                                    <label className="form-label" htmlFor="modal-order-quantity">Quantity *</label>
+                                    <input
+                                        type="number"
+                                        id="modal-order-quantity"
+                                        name="quantity"
+                                        className="form-control"
+                                        min="1"
+                                        value={formData.quantity}
+                                        onChange={handleChange}
+                                        disabled={loading}
+                                    />
+                                </div>
                             </div>
                         </form>
                     </div>
