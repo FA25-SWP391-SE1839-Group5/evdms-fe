@@ -172,6 +172,10 @@ export default function DealerOrderManagement() {
         }
     };
 
+    const handlePageSizeChange = (e) => {
+        setPageSize(Number(e.target.value));
+        setCurrentPage(1);
+    };
 
 
     return (
