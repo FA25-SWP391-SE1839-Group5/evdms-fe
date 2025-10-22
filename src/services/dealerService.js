@@ -225,3 +225,19 @@ export const createDealerPayment = (paymentData) => {
   console.log("📤 Sending data:", dataToSend);
   return api.post('/dealer-payments', dataToSend);
 };
+
+/**
+ * UPDATE Dealer Payment (e.g., amount, method)
+ * @param {string|number} paymentId
+ * @param {object} paymentData
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const updateDealerPayment = (paymentId, paymentData) => {
+  console.log(`📡 API Call: PUT /api/dealer-payments/${paymentId}`);
+   // Ensure amount is a number if present
+   const dataToSend = paymentData.amount
+      ? { ...paymentData, amount: Number(paymentData.amount) }
+      : paymentData;
+  console.log("📤 Sending update data:", dataToSend);
+  return api.put(`/dealer-payments/${paymentId}`, dataToSend);
+};
