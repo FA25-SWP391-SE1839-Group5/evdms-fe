@@ -184,6 +184,20 @@ export const deleteDealerOrder = (orderId) => {
 };
 
 // ============================================
+// API CALLS - VEHICLE VARIANTS 
+// ============================================
+
+/**
+ * Get All Vehicle Variants
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const getAllVehicleVariants = () => {
+    console.log("📡 API Call: GET /api/vehicle-variants");
+    // Giả định endpoint là '/vehicle-variants', hãy sửa nếu cần
+    return api.get('/vehicle-variants'); 
+};
+
+// ============================================
 // CÁC API KHÁC LIÊN QUAN ĐẾN DEALER (nếu cần)
 // Ví dụ: DealerContract, DealerOrder, DealerPayment
 // Bạn có thể thêm các hàm tương tự ở đây
