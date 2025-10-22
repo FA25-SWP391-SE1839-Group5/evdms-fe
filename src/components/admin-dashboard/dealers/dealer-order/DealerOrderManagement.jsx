@@ -216,10 +216,12 @@ export default function DealerOrderManagement() {
     if (loading) { /* ... loading spinner ... */ 
         return <div className="d-flex justify-content-center align-items-center vh-100"><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div></div>;
     }
-    
-    return (
-        <div>
 
-        </div>
+    return (
+        <>
+            <h4 className="fw-bold py-3 mb-4">
+              <span className="text-muted fw-light">Dealers /</span> Dealer Orders
+            </h4>
+        </>
     )
 }
