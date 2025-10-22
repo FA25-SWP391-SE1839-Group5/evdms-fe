@@ -262,3 +262,14 @@ export const markPaymentPaid = (paymentId) => {
   // POST request typically doesn't need a body for this kind of action
   return api.post(`/dealer-payments/${paymentId}/mark-paid`);
 };
+
+/**
+ * Mark Dealer Payment as FAILED
+ * @param {string|number} paymentId
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const markPaymentFailed = (paymentId) => {
+  console.log(`📡 API Call: POST /api/dealer-payments/${paymentId}/mark-failed`);
+  // POST request typically doesn't need a body
+  return api.post(`/dealer-payments/${paymentId}/mark-failed`);
+};
