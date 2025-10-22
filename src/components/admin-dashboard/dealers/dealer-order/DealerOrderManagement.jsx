@@ -149,6 +149,15 @@ export default function DealerOrderManagement() {
         filterStatus
     ]);
 
+    // Pagination Logic
+    const totalPages = Math.ceil(filteredOrders.length / pageSize);
+    const paginatedOrders = useMemo(() => {
+        const startIndex = (currentPage - 1) * pageSize;
+        return filteredOrders.slice(startIndex, startIndex + pageSize);
+    }, [filteredOrders, currentPage, pageSize]);
+    const startEntry = filteredOrders.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+    const endEntry = Math.min(currentPage * pageSize, filteredOrders.length);
+
 
 
 
