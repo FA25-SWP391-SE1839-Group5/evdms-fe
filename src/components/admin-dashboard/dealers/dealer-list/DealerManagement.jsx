@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 // Giả định bạn có service cho dealers
-import { getAllDealers, createDealer, updateDealer, deleteDealer } from '../../../../services/dealerService';
+import { getAllDealers, createDealer, updateDealer, deleteDealer } from '../../../../services/admin/dealerService';
 import { AlertCircle, CheckCircle, Plus } from 'lucide-react';
 import DealerDetailsModal from './DealerDetailsModal';
 import DealerModal from './DealerModal';

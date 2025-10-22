@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, AlertCircle, CheckCircle } from 'lucide-react';
-import { getAllUsers, createUser, updateUser, deleteUser } from '../../../services/dashboardService';
+import { getAllUsers, createUser, updateUser, deleteUser } from '../../../services/admin/dashboardService';
 import UserModal from './UserModal';
 import UserDetailsModal from './UserDetailsModal';
 

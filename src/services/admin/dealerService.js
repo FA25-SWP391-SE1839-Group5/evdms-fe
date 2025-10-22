@@ -1,4 +1,4 @@
-import api from "./api";
+import api from "../api";
 
 // ============================================
 // API CALLS - DEALERS
@@ -126,6 +126,19 @@ export const deleteDealerContract = (contractId) => {
   console.log(`📡 API Call: DELETE /api/dealer-contracts/${contractId}`);
   return api.delete(`/dealer-contracts/${contractId}`);
 };
+
+// ============================================
+// API CALLS - DEALER ORDERS 
+// ============================================
+/**
+ * Get All Dealer Orders
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const getAllDealerOrders = () => {
+    console.log("📡 API Call: GET /api/dealer-orders");
+    return api.get('/dealer-orders');
+};
+
 
 // ============================================
 // CÁC API KHÁC LIÊN QUAN ĐẾN DEALER (nếu cần)
