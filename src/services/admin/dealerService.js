@@ -139,6 +139,23 @@ export const getAllDealerOrders = () => {
     return api.get('/dealer-orders');
 };
 
+/**
+ * CREATE Dealer Order
+ * @param {object} orderData - Dữ liệu Order mới
+ * @param {string} orderData.dealerId
+ * @param {string} orderData.variantId // ID của biến thể xe
+ * @param {number} orderData.quantity
+ * @param {string} orderData.color
+ * @param {string} orderData.status // e.g., 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const createDealerOrder = (orderData) => {
+  console.log("📡 API Call: POST /api/dealer-orders");
+  console.log("📤 Sending data:", orderData);
+  // Ensure quantity is a number
+  const dataToSend = { ...orderData, quantity: Number(orderData.quantity) || 1 };
+  return api.post('/dealer-orders', dataToSend);
+};
 
 // ============================================
 // CÁC API KHÁC LIÊN QUAN ĐẾN DEALER (nếu cần)
