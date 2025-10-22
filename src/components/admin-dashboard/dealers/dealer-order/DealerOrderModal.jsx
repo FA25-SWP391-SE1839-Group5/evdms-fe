@@ -150,6 +150,26 @@ export default function DealerOrderModal({ show, onClose, onSaveSuccess, dealers
                                         <div>{error}</div>
                                     </div>
                                 )}
+
+                                {/* Dealer Select */}
+                                <div className="mb-3">
+                                    <label className="form-label" htmlFor="modal-order-dealerId">Dealer *</label>
+                                    <select
+                                        id="modal-order-dealerId"
+                                        name="dealerId"
+                                        className="form-select"
+                                        value={formData.dealerId}
+                                        onChange={handleChange}
+                                        disabled={isEditMode || loading} // Không cho đổi dealer khi edit
+                                    >
+                                        <option value="">-- Select Dealer --</option>
+                                        {dealers && dealers.map(dealer => (
+                                            <option key={dealer.id} value={dealer.id}>
+                                                {dealer.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
                         </form>
                     </div>
