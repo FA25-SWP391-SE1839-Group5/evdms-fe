@@ -301,6 +301,22 @@ export default function DealerPaymentManagement() {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination */}
+                <div className="d-flex justify-content-between align-items-center p-3">
+                    <small className="text-muted">Showing {startEntry} to {endEntry} of {filteredPayments.length} entries</small>
+                    <nav>
+                        <ul className="pagination pagination-sm mb-0">
+                            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                                <button className="page-link" onClick={() => setCurrentPage(p=>p-1)} disabled={currentPage === 1}>&laquo;</button>
+                            </li>
+                            <li className="page-item active"><span className="page-link">{currentPage}</span></li>
+                            <li className={`page-item ${currentPage >= totalPages ? 'disabled' : ''}`}>
+                                <button className="page-link" onClick={() => setCurrentPage(p=>p+1)} disabled={currentPage >= totalPages}>&raquo;</button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
             </div>
         </>
     )
