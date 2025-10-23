@@ -180,6 +180,22 @@ export default function DealerPaymentManagement() {
         <>
             {/* Stats Cards */}
             <DealerPaymentStatsCards payments={payments} />
+
+            {/* Alert Message */}
+            {error && ( /* ... error alert ... */ 
+                <div className="alert alert-danger alert-dismissible d-flex align-items-center mb-4" role="alert">
+                    <AlertCircle size={20} className="me-2" /><div className="flex-grow-1">{error}</div>
+                    <button type="button" className="btn-close" onClick={() => setError('')}></button>
+                </div>
+            )}
+            {success && ( /* ... success alert ... */ 
+                <div className="alert alert-success alert-dismissible d-flex align-items-center mb-4" role="alert">
+                    <CheckCircle size={20} className="me-2" /><div className="flex-grow-1">{success}</div>
+                    <button type="button" className="btn-close" onClick={() => setSuccess('')}></button>
+                </div>
+            )}
+
+            
         </>
     )
 }
