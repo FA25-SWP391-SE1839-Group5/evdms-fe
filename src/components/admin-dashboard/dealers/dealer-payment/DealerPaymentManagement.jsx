@@ -199,6 +199,7 @@ export default function DealerPaymentManagement() {
                 {/* Header: Show, Create, Search, Filter */}
                 <div className="card-header border-bottom">
                     <div className="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
+                        
                         {/* Left: Show Entries & Create */}
                         <div className="col-md-4 d-flex align-items-center gap-3">
                             <label className="d-flex align-items-center">
@@ -210,6 +211,30 @@ export default function DealerPaymentManagement() {
                              <button className="btn btn-primary" type="button" onClick={handleAdd}>
                                 <Plus size={18} className="me-1"/> Create Payment
                             </button>
+                        </div>
+
+                        {/* Right: Search & Status Filter */}
+                        <div className="col-md-4 ms-auto d-flex align-items-center gap-3">
+                             <input
+                                type="search"
+                                name="globalSearch"
+                                value={globalSearch}
+                                onChange={handleFilterChange}
+                                className="form-control"
+                                placeholder="Search..."
+                            />
+                             <select
+                                name="statusFilter"
+                                className="form-select"
+                                value={statusFilter}
+                                onChange={handleFilterChange}
+                             >
+                                <option value="">All Status</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Paid">Paid</option>
+                                <option value="Failed">Failed</option>
+                                {/* Add other statuses if needed */}
+                             </select>
                         </div>
                     </div>
                 </div>
