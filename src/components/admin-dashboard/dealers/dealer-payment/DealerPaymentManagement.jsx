@@ -119,6 +119,59 @@ export default function DealerPaymentManagement() {
     const startEntry = filteredPayments.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
     const endEntry = Math.min(currentPage * pageSize, filteredPayments.length);
 
+    // --- Handlers ---
+    const reloadPayments = async () => {
+         try {
+            const paymentsRes = await getAllDealerPayments();
+            setPayments(paymentsRes.data?.data?.items || paymentsRes.data?.items || paymentsRes.data || []);
+        } catch (err) {
+            setError(err.response?.data?.message || err.message || 'Failed to reload payments');
+        }
+    }
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setCurrentPage(1);
+        if (name === 'globalSearch') setGlobalSearch(value);
+        if (name === 'statusFilter') setStatusFilter(value);
+    };
+    const handlePageSizeChange = (e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); };
+    const handleAdd = () => { setPaymentToEdit(null); setShowFormModal(true); };
+    const handleSaveSuccess = (isEdit) => {
+        setShowFormModal(false);
+        setPaymentToEdit(null);
+        setSuccess(isEdit ? 'Payment updated successfully!' : 'Payment created successfully!');
+        reloadPayments(); // Reload data
+    };
+    const handleEdit = (paymentId) => {
+        const payment = payments.find(p => p.id === paymentId);
+        if (payment) { setPaymentToEdit(payment); setShowFormModal(true); }
+    };
+    const handleDelete = async (paymentId) => {
+        const payId = formatPaymentId(paymentId);
+        if (!window.confirm(`Are you sure you want to delete Payment ${payId}?`)) return;
+        try {
+            await deleteDealerPayment(paymentId);
+            setSuccess(`Payment ${payId} deleted successfully.`);
+            reloadPayments();
+        } catch (err) { setError(err.response?.data?.message || 'Failed to delete payment'); }
+    };
+    const handleMarkPaid = async (paymentId) => {
+        if (!window.confirm(`Mark Payment ${formatPaymentId(paymentId)} as PAID?`)) return;
+        try {
+            await markPaymentPaid(paymentId);
+            setSuccess(`Payment ${formatPaymentId(paymentId)} marked as Paid.`);
+            reloadPayments();
+        } catch (err) { setError(err.response?.data?.message || 'Failed to mark as paid'); }
+    };
+    const handleMarkFailed = async (paymentId) => {
+        if (!window.confirm(`Mark Payment ${formatPaymentId(paymentId)} as FAILED?`)) return;
+         try {
+            await markPaymentFailed(paymentId);
+            setSuccess(`Payment ${formatPaymentId(paymentId)} marked as Failed.`);
+            reloadPayments();
+        } catch (err) { setError(err.response?.data?.message || 'Failed to mark as failed'); }
+    };
+
     return (
         <div>
 
