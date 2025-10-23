@@ -78,7 +78,37 @@ export default function DealerPaymentManagement() {
         }
     }, [error, success]);
 
+    // Filter Logic
+    const filteredPayments = useMemo(() => {
+        return payments.filter(p => {
+            const dealerName = (dealerMap[p.dealerId] || '').toLowerCase();
+            const amount = String(p.amount || '').toLowerCase();
+            const method = (p.paymentMethod || '').toLowerCase();
+            const status = (p.status || '').toLowerCase();
+            const date = formatDate(p.createdAt || p.updatedAt).toLowerCase();
+            const id = formatPaymentId(p.id).toLowerCase();
 
+            // Status filter first
+            if (statusFilter && status !== statusFilter.toLowerCase()) {
+                return false;
+            }
+            // Global search
+            if (globalSearch) {
+                const searchLower = globalSearch.toLowerCase();
+                if (
+                    !id.includes(searchLower) &&
+                    !dealerName.includes(searchLower) &&
+                    !amount.includes(searchLower) &&
+                    !method.includes(searchLower) &&
+                    !date.includes(searchLower)
+                    // Don't search status text here, use filter dropdown
+                ) {
+                    return false;
+                }
+            }
+            return true; // Passed filters
+        });
+    }, [payments, dealerMap, statusFilter, globalSearch]);
 
     return (
         <div>
