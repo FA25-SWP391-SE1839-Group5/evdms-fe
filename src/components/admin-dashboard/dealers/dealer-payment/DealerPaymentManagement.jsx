@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { AlertCircle, CheckCircle, Plus, Edit, Trash, Check, X, MoreVertical } from 'lucide-react';
 import {
     getAllDealerPayments,
@@ -177,8 +177,9 @@ export default function DealerPaymentManagement() {
     }
 
     return (
-        <div>
-
-        </div>
+        <>
+            {/* Stats Cards */}
+            <DealerPaymentStatsCards payments={payments} />
+        </>
     )
 }
