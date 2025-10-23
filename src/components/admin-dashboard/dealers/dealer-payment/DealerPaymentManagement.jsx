@@ -199,7 +199,7 @@ export default function DealerPaymentManagement() {
                 {/* Header: Show, Create, Search, Filter */}
                 <div className="card-header border-bottom">
                     <div className="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
-                        
+
                         {/* Left: Show Entries & Create */}
                         <div className="col-md-4 d-flex align-items-center gap-3">
                             <label className="d-flex align-items-center">
@@ -237,6 +237,69 @@ export default function DealerPaymentManagement() {
                              </select>
                         </div>
                     </div>
+                </div>
+
+                {/* Table */}
+                <div className="table-responsive text-nowrap">
+                    <table className="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Status</th>
+                                <th>Dealer</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Method</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="table-border-bottom-0">
+                            {paginatedPayments.length === 0 ? (
+                                <tr><td colSpan="8" className="text-center py-4">
+                                    {filteredPayments.length === 0 && !globalSearch && !statusFilter ? 'No payments found' : 'No payments match filters'}
+                                </td></tr>
+                            ) : (
+                                paginatedPayments.map(p => (
+                                    <tr key={p.id}>
+                                        <td><input className="form-check-input" type="checkbox" value={p.id} /></td>
+                                        <td><span className="fw-semibold text-primary">{formatPaymentId(p.id)}</span></td>
+                                        <td><RenderPaymentStatus status={p.status} /></td>
+                                        <td>{dealerMap[p.dealerId] || 'N/A'}</td>
+                                        <td>{formatCurrency(p.amount)}</td>
+                                        <td>{formatDate(p.createdAt || p.updatedAt)}</td>
+                                        <td>{p.paymentMethod}</td>
+                                        <td>
+                                            <div className="dropdown">
+                                                <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                                    <MoreVertical size={18}/>
+                                                </button>
+                                                <div className="dropdown-menu">
+                                                    {p.status?.toLowerCase() === 'pending' && (
+                                                        <>
+                                                            <button className="dropdown-item" onClick={() => handleMarkPaid(p.id)}>
+                                                                <Check size={16} className="me-1 text-success"/> Mark Paid
+                                                            </button>
+                                                             <button className="dropdown-item" onClick={() => handleMarkFailed(p.id)}>
+                                                                <X size={16} className="me-1 text-danger"/> Mark Failed
+                                                            </button>
+                                                            <li><hr className="dropdown-divider" /></li>
+                                                        </>
+                                                    )}
+                                                    <button className="dropdown-item" onClick={() => handleEdit(p.id)}>
+                                                        <Edit size={16} className="me-1"/> Edit
+                                                    </button>
+                                                    <button className="dropdown-item text-danger" onClick={() => handleDelete(p.id)}>
+                                                        <Trash size={16} className="me-1"/> Delete
+                                                    </button>
+                                                    {/* Add View/Document actions later if needed */}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </>
