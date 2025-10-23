@@ -31,6 +31,47 @@ const RenderPaymentStatus = ({ status }) => {
 };
 
 export default function DealerPaymentManagement() {
+    const [payments, setPayments] = useState([]);
+    const [dealers, setDealers] = useState([]);
+    const [dealerMap, setDealerMap] = useState({});
+    const [loadingData, setLoadingData] = useState(true);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [showFormModal, setShowFormModal] = useState(false);
+    const [paymentToEdit, setPaymentToEdit] = useState(null);
+
+    // Pagination & Filter State
+    const [pageSize, setPageSize] = useState(10);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [statusFilter, setStatusFilter] = useState(''); // Filter dropdown
+    const [globalSearch, setGlobalSearch] = useState(''); // Search input
+
+    // Fetch Data
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoadingData(true);
+                setError('');
+                const [paymentsRes, dealersRes] = await Promise.all([
+                    getAllDealerPayments(),
+                    getAllDealers(),
+                ]);
+                setPayments(paymentsRes.data?.data?.items || paymentsRes.data?.items || paymentsRes.data || []);
+                const dealerList = dealersRes.data?.data?.items || dealersRes.data?.items || dealersRes.data || [];
+                setDealers(dealerList);
+                const dMap = dealerList.reduce((acc, d) => { acc[d.id] = d.name; return acc; }, {});
+                setDealerMap(dMap);
+            } catch (err) {
+                setError(err.response?.data?.message || err.message || 'Failed to load page data');
+            } finally {
+                setLoadingData(false);
+            }
+        };
+        fetchData();
+    }, []);
+
+
+    
     return (
         <div>
 
