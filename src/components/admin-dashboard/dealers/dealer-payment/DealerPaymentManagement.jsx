@@ -195,7 +195,25 @@ export default function DealerPaymentManagement() {
                 </div>
             )}
 
-            
+            <div className="card">
+                {/* Header: Show, Create, Search, Filter */}
+                <div className="card-header border-bottom">
+                    <div className="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
+                        {/* Left: Show Entries & Create */}
+                        <div className="col-md-4 d-flex align-items-center gap-3">
+                            <label className="d-flex align-items-center">
+                                Show&nbsp;
+                                <select className="form-select form-select-sm" value={pageSize} onChange={handlePageSizeChange} style={{width:'auto'}}>
+                                    <option>10</option><option>25</option><option>50</option><option>100</option>
+                                </select>
+                            </label>
+                             <button className="btn btn-primary" type="button" onClick={handleAdd}>
+                                <Plus size={18} className="me-1"/> Create Payment
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </>
     )
 }
