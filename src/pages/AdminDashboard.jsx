@@ -13,6 +13,7 @@ import UserManagement from '../components/admin-dashboard/users/UserManagement';
 import DealerManagement from '../components/admin-dashboard/dealers/dealer-list/DealerManagement';
 import DealerContractManagement from '../components/admin-dashboard/dealers/dealer-contract/DealerContractManagement';
 import DealerOrderManagement from '../components/admin-dashboard/dealers/dealer-order/DealerOrderManagement';
+import DealerPaymentManagement from '../components/admin-dashboard/dealers/dealer-payment/DealerPaymentManagement';
 
 const AdminDashboard = ({ currentPage = 'dashboard' }) => {
   const renderPageContent = () => {
@@ -48,12 +49,7 @@ const AdminDashboard = ({ currentPage = 'dashboard' }) => {
       case 'dealer-payments':
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
-            <h4 className="fw-bold py-3 mb-4">Dealer Payments</h4>
-            <div className="card">
-              <div className="card-body">
-                <p>Dealer Payments page - Coming soon...</p>
-              </div>
-            </div>
+            <DealerPaymentManagement />
           </div>
         );
 
