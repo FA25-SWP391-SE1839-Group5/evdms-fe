@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { AlertCircle } from 'lucide-react';
 import { createDealerPayment, updateDealerPayment } from '../../../../services/dealerService';
 
