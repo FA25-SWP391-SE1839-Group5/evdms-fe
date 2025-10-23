@@ -110,6 +110,15 @@ export default function DealerPaymentManagement() {
         });
     }, [payments, dealerMap, statusFilter, globalSearch]);
 
+    // Pagination Logic
+    const totalPages = Math.ceil(filteredPayments.length / pageSize);
+    const paginatedPayments = useMemo(() => {
+        const startIndex = (currentPage - 1) * pageSize;
+        return filteredPayments.slice(startIndex, startIndex + pageSize);
+    }, [filteredPayments, currentPage, pageSize]);
+    const startEntry = filteredPayments.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+    const endEntry = Math.min(currentPage * pageSize, filteredPayments.length);
+
     return (
         <div>
 
