@@ -24,7 +24,7 @@ const RenderPaymentStatus = ({ status }) => {
         case 'failed': badgeClass = 'danger'; icon = <XCircle size={14} className="me-1"/>; break;
     }
     // Mimic invoice list style
-    return <span className={`badge rounded-pill bg-label-${badgeClass} d-flex align-items-center p-1 px-2`}><span className="dot bg-${badgeClass} me-1"></span> {status || 'N/A'}</span>;
+    return <span className={`badge rounded-pill bg-label-${badgeClass} d-flex align-items-center p-1 px-2`}><span className={`dot bg-${badgeClass} me-1`}></span> {status || 'N/A'}</span>;
 
     // Original badge style:
     // return <span className={`badge bg-label-${badgeClass}`}>{status || 'N/A'}</span>;
@@ -201,14 +201,26 @@ export default function DealerPaymentManagement() {
                     <div className="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
 
                         {/* Left: Show Entries & Create */}
-                        <div className="col-md-4 d-flex align-items-center gap-3">
+                        <div className="col-md-auto d-flex align-items-center gap-3">
                             <label className="d-flex align-items-center">
                                 Show&nbsp;
-                                <select className="form-select form-select-sm" value={pageSize} onChange={handlePageSizeChange} style={{width:'auto'}}>
-                                    <option>10</option><option>25</option><option>50</option><option>100</option>
+                                <select 
+                                    className="form-select" 
+                                    value={pageSize} 
+                                    onChange={handlePageSizeChange} 
+                                    style={{width:'auto'}}
+                                >
+                                    <option>10</option>
+                                    <option>25</option>
+                                    <option>50</option>
+                                    <option>100</option>
                                 </select>
                             </label>
-                             <button className="btn btn-primary" type="button" onClick={handleAdd}>
+                             <button 
+                                className="btn btn-primary d-flex align-items-center" 
+                                type="button" 
+                                onClick={handleAdd}
+                            >
                                 <Plus size={18} className="me-1"/> Create Payment
                             </button>
                         </div>
@@ -318,6 +330,15 @@ export default function DealerPaymentManagement() {
                     </nav>
                 </div>
             </div>
+
+            {/* Modal */}
+            <DealerPaymentModal
+                show={showFormModal}
+                onClose={() => { setShowFormModal(false); setPaymentToEdit(null); }}
+                onSaveSuccess={handleSaveSuccess}
+                dealers={dealers}
+                paymentToEdit={paymentToEdit}
+            />
         </>
     )
 }
