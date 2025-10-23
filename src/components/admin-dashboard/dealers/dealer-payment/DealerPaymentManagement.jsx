@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { AlertCircle, CheckCircle, Plus, Edit, Trash, Check, X, MoreVertical } from 'lucide-react';
 import {
     getAllDealerPayments,
@@ -70,8 +70,16 @@ export default function DealerPaymentManagement() {
         fetchData();
     }, []);
 
+    // Auto-hide alerts
+    useEffect(() => {
+        if (error || success) {
+            const timer = setTimeout(() => { setError(''); setSuccess(''); }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [error, success]);
 
-    
+
+
     return (
         <div>
 
