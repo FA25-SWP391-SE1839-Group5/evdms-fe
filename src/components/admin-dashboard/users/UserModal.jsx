@@ -1,11 +1,20 @@
 import React from 'react'
 
-export default function UserModal({ show, onClose, onSubmit, user, formData, onFormChange, errors}) {
+export default function UserModal({ show, onClose, onSubmit, user, formData, onFormChange, errors, dealers}) {
   if (!show) {
     return null;
   }
+
+  const title = user ? 'Edit User' : 'Add New User';
+  const isEditMode = Boolean(user);
+
+  const shouldShowDealerSelect = ['DealerStaff', 'DealerManager'].includes(formData?.role);
+
   return (
-    <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+    <div 
+      className={`modal fade ${show ? 'show d-block' : ''}`} 
+      tabIndex="-1" 
+      style={{ backgroundColor: show ? 'rgba(0,0,0,0.5)' : 'transparent' }}>
         <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
                 <div className="modal-header">
@@ -23,7 +32,7 @@ export default function UserModal({ show, onClose, onSubmit, user, formData, onF
                       type="text"
                       className={`form-control ${errors.fullName ? 'is-invalid' : ''}`}
                       name="fullName"
-                      value={formData.fullName}
+                      value={formData.fullName || ''}
                       onChange={onFormChange}
                       placeholder="Enter full name"
                       required
@@ -59,10 +68,10 @@ export default function UserModal({ show, onClose, onSubmit, user, formData, onF
                       type="password"
                       className={`form-control ${errors.password ? 'is-invalid' : ''}`}
                       name="password"
-                      value={formData.password}
+                      value={formData.password || ''}
                       onChange={onFormChange}
-                      placeholder={user ? 'Enter new password' : 'Min 6 characters'}
-                      required={!user}
+                      placeholder={isEditMode ? 'Enter new password' : 'Min 6 characters'}
+                      required={!isEditMode}
                     />
                     {errors.password && (
                       <div className="invalid-feedback">{errors.password}</div>
@@ -80,7 +89,7 @@ export default function UserModal({ show, onClose, onSubmit, user, formData, onF
                     <select
                       className="form-select"
                       name="role"
-                      value={formData.role}
+                      value={formData.role || 'DealerStaff'}
                       onChange={onFormChange}
                       required
                     >
@@ -91,27 +100,60 @@ export default function UserModal({ show, onClose, onSubmit, user, formData, onF
                     </select>
                   </div>
 
+                  {/* 3. THÊM Ô CHỌN DEALER (hiển thị có điều kiện) */}
+                  {shouldShowDealerSelect && (
+                    <div className="mb-3">
+                      <label htmlFor="dealerId" className="form-label">
+                        Assigned Dealer {!isEditMode ? '*' : ''} {/* Bắt buộc khi tạo mới */}
+                      </label>
+                      <select
+                        id="dealerId"
+                        name="dealerId"
+                        className={`form-select ${errors?.dealerId ? 'is-invalid' : ''}`}
+                        value={formData?.dealerId || ''} // Đảm bảo giá trị là ''
+                        onChange={onFormChange}
+                        // Bắt buộc chọn khi tạo mới và role yêu cầu
+                        required={!isEditMode && shouldShowDealerSelect}
+                        disabled={isEditMode} // Không cho sửa dealer khi edit
+                      >
+                        <option value="">-- Select Dealer --</option>
+                        {/* Kiểm tra dealers trước khi map */}
+                        {dealers && dealers.map(dealer => (
+                          <option key={dealer.id} value={dealer.id}>
+                            {dealer.name}
+                          </option>
+                        ))}
+                      </select>
+                      {errors?.dealerId && <div className="invalid-feedback">{errors.dealerId}</div>}
+                      {(!dealers || dealers.length === 0) && (
+                        <div className="form-text text-warning">Loading dealers or no dealers available...</div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Active Status */}
                   <div className="form-check form-switch mb-3">
                     <input
                       className="form-check-input"
                       type="checkbox"
                       name="isActive"
-                      checked={formData.isActive}
+                      id="userIsActiveSwitch"
+                      checked={formData?.isActive === undefined ? true : formData.isActive}
                       onChange={onFormChange}
                     />
                     <label className="form-check-label">
                       Active {!formData.isActive && <span className="text-danger">(User cannot login)</span>}
                     </label>
                   </div>
+
                   <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={onClose}>
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-primary">
-                    {user ? 'Update User' : 'Create User'}
-                  </button>
-                </div>
+                    <button type="button" className="btn btn-secondary" onClick={onClose}>
+                      Cancel
+                    </button>
+                    <button type="submit" className="btn btn-primary">
+                      {isEditMode ? 'Update User' : 'Create User'}
+                    </button>
+                  </div>
                 </div>
               </form>
             </div>
