@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, AlertCircle, CheckCircle } from 'lucide-react';
 import { getAllUsers, createUser, updateUser, deleteUser } from '../../../services/dashboardService';
+import { getAllDealers } from '../../../services/dealerService';
 import UserModal from './UserModal';
 import UserDetailsModal from './UserDetailsModal';
+import UserStatsCards from './UserStatsCards';
+import RolesPermissionsTab from './RolesPermissionsTab';
 
 // Import các thư viện export
 import jsPDF from 'jspdf';
@@ -12,6 +15,7 @@ import * as XLSX from 'xlsx';
 const UserManagement = () => {
   const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState([]);
+  const [dealers, setDealers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -35,6 +39,7 @@ const UserManagement = () => {
     email: '',
     password: '',
     role: 'DealerStaff',
+    dealerI: '',
     isActive: true
   });
   const [error, setError] = useState('');
@@ -42,7 +47,7 @@ const UserManagement = () => {
   const [validationErrors, setValidationErrors] = useState({});
 
   useEffect(() => {
-    fetchUsers();
+    fetchInitialData();
   }, []);
 
   useEffect(() => {
@@ -55,19 +60,28 @@ const UserManagement = () => {
     }
   }, [error, success]);
 
-  const fetchUsers = async () => {
-  try {
-    setLoading(true);
-    const response = await getAllUsers();
-    setUsers(response.data || []);
-  } catch (err) {
-    setError(err.message || 'Failed to load users');
-    setUsers([]);
-  } finally {
-    setLoading(false);
-  }
-};
+  const fetchInitialData = async () => {
+   try {
+     setLoading(true);
+     setError('');
+     const [userResponse, dealerResponse] = await Promise.all([
+       getAllUsers(),
+       getAllDealers()
+     ]);
 
+     setUsers(userResponse.data || []);
+     setDealers(dealerResponse.data?.data?.items || dealerResponse.data?.items || []);
+
+   } catch (err) {
+     const errorMsg = err.message || 'Failed to load initial data';
+     setError(errorMsg);
+     console.error("Fetch Initial Data Error:", err);
+     setUsers([]);
+     setDealers([]);
+   } finally {
+     setLoading(false);
+   }
+ };
 
   const validateForm = () => {
     const errors = {};
@@ -129,12 +143,13 @@ const UserManagement = () => {
         if (!updateData.password || updateData.password.trim() === '') {
           delete updateData.password;
         }
-        
+        // Maybe don't send dealerId if API doesn't allow updating it
+        // delete updateData.dealerId;
         const response = await updateUser(editingUser.id, updateData);
         
         if (response.success) {
           setSuccess(`User "${formData.fullName}" updated successfully`);
-          await fetchUsers();
+          await fetchInitialData();
           handleCloseModal();
         } else {
           throw new Error(response.message || 'Update failed');
@@ -150,7 +165,7 @@ const UserManagement = () => {
         
         if (response.success) {
           setSuccess(`User "${formData.fullName}" created successfully! They can now login with their credentials.`);
-          await fetchUsers();
+          await fetchInitialData();
           handleCloseModal();
         } else {
           throw new Error(response.message || 'Creation failed');
@@ -178,7 +193,7 @@ const UserManagement = () => {
       
       if (response.data?.success) {
         setSuccess(`User "${userName}" has been permanently deleted from database. They can no longer login.`);
-        await fetchUsers();
+        await fetchInitialData();
       } else {
         throw new Error('Delete operation failed');
       }
@@ -204,7 +219,7 @@ const UserManagement = () => {
 
       if (response.success) {
         setSuccess(`User "${userToToggle.fullName}" has been ${actionText}d.`);
-        await fetchUsers(); // Tải lại danh sách
+        await fetchInitialData(); // Tải lại danh sách
       } else {
         throw new Error(response.message || 'Toggle status failed');
       }
@@ -234,6 +249,7 @@ const UserManagement = () => {
       email: user.email || '',
       password: '',
       role: user.role || 'DealerStaff',
+      dealerId: user.dealerId || '',
       isActive: user.isActive !== undefined ? user.isActive : true
     });
     setShowModal(true);
@@ -249,6 +265,7 @@ const UserManagement = () => {
       email: '',
       password: '',
       role: 'DealerStaff',
+      dealerId: '',
       isActive: true
     });
     setError('');
@@ -277,8 +294,10 @@ const UserManagement = () => {
       const matchesRole = filterRole ? user.role === filterRole : true;
       const matchesStatus = filterStatus ? user.isActive === (filterStatus === 'true') : true;
       // const matchesPlan = filterPlan ? user.plan === filterPlan : true;
+      // Add dealer filter if needed (using filterPlan state?)
+      // const matchesDealer = filterPlan ? user.dealerId === filterPlan : true;
       
-      return matchesSearch && matchesRole && matchesStatus; // && matchesPlan;
+      return matchesSearch && matchesRole && matchesStatus; // && matchesPlan && matchesDealer;
     });
   }, [users, searchTerm, filterRole, filterStatus]); // filterPlan
 
@@ -458,13 +477,11 @@ const UserManagement = () => {
 
   return (
    <>
-      <h4 className="fw-bold py-3 mb-4">
-        <span className="text-muted fw-light">Users /</span> 
-        {activeTab === 'roles' ? ' Roles & Permissions ' : ' List '}
-      </h4>
+      {/* Render Stats Cards (only on 'users' tab) */}
+      {activeTab === 'users' && <UserStatsCards users={users} />}
 
       {/* Tab Navigation */}
-      <div className="row">
+      {/* <div className="row">
         <div className="col-md-12">
           <ul className="nav nav-pills flex-column flex-md-row mb-3">
             <li className="nav-item">
@@ -487,7 +504,7 @@ const UserManagement = () => {
             </li>
           </ul>
         </div>
-      </div>
+      </div> */}
 
       {/* Alert messages */}
       {error && (
@@ -767,12 +784,10 @@ const UserManagement = () => {
             </div>
           </div>
       ) : (
-        <div className="card">
-          <h5 className="card-header">Roles & Permissions</h5>
-          <div className="card-body">
-            <p className="mb-0">Roles and permissions management - Coming soon...</p>
-          </div>
-        </div>
+        <RolesPermissionsTab
+          users={users}
+          formatRoleDisplay={formatRoleDisplay} // Pass the formatter function
+        />
       )}
 
       {/* Modal */}
@@ -784,6 +799,7 @@ const UserManagement = () => {
         formData={formData || {}}
         onFormChange={handleChange}
         errors={validationErrors}
+        dealers={dealers} // Pass dealers list
       />
 
       {/* Details Modal */}
