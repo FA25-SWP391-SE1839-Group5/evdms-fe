@@ -14,6 +14,7 @@ import DealerManagement from '../components/admin-dashboard/dealers/dealer-list/
 import DealerContractManagement from '../components/admin-dashboard/dealers/dealer-contract/DealerContractManagement';
 import DealerOrderManagement from '../components/admin-dashboard/dealers/dealer-order/DealerOrderManagement';
 import DealerPaymentManagement from '../components/admin-dashboard/dealers/dealer-payment/DealerPaymentManagement';
+import RolesPermissionsTab from '../components/admin-dashboard/users/RolesPermissionsTab';
 
 const AdminDashboard = ({ currentPage = 'dashboard' }) => {
   const renderPageContent = () => {
@@ -25,6 +26,13 @@ const AdminDashboard = ({ currentPage = 'dashboard' }) => {
           </div>
         );
       
+      case 'roles':
+        return (
+          <div className="container-xxl flex-grow-1 container-p-y">
+            <RolesPermissionsTab />
+          </div>
+        );
+
       case 'dealers':
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
