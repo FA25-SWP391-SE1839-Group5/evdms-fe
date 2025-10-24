@@ -201,7 +201,7 @@ export default function DealerPaymentManagement() {
                     <div className="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
 
                         {/* Left: Show Entries & Create */}
-                        <div className="col-md-auto d-flex align-items-center gap-3">
+                        <div className="col-md-auto d-flex align-items-center gap-2">
                             <label className="d-flex align-items-center">
                                 Show&nbsp;
                                 <select 
@@ -226,7 +226,7 @@ export default function DealerPaymentManagement() {
                         </div>
 
                         {/* Right: Search & Status Filter */}
-                        <div className="col-md-4 ms-auto d-flex align-items-center gap-3">
+                        <div className="col-md-4 ms-auto d-flex align-items-center gap-2">
                              <input
                                 type="search"
                                 name="globalSearch"
