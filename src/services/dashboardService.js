@@ -546,14 +546,25 @@ export const getUserById = async (id) => {
 export const createUser = async (userData) => {
   try {
     console.log('📡 API Call: POST /api/users');
-    console.log('📤 Request body:', userData);
+
+    const dataToSend = {
+      fullName: userData.fullName,
+      email: userData.email,
+      password: userData.password,
+      role: userData.role || 'DealerStaff', // Mặc định nếu không có
+      // Chỉ gửi dealerId nếu nó tồn tại và không rỗng
+      ...(userData.dealerId && { dealerId: userData.dealerId }),
+      // isActive có thể do backend xử lý mặc định
+      ...(typeof userData.isActive === 'boolean' && { isActive: userData.isActive }),
+    };
+      console.log('📤 Request body:', dataToSend);
 
     // Validate required fields
     if (!userData.fullName || !userData.email || !userData.password) {
       throw new Error('Missing required fields: fullName, email, password');
     }
 
-    const response = await api.post('/users', userData);
+    const response = await api.post('/users', dataToSend);
     console.log('✅ User created successfully:', response.data);
     return response.data;
   } catch (error) {
@@ -565,9 +576,17 @@ export const createUser = async (userData) => {
 export const updateUser = async (id, userData) => {
   try {
     console.log(`📡 API Call: PUT /api/users/${id}`);
-    console.log('📤 Request body:', userData);
 
-    const response = await api.put(`/users/${id}`, userData);
+    const dataToSend = { ...userData };
+    // Xóa password nếu rỗng (logic cũ giữ nguyên)
+    if (!dataToSend.password || dataToSend.password.trim() === '') {
+      delete dataToSend.password;
+    }
+    // Nếu API không cho sửa dealerId khi PUT, bạn có thể xóa nó ở đây:
+    // delete dataToSend.dealerId;
+    console.log('📤 Request body:', dataToSend);
+
+    const response = await api.put(`/users/${id}`, dataToSend);
     console.log('✅ User updated successfully:', response.data);
     return response.data;
   } catch (error) {
