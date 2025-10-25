@@ -140,6 +140,19 @@ export default function VehicleModelModal({ show, onClose, onSaveSuccess, modelT
                  throw new Error(modelResponse.data?.message || "Failed to update model");
             }
 
+            // Bước 2: Upload ảnh mới (nếu có)
+            if (selectedImageFile && modelIdForUpload) {
+                try {
+                    const imageResponse = await uploadVehicleModelImage(modelIdForUpload, selectedImageFile);
+                    // Lấy URL và publicId từ response upload
+                    finalImageUrl = imageResponse.data?.data?.imageUrl || imageResponse.data?.imageUrl;
+                    finalImagePublicId = imageResponse.data?.data?.imagePublicId || imageResponse.data?.imagePublicId;
+
+                    if (!finalImageUrl || !finalImagePublicId) {
+                        console.warn("Image uploaded, but API did not return expected imageUrl/imagePublicId:", imageResponse.data);
+                        // Có thể hiển thị warning nhưng vẫn tiếp tục
+                    }
+
     return (
         <div>
 
