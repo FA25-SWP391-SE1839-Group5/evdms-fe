@@ -130,3 +130,16 @@ export const deleteVehicleVariant = (id) => {
     console.log(`📡 API Call: DELETE /api/vehicle-variants/${id}`);
     return api.delete(`/vehicle-variants/${id}`);
 };
+
+// ============================================
+// VEHICLES (Inventory Stock)
+// ============================================
+
+/**
+ * GET ALL VEHICLES IN INVENTORY (Vehicles)
+ * @param {object} params - Optional query parameters
+ */
+export const getAllVehicles = (params = {}) => {
+    console.log("📡 API Call: GET /api/vehicles");
+    return api.get('/vehicles', { params });
+};
