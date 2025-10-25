@@ -121,3 +121,12 @@ export const updateVehicleVariant = (id, variantData) => {
     console.log("📤 Sending update data:", variantData);
     return api.put(`/vehicle-variants/${id}`, variantData);
 };
+
+/**
+ * DELETE Vehicle Variant
+ * @param {string} id - Variant ID
+ */
+export const deleteVehicleVariant = (id) => {
+    console.log(`📡 API Call: DELETE /api/vehicle-variants/${id}`);
+    return api.delete(`/vehicle-variants/${id}`);
+};
