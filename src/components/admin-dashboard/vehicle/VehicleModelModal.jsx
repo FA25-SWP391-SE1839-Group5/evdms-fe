@@ -209,6 +209,15 @@ export default function VehicleModelModal({ show, onClose, onSaveSuccess, modelT
                                     disabled={loading}
                                 ></button>
                             </div>
+
+                            <div className="modal-body">
+                                {error && (
+                                    <div className="alert alert-danger d-flex align-items-center" role="alert">
+                                        <AlertCircle size={20} className="me-2" />
+                                        <div>{error}</div>
+                                    </div>
+                                )}
+                            </div>
                         </form>
                     </div>
                 </div>
