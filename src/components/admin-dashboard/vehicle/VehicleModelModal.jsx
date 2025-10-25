@@ -95,6 +95,51 @@ export default function VehicleModelModal({ show, onClose, onSaveSuccess, modelT
         }
     };
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+
+        if (!formData.name) {
+            setError('Model Name is required.');
+            setLoading(false);
+            return;
+        }
+
+        let finalImageUrl = formData.imageUrl;
+        let finalImagePublicId = formData.imagePublicId;
+        let modelIdForUpload = isEditMode ? modelToEdit.id : null;
+
+        try {
+            // Bước 1: Tạo hoặc Cập nhật Model (chưa có ảnh mới)
+            let modelResponse;
+            const modelDataToSend = {
+                name: formData.name,
+                description: formData.description,
+                // Giữ lại ảnh cũ nếu không có ảnh mới được chọn VÀ không xóa ảnh cũ
+                imageUrl: !selectedImageFile ? formData.imageUrl : '',
+                imagePublicId: !selectedImageFile ? formData.imagePublicId : ''
+            };
+
+            if (isEditMode) {
+                modelResponse = await updateVehicleModel(modelToEdit.id, modelDataToSend);
+            } else {
+                modelResponse = await createVehicleModel(modelDataToSend);
+                // Lấy ID model mới tạo để upload ảnh
+                modelIdForUpload = modelResponse.data?.data?.id || modelResponse.data?.id; // Điều chỉnh theo response thực tế
+                 if (!modelIdForUpload) {
+                    throw new Error("Failed to get new model ID after creation.");
+                }
+            }
+
+             // Kiểm tra lỗi sau khi tạo/sửa model
+            if (!modelResponse.data?.success && !isEditMode) { // Check lỗi khi tạo mới
+                 throw new Error(modelResponse.data?.message || "Failed to create model");
+            }
+            if (!modelResponse.data?.success && isEditMode) { // Check lỗi khi cập nhật
+                 throw new Error(modelResponse.data?.message || "Failed to update model");
+            }
+
     return (
         <div>
 
