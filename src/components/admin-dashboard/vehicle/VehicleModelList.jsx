@@ -100,10 +100,22 @@ export default function VehicleModelList() {
     if (loading) {
         return <div className="text-center p-4"><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div></div>;
     }
-    
-    return (
-        <div>
 
+    return (
+        <div className="card">
+            {/* Header: Search, Entries, Add */}
+            <div className="card-header border-bottom d-flex justify-content-between align-items-center">
+                {/* Left: Show entries */}
+                 <div>
+                    <label className="d-flex align-items-center">
+                        Show&nbsp;
+                        <select className="form-select form-select-sm" value={pageSize} onChange={handlePageSizeChange} style={{width:'auto'}}>
+                            <option>10</option><option>25</option><option>50</option>
+                        </select>
+                        &nbsp;entries
+                    </label>
+                </div>
+            </div>
         </div>
     )
 }
