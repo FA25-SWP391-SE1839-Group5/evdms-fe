@@ -64,7 +64,43 @@ export default function VehicleModelList() {
     const endEntry = Math.min(currentPage * pageSize, filteredModels.length);
 
     // Handlers
+    const handleAdd = () => {
+        setModelToEdit(null);
+        setShowModal(true);
+    };
 
+    const handleEdit = (model) => {
+        setModelToEdit(model);
+        setShowModal(true);
+    };
+
+    const handleDelete = async (modelId, modelName) => {
+        if (!window.confirm(`Are you sure you want to delete the model "${modelName}"? This might affect related variants and vehicles.`)) return;
+        try {
+            await deleteVehicleModel(modelId);
+            setSuccess(`Model "${modelName}" deleted successfully.`);
+            fetchModels(); // Reload list
+        } catch (err) {
+            setError(err.response?.data?.message || err.message || 'Failed to delete model');
+        }
+    };
+
+    const handleSaveSuccess = (isEdit) => {
+        setShowModal(false);
+        setModelToEdit(null);
+        setSuccess(`Model ${isEdit ? 'updated' : 'created'} successfully.`);
+        fetchModels(); // Reload list
+    };
+
+    const handlePageSizeChange = (e) => {
+        setPageSize(Number(e.target.value));
+        setCurrentPage(1);
+    };
+
+    if (loading) {
+        return <div className="text-center p-4"><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div></div>;
+    }
+    
     return (
         <div>
 
