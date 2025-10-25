@@ -152,3 +152,33 @@ export const getVehicleById = (id) => {
     console.log(`📡 API Call: GET /api/vehicles/${id}`);
     return api.get(`/vehicles/${id}`);
 };
+
+/**
+ * CREATE VEHICLE
+ * @param {object} vehicleData - { variantId, dealerId, color, vin, type, status }
+ */
+export const createVehicle = (vehicleData) => {
+    console.log("📡 API Call: POST /api/vehicles");
+    console.log("📤 Sending data:", vehicleData);
+    return api.post('/vehicles', vehicleData);
+};
+
+/**
+ * UPDATE VEHICLE
+ * @param {string} id - Vehicle ID
+ * @param {object} vehicleData - Dữ liệu cập nhật
+ */
+export const updateVehicle = (id, vehicleData) => {
+    console.log(`📡 API Call: PUT /api/vehicles/${id}`);
+    console.log("📤 Sending update data:", vehicleData);
+    return api.put(`/vehicles/${id}`, vehicleData);
+};
+
+/**
+ * DELETE VEHICLE
+ * @param {string} id - Vehicle ID
+ */
+export const deleteVehicle = (id) => {
+    console.log(`📡 API Call: DELETE /api/vehicles/${id}`);
+    return api.delete(`/vehicles/${id}`);
+};
