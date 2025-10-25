@@ -15,6 +15,7 @@ import DealerContractManagement from '../components/admin-dashboard/dealers/deal
 import DealerOrderManagement from '../components/admin-dashboard/dealers/dealer-order/DealerOrderManagement';
 import DealerPaymentManagement from '../components/admin-dashboard/dealers/dealer-payment/DealerPaymentManagement';
 import RolesPermissionsTab from '../components/admin-dashboard/users/RolesPermissionsTab';
+import VehicleInventoryManagement from '../components/admin-dashboard/vehicle/VehicleInventoryManagement';
 
 const AdminDashboard = ({ currentPage = 'dashboard' }) => {
   const renderPageContent = () => {
@@ -76,12 +77,7 @@ const AdminDashboard = ({ currentPage = 'dashboard' }) => {
       case 'inventory':
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
-            <h4 className="fw-bold py-3 mb-4">Vehicle Inventory</h4>
-            <div className="card">
-              <div className="card-body">
-                <p>Vehicle inventory page - Coming soon...</p>
-              </div>
-            </div>
+            <VehicleInventoryManagement />
           </div>
         );
       
