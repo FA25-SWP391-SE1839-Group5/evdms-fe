@@ -299,6 +299,7 @@ export default function VehicleModelModal({ show, onClose, onSaveSuccess, modelT
                     </div>
                 </div>
             </div>
+            {show && <div className="modal-backdrop fade show"></div>}
         </>
     )
 }
