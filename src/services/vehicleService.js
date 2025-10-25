@@ -110,3 +110,14 @@ export const createVehicleVariant = (variantData) => {
     console.log("📤 Sending data:", variantData);
     return api.post('/vehicle-variants', variantData);
 };
+
+/**
+ * UPDATE Vehicle Variant
+ * @param {string} id - Variant ID
+ * @param {object} variantData - Dữ liệu cập nhật
+ */
+export const updateVehicleVariant = (id, variantData) => {
+    console.log(`📡 API Call: PUT /api/vehicle-variants/${id}`);
+    console.log("📤 Sending update data:", variantData);
+    return api.put(`/vehicle-variants/${id}`, variantData);
+};
