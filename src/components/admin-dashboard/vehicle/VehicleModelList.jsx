@@ -160,6 +160,56 @@ export default function VehicleModelList() {
                     )}
                 </div>
             )}
+
+           {/* Table */}
+            <div className="table-responsive text-nowrap">
+                <table className="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody className="table-border-bottom-0">
+                        {paginatedModels.length === 0 ? (
+                            <tr><td colSpan="4" className="text-center py-4">
+                                {filteredModels.length === 0 && !searchTerm ? 'No models found.' : 'No models match your search.'}
+                            </td></tr>
+                        ) : (
+                            paginatedModels.map(model => (
+                                <tr key={model.id}>
+                                    <td>
+                                        {model.imageUrl ? (
+                                            <>
+                                                <img
+                                                    src={model.imageUrl}
+                                                    alt={model.name}
+                                                    style={{ height: '40px', width: 'auto', borderRadius: '4px', objectFit: 'contain' }}
+                                                    onError={(e) => { e.target.style.display='none'; if (e.target.nextSibling) e.target.nextSibling.style.display='inline-block'; }}
+                                                />
+                                                {/* Placeholder for image error */}
+                                                <span style={{display: 'none', fontSize: '24px', color: '#ccc'}}><i className='bx bx-image'></i></span>
+                                            </>
+                                        ) : (
+                                            <span style={{ fontSize: '24px', color: '#ccc' }}><i className='bx bx-image'></i></span> // Placeholder if no image
+                                        )}
+                                    </td>
+                                    <td><span className="fw-semibold">{model.name}</span></td>
+                                    <td>{model.description || '-'}</td>
+                                    <td>
+                                        <div className="d-inline-block text-nowrap">
+                                            <button className="btn btn-sm btn-icon" title="Edit" onClick={() => handleEdit(model)}><i className="bx bx-edit"></i></button>
+                                            <button className="btn btn-sm btn-icon delete-record" title="Delete" onClick={() => handleDelete(model.id, model.name)}><i className="bx bx-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
         </div>
     )
 }
