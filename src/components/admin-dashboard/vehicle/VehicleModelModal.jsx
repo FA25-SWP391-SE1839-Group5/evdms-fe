@@ -183,15 +183,36 @@ export default function VehicleModelModal({ show, onClose, onSaveSuccess, modelT
             setError(`Database operation failed: ${errorMsg}`);
             setLoading(false); // Dừng loading nếu có lỗi ở bước 1
         } finally {
-             // setLoading(false); // Chuyển vào onSaveSuccess hoặc catch
+            setLoading(false); // Chuyển vào onSaveSuccess hoặc catch
         }
     };
 
     if (!show) return null;
 
     return (
-        <div>
-
-        </div>
+        <>
+            <div 
+                className={`modal fade ${show ? 'show d-block' : ''}`} 
+                tabIndex="-1" 
+                style={{ backgroundColor: show ? 'rgba(0,0,0,0.5)' : 'transparent' }}
+            >
+                <div className="modal-dialog modal-dialog-centered" role="document">
+                    <div className="modal-content">
+                        <form onSubmit={handleSubmit}>
+                            <div className="modal-header">
+                                <h5 className="modal-title">{title}</h5>
+                                <button 
+                                    type="button" 
+                                    className="btn-close" 
+                                    onClick={onClose} 
+                                    aria-label="Close" 
+                                    disabled={loading}
+                                ></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </>
     )
 }
