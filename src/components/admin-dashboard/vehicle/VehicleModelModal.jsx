@@ -217,6 +217,22 @@ export default function VehicleModelModal({ show, onClose, onSaveSuccess, modelT
                                         <div>{error}</div>
                                     </div>
                                 )}
+
+                                {/* Model Name */}
+                                <div className="mb-3">
+                                    <label htmlFor="modelName" className="form-label">Model Name *</label>
+                                    <input
+                                        type="text"
+                                        id="modelName"
+                                        name="name"
+                                        className={`form-control ${!formData.name && error ? 'is-invalid' : ''}`} // Basic validation visual
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                        placeholder="e.g., VF8"
+                                        disabled={loading}
+                                        required
+                                    />
+                                </div>
                             </div>
                         </form>
                     </div>
