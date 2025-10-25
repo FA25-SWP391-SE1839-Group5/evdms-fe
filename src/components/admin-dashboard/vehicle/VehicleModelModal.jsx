@@ -42,6 +42,26 @@ export default function VehicleModelModal({ show, onClose, onSaveSuccess, modelT
         }
     }, [show, modelToEdit, isEditMode]);
 
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    // Xử lý khi chọn file ảnh mới
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedImageFile(file);
+            // Tạo URL xem trước
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+            setError(''); // Xóa lỗi cũ nếu có
+        }
+    };
+
     return (
         <div>
 
