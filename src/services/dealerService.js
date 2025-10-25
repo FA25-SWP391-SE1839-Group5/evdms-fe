@@ -273,3 +273,31 @@ export const markPaymentFailed = (paymentId) => {
   // POST request typically doesn't need a body
   return api.post(`/dealer-payments/${paymentId}/mark-failed`);
 };
+
+/**
+ * Upload document cho Dealer Payment
+ * @param {string} paymentId - ID của payment
+ * @param {File} documentFile - File document (PDF)
+ */
+export const uploadDealerPaymentDocument = (paymentId, documentFile) => {
+    console.log(`📡 API Call: POST /api/dealer-payments/${paymentId}/upload-document`);
+    const formData = new FormData();
+    formData.append('document', documentFile); // Tên field 'document' có thể cần đổi
+
+    return api.post(`/dealer-payments/${paymentId}/upload-document`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
+
+/**
+ * Xóa document của Dealer Payment
+ * @param {string} paymentId - ID của payment
+ * @param {string} documentId - ID của document cần xóa (hoặc publicId, tùy backend)
+ */
+export const deleteDealerPaymentDocument = (paymentId, documentId) => { // Cần làm rõ cách xác định document cần xóa
+     console.log(`📡 API Call: DELETE /api/dealer-payments/${paymentId}/delete-document`);
+     // API này có thể cần documentId trong URL hoặc body
+     return api.delete(`/dealer-payments/${paymentId}/delete-document`, { data: { documentId } }); // Ví dụ gửi ID trong body
+};
