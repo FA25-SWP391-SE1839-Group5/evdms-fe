@@ -143,3 +143,12 @@ export const getAllVehicles = (params = {}) => {
     console.log("📡 API Call: GET /api/vehicles");
     return api.get('/vehicles', { params });
 };
+
+/**
+ * GET VEHICLE BY ID
+ * @param {string} id - Vehicle ID
+ */
+export const getVehicleById = (id) => {
+    console.log(`📡 API Call: GET /api/vehicles/${id}`);
+    return api.get(`/vehicles/${id}`);
+};
