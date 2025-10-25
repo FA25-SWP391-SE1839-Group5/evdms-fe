@@ -32,7 +32,39 @@ export default function VehicleModelList() {
         }
     }, [error, success]);
 
-    
+    const fetchModels = async () => {
+        try {
+            setLoading(true);
+            setError('');
+            const response = await getAllVehicleModels();
+            // Điều chỉnh dựa trên cấu trúc response API của bạn
+            setModels(response.data?.data?.items || response.data?.items || response.data || []);
+        } catch (err) {
+            setError(err.response?.data?.message || err.message || 'Failed to load vehicle models');
+            setModels([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Filter & Paginate
+    const filteredModels = useMemo(() => {
+        return models.filter(model =>
+            model.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            model.description?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [models, searchTerm]);
+
+    const totalPages = Math.ceil(filteredModels.length / pageSize);
+    const paginatedModels = useMemo(() => {
+        const startIndex = (currentPage - 1) * pageSize;
+        return filteredModels.slice(startIndex, startIndex + pageSize);
+    }, [filteredModels, currentPage, pageSize]);
+    const startEntry = filteredModels.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+    const endEntry = Math.min(currentPage * pageSize, filteredModels.length);
+
+    // Handlers
+
     return (
         <div>
 
