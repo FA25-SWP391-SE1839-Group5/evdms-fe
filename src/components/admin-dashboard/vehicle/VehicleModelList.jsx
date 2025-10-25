@@ -222,6 +222,14 @@ export default function VehicleModelList() {
                     </ul>
                 </nav>
             </div>
+
+            {/* Modal */}
+            <VehicleModelModal
+                show={showModal}
+                onClose={() => { setShowModal(false); setModelToEdit(null); }}
+                onSaveSuccess={handleSaveSuccess}
+                modelToEdit={modelToEdit}
+            />
         </div>
     )
 }
