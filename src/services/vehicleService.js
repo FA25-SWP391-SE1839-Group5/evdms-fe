@@ -100,3 +100,13 @@ export const getVehicleVariantById = (id) => {
     console.log(`📡 API Call: GET /api/vehicle-variants/${id}`);
     return api.get(`/vehicle-variants/${id}`);
 };
+
+/**
+ * CREATE Vehicle Variant 
+ * @param {object} variantData - Dữ liệu variant (modelId, name, basePrice, specs, features)
+ */
+export const createVehicleVariant = (variantData) => {
+    console.log("📡 API Call: POST /api/vehicle-variants");
+    console.log("📤 Sending data:", variantData);
+    return api.post('/vehicle-variants', variantData);
+};
