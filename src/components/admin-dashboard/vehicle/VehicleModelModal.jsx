@@ -248,6 +248,39 @@ export default function VehicleModelModal({ show, onClose, onSaveSuccess, modelT
                                         disabled={loading}
                                     ></textarea>
                                 </div>
+
+                                {/* Image Upload & Preview */}
+                                <div className="mb-3">
+                                    <label htmlFor="modelImage" className="form-label">Model Image</label>
+                                    {imagePreview && (
+                                        <div className="mb-2 text-center position-relative">
+                                            <img src={imagePreview} alt="Model Preview" style={{ maxHeight: '150px', maxWidth: '100%', borderRadius: 'var(--bs-border-radius)' }} />
+                                            {/* Nút xóa ảnh */}
+                                            {(selectedImageFile || (isEditMode && formData.imageUrl)) && (
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm btn-icon btn-danger rounded-circle position-absolute top-0 end-0 m-1"
+                                                    onClick={handleRemoveImage}
+                                                    title={selectedImageFile ? "Cancel selection" : "Remove current image"}
+                                                    disabled={loading}
+                                                    style={{ lineHeight: 0.8 }}
+                                                >
+                                                   &times; {/* Dấu X */}
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
+                                    <input
+                                        type="file"
+                                        id="modelImage"
+                                        className="form-control"
+                                        accept="image/png, image/jpeg, image/webp" // Chấp nhận các loại ảnh phổ biến
+                                        onChange={handleImageChange}
+                                        disabled={loading}
+                                        ref={fileInputRef} // Gán ref
+                                    />
+                                    <div className="form-text">Upload an image for the model (e.g., PNG, JPG, WEBP).</div>
+                                </div>
                             </div>
                         </form>
                     </div>
