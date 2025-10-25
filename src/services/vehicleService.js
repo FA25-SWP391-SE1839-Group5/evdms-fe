@@ -92,3 +92,11 @@ export const getAllVehicleVariants = (params = {}) => {
     return api.get('/vehicle-variants', { params });
 };
 
+/**
+ * GET Vehicle Variant BY ID
+ * @param {string} id - Variant ID
+ */
+export const getVehicleVariantById = (id) => {
+    console.log(`📡 API Call: GET /api/vehicle-variants/${id}`);
+    return api.get(`/vehicle-variants/${id}`);
+};
