@@ -282,6 +282,19 @@ export default function VehicleModelModal({ show, onClose, onSaveSuccess, modelT
                                     <div className="form-text">Upload an image for the model (e.g., PNG, JPG, WEBP).</div>
                                 </div>
                             </div>
+                            <div className="modal-footer">
+                                <button 
+                                    type="button" 
+                                    className="btn btn-outline-secondary" 
+                                    onClick={onClose} 
+                                    disabled={loading}
+                                >
+                                    Cancel
+                                </button>
+                                <button type="submit" className="btn btn-primary" disabled={loading}>
+                                    {loading ? 'Saving...' : (isEditMode ? 'Update Model' : 'Create Model')}
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
