@@ -153,6 +153,42 @@ export default function VehicleModelModal({ show, onClose, onSaveSuccess, modelT
                         // Có thể hiển thị warning nhưng vẫn tiếp tục
                     }
 
+                    // Bước 3: Cập nhật lại Model với thông tin ảnh mới (nếu cần thiết và API hỗ trợ)
+                    // Nếu bước 1 chưa lưu ảnh, hoặc bạn muốn đảm bảo thông tin ảnh được lưu sau khi upload thành công
+                     try {
+                         await updateVehicleModel(modelIdForUpload, {
+                             ...modelDataToSend, // Dữ liệu cũ
+                             imageUrl: finalImageUrl, // Ảnh mới
+                             imagePublicId: finalImagePublicId // ID ảnh mới
+                         });
+                     } catch (updateAfterUploadError) {
+                          console.error("Failed to update model with new image info:", updateAfterUploadError);
+                          setError("Model saved, but failed to link new image. Please edit again.");
+                          // Không throw lỗi ở đây để coi như model vẫn được lưu
+                     }
+
+                } catch (uploadError) {
+                    console.error("Image upload failed:", uploadError);
+                    // Dù upload lỗi, model có thể đã được tạo/sửa ở bước 1
+                    setError(`Model ${isEditMode ? 'updated' : 'created'}, but image upload failed: ${uploadError.response?.data?.message || uploadError.message}. You can edit the model to try uploading again.`);
+                    // Không throw lỗi ở đây, gọi onSaveSuccess để reload list
+                }
+            }
+
+            // Gọi callback báo thành công (dù ảnh có lỗi hay không, model đã được xử lý)
+            onSaveSuccess(isEditMode);
+
+        } catch (err) {
+            const errorMsg = err.response?.data?.message || err.message || 'Operation failed';
+            setError(`Database operation failed: ${errorMsg}`);
+            setLoading(false); // Dừng loading nếu có lỗi ở bước 1
+        } finally {
+             // setLoading(false); // Chuyển vào onSaveSuccess hoặc catch
+        }
+    };
+
+    if (!show) return null;
+
     return (
         <div>
 
