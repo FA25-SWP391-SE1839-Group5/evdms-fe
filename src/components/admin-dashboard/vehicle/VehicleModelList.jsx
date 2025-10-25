@@ -103,18 +103,42 @@ export default function VehicleModelList() {
 
     return (
         <div className="card">
+
             {/* Header: Search, Entries, Add */}
             <div className="card-header border-bottom d-flex justify-content-between align-items-center">
+
                 {/* Left: Show entries */}
                  <div>
                     <label className="d-flex align-items-center">
                         Show&nbsp;
-                        <select className="form-select form-select-sm" value={pageSize} onChange={handlePageSizeChange} style={{width:'auto'}}>
-                            <option>10</option><option>25</option><option>50</option>
+                        <select 
+                            className="form-select form-select-sm" 
+                            value={pageSize} 
+                            onChange={handlePageSizeChange} 
+                            style={{width:'auto'}}
+                        >
+                            <option>10</option>
+                            <option>25</option>
+                            <option>50</option>
                         </select>
                         &nbsp;entries
                     </label>
                 </div>
+
+                {/* Right: Search + Add */}
+                 <div className="d-flex align-items-center gap-3">
+                    <input
+                        type="search"
+                        className="form-control"
+                        placeholder="Search Models..."
+                        value={searchTerm}
+                        onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+                        style={{width: '200px'}}
+                    />
+                    <button className="btn btn-primary rounded-pill d-flex align-items-center" type="button" onClick={handleAdd}>
+                        <Plus size={18} className="me-1"/> Add Model
+                    </button>
+                 </div>
             </div>
         </div>
     )
