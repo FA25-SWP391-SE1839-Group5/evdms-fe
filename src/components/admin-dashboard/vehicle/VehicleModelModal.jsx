@@ -5,7 +5,7 @@ import {
     updateVehicleModel,
     uploadVehicleModelImage,
     deleteVehicleModelImage
-} from '../../../../services/vehicleService';
+} from '../../../services/vehicleService';
 
 export default function VehicleModelModal({ show, onClose, onSaveSuccess, modelToEdit }) {
     const isEditMode = Boolean(modelToEdit);

@@ -3,7 +3,7 @@ import { AlertCircle, CheckCircle, Plus, Edit, Trash } from 'lucide-react';
 import {
     getAllVehicleModels,
     deleteVehicleModel
-} from '../../../../services/vehicleService';
+} from '../../../services/vehicleService';
 import VehicleModelModal from './VehicleModelModal';
 
 export default function VehicleModelList() {
