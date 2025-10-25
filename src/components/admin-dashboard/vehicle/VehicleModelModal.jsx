@@ -62,6 +62,39 @@ export default function VehicleModelModal({ show, onClose, onSaveSuccess, modelT
         }
     };
 
+    // Xử lý khi xóa ảnh (chỉ xóa ảnh hiện có, chưa upload)
+    const handleRemoveImage = async (e) => {
+        e.preventDefault(); // Ngăn submit form
+        if (!formData.imagePublicId && !selectedImageFile) return; // Không có gì để xóa
+
+        // Nếu có file đang chọn thì chỉ cần hủy chọn
+        if (selectedImageFile) {
+            setSelectedImageFile(null);
+            setImagePreview(isEditMode ? modelToEdit?.imageUrl || '' : ''); // Quay lại ảnh cũ (nếu edit) hoặc trống (nếu add)
+            if (fileInputRef.current) fileInputRef.current.value = null; // Reset input file
+            return;
+        }
+
+        // Nếu đang edit và có ảnh cũ (có imagePublicId)
+        if (isEditMode && modelToEdit?.id && formData.imagePublicId) {
+            if (!window.confirm("Are you sure you want to remove the current image from this model? This will delete it from storage.")) return;
+            setLoading(true);
+            setError('');
+            try {
+                // Gọi API xóa ảnh dùng model ID
+                await deleteVehicleModelImage(modelToEdit.id);
+                // Cập nhật lại state formData và preview
+                setFormData(prev => ({ ...prev, imageUrl: '', imagePublicId: '' }));
+                setImagePreview('');
+                setSuccess('Image removed successfully.'); // Cần thêm state success nếu muốn
+            } catch (err) {
+                setError(err.response?.data?.message || err.message || 'Failed to remove image.');
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
     return (
         <div>
 
