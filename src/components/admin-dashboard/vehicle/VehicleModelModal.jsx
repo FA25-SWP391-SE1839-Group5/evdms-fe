@@ -233,6 +233,21 @@ export default function VehicleModelModal({ show, onClose, onSaveSuccess, modelT
                                         required
                                     />
                                 </div>
+
+                                {/* Description */}
+                                <div className="mb-3">
+                                    <label htmlFor="modelDescription" className="form-label">Description</label>
+                                    <textarea
+                                        id="modelDescription"
+                                        name="description"
+                                        className="form-control"
+                                        rows="3"
+                                        value={formData.description}
+                                        onChange={handleChange}
+                                        placeholder="Enter model description..."
+                                        disabled={loading}
+                                    ></textarea>
+                                </div>
                             </div>
                         </form>
                     </div>
