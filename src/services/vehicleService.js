@@ -51,3 +51,21 @@ export const deleteVehicleModel = (id) => {
     console.log(`📡 API Call: DELETE /api/vehicle-models/${id}`);
     return api.delete(`/vehicle-models/${id}`);
 };
+
+/**
+ * Upload IMAGE for Vehicle Model
+ * @param {string} modelId - Model ID
+ * @param {File} imageFile - File ảnh cần upload
+ */
+export const uploadVehicleModelImage = (modelId, imageFile) => {
+    console.log(`📡 API Call: POST /api/vehicle-models/${modelId}/upload-image`); 
+    const formData = new FormData();
+    formData.append('imageFile', imageFile); 
+
+    return api.post(`/vehicle-models/${modelId}/upload-image`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
+
