@@ -31,3 +31,14 @@ export const createVehicleModel = (modelData) => {
     console.log("📤 Sending data:", modelData);
     return api.post('/vehicle-models', modelData);
 };
+
+/**
+ * UPDATE Vehicle Model
+ * @param {string} id - Model ID
+ * @param {object} modelData - Dữ liệu cập nhật
+ */
+export const updateVehicleModel = (id, modelData) => {
+    console.log(`📡 API Call: PUT /api/vehicle-models/${id}`);
+    console.log("📤 Sending update data:", modelData);
+    return api.put(`/vehicle-models/${id}`, modelData);
+};
