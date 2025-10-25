@@ -69,3 +69,13 @@ export const uploadVehicleModelImage = (modelId, imageFile) => {
     });
 };
 
+/**
+ * DELETE Vehicle Model's IMAGE
+ * @param {string} modelId - Model ID (Theo lưu ý mới của bạn)
+ */
+export const deleteVehicleModelImage = (modelId) => {
+    console.log(`📡 API Call: DELETE /api/vehicle-models/${modelId}/delete-image`); // Endpoint có thể khác
+    // API này có thể cần gửi imagePublicId trong body hoặc không, tùy backend
+    return api.delete(`/vehicle-models/${modelId}/delete-image`);
+};
+
