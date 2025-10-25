@@ -79,3 +79,16 @@ export const deleteVehicleModelImage = (modelId) => {
     return api.delete(`/vehicle-models/${modelId}/delete-image`);
 };
 
+// ============================================
+// VEHICLE VARIANTS
+// ============================================
+
+/**
+ * GET ALL Vehicle Variants
+ * @param {object} params - Optional query parameters
+ */
+export const getAllVehicleVariants = (params = {}) => {
+    console.log("📡 API Call: GET /api/vehicle-variants");
+    return api.get('/vehicle-variants', { params });
+};
+
