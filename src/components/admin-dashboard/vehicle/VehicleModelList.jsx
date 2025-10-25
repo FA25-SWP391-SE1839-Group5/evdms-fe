@@ -140,6 +140,26 @@ export default function VehicleModelList() {
                     </button>
                  </div>
             </div>
+
+            {/* Alerts within card-body or above card */}
+            {(error || success) && (
+                <div className="card-body pb-0">
+                    {error && (
+                        <div className="alert alert-danger alert-dismissible d-flex align-items-center mb-0" role="alert">
+                            <AlertCircle size={20} className="me-2" />
+                            <div className="flex-grow-1">{error}</div>
+                            <button type="button" className="btn-close" onClick={() => setError('')}></button>
+                        </div>
+                    )}
+                    {success && (
+                        <div className="alert alert-success alert-dismissible d-flex align-items-center mb-0" role="alert">
+                            <CheckCircle size={20} className="me-2" />
+                            <div className="flex-grow-1">{success}</div>
+                            <button type="button" className="btn-close" onClick={() => setSuccess('')}></button>
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     )
 }
