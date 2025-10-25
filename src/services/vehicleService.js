@@ -42,3 +42,12 @@ export const updateVehicleModel = (id, modelData) => {
     console.log("📤 Sending update data:", modelData);
     return api.put(`/vehicle-models/${id}`, modelData);
 };
+
+/**
+ * DELETE Vehicle Model
+ * @param {string} id - Model ID
+ */
+export const deleteVehicleModel = (id) => {
+    console.log(`📡 API Call: DELETE /api/vehicle-models/${id}`);
+    return api.delete(`/vehicle-models/${id}`);
+};
