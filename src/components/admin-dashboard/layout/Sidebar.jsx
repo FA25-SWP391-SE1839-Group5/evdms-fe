@@ -33,7 +33,7 @@ const Sidebar = ({ currentPage }) => {
     {
       id: 'users-notifications',
       label: 'Roles & Permissions',
-      page: 'users/notifications'
+      page: 'roles'
     },
   ];
 
@@ -193,7 +193,7 @@ const Sidebar = ({ currentPage }) => {
 
         {/* User Management with Submenu */}
         <li 
-          className={`menu-item ${ currentPage.startsWith('users') ? 'active open' : '' }`}
+          className={`menu-item ${ (currentPage === 'users' || currentPage === 'roles') ? 'active open' : '' }`}
         >
           <a href="javascript:void(0);" className="menu-link menu-toggle">
             <i className="menu-icon tf-icons bx bx-user" />

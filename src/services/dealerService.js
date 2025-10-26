@@ -128,13 +128,176 @@ export const deleteDealerContract = (contractId) => {
 };
 
 // ============================================
-// CÁC API KHÁC LIÊN QUAN ĐẾN DEALER (nếu cần)
-// Ví dụ: DealerContract, DealerOrder, DealerPayment
-// Bạn có thể thêm các hàm tương tự ở đây
+// API CALLS - DEALER ORDERS 
+// ============================================
+/**
+ * Get All Dealer Orders
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const getAllDealerOrders = () => {
+    console.log("📡 API Call: GET /api/dealer-orders");
+    return api.get('/dealer-orders');
+};
+
+/**
+ * CREATE Dealer Order
+ * @param {object} orderData - Dữ liệu Order mới
+ * @param {string} orderData.dealerId
+ * @param {string} orderData.variantId // ID của biến thể xe
+ * @param {number} orderData.quantity
+ * @param {string} orderData.color
+ * @param {string} orderData.status // e.g., 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const createDealerOrder = (orderData) => {
+  console.log("📡 API Call: POST /api/dealer-orders");
+  console.log("📤 Sending data:", orderData);
+  // Ensure quantity is a number
+  const dataToSend = { ...orderData, quantity: Number(orderData.quantity) || 1 };
+  return api.post('/dealer-orders', dataToSend);
+};
+
+/**
+ * UPDATE Dealer Order
+ * @param {string|number} orderId
+ * @param {object} orderData - Chỉ chứa các trường cần update
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const updateDealerOrder = (orderId, orderData) => {
+  console.log(`📡 API Call: PUT /api/dealer-orders/${orderId}`);
+  console.log("📤 Sending update data:", orderData);
+  // Ensure quantity is a number if present
+  const dataToSend = orderData.quantity
+      ? { ...orderData, quantity: Number(orderData.quantity) }
+      : orderData;
+  return api.put(`/dealer-orders/${orderId}`, dataToSend);
+};
+
+/**
+ * DELETE Dealer Order
+ * @param {string|number} orderId
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const deleteDealerOrder = (orderId) => {
+  console.log(`📡 API Call: DELETE /api/dealer-orders/${orderId}`);
+  return api.delete(`/dealer-orders/${orderId}`);
+};
+
+// ============================================
+// API CALLS - VEHICLE VARIANTS 
 // ============================================
 
-// Ví dụ cho DealerContract:
-// export const getAllDealerContracts = (dealerId) => {
-//   console.log(`📡 API Call: GET /api/dealer-contracts?dealerId=${dealerId}`); // Giả sử có query param
-//   return api.get('/dealer-contracts', { params: { dealerId } });
-// };
+/**
+ * Get All Vehicle Variants
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const getAllVehicleVariants = () => {
+    console.log("📡 API Call: GET /api/vehicle-variants");
+    // Giả định endpoint là '/vehicle-variants', hãy sửa nếu cần
+    return api.get('/vehicle-variants'); 
+};
+
+// ============================================
+// API CALLS - DEALER PAYMENTS
+// ============================================
+
+/**
+ * Get All Dealer Payments
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const getAllDealerPayments = () => {
+    console.log("📡 API Call: GET /api/dealer-payments");
+    return api.get('/dealer-payments');
+};
+
+/**
+ * CREATE Dealer Payment
+ * @param {object} paymentData
+ * @param {string} paymentData.dealerId
+ * @param {number} paymentData.amount
+ * @param {string} paymentData.paymentMethod
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const createDealerPayment = (paymentData) => {
+  console.log("📡 API Call: POST /api/dealer-payments");
+  // Ensure amount is a number, status will likely be set by backend (default 'Pending')
+  const dataToSend = { ...paymentData, amount: Number(paymentData.amount) || 0 };
+  console.log("📤 Sending data:", dataToSend);
+  return api.post('/dealer-payments', dataToSend);
+};
+
+/**
+ * UPDATE Dealer Payment (e.g., amount, method)
+ * @param {string|number} paymentId
+ * @param {object} paymentData
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const updateDealerPayment = (paymentId, paymentData) => {
+  console.log(`📡 API Call: PUT /api/dealer-payments/${paymentId}`);
+   // Ensure amount is a number if present
+   const dataToSend = paymentData.amount
+      ? { ...paymentData, amount: Number(paymentData.amount) }
+      : paymentData;
+  console.log("📤 Sending update data:", dataToSend);
+  return api.put(`/dealer-payments/${paymentId}`, dataToSend);
+};
+
+/**
+ * DELETE Dealer Payment
+ * @param {string|number} paymentId
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const deleteDealerPayment = (paymentId) => {
+  console.log(`📡 API Call: DELETE /api/dealer-payments/${paymentId}`);
+  return api.delete(`/dealer-payments/${paymentId}`);
+};
+
+/**
+ * Mark Dealer Payment as PAID
+ * @param {string|number} paymentId
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const markPaymentPaid = (paymentId) => {
+  console.log(`📡 API Call: POST /api/dealer-payments/${paymentId}/mark-paid`);
+  // POST request typically doesn't need a body for this kind of action
+  return api.post(`/dealer-payments/${paymentId}/mark-paid`);
+};
+
+/**
+ * Mark Dealer Payment as FAILED
+ * @param {string|number} paymentId
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const markPaymentFailed = (paymentId) => {
+  console.log(`📡 API Call: POST /api/dealer-payments/${paymentId}/mark-failed`);
+  // POST request typically doesn't need a body
+  return api.post(`/dealer-payments/${paymentId}/mark-failed`);
+};
+
+/**
+ * Upload document cho Dealer Payment
+ * @param {string} paymentId - ID của payment
+ * @param {File} documentFile - File document (PDF)
+ */
+export const uploadDealerPaymentDocument = (paymentId, documentFile) => {
+    console.log(`📡 API Call: POST /api/dealer-payments/${paymentId}/upload-document`);
+    const formData = new FormData();
+    formData.append('document', documentFile); // Tên field 'document' có thể cần đổi
+
+    return api.post(`/dealer-payments/${paymentId}/upload-document`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
+
+/**
+ * Xóa document của Dealer Payment
+ * @param {string} paymentId - ID của payment
+ * @param {string} documentId - ID của document cần xóa (hoặc publicId, tùy backend)
+ */
+export const deleteDealerPaymentDocument = (paymentId, documentId) => { // Cần làm rõ cách xác định document cần xóa
+     console.log(`📡 API Call: DELETE /api/dealer-payments/${paymentId}/delete-document`);
+     // API này có thể cần documentId trong URL hoặc body
+     return api.delete(`/dealer-payments/${paymentId}/delete-document`, { data: { documentId } }); // Ví dụ gửi ID trong body
+};
