@@ -285,6 +285,37 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                         ))}
                     </>
                 );
+                case 3: // Features
+                return (
+                     <>
+                        {Object.entries(featureCategories).map(([category, featuresInCategory]) => (
+                            <div key={category} className="mb-4">
+                                <h6>{category}</h6>
+                                <div className="row g-2">
+                                    {featuresInCategory.map(feature => (
+                                        <div key={feature} className="col-md-4 col-sm-6">
+                                            <div className="form-check">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="checkbox"
+                                                    id={`feature-${category}-${feature}`}
+                                                    checked={features[category]?.includes(feature) || false}
+                                                    onChange={() => handleFeatureChange(category, feature)}
+                                                    disabled={loading}
+                                                />
+                                                <label className="form-check-label" htmlFor={`feature-${category}-${feature}`}>
+                                                    {/* Chuyển đổi tên feature thành dạng đọc được */}
+                                                    {feature.replace(/([A-Z])/g, ' $1').trim()}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </>
+                );
+            default: return null;
         }
     };
 
