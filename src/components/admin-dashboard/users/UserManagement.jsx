@@ -228,8 +228,6 @@ const UserManagement = () => {
       setError(errorMsg);
     }
   };
-  // END: HÀM MỚI
-
 
   // HÀM ĐỂ XEM CHI TIẾT
   const handleView = (user) => {

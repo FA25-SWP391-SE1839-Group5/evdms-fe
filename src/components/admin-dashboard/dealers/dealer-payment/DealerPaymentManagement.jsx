@@ -1,14 +1,17 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { AlertCircle, CheckCircle, Plus, Edit, Trash, Check, X, MoreVertical } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { AlertCircle, CheckCircle, Plus, Edit, Trash, Check, X, Download, FileX } from 'lucide-react';
 import {
     getAllDealerPayments,
     deleteDealerPayment,
     markPaymentPaid,
     markPaymentFailed,
+    uploadDealerPaymentDocument,
+    deleteDealerPaymentDocument,
     getAllDealers,
 } from '../../../../services/dealerService';
 import DealerPaymentModal from './DealerPaymentModal';
 import DealerPaymentStatsCards from './DealerPaymentStatsCards';
+import DealerPaymentDetailsModal from './DealerPaymentDetailsModal';
 
 // --- Helper Functions ---
 const formatPaymentId = (id) => `#${id?.slice(-6).toUpperCase() || 'N/A'}`;
@@ -16,18 +19,26 @@ const formatDate = (isoString) => isoString ? new Date(isoString).toLocaleString
 const formatCurrency = (amount) => typeof amount === 'number' ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount) : 'N/A';
 
 const RenderPaymentStatus = ({ status }) => {
-    let badgeClass = 'secondary';
-    let icon = null; // Optional icon
-    switch (status?.toLowerCase()) {
-        case 'pending': badgeClass = 'warning'; icon = <Clock size={14} className="me-1"/>; break;
-        case 'paid': badgeClass = 'success'; icon = <CheckCircle size={14} className="me-1"/>; break;
-        case 'failed': badgeClass = 'danger'; icon = <XCircle size={14} className="me-1"/>; break;
-    }
-    // Mimic invoice list style
-    return <span className={`badge rounded-pill bg-label-${badgeClass} d-flex align-items-center p-1 px-2`}><span className={`dot bg-${badgeClass} me-1`}></span> {status || 'N/A'}</span>;
+    let badgeLabelClass = 'secondary'; // Màu mặc định
 
-    // Original badge style:
-    // return <span className={`badge bg-label-${badgeClass}`}>{status || 'N/A'}</span>;
+    switch (status?.toLowerCase()) {
+        case 'pending':
+            badgeLabelClass = 'warning'; // Màu cam cho Pending
+            break;
+        case 'paid':
+            badgeLabelClass = 'success'; // Màu xanh lá cho Paid (giống 'Active' của cậu)
+            break;
+        case 'failed':
+            badgeLabelClass = 'danger'; // Màu đỏ cho Failed
+            break;
+    }
+
+    // Dùng chính xác cấu trúc class của cậu: badge bg-label-COLOR
+    return (
+        <span className={`badge bg-label-${badgeLabelClass}`}>
+            {status || 'N/A'}
+        </span>
+    );
 };
 
 export default function DealerPaymentManagement() {
@@ -40,11 +51,17 @@ export default function DealerPaymentManagement() {
     const [showFormModal, setShowFormModal] = useState(false);
     const [paymentToEdit, setPaymentToEdit] = useState(null);
 
+    const [showViewModal, setShowViewModal] = useState(false);
+    const [paymentToView, setPaymentToView] = useState(null);
+
     // Pagination & Filter State
     const [pageSize, setPageSize] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     const [statusFilter, setStatusFilter] = useState(''); // Filter dropdown
     const [globalSearch, setGlobalSearch] = useState(''); // Search input
+
+    const [paymentIdForUpload, setPaymentIdForUpload] = useState(null);
+    const fileInputRef = useRef(null);
 
     // Fetch Data
     useEffect(() => {
@@ -172,6 +189,64 @@ export default function DealerPaymentManagement() {
         } catch (err) { setError(err.response?.data?.message || 'Failed to mark as failed'); }
     };
 
+    // Handler View
+    const handleView = (paymentId) => {
+        const payment = payments.find(p => p.id === paymentId);
+        if (payment) { setPaymentToView(payment); setShowViewModal(true); }
+    };
+
+    const handleUploadClick = (paymentId) => {
+        setPaymentIdForUpload(paymentId); // Lưu ID của payment cần upload
+        fileInputRef.current.click(); // Kích hoạt input file ẩn
+    };
+
+    const handleFileSelected = async (event) => {
+        const file = event.target.files[0];
+        
+        // Kiểm tra nếu không có file hoặc không có ID đã lưu
+        if (!file || !paymentIdForUpload) {
+            if(fileInputRef.current) fileInputRef.current.value = null;
+            setPaymentIdForUpload(null);
+            return; 
+        }
+
+        const payId = formatPaymentId(paymentIdForUpload);
+        
+        // Hiển thị loading (nếu muốn)
+        // setLoadingData(true); // Cân nhắc dùng 1 state loading riêng
+        setSuccess(`Uploading ${file.name} for ${payId}...`);
+        
+        try {
+            await uploadDealerPaymentDocument(paymentIdForUpload, file);
+            setSuccess(`Document uploaded successfully for ${payId}.`);
+            reloadPayments(); 
+        } catch (err) {
+            console.error("Upload failed:", err);
+            setError(err.response?.data?.message || 'Failed to upload document');
+        } finally {
+            // Reset state và input file
+            // setLoadingData(false);
+            setPaymentIdForUpload(null);
+            if(fileInputRef.current) {
+                fileInputRef.current.value = null; // Reset để có thể upload file y hệt lần nữa
+            }
+        }
+    };
+
+    const handleDeleteDocument = async (paymentId, documentId) => {
+        const payId = formatPaymentId(paymentId);
+        if (!window.confirm(`Are you sure you want to delete the document for Payment ${payId}?`)) return;
+
+        try {
+            // Gọi API delete từ dealerService
+            await deleteDealerPaymentDocument(paymentId, documentId);
+            setSuccess(`Document for ${payId} deleted successfully.`);
+            reloadPayments(); // Tải lại list để cập nhật (p.documentUrl sẽ bị null)
+        } catch (err) {
+            setError(err.response?.data?.message || 'Failed to delete document');
+        }
+    };
+
     if (loadingData) {
         return <div className="d-flex justify-content-center align-items-center vh-100"><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div></div>;
     }
@@ -273,7 +348,6 @@ export default function DealerPaymentManagement() {
                             ) : (
                                 paginatedPayments.map(p => (
                                     <tr key={p.id}>
-                                        <td><input className="form-check-input" type="checkbox" value={p.id} /></td>
                                         <td><span className="fw-semibold text-primary">{formatPaymentId(p.id)}</span></td>
                                         <td><RenderPaymentStatus status={p.status} /></td>
                                         <td>{dealerMap[p.dealerId] || 'N/A'}</td>
@@ -281,10 +355,72 @@ export default function DealerPaymentManagement() {
                                         <td>{formatDate(p.createdAt || p.updatedAt)}</td>
                                         <td>{p.paymentMethod}</td>
                                         <td>
-                                            <div className="dropdown">
-                                                <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                                    <MoreVertical size={18}/>
+                                            <div className="d-flex align-items-center">
+                                                {/* 1. Delete Button */}
+                                                <button 
+                                                    type="button" 
+                                                    className="btn btn-icon btn-text-secondary rounded-pill btn-sm"
+                                                    data-bs-toggle="tooltip" 
+                                                    title="Delete"
+                                                    onClick={() => handleDelete(p.id)}
+                                                >
+                                                    <i className="bx bx-trash" />
                                                 </button>
+
+                                                {/* View Button */}
+                                                <button 
+                                                    type="button" 
+                                                    className="btn btn-icon btn-text-secondary rounded-pill btn-sm"
+                                                    data-bs-toggle="tooltip" 
+                                                    title="View"
+                                                    onClick={() => handleView(p.id)}
+                                                >
+                                                    <i className="bx bx-show" /> 
+                                                </button>
+
+                                                {/*  Menu Buttons */}
+                                                <div className="dropdown">
+                                                    <button 
+                                                        type="button" 
+                                                        className="btn p-0 dropdown-toggle hide-arrow btn-sm" 
+                                                        data-bs-toggle="dropdown"
+                                                    >
+                                                        <i className="bx bx-dots-vertical-rounded" />
+                                                    </button>
+                                                    <div className="dropdown-menu">
+                                                        <button 
+                                                            type="button" 
+                                                            className="dropdown-item d-flex align-items-center" 
+                                                            onClick={() => handleEdit(p.id)}
+                                                        >
+                                                            <i className="bx bx-edit-alt me-2" /> Edit
+                                                        </button>
+                                                        <button
+                                                            type="button" 
+                                                            className="dropdown-item" 
+                                                            onClick={() => handleUploadClick(p.id)}
+                                                        >
+                                                            <i class="bx bx-export me-1" />  Upload
+                                                        </button>
+                                                        <button 
+                                                            className="dropdown-item d-flex align-items-center gap-2" 
+                                                            onClick={() => window.open(p.documentUrl, '_blank')}
+                                                            disabled={!p.documentUrl} 
+                                                            title={!p.documentUrl ? "No document uploaded" : "View uploaded document"}
+                                                        >
+                                                            <Download size={16} className="me-1" /> View Document
+                                                        </button>
+
+                                                        <button 
+                                                            className="dropdown-item text-danger d-flex align-items-center gap-2" 
+                                                            onClick={() => handleDeleteDocument(p.id, p.documentId)}
+                                                            disabled={!p.documentId}
+                                                            title={!p.documentId ? "No document to delete" : "Delete uploaded document"}
+                                                        >
+                                                            <FileX size={16} className="me-1"/> Delete Document
+                                                        </button>
+                                                    </div>
+                                                </div>
                                                 <div className="dropdown-menu">
                                                     {p.status?.toLowerCase() === 'pending' && (
                                                         <>
@@ -331,6 +467,14 @@ export default function DealerPaymentManagement() {
                 </div>
             </div>
 
+            <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileSelected}
+                style={{ display: 'none' }}
+                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" // Giới hạn loại file (tùy chọn)
+            />
+
             {/* Modal */}
             <DealerPaymentModal
                 show={showFormModal}
@@ -338,6 +482,13 @@ export default function DealerPaymentManagement() {
                 onSaveSuccess={handleSaveSuccess}
                 dealers={dealers}
                 paymentToEdit={paymentToEdit}
+            />
+
+            <DealerPaymentDetailsModal
+                show={showViewModal}
+                onClose={() => { setShowViewModal(false); setPaymentToView(null); }}
+                payment={paymentToView}
+                dealerName={paymentToView ? dealerMap[paymentToView.dealerId] : ''}
             />
         </>
     )

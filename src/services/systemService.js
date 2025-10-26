@@ -18,12 +18,19 @@ export const getAllAuditLogs = (params = {}) => {
 
 /**
  * EXPORT file Audit Logs (CSV/Excel)
+ * @param {string} format - 'csv', 'excel', 'pdf'
+ * @param {object} filters - Các bộ lọc (search, timePeriod, roles, actions)
  */
-export const exportAuditLogs = async (format = 'csv') => { 
+export const exportAuditLogs = async (format = 'csv', filters = {}) => { 
+    const params = {
+        format,         // 'csv', 'excel', 'pdf'
+        ...filters      // Thêm: search, timePeriod, roles, actions...
+    };
+
     console.log(`📡 API Call: GET /api/audit-logs/export?format=${format}`);
     try {
         const response = await api.get('/audit-logs/export', {
-            params: { format },
+            params: params,
             responseType: 'blob', 
         });
 
