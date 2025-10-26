@@ -153,6 +153,59 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
         if (currentStep > 1) setCurrentStep(s => s - 1);
     };
 
+    // --- Submit Handler ---
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+
+        // Basic validation (đã check ở nextStep)
+        if (!basicInfo.modelId || !basicInfo.name || !basicInfo.basePrice) {
+            setError('Basic information is missing.');
+            setCurrentStep(1); // Quay về step 1
+            setLoading(false);
+            return;
+        }
+
+        const dataToSend = {
+            modelId: basicInfo.modelId,
+            name: basicInfo.name,
+            basePrice: Number(basicInfo.basePrice) || 0,
+            // Chỉ gửi specs/features nếu object không rỗng
+            ...(Object.keys(specs).length > 0 && { specs: specs }),
+            ...(Object.keys(features).length > 0 && { features: features }),
+        };
+
+        try {
+            let response;
+            if (isEditMode) {
+                response = await updateVehicleVariant(variantToEdit.id, dataToSend);
+            } else {
+                response = await createVehicleVariant(dataToSend);
+            }
+
+            // Kiểm tra response từ backend (giả định có success flag)
+             if (response.data?.success === true || (response.status >= 200 && response.status < 300) ) {
+                onSaveSuccess(isEditMode);
+            } else {
+                throw new Error(response.data?.message || 'Failed to save variant');
+            }
+        } catch (err) {
+            console.error("Save Variant Error:", err);
+            setError(err.response?.data?.message || err.message || 'Operation failed');
+        } finally {
+            setLoading(false);
+            // Không đóng modal ngay nếu có lỗi
+        }
+    };
+
+
+
+
+
+
+
+    
     return (
         <div>
 
