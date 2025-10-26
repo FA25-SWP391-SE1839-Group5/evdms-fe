@@ -354,6 +354,17 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                     )}
                                     {renderStepContent()}
                                 </div>
+                                <div className="modal-footer d-flex justify-content-between">
+                                    {/* Previous Button */}
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary"
+                                        onClick={prevStep}
+                                        disabled={loading || currentStep === 1}
+                                    >
+                                        <ArrowLeft size={16} className="me-1" /> Previous
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>
