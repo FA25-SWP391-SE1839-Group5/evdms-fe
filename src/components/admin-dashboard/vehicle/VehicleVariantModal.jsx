@@ -342,6 +342,18 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                         disabled={loading}
                                     ></button>
                                 </div>
+                                <div 
+                                    className="modal-body" 
+                                    style={{ maxHeight: '70vh', overflowY: 'auto' }}
+                                > {/* Scroll nếu nội dung dài */}
+                                    {error && (
+                                        <div className="alert alert-danger d-flex align-items-center" role="alert">
+                                            <AlertCircle size={20} className="me-2" />
+                                            <div>{error}</div>
+                                        </div>
+                                    )}
+                                    {renderStepContent()}
+                                </div>
                             </form>
                         </div>
                     </div>
