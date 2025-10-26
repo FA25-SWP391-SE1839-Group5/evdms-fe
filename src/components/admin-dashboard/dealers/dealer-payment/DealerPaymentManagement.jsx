@@ -377,7 +377,7 @@ export default function DealerPaymentManagement() {
                                                             className="dropdown-item" 
                                                             onClick={() => handleUploadClick(p.id)}
                                                         >
-                                                            <Upload size={16} className="me-1"/> Upload Document
+                                                            <i class="bx bx-export me-1" />  Upload
                                                         </button>
                                                     </div>
                                                 </div>
