@@ -111,8 +111,11 @@ export default function AuditLogManagement() {
     }
 
     return (
-        <div>
-            
-        </div>
+        <>
+        <h4 className="fw-bold py-3 mb-4">
+            <span className="text-muted fw-light">System /</span> Audit Logs
+        </h4>
+
+        </>
     )
 }
