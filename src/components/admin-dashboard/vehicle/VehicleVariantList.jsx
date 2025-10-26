@@ -63,7 +63,21 @@ export default function VehicleVariantList() {
         }
     }, [error, success]);
 
+    // Filter & Paginate
+    const filteredVariants = useMemo(() => {
+        return variants.filter(variant =>
+            variant.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            modelsMap[variant.modelId]?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [variants, modelsMap, searchTerm]);
 
+    const totalPages = Math.ceil(filteredVariants.length / pageSize);
+    const paginatedVariants = useMemo(() => {
+        const startIndex = (currentPage - 1) * pageSize;
+        return filteredVariants.slice(startIndex, startIndex + pageSize);
+    }, [filteredVariants, currentPage, pageSize]);
+    const startEntry = filteredVariants.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+    const endEntry = Math.min(currentPage * pageSize, filteredVariants.length);
 
     return (
         <div>
