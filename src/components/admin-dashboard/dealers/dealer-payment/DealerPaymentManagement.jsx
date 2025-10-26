@@ -177,10 +177,15 @@ export default function DealerPaymentManagement() {
         } catch (err) { setError(err.response?.data?.message || 'Failed to mark as failed'); }
     };
 
-    // Handler mới cho nút con mắt (View)
+    // Handler View
     const handleView = (paymentId) => {
         const payment = payments.find(p => p.id === paymentId);
         if (payment) { setPaymentToView(payment); setShowViewModal(true); }
+    };
+
+    const handleUploadClick = (paymentId) => {
+        setPaymentIdForUpload(paymentId); // Lưu ID của payment cần upload
+        fileInputRef.current.click(); // Kích hoạt input file ẩn
     };
 
     if (loadingData) {
