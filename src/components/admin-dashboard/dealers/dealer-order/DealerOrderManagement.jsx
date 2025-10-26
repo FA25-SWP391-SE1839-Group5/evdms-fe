@@ -432,7 +432,17 @@ export default function DealerOrderManagement() {
                                 paginatedOrders.map(order => (
                                     <tr key={order.id}>
                                         <td>
-                                            <span className="fw-semibold text-primary">{formatOrderId(order.id)}</span>
+                                            <a 
+                                                href="#" 
+                                                className="fw-semibold text-primary"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    handleViewDetails(order.id);
+                                                }}
+                                                title="View Details"
+                                            >
+                                                {formatOrderId(order.id)}
+                                            </a>
                                         </td>
                                         <td>{formatDate(order.createdAt || order.updatedAt)}</td>
                                         <td>{dealerMap[order.dealerId] || 'N/A'}</td>
@@ -487,6 +497,15 @@ export default function DealerOrderManagement() {
                 onSaveSuccess={handleSaveSuccess}
                 dealers={dealers} 
                 orderToEdit={orderToEdit}
+            />
+
+            {/* Modal Views */}
+            <DealerOrderDetailsModal
+                show={showViewModal}
+                onClose={() => { setShowViewModal(false); setOrderToView(null); }}
+                order={orderToView}
+                dealerName={orderToView ? dealerMap[orderToView.dealerId] : 'N/A'}
+                variantName={orderToView ? variantMap[orderToView.variantId] : 'N/A'}
             />
         </>
     )
