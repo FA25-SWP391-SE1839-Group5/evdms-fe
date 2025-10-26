@@ -332,13 +332,26 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                             <small>Enter model, name, and price.</small>
                                         </div>
                                         <div className="row g-3">
-                                            
+
                                             {/* Model Select */}
                                             <div className="col-md-6">
                                                 <label htmlFor="modelId" className="form-label">Parent Model *</label>
-                                                <select id="modelId" name="modelId" className={`form-select ${!basicInfo.modelId && error ? 'is-invalid' : ''}`} value={basicInfo.modelId} onChange={handleBasicInfoChange} disabled={loadingModels || loading || isEditMode} required>
+                                                <select 
+                                                    id="modelId" 
+                                                    name="modelId" 
+                                                    className={`form-select ${!basicInfo.modelId && error ? 'is-invalid' : ''}`} value={basicInfo.modelId} 
+                                                    onChange={handleBasicInfoChange} 
+                                                    disabled={loadingModels || loading || isEditMode} 
+                                                    required
+                                                >
                                                     <option value="">-- Select Model --</option>
-                                                    {models.map(model => (<option key={model.id} value={model.id}>{model.name}</option>))}
+                                                    {models.map(
+                                                        model => (
+                                                        <option 
+                                                            key={model.id} 
+                                                            value={model.id}>{model.name}
+                                                        </option>
+                                                    ))}
                                                 </select>
                                                 {loadingModels && <div className="form-text">Loading models...</div>}
                                             </div>
@@ -346,7 +359,33 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                             {/* Variant Name */}
                                             <div className="col-md-6">
                                                 <label htmlFor="variantName" className="form-label">Variant Name *</label>
-                                                <input type="text" id="variantName" name="name" className={`form-control ${!basicInfo.name && error ? 'is-invalid' : ''}`} value={basicInfo.name} onChange={handleBasicInfoChange} placeholder="e.g., Eco, Plus, Premium" disabled={loading} required />
+                                                <input 
+                                                    type="text" 
+                                                    id="variantName" 
+                                                    name="name" 
+                                                    className={`form-control ${!basicInfo.name && error ? 'is-invalid' : ''}`} value={basicInfo.name} 
+                                                    onChange={handleBasicInfoChange} 
+                                                    placeholder="e.g., Eco, Plus, Premium" 
+                                                    disabled={loading} 
+                                                    required 
+                                                />
+                                            </div>
+
+                                            {/* Base Price */}
+                                            <div className="col-md-6">
+                                                <label htmlFor="basePrice" className="form-label">Base Price (VND) *</label>
+                                                <input 
+                                                    type="number" 
+                                                    id="basePrice" 
+                                                    name="basePrice" 
+                                                    className={`form-control ${!basicInfo.basePrice && error ? 'is-invalid' : ''}`} 
+                                                    value={basicInfo.basePrice} 
+                                                    onChange={handleBasicInfoChange} 
+                                                    placeholder="e.g., 900000000" 
+                                                    min="0" 
+                                                    disabled={loading} 
+                                                    required
+                                                />
                                             </div>
                                         </div>
                                     </div>
