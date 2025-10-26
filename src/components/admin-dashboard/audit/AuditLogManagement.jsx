@@ -54,6 +54,14 @@ export default function AuditLogManagement() {
         fetchData();
     }, []);
 
+    // Auto-hide alerts
+    useEffect(() => {
+        if (error || success) {
+            const timer = setTimeout(() => { setError(''); setSuccess(''); }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [error, success]);
+
     return (
         <div>
             
