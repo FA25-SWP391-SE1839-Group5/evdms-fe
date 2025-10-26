@@ -216,6 +216,38 @@ export default function AuditLogManagement() {
             </div>
         </div>
 
+        {/* Table */}
+        <div className="table-responsive text-nowrap">
+            <table className="table table-hover">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Description</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody className="table-border-bottom-0">
+                    {paginatedLogs.length === 0 ? (
+                        <tr>
+                            <td colSpan="4" className="text-center py-4">
+                                {filteredLogs.length === 0 && !searchTerm ? 'No logs found' : 'No logs match your search'}
+                            </td>
+                        </tr>
+                    ) : (
+                        paginatedLogs.map(log => (
+                            <tr key={log.id}>
+                                <td>{userMap[log.userId] || log.userId || 'System/Unknown'}</td>
+                                <td><span className="badge bg-label-info">{log.action}</span></td>
+                                <td>{log.description}</td>
+                                <td>{formatDate(log.createdAt)}</td> 
+                            </tr>
+                        ))
+                    )}
+                </tbody>
+            </table>
+        </div>
+
         </>
     )
 }
