@@ -188,6 +188,39 @@ export default function DealerPaymentManagement() {
         fileInputRef.current.click(); // Kích hoạt input file ẩn
     };
 
+    const handleFileSelected = async (event) => {
+        const file = event.target.files[0];
+        
+        // Kiểm tra nếu không có file hoặc không có ID đã lưu
+        if (!file || !paymentIdForUpload) {
+            if(fileInputRef.current) fileInputRef.current.value = null;
+            setPaymentIdForUpload(null);
+            return; 
+        }
+
+        const payId = formatPaymentId(paymentIdForUpload);
+        
+        // Hiển thị loading (nếu muốn)
+        // setLoadingData(true); // Cân nhắc dùng 1 state loading riêng
+        setSuccess(`Uploading ${file.name} for ${payId}...`);
+        
+        try {
+            await uploadDealerPaymentDocument(paymentIdForUpload, file);
+            setSuccess(`Document uploaded successfully for ${payId}.`);
+            // reloadPayments(); // Tải lại list nếu cần
+        } catch (err) {
+            console.error("Upload failed:", err);
+            setError(err.response?.data?.message || 'Failed to upload document');
+        } finally {
+            // Reset state và input file
+            // setLoadingData(false);
+            setPaymentIdForUpload(null);
+            if(fileInputRef.current) {
+                fileInputRef.current.value = null; // Reset để có thể upload file y hệt lần nữa
+            }
+        }
+    };
+
     if (loadingData) {
         return <div className="d-flex justify-content-center align-items-center vh-100"><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div></div>;
     }
