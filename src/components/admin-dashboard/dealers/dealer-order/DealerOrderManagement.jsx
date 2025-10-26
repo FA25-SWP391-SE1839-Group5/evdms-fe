@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { AlertCircle, CheckCircle, Plus, Edit, Trash, FileText } from 'lucide-react';
+import { AlertCircle, CheckCircle, Plus, Edit, Trash } from 'lucide-react';
 import { getAllDealerOrders, deleteDealerOrder, getAllDealers, getAllVehicleVariants } from '../../../../services/dealerService';
 import DealerOrderModal from './DealerOrderModal';
 import OrderStatsCards from './OrdersStatsCards';
+import DealerOrderDetailsModal from './DealerOrderDetailsModal';
 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -44,6 +45,9 @@ export default function DealerOrderManagement() {
     const [success, setSuccess] = useState('');
     const [showFormModal, setShowFormModal] = useState(false);
     const [orderToEdit, setOrderToEdit] = useState(null);
+
+    const [showViewModal, setShowViewModal] = useState(false);
+    const [orderToView, setOrderToView] = useState(null);
 
     const [pageSize, setPageSize] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
@@ -291,6 +295,14 @@ export default function DealerOrderManagement() {
         } catch (exportError) {
              setError(`Failed to export data as ${format.toUpperCase()}.`);
              console.error(`Export Error (${format}):`, exportError);
+        }
+    };
+
+    const handleViewDetails = (orderId) => {
+        const order = orders.find(o => o.id === orderId);
+        if (order) {
+            setOrderToView(order);
+            setShowViewModal(true);
         }
     };
 
