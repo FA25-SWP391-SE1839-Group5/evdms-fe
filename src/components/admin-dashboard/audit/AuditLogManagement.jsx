@@ -89,7 +89,7 @@ export default function AuditLogManagement() {
 
     // Handlers
     const handlePageSizeChange = (e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); };
-    
+    const handleSearchChange = (e) => { setSearchTerm(e.target.value); setCurrentPage(1); };
 
     return (
         <div>
