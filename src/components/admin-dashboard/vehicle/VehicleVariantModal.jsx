@@ -77,6 +77,31 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
             fetchModels();
         }
     }, [show]); // Phụ thuộc vào show
+
+    // Populate form data when editing
+    useEffect(() => {
+        if (show) {
+            setError('');
+            setCurrentStep(1); // Luôn bắt đầu từ step 1
+            if (isEditMode && variantToEdit) {
+                setBasicInfo({
+                    modelId: variantToEdit.modelId || '',
+                    name: variantToEdit.name || '',
+                    basePrice: variantToEdit.basePrice || ''
+                });
+                setSpecs(variantToEdit.specs || {});
+                setFeatures(variantToEdit.features || {});
+            } else {
+                // Reset form for adding
+                setBasicInfo({ modelId: '', name: '', basePrice: '' });
+                setSpecs({});
+                setFeatures({});
+            }
+        }
+    }, [show, variantToEdit, isEditMode]);
+
+
+    
     return (
         <div>
 
