@@ -382,7 +382,7 @@ export default function DealerPaymentManagement() {
                                                     <div className="dropdown-menu">
                                                         <button 
                                                             type="button" 
-                                                            className="dropdown-item" 
+                                                            className="dropdown-item d-flex align-items-center" 
                                                             onClick={() => handleEdit(p.id)}
                                                         >
                                                             <i className="bx bx-edit-alt me-2" /> Edit
@@ -395,7 +395,7 @@ export default function DealerPaymentManagement() {
                                                             <i class="bx bx-export me-1" />  Upload
                                                         </button>
                                                         <button 
-                                                            className="dropdown-item" 
+                                                            className="dropdown-item d-flex align-items-center gap-2" 
                                                             onClick={() => window.open(p.documentUrl, '_blank')}
                                                             disabled={!p.documentUrl} 
                                                             title={!p.documentUrl ? "No document uploaded" : "View uploaded document"}
@@ -404,7 +404,7 @@ export default function DealerPaymentManagement() {
                                                         </button>
 
                                                         <button 
-                                                            className="dropdown-item text-danger" 
+                                                            className="dropdown-item text-danger d-flex align-items-center gap-2" 
                                                             onClick={() => handleDeleteDocument(p.id, p.documentId)}
                                                             disabled={!p.documentId}
                                                             title={!p.documentId ? "No document to delete" : "Delete uploaded document"}
