@@ -355,6 +355,7 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                     {renderStepContent()}
                                 </div>
                                 <div className="modal-footer d-flex justify-content-between">
+
                                     {/* Previous Button */}
                                     <button
                                         type="button"
@@ -364,11 +365,32 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                     >
                                         <ArrowLeft size={16} className="me-1" /> Previous
                                     </button>
-                                </div>
-                            </form>
-                        </div>
+
+                                    {/* Next / Submit Button */}
+                                    {currentStep < 3 ? (
+                                    <button
+                                        type="button"
+                                        className="btn btn-primary"
+                                        onClick={nextStep}
+                                        disabled={loading || loadingModels}
+                                    >
+                                        Next <ArrowRight size={16} className="ms-1" />
+                                    </button>
+                                ) : (
+                                    <button
+                                        type="submit"
+                                        className="btn btn-success" // Nút Submit màu xanh
+                                        disabled={loading}
+                                    >
+                                        {loading ? 'Saving...' : (isEditMode ? 'Update Variant' : 'Create Variant')}
+                                    </button>
+                                )}
+                            </div>
+                        </form>
                     </div>
+                </div>
             </div>
+            {show && <div className="modal-backdrop fade show"></div>}
         </>
     )
 }
