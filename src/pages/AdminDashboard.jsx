@@ -16,6 +16,7 @@ import DealerOrderManagement from '../components/admin-dashboard/dealers/dealer-
 import DealerPaymentManagement from '../components/admin-dashboard/dealers/dealer-payment/DealerPaymentManagement';
 import RolesPermissionsTab from '../components/admin-dashboard/users/RolesPermissionsTab';
 import VehicleInventoryManagement from '../components/admin-dashboard/vehicle/VehicleInventoryManagement';
+import AuditLogManagement from '../components/admin-dashboard/audit/AuditLogManagement';
 
 const AdminDashboard = ({ currentPage = 'dashboard' }) => {
   const renderPageContent = () => {
@@ -144,12 +145,7 @@ const AdminDashboard = ({ currentPage = 'dashboard' }) => {
       case 'audit':
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
-            <h4 className="fw-bold py-3 mb-4">Audit Logs</h4>
-            <div className="card">
-              <div className="card-body">
-                <p>Audit logs page - Coming soon...</p>
-              </div>
-            </div>
+            <AuditLogManagement />
           </div>
         );
       
