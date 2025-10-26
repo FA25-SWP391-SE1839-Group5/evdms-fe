@@ -78,6 +78,15 @@ export default function AuditLogManagement() {
         });
     }, [logs, userMap, searchTerm]);
 
+    // Pagination Logic
+    const totalPages = Math.ceil(filteredLogs.length / pageSize);
+    const paginatedLogs = useMemo(() => {
+        const startIndex = (currentPage - 1) * pageSize;
+        return filteredLogs.slice(startIndex, startIndex + pageSize);
+    }, [filteredLogs, currentPage, pageSize]);
+    const startEntry = filteredLogs.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+    const endEntry = Math.min(currentPage * pageSize, filteredLogs.length);
+
     return (
         <div>
             
