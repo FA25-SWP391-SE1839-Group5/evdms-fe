@@ -187,6 +187,26 @@ export default function VehicleVariantList() {
                                     <th>Actions</th>
                                 </tr>
                             </thead>
+                            <tbody className="table-border-bottom-0">
+                                {paginatedVariants.length === 0 ? (
+                                    <tr><td colSpan="4" className="text-center py-4"> No variants found. </td></tr>
+                                ) : (
+                                    paginatedVariants.map(variant => (
+                                        <tr key={variant.id}>
+                                            <td>{modelsMap[variant.modelId] || 'Unknown Model'}</td>
+                                            <td><span className="fw-semibold">{variant.name}</span></td>
+                                            <td>{formatCurrency(variant.basePrice)}</td>
+                                            <td>
+                                                <div className="d-inline-block text-nowrap">
+                                                    <button className="btn btn-sm btn-icon" title="Edit" onClick={() => handleEdit(variant)}><i className="bx bx-edit"></i></button>
+                                                    <button className="btn btn-sm btn-icon delete-record" title="Delete" onClick={() => handleDelete(variant.id, variant.name)}><i className="bx bx-trash"></i></button>
+                                                    {/* Thêm nút View Details nếu cần */}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
                         </table>
                     </div>
                 </div>
