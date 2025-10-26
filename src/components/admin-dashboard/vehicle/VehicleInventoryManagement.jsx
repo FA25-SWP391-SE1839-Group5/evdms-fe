@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-// Import các component con sẽ tạo sau
+
 import VehicleModelList from './VehicleModelList';
-// import VehicleVariantList from './variants/VehicleVariantList';
+import VehicleVariantList from './variants/VehicleVariantList';
 // import VehicleStockList from './stock/VehicleStockList';
 
 export default function VehicleInventoryManagement() {
@@ -12,8 +12,7 @@ export default function VehicleInventoryManagement() {
             case 'models':
                 return <VehicleModelList />
             case 'variants':
-                // return <VehicleVariantList />;
-                return <div>Vehicle Variants Management - Coming Soon...</div>;
+                return <VehicleVariantList />
             case 'stock':
                 // return <VehicleStockList />;
                 return <div>Vehicle Stock/Inventory Management - Coming Soon...</div>;
