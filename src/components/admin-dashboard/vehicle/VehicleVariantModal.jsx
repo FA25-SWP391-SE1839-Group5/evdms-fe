@@ -294,6 +294,21 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                         <div className="line">
                                             <i className="bx bx-chevron-right"></i>
                                         </div>
+
+                                        {/* Step 4: Review */}
+                                        <div className={`step ${currentStep === 4 ? 'active' : ''}`} data-target="#review-step">
+                                            <button 
+                                                type="button" 
+                                                className="step-trigger" 
+                                                onClick={() => setCurrentStep(4)} 
+                                                disabled={loading}
+                                            >
+                                                <span className="bs-stepper-icon">
+                                                    <i className="bx bx-file-find"></i>
+                                                </span>
+                                                <span className="bs-stepper-label">Review & Submit</span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 
