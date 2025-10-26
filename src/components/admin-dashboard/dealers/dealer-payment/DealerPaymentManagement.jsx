@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { AlertCircle, CheckCircle, Plus, Edit, Trash, Check, X, Upload } from 'lucide-react';
+import { AlertCircle, CheckCircle, Plus, Edit, Trash, Check, X, Download, FileX } from 'lucide-react';
 import {
     getAllDealerPayments,
     deleteDealerPayment,
     markPaymentPaid,
     markPaymentFailed,
     uploadDealerPaymentDocument,
+    deleteDealerPaymentDocument,
     getAllDealers,
 } from '../../../../services/dealerService';
 import DealerPaymentModal from './DealerPaymentModal';
@@ -210,7 +211,7 @@ export default function DealerPaymentManagement() {
         try {
             await uploadDealerPaymentDocument(paymentIdForUpload, file);
             setSuccess(`Document uploaded successfully for ${payId}.`);
-            // reloadPayments(); // Tải lại list nếu cần
+            reloadPayments(); 
         } catch (err) {
             console.error("Upload failed:", err);
             setError(err.response?.data?.message || 'Failed to upload document');
@@ -221,6 +222,20 @@ export default function DealerPaymentManagement() {
             if(fileInputRef.current) {
                 fileInputRef.current.value = null; // Reset để có thể upload file y hệt lần nữa
             }
+        }
+    };
+
+    const handleDeleteDocument = async (paymentId, documentId) => {
+        const payId = formatPaymentId(paymentId);
+        if (!window.confirm(`Are you sure you want to delete the document for Payment ${payId}?`)) return;
+
+        try {
+            // Gọi API delete từ dealerService
+            await deleteDealerPaymentDocument(paymentId, documentId);
+            setSuccess(`Document for ${payId} deleted successfully.`);
+            reloadPayments(); // Tải lại list để cập nhật (p.documentUrl sẽ bị null)
+        } catch (err) {
+            setError(err.response?.data?.message || 'Failed to delete document');
         }
     };
 
@@ -378,6 +393,23 @@ export default function DealerPaymentManagement() {
                                                             onClick={() => handleUploadClick(p.id)}
                                                         >
                                                             <i class="bx bx-export me-1" />  Upload
+                                                        </button>
+                                                        <button 
+                                                            className="dropdown-item" 
+                                                            onClick={() => window.open(p.documentUrl, '_blank')}
+                                                            disabled={!p.documentUrl} 
+                                                            title={!p.documentUrl ? "No document uploaded" : "View uploaded document"}
+                                                        >
+                                                            <Download size={16} className="me-1" /> View Document
+                                                        </button>
+
+                                                        <button 
+                                                            className="dropdown-item text-danger" 
+                                                            onClick={() => handleDeleteDocument(p.id, p.documentId)}
+                                                            disabled={!p.documentId}
+                                                            title={!p.documentId ? "No document to delete" : "Delete uploaded document"}
+                                                        >
+                                                            <FileX size={16} className="me-1"/> Delete Document
                                                         </button>
                                                     </div>
                                                 </div>
