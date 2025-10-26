@@ -711,7 +711,7 @@ const UserManagement = () => {
                                     <i className="bx bx-trash" />
                                   </button>
 
-                                  {/* 2. Nút Xem (Con mắt) - Chưa có logic */}
+                                  {/* 2. Nút Xem (Con mắt) */}
                                   <button 
                                     type="button" 
                                     className="btn btn-icon btn-text-secondary rounded-pill btn-sm"
