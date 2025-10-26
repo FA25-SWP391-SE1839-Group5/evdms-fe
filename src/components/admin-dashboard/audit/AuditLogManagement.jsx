@@ -91,6 +91,21 @@ export default function AuditLogManagement() {
     const handlePageSizeChange = (e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); };
     const handleSearchChange = (e) => { setSearchTerm(e.target.value); setCurrentPage(1); };
 
+    // Handle Export
+    const handleExport = async (format) => {
+        setExporting(true);
+        setError('');
+        setSuccess('');
+        try {
+            const result = await exportAuditLogs(format);
+            setSuccess(result.message || `Exported logs as ${format.toUpperCase()}.`);
+        } catch (err) {
+            setError(err.message || `Failed to export logs as ${format.toUpperCase()}.`);
+        } finally {
+            setExporting(false);
+        }
+    };
+
     return (
         <div>
             
