@@ -226,92 +226,125 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
             <div 
                 className={`modal fade ${show ? 'show d-block' : ''}`} 
                 tabIndex="-1" 
-                style={{ backgroundColor: show ? 'rgba(0,0,0,0.5)' : 'transparent' }}>
+                style={{ backgroundColor: show ? 'rgba(0,0,0,0.5)' : 'transparent' }}
+            >
+                {/* Tăng kích thước modal cho nhiều nội dung */}
+                <div className="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" role="document">
+                    <div className="modal-content">
+                        <form onSubmit={handleSubmit}>
+                            <div
+                                id="wizard-modern-icons" 
+                                className="bs-stepper wizard-icons wizard-modern mt-2"
+                            >
 
-                    {/* Tăng kích thước modal cho nhiều nội dung */}
-                    <div className="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" role="document">
-                        <div className="modal-content">
-                            <form onSubmit={handleSubmit}>
-                                <div
-                                    id="wizard-modern-icons" 
-                                    className="bs-stepper wizard-icons wizard-modern mt-2"
-                                >
+                                {/* Stepper Header */}
+                                <div className="bs-stepper-header border-bottom">
 
-                                    {/* Stepper Header */}
-                                    <div className="bs-stepper-header border-bottom">
-                                        {/* Step 1: Basic */}
-                                        <div 
-                                            className={`step ${currentStep === 1 ? 'active' : ''}`} data-target="#basic-details-step"
+                                    {/* Step 1: Basic */}
+                                    <div 
+                                        className={`step ${currentStep === 1 ? 'active' : ''}`} 
+                                        data-target="#basic-details-step"
+                                    >
+                                        <button 
+                                            type="button" 
+                                            className="step-trigger" 
+                                            onClick={() => setCurrentStep(1)} 
+                                            disabled={loading}
                                         >
-                                            <button 
-                                                type="button" 
-                                                className="step-trigger" 
-                                                onClick={() => setCurrentStep(1)} 
-                                                disabled={loading}
-                                            >
-                                                <span className="bs-stepper-icon">
-                                                    <i className="bx bx-info-circle"></i>
-                                                </span>
-                                                <span className="bs-stepper-label">Basic Details</span>
-                                            </button>
-                                        </div>
-                                        <div className="line">
-                                            <i className="bx bx-chevron-right"></i>
-                                        </div>
+                                            <span className="bs-stepper-icon">
+                                                <i className="bx bx-info-circle"></i>
+                                            </span>
+                                            <span className="bs-stepper-label">Basic Details</span>
+                                        </button>
+                                    </div>
+                                    <div className="line">
+                                        <i className="bx bx-chevron-right"></i>
+                                    </div>
 
-                                        {/* Step 2: Specs */}
-                                        <div className={`step ${currentStep === 2 ? 'active' : ''}`} data-target="#specs-step">
-                                            <button 
-                                                type="button" 
-                                                className="step-trigger" 
-                                                onClick={() => setCurrentStep(2)} 
-                                                disabled={loading}
-                                            >
-                                                <span className="bs-stepper-icon">
-                                                    <i className="bx bx-slider-alt"></i>
-                                                </span>
-                                                <span className="bs-stepper-label">Specifications</span>
-                                            </button>
-                                        </div>
-                                        <div className="line">
-                                            <i className="bx bx-chevron-right"></i>
-                                        </div>
+                                    {/* Step 2: Specs */}
+                                    <div className={`step ${currentStep === 2 ? 'active' : ''}`} data-target="#specs-step">
+                                        <button 
+                                            type="button" 
+                                            className="step-trigger" 
+                                            onClick={() => setCurrentStep(2)} 
+                                            disabled={loading}
+                                        >
+                                            <span className="bs-stepper-icon">
+                                                <i className="bx bx-slider-alt"></i>
+                                            </span>
+                                            <span className="bs-stepper-label">Specifications</span>
+                                        </button>
+                                    </div>
+                                    <div className="line">
+                                        <i className="bx bx-chevron-right"></i>
+                                    </div>
 
-                                        {/* Step 3: Features */}
-                                        <div className={`step ${currentStep === 3 ? 'active' : ''}`} data-target="#features-step">
-                                            <button 
-                                                type="button" 
-                                                className="step-trigger" 
-                                                onClick={() => setCurrentStep(3)} 
-                                                disabled={loading}
-                                            >
-                                                <span className="bs-stepper-icon">
-                                                    <i className="bx bx-list-check"></i>
-                                                </span>
-                                                <span className="bs-stepper-label">Features</span>
-                                            </button>
-                                        </div>
-                                        <div className="line">
-                                            <i className="bx bx-chevron-right"></i>
-                                        </div>
+                                    {/* Step 3: Features */}
+                                    <div className={`step ${currentStep === 3 ? 'active' : ''}`} data-target="#features-step">
+                                        <button 
+                                            type="button" 
+                                            className="step-trigger" 
+                                            onClick={() => setCurrentStep(3)} 
+                                            disabled={loading}
+                                        >
+                                            <span className="bs-stepper-icon">
+                                                <i className="bx bx-list-check"></i>
+                                            </span>
+                                            <span className="bs-stepper-label">Features</span>
+                                        </button>
+                                    </div>
+                                    <div className="line">
+                                        <i className="bx bx-chevron-right"></i>
+                                    </div>
 
-                                        {/* Step 4: Review */}
-                                        <div className={`step ${currentStep === 4 ? 'active' : ''}`} data-target="#review-step">
-                                            <button 
-                                                type="button" 
-                                                className="step-trigger" 
-                                                onClick={() => setCurrentStep(4)} 
-                                                disabled={loading}
-                                            >
-                                                <span className="bs-stepper-icon">
-                                                    <i className="bx bx-file-find"></i>
-                                                </span>
-                                                <span className="bs-stepper-label">Review & Submit</span>
-                                            </button>
+                                    {/* Step 4: Review */}
+                                    <div className={`step ${currentStep === 4 ? 'active' : ''}`} data-target="#review-step">
+                                        <button 
+                                            type="button" 
+                                            className="step-trigger" 
+                                            onClick={() => setCurrentStep(4)} 
+                                            disabled={loading}
+                                        >
+                                            <span className="bs-stepper-icon">
+                                                <i className="bx bx-file-find"></i>
+                                            </span>
+                                            <span className="bs-stepper-label">Review & Submit</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Stepper Content */}
+                                <div className="bs-stepper-content mt-1">
+                                    {error && (
+                                        <div className="alert alert-danger mx-4 d-flex align-items-center" role="alert">
+                                            <AlertCircle size={20} className="me-2" />
+                                            <div>{error}</div>
+                                        </div>
+                                    )}
+
+                                    {/* Content Step 1: Basic Info */}
+                                    <div 
+                                        id="basic-details-step" 
+                                        className={`content ${currentStep === 1 ? 'active dstepper-block' : 'dstepper-none'}`}
+                                    >
+                                        <div className="content-header mb-3">
+                                            <h6 className="mb-0">Basic Details</h6>
+                                            <small>Enter model, name, and price.</small>
+                                        </div>
+                                        <div className="row g-3">
+                                            {/* Model Select */}
+                                            <div className="col-md-6">
+                                                <label htmlFor="modelId" className="form-label">Parent Model *</label>
+                                                <select id="modelId" name="modelId" className={`form-select ${!basicInfo.modelId && error ? 'is-invalid' : ''}`} value={basicInfo.modelId} onChange={handleBasicInfoChange} disabled={loadingModels || loading || isEditMode} required>
+                                                    <option value="">-- Select Model --</option>
+                                                    {models.map(model => (<option key={model.id} value={model.id}>{model.name}</option>))}
+                                                </select>
+                                                {loadingModels && <div className="form-text">Loading models...</div>}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                
+                            </div>
                         </form>
                     </div>
                 </div>
