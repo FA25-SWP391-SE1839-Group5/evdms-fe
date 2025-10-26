@@ -62,6 +62,22 @@ export default function AuditLogManagement() {
         }
     }, [error, success]);
 
+    // Filter Logic 
+    const filteredLogs = useMemo(() => {
+        const searchLower = searchTerm.toLowerCase();
+        return logs.filter(log => {
+            const userName = (userMap[log.userId] || log.userId || '').toLowerCase();
+            const action = (log.action || '').toLowerCase();
+            const description = (log.description || '').toLowerCase();
+            const date = formatDate(log.createdAt).toLowerCase(); // Giả sử có createdAt
+
+            return userName.includes(searchLower) ||
+                   action.includes(searchLower) ||
+                   description.includes(searchLower) ||
+                   date.includes(searchLower);
+        });
+    }, [logs, userMap, searchTerm]);
+
     return (
         <div>
             
