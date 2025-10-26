@@ -174,6 +174,21 @@ export default function VehicleVariantList() {
                                 onClick={() => setSuccess('')}></button> 
                         </div> 
                     )}
+
+                    {/* Table */}
+                    <div className="table-responsive text-nowrap">
+                        <table className="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Model</th>
+                                    <th>Variant Name</th>
+                                    <th>Base Price</th>
+                                    {/* Thêm các cột tóm tắt specs/features nếu muốn */}
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
                 </div>
             )}
         </div>
