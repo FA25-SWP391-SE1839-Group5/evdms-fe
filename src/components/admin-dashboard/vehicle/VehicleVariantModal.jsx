@@ -319,9 +319,33 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
         }
     };
 
-    return (
-        <div>
+    if (!show) return null;
 
-        </div>
+    return (
+        <>
+            <div 
+                className={`modal fade ${show ? 'show d-block' : ''}`} 
+                tabIndex="-1" 
+                style={{ backgroundColor: show ? 'rgba(0,0,0,0.5)' : 'transparent' }}>
+
+                    {/* Tăng kích thước modal cho nhiều nội dung */}
+                    <div className="modal-dialog modal-dialog-centered modal-xl" role="document">
+                        <div className="modal-content">
+                            <form onSubmit={handleSubmit}>
+                                <div className="modal-header">
+                                    <h5 className="modal-title">{title} - Step {currentStep} of 3</h5>
+                                    <button 
+                                        type="button" 
+                                        className="btn-close" 
+                                        onClick={onClose} 
+                                        aria-label="Close" 
+                                        disabled={loading}
+                                    ></button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+            </div>
+        </>
     )
 }
