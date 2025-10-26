@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
 import { AlertCircle, Search, Filter } from 'lucide-react'; 
-import { getAllAuditLogs } from '../../../services/systemService';
+import { getAllAuditLogs, exportAuditLogs } from '../../../services/systemService';
 import { getUserById } from '../../../services/dashboardService';
 import AuditLogFilterPanel from './AuditLogFilterPanel';
 import AuditLogDetailsModal from './AuditLogDetailsModal';
@@ -59,7 +58,7 @@ const AuditLogManagement = () => {
             try {
                 setLoading(true);
                 setError('');
-                const logsRes = await getAllAuditLogs();
+                const logsRes = await getAllAuditLogs({ page: 1, pageSize: 9999 });
                 const fetchedLogs = logsRes.data?.data?.items || logsRes.data?.items || logsRes.data || [];
                 setLogs(fetchedLogs);
 
@@ -188,59 +187,29 @@ const AuditLogManagement = () => {
         setError('');
 
         try {
-            // 3. Chuẩn bị query params (gửi filter lên server)
-            const params = new URLSearchParams();
+            const filters = {};
             
-            // THÊM THAM SỐ FORMAT (HÃY KIỂM TRA LẠI VỚI BACKEND)
-            params.append('format', format); // Ví dụ: 'csv', 'excel', 'pdf'
-
-            // Thêm các filter đang hoạt động
             if (activeFilters.timePeriod !== 'all') {
-                params.append('timePeriod', activeFilters.timePeriod);
+                filters.timePeriod = activeFilters.timePeriod;
             }
             if (searchTerm) {
-                params.append('search', searchTerm);
+                // Đảm bảo tên key khớp với backend, ví dụ: 'search' hoặc 'q'
+                filters.search = searchTerm;
             }
-            activeFilters.roles.forEach(role => {
-                params.append('roles', role); // Gửi nhiều lần
-            });
-            activeFilters.actions.forEach(action => {
-                params.append('actions', action); // Gửi nhiều lần
-            });
-
-            // 4. Gọi API bằng Axios (để nhận file)
-            // Bạn CẦN thay đổi 'axios.get' bằng service API của bạn nếu có
-            const response = await axios.get('/api/audit-logs/export', {
-                params: params,
-                responseType: 'blob', // Rất quan trọng: để nhận file
-            });
-
-            // 5. Xử lý file trả về
-            const blob = new Blob([response.data], { type: response.headers['content-type'] });
-
-            // 6. Lấy tên file từ header (nếu backend gửi)
-            const contentDisposition = response.headers['content-disposition'];
-            let filename = `AuditLogs_${new Date().toISOString().split('T')[0]}.${format}`;
-            if (contentDisposition) {
-                const filenameMatch = contentDisposition.match(/filename="?(.+?)"?$/);
-                if (filenameMatch && filenameMatch[1]) {
-                    filename = filenameMatch[1];
-                }
+            if (activeFilters.roles.length > 0) {
+                filters.roles = activeFilters.roles;
+            }
+            if (activeFilters.actions.length > 0) {
+                filters.actions = activeFilters.actions;
             }
 
-            // 7. Tạo link và trigger download
-            const link = document.createElement('a');
-            const url = window.URL.createObjectURL(blob);
-            link.href = url;
-            link.setAttribute('download', filename);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
+            await exportAuditLogs(format, filters);
+
+            // 3. Không cần xử lý blob ở đây nữa
 
         } catch (err) {
             console.error("Export failed:", err);
-            setError(err.response?.data?.message || err.message || "Failed to generate export file.");
+            setError(err.message || "Failed to generate export file."); 
         } finally {
             setExportStatus(prev => ({ ...prev, [format]: false }));
         }
