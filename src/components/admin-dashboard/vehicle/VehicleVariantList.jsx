@@ -1,5 +1,5 @@
-import React from 'react'
-import { AlertCircle, CheckCircle, Plus, Edit, Trash } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react'
+import { AlertCircle, CheckCircle, Plus } from 'lucide-react';
 import { getAllVehicleVariants, deleteVehicleVariant, getAllVehicleModels } from '../../../services/vehicleService';
 import VehicleVariantModal from './VehicleVariantModal';
 
@@ -212,21 +212,45 @@ export default function VehicleVariantList() {
 
                     {/* Pagination */}                
                     <div className="d-flex justify-content-between align-items-center p-3">
-                        <small className="text-muted">Showing {startEntry} to {endEntry} of {filteredVariants.length} entries</small>
+                        <small className="text-muted">
+                            Showing {startEntry} to {endEntry} of {filteredVariants.length} entries
+                        </small>
                         <nav>
                             <ul className="pagination pagination-sm mb-0">
                                 <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                                    <button className="page-link" onClick={() => setCurrentPage(p=>p-1)} disabled={currentPage === 1}>&laquo;</button>
+                                    <button 
+                                        className="page-link" 
+                                        onClick={() => setCurrentPage(p=>p-1)} 
+                                        disabled={currentPage === 1}
+                                    >
+                                        &laquo;
+                                    </button>
                                 </li>
-                                <li className="page-item active"><span className="page-link">{currentPage}</span></li>
+                                <li className="page-item active">
+                                    <span className="page-link">{currentPage}</span>
+                                </li>
                                 <li className={`page-item ${currentPage >= totalPages ? 'disabled' : ''}`}>
-                                    <button className="page-link" onClick={() => setCurrentPage(p=>p+1)} disabled={currentPage >= totalPages}>&raquo;</button>
+                                    <button 
+                                        className="page-link" 
+                                        onClick={() => setCurrentPage(p=>p+1)} 
+                                        disabled={currentPage >= totalPages}
+                                    >
+                                        &raquo;
+                                    </button>
                                 </li>
                             </ul>
                         </nav>
                     </div>
                 </div>
             )}
+
+            {/* Modal */}
+            <VehicleVariantModal
+                show={showModal}
+                onClose={() => { setShowModal(false); setVariantToEdit(null); }}
+                onSaveSuccess={handleSaveSuccess}
+                variantToEdit={variantToEdit}
+            />
         </div>
     )
 }
