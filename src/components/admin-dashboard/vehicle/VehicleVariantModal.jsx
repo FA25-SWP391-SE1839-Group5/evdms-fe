@@ -100,8 +100,47 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
         }
     }, [show, variantToEdit, isEditMode]);
 
+    // --- Handlers cho từng bước ---
+    const handleBasicInfoChange = (e) => {
+        const { name, value } = e.target;
+        setBasicInfo(prev => ({ ...prev, [name]: value }));
+    };
 
-    
+    const handleSpecChange = (specKey, value) => {
+        setSpecs(prev => {
+            const newSpecs = { ...prev };
+            const specConfig = Object.values(specCategories).flat().find(s => s.key === specKey);
+            // Chỉ cập nhật nếu có giá trị, xóa nếu rỗng
+            if (value && value.trim() !== '') {
+                newSpecs[specKey] = { value: value, ...(specConfig?.unit && { unit: specConfig.unit }) };
+            } else {
+                delete newSpecs[specKey]; // Xóa spec khỏi object nếu value rỗng
+            }
+            return newSpecs;
+        });
+    };
+
+    const handleFeatureChange = (category, feature) => {
+        setFeatures(prev => {
+            const newFeatures = { ...prev };
+            const categoryFeatures = newFeatures[category] || [];
+            if (categoryFeatures.includes(feature)) {
+                // Remove feature
+                newFeatures[category] = categoryFeatures.filter(f => f !== feature);
+                // Nếu category rỗng thì xóa luôn category đó
+                if (newFeatures[category].length === 0) {
+                    delete newFeatures[category];
+                }
+            } else {
+                // Add feature
+                newFeatures[category] = [...categoryFeatures, feature];
+            }
+            return newFeatures;
+        });
+    };
+
+
+
     return (
         <div>
 
