@@ -87,6 +87,10 @@ export default function AuditLogManagement() {
     const startEntry = filteredLogs.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
     const endEntry = Math.min(currentPage * pageSize, filteredLogs.length);
 
+    // Handlers
+    const handlePageSizeChange = (e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); };
+    
+
     return (
         <div>
             
