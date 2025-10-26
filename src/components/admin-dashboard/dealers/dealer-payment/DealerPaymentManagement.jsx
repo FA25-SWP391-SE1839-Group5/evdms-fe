@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { AlertCircle, CheckCircle, Plus, Edit, Trash, Check, X, Upload } from 'lucide-react';
 import {
     getAllDealerPayments,
@@ -50,6 +50,9 @@ export default function DealerPaymentManagement() {
     const [currentPage, setCurrentPage] = useState(1);
     const [statusFilter, setStatusFilter] = useState(''); // Filter dropdown
     const [globalSearch, setGlobalSearch] = useState(''); // Search input
+
+    const [paymentIdForUpload, setPaymentIdForUpload] = useState(null);
+    const fileInputRef = useRef(null);
 
     // Fetch Data
     useEffect(() => {
@@ -369,7 +372,13 @@ export default function DealerPaymentManagement() {
                                                         >
                                                             <i className="bx bx-edit-alt me-2" /> Edit
                                                         </button>
-                                                        
+                                                        <button
+                                                            type="button" 
+                                                            className="dropdown-item" 
+                                                            onClick={() => handleUploadClick(p.id)}
+                                                        >
+                                                            <Upload size={16} className="me-1"/> Upload Document
+                                                        </button>
                                                     </div>
                                                 </div>
                                                 <div className="dropdown-menu">
@@ -417,6 +426,14 @@ export default function DealerPaymentManagement() {
                     </nav>
                 </div>
             </div>
+
+            <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileSelected}
+                style={{ display: 'none' }}
+                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" // Giới hạn loại file (tùy chọn)
+            />
 
             {/* Modal */}
             <DealerPaymentModal
