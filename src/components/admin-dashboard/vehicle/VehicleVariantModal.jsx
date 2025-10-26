@@ -44,7 +44,39 @@ const featureCategories = {
     Seating: ['LeatherSeats', 'MemorySeat', 'PowerDriverSeat', 'PowerPassengerSeat', 'HeatedRearSeats', 'VentilatedSeats', 'SplitFoldingRearSeat', 'AdjustableLumbarSupport', 'BucketSeats', 'ThirdRowSeating']
 };
 
-export default function VehicleVariantModal() {
+export default function VehicleVariantModal({ show, onClose, onSaveSuccess, variantToEdit }) {
+    const isEditMode = Boolean(variantToEdit);
+    const title = isEditMode ? 'Edit Vehicle Variant' : 'Add New Vehicle Variant';
+
+    const [currentStep, setCurrentStep] = useState(1); // 1: Basic, 2: Specs, 3: Features
+    const [models, setModels] = useState([]);
+    const [loadingModels, setLoadingModels] = useState(false);
+
+    // State cho form data
+    const [basicInfo, setBasicInfo] = useState({ modelId: '', name: '', basePrice: '' });
+    const [specs, setSpecs] = useState({}); // Lưu dạng { horsepower: { value: '...', unit: 'hp' }, ... }
+    const [features, setFeatures] = useState({}); // Lưu dạng { Safety: ['Feature1', 'Feature2'], ... }
+
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    // Fetch Vehicle Models khi modal mở lần đầu hoặc khi show=true
+    useEffect(() => {
+        if (show && models.length === 0) { // Chỉ fetch nếu chưa có models
+            const fetchModels = async () => {
+                setLoadingModels(true);
+                try {
+                    const response = await getAllVehicleModels();
+                    setModels(response.data?.data?.items || response.data?.items || response.data || []);
+                } catch (err) {
+                    setError('Failed to load vehicle models. Cannot add/edit variants.');
+                } finally {
+                    setLoadingModels(false);
+                }
+            };
+            fetchModels();
+        }
+    }, [show]); // Phụ thuộc vào show
     return (
         <div>
 
