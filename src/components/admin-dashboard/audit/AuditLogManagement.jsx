@@ -166,6 +166,18 @@ export default function AuditLogManagement() {
                         &nbsp;entries
                     </label>
                 </div>
+
+                {/* Right: Search + Export */}
+                <div className="d-flex align-items-center gap-3">
+                    <input
+                        type="search"
+                        className="form-control"
+                        placeholder="Search logs..."
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        style={{width: '250px'}}
+                    />
+                </div>
             </div>
         </div>
 
