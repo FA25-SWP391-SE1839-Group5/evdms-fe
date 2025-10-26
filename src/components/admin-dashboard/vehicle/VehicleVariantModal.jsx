@@ -199,13 +199,69 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
         }
     };
 
+    // --- Render Functions cho từng step ---
+    const renderStepContent = () => {
+        switch (currentStep) {
+            case 1: // Basic Info
+                return (
+                    <>
+                        <div className="mb-3">
+                            <label htmlFor="modelId" className="form-label">Parent Model *</label>
+                            <select
+                                id="modelId"
+                                name="modelId"
+                                className={`form-select ${!basicInfo.modelId && error ? 'is-invalid' : ''}`}
+                                value={basicInfo.modelId}
+                                onChange={handleBasicInfoChange}
+                                disabled={loadingModels || loading || isEditMode} // Không cho đổi model khi edit
+                                required
+                            >
+                                <option value="">-- Select Model --</option>
+                                {models.map(model => (
+                                    <option key={model.id} value={model.id}>{model.name}</option>
+                                ))}
+                            </select>
+                            {loadingModels && <div className="form-text">Loading models...</div>}
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="variantName" className="form-label">Variant Name *</label>
+                            <input
+                                type="text"
+                                id="variantName"
+                                name="name"
+                                className={`form-control ${!basicInfo.name && error ? 'is-invalid' : ''}`}
+                                value={basicInfo.name}
+                                onChange={handleBasicInfoChange}
+                                placeholder="e.g., Eco, Plus, Premium"
+                                disabled={loading}
+                                required
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="basePrice" className="form-label">Base Price (VND) *</label>
+                            <input
+                                type="number"
+                                id="basePrice"
+                                name="basePrice"
+                                className={`form-control ${!basicInfo.basePrice && error ? 'is-invalid' : ''}`}
+                                value={basicInfo.basePrice}
+                                onChange={handleBasicInfoChange}
+                                placeholder="e.g., 900000000"
+                                min="0"
+                                disabled={loading}
+                                required
+                            />
+                        </div>
+                    </>
+                );
+        }
+    };
 
 
 
 
 
 
-    
     return (
         <div>
 
