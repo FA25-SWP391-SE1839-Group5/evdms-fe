@@ -254,13 +254,39 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                         </div>
                     </>
                 );
+                case 2: // Specs
+                return (
+                    <>
+                        {Object.entries(specCategories).map(([category, specsInCategory]) => (
+                            <div key={category} className="mb-4">
+                                <h6>{category}</h6>
+                                <div className="row g-3">
+                                    {specsInCategory.map(spec => (
+                                        <div key={spec.key} className="col-md-6">
+                                            <label htmlFor={`spec-${spec.key}`} className="form-label">{spec.label}</label>
+                                            <div className="input-group">
+                                                <input
+                                                    type={spec.unit ? 'number' : 'text'} // Dùng number nếu có đơn vị (thường là số)
+                                                    step={spec.unit === 's' || spec.unit === 'kWh' || spec.unit === 'Wh/km' ? '0.1' : '1'} // Bước nhảy cho số thập phân
+                                                    id={`spec-${spec.key}`}
+                                                    name={spec.key}
+                                                    className="form-control"
+                                                    value={specs[spec.key]?.value || ''}
+                                                    onChange={(e) => handleSpecChange(spec.key, e.target.value)}
+                                                    placeholder={spec.unit ? `Enter value` : `e.g., AWD`}
+                                                    disabled={loading}
+                                                />
+                                                {spec.unit && <span className="input-group-text">{spec.unit}</span>}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </>
+                );
         }
     };
-
-
-
-
-
 
     return (
         <div>
