@@ -144,6 +144,31 @@ export default function AuditLogManagement() {
             </div>
         )}
 
+        <div className="card">
+            {/* Header: Show, Search, Export */}
+            <div className="card-header border-bottom d-flex justify-content-between align-items-center">
+
+                {/* Left: Show entries */}
+                <div>
+                    <label className="d-flex align-items-center">
+                        Show&nbsp;
+                        <select 
+                            className="form-select" 
+                            value={pageSize} 
+                            onChange={handlePageSizeChange} 
+                            style={{width:'auto'}}
+                        >
+                            <option>10</option>
+                            <option>25</option>
+                            <option>50</option>
+                            <option>100</option>
+                        </select>
+                        &nbsp;entries
+                    </label>
+                </div>
+            </div>
+        </div>
+
         </>
     )
 }
