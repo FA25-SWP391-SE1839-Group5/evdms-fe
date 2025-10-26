@@ -178,6 +178,41 @@ export default function AuditLogManagement() {
                         style={{width: '250px'}}
                     />
                 </div>
+
+                {/* Export Button */}
+                <div className="btn-group">
+                    <button
+                        type="button"
+                        className="btn btn-light dropdown-toggle"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                        disabled={exporting} // Disable khi đang export
+                    >
+                        <Download size={18} className="me-1" /> Export
+                    </button>
+                    <ul className="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <button 
+                                type="button" 
+                                className="dropdown-item" 
+                                onClick={() => handleExport('csv')} 
+                                disabled={exporting}
+                            >
+                                CSV
+                            </button>
+                        </li>
+                        <li>
+                            <button 
+                                type="button" 
+                                className="dropdown-item" 
+                                onClick={() => handleExport('xlsx')} 
+                                disabled={exporting}
+                            >
+                                Excel
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
 
