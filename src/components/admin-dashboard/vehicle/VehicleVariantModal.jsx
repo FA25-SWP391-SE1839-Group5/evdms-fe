@@ -139,7 +139,19 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
         });
     };
 
-
+    // --- Navigation Handlers ---
+    const nextStep = () => {
+        // Validate basic info before proceeding from step 1
+        if (currentStep === 1 && (!basicInfo.modelId || !basicInfo.name || !basicInfo.basePrice)) {
+            setError('Please fill in all basic information fields (Model, Name, Base Price).');
+            return;
+        }
+        setError(''); // Clear error if validation passes
+        if (currentStep < 3) setCurrentStep(s => s + 1);
+    };
+    const prevStep = () => {
+        if (currentStep > 1) setCurrentStep(s => s - 1);
+    };
 
     return (
         <div>
