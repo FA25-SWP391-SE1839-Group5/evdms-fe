@@ -19,18 +19,26 @@ const formatDate = (isoString) => isoString ? new Date(isoString).toLocaleString
 const formatCurrency = (amount) => typeof amount === 'number' ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount) : 'N/A';
 
 const RenderPaymentStatus = ({ status }) => {
-    let badgeClass = 'secondary';
-    let icon = null; // Optional icon
-    switch (status?.toLowerCase()) {
-        case 'pending': badgeClass = 'warning'; icon = <Clock size={14} className="me-1"/>; break;
-        case 'paid': badgeClass = 'success'; icon = <CheckCircle size={14} className="me-1"/>; break;
-        case 'failed': badgeClass = 'danger'; icon = <XCircle size={14} className="me-1"/>; break;
-    }
-    // Mimic invoice list style
-    return <span className={`badge rounded-pill bg-label-${badgeClass} d-flex align-items-center p-1 px-2`}><span className={`dot bg-${badgeClass} me-1`}></span> {status || 'N/A'}</span>;
+    let badgeLabelClass = 'secondary'; // Màu mặc định
 
-    // Original badge style:
-    // return <span className={`badge bg-label-${badgeClass}`}>{status || 'N/A'}</span>;
+    switch (status?.toLowerCase()) {
+        case 'pending':
+            badgeLabelClass = 'warning'; // Màu cam cho Pending
+            break;
+        case 'paid':
+            badgeLabelClass = 'success'; // Màu xanh lá cho Paid (giống 'Active' của cậu)
+            break;
+        case 'failed':
+            badgeLabelClass = 'danger'; // Màu đỏ cho Failed
+            break;
+    }
+
+    // Dùng chính xác cấu trúc class của cậu: badge bg-label-COLOR
+    return (
+        <span className={`badge bg-label-${badgeLabelClass}`}>
+            {status || 'N/A'}
+        </span>
+    );
 };
 
 export default function DealerPaymentManagement() {
