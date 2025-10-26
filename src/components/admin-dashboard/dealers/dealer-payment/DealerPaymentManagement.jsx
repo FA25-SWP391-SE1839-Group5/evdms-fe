@@ -273,7 +273,6 @@ export default function DealerPaymentManagement() {
                             ) : (
                                 paginatedPayments.map(p => (
                                     <tr key={p.id}>
-                                        <td><input className="form-check-input" type="checkbox" value={p.id} /></td>
                                         <td><span className="fw-semibold text-primary">{formatPaymentId(p.id)}</span></td>
                                         <td><RenderPaymentStatus status={p.status} /></td>
                                         <td>{dealerMap[p.dealerId] || 'N/A'}</td>
