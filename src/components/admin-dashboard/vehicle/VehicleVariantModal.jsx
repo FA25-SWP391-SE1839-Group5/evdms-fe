@@ -332,6 +332,7 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                             <small>Enter model, name, and price.</small>
                                         </div>
                                         <div className="row g-3">
+                                            
                                             {/* Model Select */}
                                             <div className="col-md-6">
                                                 <label htmlFor="modelId" className="form-label">Parent Model *</label>
@@ -340,6 +341,12 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                                     {models.map(model => (<option key={model.id} value={model.id}>{model.name}</option>))}
                                                 </select>
                                                 {loadingModels && <div className="form-text">Loading models...</div>}
+                                            </div>
+
+                                            {/* Variant Name */}
+                                            <div className="col-md-6">
+                                                <label htmlFor="variantName" className="form-label">Variant Name *</label>
+                                                <input type="text" id="variantName" name="name" className={`form-control ${!basicInfo.name && error ? 'is-invalid' : ''}`} value={basicInfo.name} onChange={handleBasicInfoChange} placeholder="e.g., Eco, Plus, Premium" disabled={loading} required />
                                             </div>
                                         </div>
                                     </div>
