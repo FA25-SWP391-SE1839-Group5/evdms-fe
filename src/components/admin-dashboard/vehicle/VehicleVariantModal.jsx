@@ -240,10 +240,19 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                     {/* Stepper Header */}
                                     <div className="bs-stepper-header border-bottom">
                                         {/* Step 1: Basic */}
-                                        <div className={`step ${currentStep === 1 ? 'active' : ''}`} data-target="#basic-details-step">
-                                        <button type="button" className="step-trigger" onClick={() => setCurrentStep(1)} disabled={loading}>
-                                            <span className="bs-stepper-icon"><i className="bx bx-info-circle"></i></span>
-                                            <span className="bs-stepper-label">Basic Details</span>
+                                        <div 
+                                            className={`step ${currentStep === 1 ? 'active' : ''}`} data-target="#basic-details-step"
+                                        >
+                                            <button 
+                                                type="button" 
+                                                className="step-trigger" 
+                                                onClick={() => setCurrentStep(1)} 
+                                                disabled={loading}
+                                            >
+                                                <span className="bs-stepper-icon">
+                                                    <i className="bx bx-info-circle"></i>
+                                                </span>
+                                                <span className="bs-stepper-label">Basic Details</span>
                                         </button>
                                     </div>
                                     </div>
