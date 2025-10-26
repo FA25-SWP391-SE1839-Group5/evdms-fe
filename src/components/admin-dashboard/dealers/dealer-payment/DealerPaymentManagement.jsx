@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { AlertCircle, CheckCircle, Plus, Edit, Trash, Check, X, MoreVertical } from 'lucide-react';
+import { AlertCircle, CheckCircle, Plus, Edit, Trash, Check, X, Upload } from 'lucide-react';
 import {
     getAllDealerPayments,
     deleteDealerPayment,
     markPaymentPaid,
     markPaymentFailed,
+    uploadDealerPaymentDocument,
     getAllDealers,
 } from '../../../../services/dealerService';
 import DealerPaymentModal from './DealerPaymentModal';
 import DealerPaymentStatsCards from './DealerPaymentStatsCards';
+import DealerPaymentDetailsModal from './DealerPaymentDetailsModal';
 
 // --- Helper Functions ---
 const formatPaymentId = (id) => `#${id?.slice(-6).toUpperCase() || 'N/A'}`;
@@ -39,6 +41,9 @@ export default function DealerPaymentManagement() {
     const [success, setSuccess] = useState('');
     const [showFormModal, setShowFormModal] = useState(false);
     const [paymentToEdit, setPaymentToEdit] = useState(null);
+
+    const [showViewModal, setShowViewModal] = useState(false);
+    const [paymentToView, setPaymentToView] = useState(null);
 
     // Pagination & Filter State
     const [pageSize, setPageSize] = useState(10);
@@ -172,6 +177,12 @@ export default function DealerPaymentManagement() {
         } catch (err) { setError(err.response?.data?.message || 'Failed to mark as failed'); }
     };
 
+    // Handler mới cho nút con mắt (View)
+    const handleView = (paymentId) => {
+        const payment = payments.find(p => p.id === paymentId);
+        if (payment) { setPaymentToView(payment); setShowViewModal(true); }
+    };
+
     if (loadingData) {
         return <div className="d-flex justify-content-center align-items-center vh-100"><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div></div>;
     }
@@ -280,10 +291,49 @@ export default function DealerPaymentManagement() {
                                         <td>{formatDate(p.createdAt || p.updatedAt)}</td>
                                         <td>{p.paymentMethod}</td>
                                         <td>
-                                            <div className="dropdown">
-                                                <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                                    <MoreVertical size={18}/>
+                                            <div className="d-flex align-items-center">
+                                                {/* 1. Delete Button */}
+                                                <button 
+                                                    type="button" 
+                                                    className="btn btn-icon btn-text-secondary rounded-pill btn-sm"
+                                                    data-bs-toggle="tooltip" 
+                                                    title="Delete"
+                                                    onClick={() => handleDelete(p.id)}
+                                                >
+                                                    <i className="bx bx-trash" />
                                                 </button>
+
+                                                {/* View Button */}
+                                                <button 
+                                                    type="button" 
+                                                    className="btn btn-icon btn-text-secondary rounded-pill btn-sm"
+                                                    data-bs-toggle="tooltip" 
+                                                    title="View"
+                                                    onClick={() => handleView(p.id)}
+                                                >
+                                                    <i className="bx bx-show" /> 
+                                                </button>
+
+                                                {/*  Menu Buttons */}
+                                                <div className="dropdown">
+                                                    <button 
+                                                        type="button" 
+                                                        className="btn p-0 dropdown-toggle hide-arrow btn-sm" 
+                                                        data-bs-toggle="dropdown"
+                                                    >
+                                                        <i className="bx bx-dots-vertical-rounded" />
+                                                    </button>
+                                                    <div className="dropdown-menu">
+                                                        <button 
+                                                            type="button" 
+                                                            className="dropdown-item" 
+                                                            onClick={() => handleEdit(p.id)}
+                                                        >
+                                                            <i className="bx bx-edit-alt me-2" /> Edit
+                                                        </button>
+                                                        
+                                                    </div>
+                                                </div>
                                                 <div className="dropdown-menu">
                                                     {p.status?.toLowerCase() === 'pending' && (
                                                         <>
@@ -337,6 +387,13 @@ export default function DealerPaymentManagement() {
                 onSaveSuccess={handleSaveSuccess}
                 dealers={dealers}
                 paymentToEdit={paymentToEdit}
+            />
+
+            <DealerPaymentDetailsModal
+                show={showViewModal}
+                onClose={() => { setShowViewModal(false); setPaymentToView(null); }}
+                payment={paymentToView}
+                dealerName={paymentToView ? dealerMap[paymentToView.dealerId] : ''}
             />
         </>
     )
