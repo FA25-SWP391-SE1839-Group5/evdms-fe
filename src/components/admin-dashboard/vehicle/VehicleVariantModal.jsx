@@ -46,7 +46,7 @@ const featureCategories = {
 
 export default function VehicleVariantModal({ show, onClose, onSaveSuccess, variantToEdit }) {
     const isEditMode = Boolean(variantToEdit);
-    const title = isEditMode ? 'Edit Vehicle Variant' : 'Add New Vehicle Variant';
+    const modalTitle = isEditMode ? 'Edit Vehicle Variant' : 'Add New Vehicle Variant';
 
     const [currentStep, setCurrentStep] = useState(1); // 1: Basic, 2: Specs, 3: Features
     const [models, setModels] = useState([]);
@@ -141,31 +141,33 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
 
     // --- Navigation Handlers ---
     const nextStep = () => {
-        // Validate basic info before proceeding from step 1
-        if (currentStep === 1 && (!basicInfo.modelId || !basicInfo.name || !basicInfo.basePrice)) {
-            setError('Please fill in all basic information fields (Model, Name, Base Price).');
-            return;
+        setError(''); // Clear previous errors
+        if (currentStep === 1) { // Validate Basic Info
+            if (!basicInfo.modelId || !basicInfo.name || !basicInfo.basePrice || Number(basicInfo.basePrice) <= 0) {
+                setError('Please select a Model, enter a valid Name, and a positive Base Price.');
+                return;
+            }
         }
-        setError(''); // Clear error if validation passes
-        if (currentStep < 3) setCurrentStep(s => s + 1);
+        // Add validation for other steps if needed before proceeding
+        if (currentStep < 4) setCurrentStep(s => s + 1);
     };
     const prevStep = () => {
+        setError(''); // Clear errors when navigating back
         if (currentStep > 1) setCurrentStep(s => s - 1);
     };
 
     // --- Submit Handler ---
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        setError('');
-
         // Basic validation (đã check ở nextStep)
         if (!basicInfo.modelId || !basicInfo.name || !basicInfo.basePrice) {
             setError('Basic information is missing.');
             setCurrentStep(1); // Quay về step 1
-            setLoading(false);
             return;
         }
+
+        setLoading(true);
+        setError('');
 
         const dataToSend = {
             modelId: basicInfo.modelId,
@@ -199,124 +201,22 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
         }
     };
 
-    // --- Render Functions cho từng step ---
-    const renderStepContent = () => {
-        switch (currentStep) {
-            case 1: // Basic Info
-                return (
-                    <>
-                        <div className="mb-3">
-                            <label htmlFor="modelId" className="form-label">Parent Model *</label>
-                            <select
-                                id="modelId"
-                                name="modelId"
-                                className={`form-select ${!basicInfo.modelId && error ? 'is-invalid' : ''}`}
-                                value={basicInfo.modelId}
-                                onChange={handleBasicInfoChange}
-                                disabled={loadingModels || loading || isEditMode} // Không cho đổi model khi edit
-                                required
-                            >
-                                <option value="">-- Select Model --</option>
-                                {models.map(model => (
-                                    <option key={model.id} value={model.id}>{model.name}</option>
-                                ))}
-                            </select>
-                            {loadingModels && <div className="form-text">Loading models...</div>}
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="variantName" className="form-label">Variant Name *</label>
-                            <input
-                                type="text"
-                                id="variantName"
-                                name="name"
-                                className={`form-control ${!basicInfo.name && error ? 'is-invalid' : ''}`}
-                                value={basicInfo.name}
-                                onChange={handleBasicInfoChange}
-                                placeholder="e.g., Eco, Plus, Premium"
-                                disabled={loading}
-                                required
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="basePrice" className="form-label">Base Price (VND) *</label>
-                            <input
-                                type="number"
-                                id="basePrice"
-                                name="basePrice"
-                                className={`form-control ${!basicInfo.basePrice && error ? 'is-invalid' : ''}`}
-                                value={basicInfo.basePrice}
-                                onChange={handleBasicInfoChange}
-                                placeholder="e.g., 900000000"
-                                min="0"
-                                disabled={loading}
-                                required
-                            />
-                        </div>
-                    </>
-                );
-                case 2: // Specs
-                return (
-                    <>
-                        {Object.entries(specCategories).map(([category, specsInCategory]) => (
-                            <div key={category} className="mb-4">
-                                <h6>{category}</h6>
-                                <div className="row g-3">
-                                    {specsInCategory.map(spec => (
-                                        <div key={spec.key} className="col-md-6">
-                                            <label htmlFor={`spec-${spec.key}`} className="form-label">{spec.label}</label>
-                                            <div className="input-group">
-                                                <input
-                                                    type={spec.unit ? 'number' : 'text'} // Dùng number nếu có đơn vị (thường là số)
-                                                    step={spec.unit === 's' || spec.unit === 'kWh' || spec.unit === 'Wh/km' ? '0.1' : '1'} // Bước nhảy cho số thập phân
-                                                    id={`spec-${spec.key}`}
-                                                    name={spec.key}
-                                                    className="form-control"
-                                                    value={specs[spec.key]?.value || ''}
-                                                    onChange={(e) => handleSpecChange(spec.key, e.target.value)}
-                                                    placeholder={spec.unit ? `Enter value` : `e.g., AWD`}
-                                                    disabled={loading}
-                                                />
-                                                {spec.unit && <span className="input-group-text">{spec.unit}</span>}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        ))}
-                    </>
-                );
-                case 3: // Features
-                return (
-                     <>
-                        {Object.entries(featureCategories).map(([category, featuresInCategory]) => (
-                            <div key={category} className="mb-4">
-                                <h6>{category}</h6>
-                                <div className="row g-2">
-                                    {featuresInCategory.map(feature => (
-                                        <div key={feature} className="col-md-4 col-sm-6">
-                                            <div className="form-check">
-                                                <input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    id={`feature-${category}-${feature}`}
-                                                    checked={features[category]?.includes(feature) || false}
-                                                    onChange={() => handleFeatureChange(category, feature)}
-                                                    disabled={loading}
-                                                />
-                                                <label className="form-check-label" htmlFor={`feature-${category}-${feature}`}>
-                                                    {/* Chuyển đổi tên feature thành dạng đọc được */}
-                                                    {feature.replace(/([A-Z])/g, ' $1').trim()}
-                                                </label>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        ))}
-                    </>
-                );
-            default: return null;
-        }
+    // --- Render Spec Value Helper ---
+    const renderSpecValue = (specKey) => {
+        const spec = specs[specKey];
+        if (!spec) return <span className="text-muted">N/A</span>;
+        return `${spec.value}${spec.unit ? ` ${spec.unit}` : ''}`;
+    };
+
+    // --- Render Feature List Helper ---
+    const renderFeatureList = (category) => {
+        const list = features[category];
+        if (!list || list.length === 0) return <span className="text-muted">None</span>;
+        return (
+            <ul className="list-unstyled mb-0 small">
+                {list.map(f => <li key={f}>- {f.replace(/([A-Z])/g, ' $1').trim()}</li>)}
+            </ul>
+        );
     };
 
     if (!show) return null;
@@ -329,63 +229,26 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                 style={{ backgroundColor: show ? 'rgba(0,0,0,0.5)' : 'transparent' }}>
 
                     {/* Tăng kích thước modal cho nhiều nội dung */}
-                    <div className="modal-dialog modal-dialog-centered modal-xl" role="document">
+                    <div className="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" role="document">
                         <div className="modal-content">
                             <form onSubmit={handleSubmit}>
-                                <div className="modal-header">
-                                    <h5 className="modal-title">{title} - Step {currentStep} of 3</h5>
-                                    <button 
-                                        type="button" 
-                                        className="btn-close" 
-                                        onClick={onClose} 
-                                        aria-label="Close" 
-                                        disabled={loading}
-                                    ></button>
-                                </div>
-                                <div 
-                                    className="modal-body" 
-                                    style={{ maxHeight: '70vh', overflowY: 'auto' }}
-                                > {/* Scroll nếu nội dung dài */}
-                                    {error && (
-                                        <div className="alert alert-danger d-flex align-items-center" role="alert">
-                                            <AlertCircle size={20} className="me-2" />
-                                            <div>{error}</div>
-                                        </div>
-                                    )}
-                                    {renderStepContent()}
-                                </div>
-                                <div className="modal-footer d-flex justify-content-between">
+                                <div
+                                    id="wizard-modern-icons" 
+                                    className="bs-stepper wizard-icons wizard-modern mt-2"
+                                >
 
-                                    {/* Previous Button */}
-                                    <button
-                                        type="button"
-                                        className="btn btn-secondary"
-                                        onClick={prevStep}
-                                        disabled={loading || currentStep === 1}
-                                    >
-                                        <ArrowLeft size={16} className="me-1" /> Previous
-                                    </button>
-
-                                    {/* Next / Submit Button */}
-                                    {currentStep < 3 ? (
-                                    <button
-                                        type="button"
-                                        className="btn btn-primary"
-                                        onClick={nextStep}
-                                        disabled={loading || loadingModels}
-                                    >
-                                        Next <ArrowRight size={16} className="ms-1" />
-                                    </button>
-                                ) : (
-                                    <button
-                                        type="submit"
-                                        className="btn btn-success" // Nút Submit màu xanh
-                                        disabled={loading}
-                                    >
-                                        {loading ? 'Saving...' : (isEditMode ? 'Update Variant' : 'Create Variant')}
-                                    </button>
-                                )}
-                            </div>
+                                    {/* Stepper Header */}
+                                    <div className="bs-stepper-header border-bottom">
+                                        {/* Step 1: Basic */}
+                                        <div className={`step ${currentStep === 1 ? 'active' : ''}`} data-target="#basic-details-step">
+                                        <button type="button" className="step-trigger" onClick={() => setCurrentStep(1)} disabled={loading}>
+                                            <span className="bs-stepper-icon"><i className="bx bx-info-circle"></i></span>
+                                            <span className="bs-stepper-label">Basic Details</span>
+                                        </button>
+                                    </div>
+                                    </div>
+                                </div>
+                                
                         </form>
                     </div>
                 </div>
