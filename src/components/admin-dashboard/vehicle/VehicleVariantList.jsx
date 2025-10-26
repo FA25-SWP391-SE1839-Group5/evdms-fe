@@ -79,6 +79,35 @@ export default function VehicleVariantList() {
     const startEntry = filteredVariants.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
     const endEntry = Math.min(currentPage * pageSize, filteredVariants.length);
 
+    // Handlers
+    const handleAdd = () => { setVariantToEdit(null); setShowModal(true); };
+    const handleEdit = (variant) => { setVariantToEdit(variant); setShowModal(true); };
+    const handleDelete = async (variantId, variantName) => {
+        if (!window.confirm(`Delete variant "${variantName}"? This might affect related vehicles and orders.`)) return;
+        try {
+            await deleteVehicleVariant(variantId);
+            setSuccess(`Variant "${variantName}" deleted.`);
+            // Refetch variants after delete
+            const variantsRes = await getAllVehicleVariants();
+            setVariants(variantsRes.data?.data?.items || variantsRes.data?.items || variantsRes.data || []);
+        } catch (err) {
+            setError(err.response?.data?.message || 'Failed to delete variant.');
+        }
+    };
+    const handleSaveSuccess = async (isEdit) => {
+        setShowModal(false);
+        setVariantToEdit(null);
+        setSuccess(`Variant ${isEdit ? 'updated' : 'created'} successfully.`);
+        // Refetch variants after save
+        try {
+            const variantsRes = await getAllVehicleVariants();
+            setVariants(variantsRes.data?.data?.items || variantsRes.data?.items || variantsRes.data || []);
+        } catch(err) {
+            setError('Failed to reload variants after saving.')
+        }
+    };
+    const handlePageSizeChange = (e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); };
+
     return (
         <div>
 
