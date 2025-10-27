@@ -55,3 +55,12 @@ export const updatePromotion = (id, promotionData) => {
     console.log("📤 Sending update data:", dataToSend);
     return api.put(`/promotions/${id}`, dataToSend);
 };
+
+/**
+ * DELETE Promotion
+ * @param {string|number} id
+ */
+export const deletePromotion = (id) => {
+    console.log(`📡 API Call: DELETE /api/promotions/${id}`);
+    return api.delete(`/promotions/${id}`);
+};
