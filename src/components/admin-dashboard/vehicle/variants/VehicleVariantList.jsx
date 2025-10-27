@@ -195,7 +195,15 @@ export default function VehicleVariantList() {
                                 paginatedVariants.map(variant => (
                                     <tr key={variant.id}>
                                         <td>{modelsMap[variant.modelId] || 'Unknown Model'}</td>
-                                        <td><span className="fw-semibold">{variant.name}</span></td>
+                                        <td
+                                            onClick={() => handleViewDetails(variant.id)}
+                                            style={{ cursor: 'pointer' }}
+                                            title="View Details"
+                                        >
+                                            <span className="fw-semibold">
+                                                {variant.name}
+                                            </span>
+                                        </td>
                                         <td>{formatCurrency(variant.basePrice)}</td>
                                         <td>
                                             <div className="d-inline-block text-nowrap">
@@ -244,12 +252,20 @@ export default function VehicleVariantList() {
                 </div>
             </div>
             
-            {/* Modal */}
+            {/* Modal Edit */}
             <VehicleVariantModal
                 show={showModal}
                 onClose={() => { setShowModal(false); setVariantToEdit(null); }}
                 onSaveSuccess={handleSaveSuccess}
                 variantToEdit={variantToEdit}
+            />
+
+            {/* Modal View */}
+            <VehicleVariantDetailsModal
+                show={showDetailModal}
+                onClose={() => setShowDetailModal(false)}
+                variantId={viewVariantId}
+                modelsMap={modelsMap} 
             />
         </div>
     )
