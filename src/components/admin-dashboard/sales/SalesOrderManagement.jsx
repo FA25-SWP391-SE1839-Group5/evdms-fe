@@ -17,6 +17,20 @@ const getAvatarInitials = (name) => {
     return (parts[0].substring(0, 1) + parts[parts.length - 1].substring(0, 1)).toUpperCase();
 };
 
+// Render Status Badge (Cần điều chỉnh theo status thực tế của Sales Order)
+const RenderSalesOrderStatus = ({ status }) => {
+    let badgeClass = 'secondary';
+    switch (status?.toLowerCase()) {
+        case 'pending': badgeClass = 'warning'; break;
+        case 'processing': badgeClass = 'info'; break;
+        case 'shipped': badgeClass = 'primary'; break;
+        case 'delivered': badgeClass = 'success'; break;
+        case 'cancelled': badgeClass = 'danger'; break;
+    }
+    // Style giống Invoice list
+    return <span className={`badge rounded-pill bg-label-${badgeClass} d-flex align-items-center p-1 px-2`}><span className={`dot bg-${badgeClass} me-1`}></span> {status || 'N/A'}</span>;
+};
+
 export default function SalesOrderManagement() {
   return (
     <div>SalesOrderManagement</div>
