@@ -1,4 +1,5 @@
 export const ROUTES = {
+    HOME: 'home',
     LOGIN: 'login',
     CATALOG: 'catalog',
     DETAIL: 'detail',
@@ -24,7 +25,7 @@ const ADMIN_PAGES = {
 };
 
 export const initialState = {
-    currentPage: ROUTES.LOGIN,
+    currentPage: ROUTES.HOME,
     selectedVehicle: null,
     user: null,
     isAuthenticated: false
@@ -32,6 +33,13 @@ export const initialState = {
 
 export const routeReducer = (state, action) => {
     switch (action.type) {
+        case 'NAVIGATE_TO_HOME':
+            return {
+                ...state,
+                currentPage: ROUTES.HOME,
+                selectedVehicle: null
+            };
+            
         case 'NAVIGATE_TO_LOGIN':
             return {
                 ...state,
@@ -96,7 +104,7 @@ export const routeReducer = (state, action) => {
         case 'LOGOUT':
             return {
                 ...state,
-                currentPage: ROUTES.LOGIN,
+                currentPage: ROUTES.HOME,
                 user: null,
                 isAuthenticated: false,
                 selectedVehicle: null
