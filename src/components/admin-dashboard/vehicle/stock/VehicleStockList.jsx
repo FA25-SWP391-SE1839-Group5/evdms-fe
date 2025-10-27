@@ -245,6 +245,34 @@ export default function VehicleStockList() {
                     </tbody>
                 </table>
             </div>
+
+            <div className="d-flex justify-content-between align-items-center p-3">
+                <small className="text-muted">
+                    Showing {startEntry} to {endEntry} of {filteredVehicles.length} entries
+                </small>
+                <nav>
+                    <ul className="pagination pagination-sm mb-0">
+                        <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                            <button 
+                                className="page-link" 
+                                onClick={() => setCurrentPage(p => p - 1)}
+                                disabled={currentPage === 1}
+                            >
+                                &laquo; Previous
+                            </button>
+                        </li>
+                        <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
+                            <button 
+                                className="page-link" 
+                                onClick={() => setCurrentPage(p => p + 1)}
+                                disabled={currentPage === totalPages || totalPages === 0}
+                            >
+                                Next &raquo;
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     )
 }
