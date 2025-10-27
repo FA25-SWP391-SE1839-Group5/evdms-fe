@@ -389,6 +389,17 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                             </div>
                                         </div>
                                     </div>
+
+                                    {/* Content Step 2: Specs */}
+                                    <div 
+                                        id="specs-step" 
+                                        className={`content ${currentStep === 2 ? 'active dstepper-block' : 'dstepper-none'}`}
+                                    >
+                                        <div className="content-header mb-3">
+                                            <h6 className="mb-0">Specifications</h6>
+                                            <small>Enter technical specifications.</small>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </form>
