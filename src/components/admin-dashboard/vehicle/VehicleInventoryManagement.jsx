@@ -49,6 +49,11 @@ export default function VehicleInventoryManagement() {
         }
     };
 
+    // Fetch dữ liệu khi component mount
+    useEffect(() => {
+        fetchAllInventoryData();
+    }, []); // Chỉ chạy 1 lần
+
     const renderTabContent = () => {
         switch (activeTab) {
             case 'models':
@@ -61,6 +66,7 @@ export default function VehicleInventoryManagement() {
                 return <div>Select a tab</div>;
         }
     };
+
     return (
         <>
             <h4 className="fw-bold py-3 mb-4">
