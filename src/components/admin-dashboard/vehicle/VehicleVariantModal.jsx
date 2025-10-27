@@ -442,6 +442,26 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                             </div>
                                         ))}
                                     </div>
+
+                                    {/* Content Step 4: Review */}
+                                    <div 
+                                        id="review-step" 
+                                        className={`content ${currentStep === 4 ? 'active dstepper-block' : 'dstepper-none'}`}
+                                    >
+                                        <div className="content-header mb-3">
+                                            <h6 className="mb-0">Review & Submit</h6>
+                                            <small>Review the details before submitting.</small>
+                                        </div>
+
+                                        {/* Basic Info Summary */}
+                                        <h6>Basic Details</h6>
+                                        <ul className="list-unstyled">
+                                            <li><strong>Model:</strong> {models.find(m => m.id === basicInfo.modelId)?.name || 'N/A'}</li>
+                                            <li><strong>Variant Name:</strong> {basicInfo.name || 'N/A'}</li>
+                                            <li><strong>Base Price:</strong> {basicInfo.basePrice ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(basicInfo.basePrice) : 'N/A'}</li>
+                                        </ul>
+                                        <hr/>
+                                    </div>
                                 </div>
                             </div>
                         </form>
