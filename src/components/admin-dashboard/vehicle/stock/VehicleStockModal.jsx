@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { AlertCircle } from 'lucide-react';
 import { createVehicle, updateVehicle, getAllVehicleVariants } from '../../../../services/vehicleService';
 import { getAllDealers } from '../../../../services/dealerService';
