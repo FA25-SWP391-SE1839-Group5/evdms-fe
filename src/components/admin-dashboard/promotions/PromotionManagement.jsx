@@ -19,6 +19,33 @@ const RenderPromotionStatus = ({ startDate, endDate }) => {
 };
 
 export default function PromotionManagement() {
+    const [promotions, setPromotions] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [showModal, setShowModal] = useState(false);
+    const [promotionToEdit, setPromotionToEdit] = useState(null);
+
+    // Pagination & Search
+    const [searchTerm, setSearchTerm] = useState('');
+    const [pageSize, setPageSize] = useState(10);
+    const [currentPage, setCurrentPage] = useState(1);
+
+    // Fetch data
+    useEffect(() => {
+        fetchPromotions();
+    }, []);
+
+    useEffect(() => {
+        if (error || success) {
+            const timer = setTimeout(() => {
+                setError('');
+                setSuccess('');
+        }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [error, success]);
+
     return (
         <div>PromotionManagement</div>
     )
