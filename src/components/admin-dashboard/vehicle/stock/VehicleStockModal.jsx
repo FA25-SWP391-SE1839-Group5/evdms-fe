@@ -1,0 +1,107 @@
+import React from 'react'
+import { AlertCircle } from 'lucide-react';
+import { createVehicle, updateVehicle, getAllVehicleVariants } from '../../../../services/vehicleService';
+import { getAllDealers } from '../../../../services/dealerService';
+
+export default function VehicleStockModal({ show, onClose, onSaveSuccess, vehicleToEdit, variants = [], dealers = [] }) {
+    const isEditMode = Boolean(vehicleToEdit);
+    const title = isEditMode ? 'Edit Vehicle Stock' : 'Add New Vehicle to Stock';
+
+    const [formData, setFormData] = useState({
+        variantId: '',
+        dealerId: '', // ID của dealer đang giữ xe (có thể trống nếu chưa phân)
+        color: '',
+        vin: '',    // Số VIN (Vehicle Identification Number)
+        type: 'New', // Loại xe: New, Used, Demo?
+        status: 'Available' // Trạng thái: Available, Reserved, Sold, InTransit
+    });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    // Populate form data when editing or reset when adding
+    useEffect(() => {
+        if (show) {
+            setError('');
+            if (isEditMode && vehicleToEdit) {
+                setFormData({
+                    variantId: vehicleToEdit.variantId || '',
+                    dealerId: vehicleToEdit.dealerId || '', // Có thể null
+                    color: vehicleToEdit.color || '',
+                    vin: vehicleToEdit.vin || '',
+                    type: vehicleToEdit.type || 'New',
+                    status: vehicleToEdit.status || 'Available',
+                });
+            } else {
+                // Reset form for adding
+                setFormData({
+                    variantId: '',
+                    dealerId: '',
+                    color: '',
+                    vin: '',
+                    type: 'New',
+                    status: 'Available',
+                });
+            }
+        }
+    }, [show, vehicleToEdit, isEditMode]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+
+        // Basic validation
+        if (!formData.variantId || !formData.color || !formData.vin || !formData.type || !formData.status) {
+            setError('Please fill in Variant, Color, VIN, Type, and Status.');
+            setLoading(false);
+            return;
+        }
+        // Có thể thêm validation cho VIN (độ dài, ký tự...)
+
+        // Chuẩn bị dữ liệu gửi đi (chuyển đổi nếu cần)
+        const dataToSend = {
+            ...formData,
+            // Đảm bảo dealerId là null nếu giá trị là chuỗi rỗng
+            dealerId: formData.dealerId || null,
+        };
+
+        try {
+            let response;
+            if (isEditMode) {
+                response = await updateVehicle(vehicleToEdit.id, dataToSend);
+            } else {
+                response = await createVehicle(dataToSend);
+            }
+
+            // Check response from backend (assuming success flag or status code)
+             if (response.data?.success === true || (response.status >= 200 && response.status < 300) ) {
+                onSaveSuccess(isEditMode);
+            } else {
+                throw new Error(response.data?.message || 'Failed to save vehicle');
+            }
+        } catch (err) {
+            console.error("Save Vehicle Error:", err);
+            // Hiển thị lỗi cụ thể hơn, ví dụ lỗi trùng VIN
+             let specificError = err.response?.data?.message || err.message || 'Operation failed';
+             if (specificError.toLowerCase().includes('vin') && specificError.toLowerCase().includes('unique')) {
+                 specificError = 'This VIN already exists in the inventory.';
+             }
+            setError(`Database operation failed: ${specificError}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (!show) return null;
+    
+    return (
+        <div>
+            
+        </div>
+    )
+}
