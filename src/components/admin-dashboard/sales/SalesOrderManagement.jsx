@@ -233,6 +233,67 @@ export default function SalesOrderManagement() {
                         </div>
                     </div>
                 </div>
+
+                {/* Table */}
+                <div className="table-responsive text-nowrap">
+                    <table className="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Dealer</th>
+                                <th>Vehicle</th>
+                                {/* <th>Total</th> */}
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="table-border-bottom-0">
+                            {paginatedOrders.length === 0 ? (
+                                <tr><td colSpan="7" className="text-center py-4"> No orders found. </td></tr>
+                            ) : (
+                                paginatedOrders.map(order => {
+                                    const customer = customerMap[order.customerId];
+                                    return (
+                                        <tr key={order.id}>
+                                            <td><span className="fw-semibold text-primary">{formatOrderId(order.id)}</span></td>
+                                            <td>{formatDate(order.createdAt || order.updatedAt)}</td>
+                                            <td>
+                                                {customer ? (
+                                                     <div className="d-flex justify-content-start align-items-center">
+                                                        <div className="avatar avatar-sm me-3"> <span className="avatar-initial rounded-circle bg-label-secondary">{getAvatarInitials(customer.name)}</span> </div>
+                                                        <div className="d-flex flex-column">
+                                                            <span className="fw-semibold">{customer.name}</span>
+                                                            <small className="text-muted">{customer.email}</small>
+                                                        </div>
+                                                    </div>
+                                                ) : ( order.customerId || 'N/A' )}
+                                            </td>
+                                            <td>{dealerMap[order.dealerId] || 'N/A'}</td>
+                                            <td>{variantMap[order.variantId] || 'N/A'}</td>
+                                            {/* <td>{formatCurrency(order.totalAmount)}</td> */}
+                                            <td><RenderSalesOrderStatus status={order.status} /></td>
+                                            <td>
+                                                {/* Actions: View Details */}
+                                                 <button
+                                                    type="button"
+                                                    className="btn btn-sm btn-icon btn-text-secondary rounded-pill"
+                                                    title="View Details"
+                                                    onClick={() => handleViewDetails(order)}
+                                                >
+                                                   <Eye size={18} />
+                                                </button>
+                                                {/* Thêm dropdown nếu cần action khác (Mark Delivered...) */}
+                                                {/* <div className="dropdown"> ... </div> */}
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </>
     )
