@@ -15,6 +15,9 @@ export default function VehicleModelList() {
     const [showModal, setShowModal] = useState(false);
     const [modelToEdit, setModelToEdit] = useState(null);
 
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [viewModelId, setViewModelId] = useState(null);
+
     // Pagination & Search (Simple)
     const [searchTerm, setSearchTerm] = useState('');
     const [pageSize, setPageSize] = useState(10);
@@ -73,6 +76,11 @@ export default function VehicleModelList() {
     const handleEdit = (model) => {
         setModelToEdit(model);
         setShowModal(true);
+    };
+
+    const handleViewDetails = (modelId) => {
+        setViewModelId(modelId);
+        setShowDetailModal(true);
     };
 
     const handleDelete = async (modelId, modelName) => {
@@ -181,7 +189,11 @@ export default function VehicleModelList() {
                         ) : (
                             paginatedModels.map(model => (
                                 <tr key={model.id}>
-                                    <td>
+                                    <td
+                                        onClick={() => handleViewDetails(model.id)} 
+                                        style={{ cursor: 'pointer' }}
+                                        title="View Details"
+                                    >
                                         {model.imageUrl ? (
                                             <>
                                                 <img
@@ -224,12 +236,19 @@ export default function VehicleModelList() {
                 </nav>
             </div>
 
-            {/* Modal */}
+            {/* Modal Edit */}
             <VehicleModelModal
                 show={showModal}
                 onClose={() => { setShowModal(false); setModelToEdit(null); }}
                 onSaveSuccess={handleSaveSuccess}
                 modelToEdit={modelToEdit}
+            />
+
+             {/* Modal View */}
+            <VehicleModelDetailsModal
+                show={showDetailModal}
+                onClose={() => setShowDetailModal(false)}
+                modelId={viewModelId}
             />
         </div>
     )
