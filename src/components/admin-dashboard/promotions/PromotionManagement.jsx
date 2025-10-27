@@ -107,6 +107,10 @@ export default function PromotionManagement() {
     }
   
     return (
-        <div>PromotionManagement</div>
+        <>
+            <h4 className="fw-bold py-3 mb-4">
+              <span className="text-muted fw-light">Financial /</span> Promotions
+            </h4>
+        </>
     )
 }
