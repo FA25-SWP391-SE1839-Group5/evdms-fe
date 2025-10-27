@@ -197,6 +197,26 @@ export default function VehicleStockModal({ show, onClose, onSaveSuccess, vehicl
                                             <option value="Demo">Demo</option>
                                         </select>
                                     </div>
+
+                                    {/* Status Select */}
+                                    <div className="col-md-6">
+                                        <label htmlFor="vehicleStatus" className="form-label">Status *</label>
+                                        <select
+                                            id="vehicleStatus"
+                                            name="status"
+                                            className="form-select"
+                                            value={formData.status}
+                                            onChange={handleChange}
+                                            disabled={loading}
+                                            required
+                                        >
+                                            <option value="Available">Available</option>
+                                            <option value="Reserved">Reserved</option>
+                                            <option value="Sold">Sold</option>
+                                            <option value="InTransit">In Transit</option>
+                                            {/* Thêm các trạng thái khác nếu cần */}
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                         </form>
