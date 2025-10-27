@@ -140,6 +140,24 @@ export default function PromotionModal({ show, onClose, onSaveSuccess, promotion
                                     <button type="button" className="btn-close" onClick={() => setError('')}></button>
                                     </div>
                                 )}
+
+                                <div className="row g-3">
+                                    {/* Description */}
+                                    <div className="col-12">
+                                        <label htmlFor="promoDescription" className="form-label">Description *</label>
+                                        <input
+                                            type="text"
+                                            id="promoDescription"
+                                            name="description"
+                                            className={`form-control ${!formData.description && error ? 'is-invalid' : ''}`}
+                                            value={formData.description}
+                                            onChange={handleChange}
+                                            placeholder="e.g., Year End Sale"
+                                            disabled={loading}
+                                            required
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </form>
                     </div>
