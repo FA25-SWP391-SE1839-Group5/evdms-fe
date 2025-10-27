@@ -238,6 +238,23 @@ export default function VehicleStockModal({ show, onClose, onSaveSuccess, vehicl
                                     </div>
                                 </div>
                             </div>
+                            <div className="modal-footer">
+                                <button 
+                                    type="button" 
+                                    className="btn btn-outline-secondary" 
+                                    onClick={onClose} 
+                                    disabled={loading}
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    type="submit" 
+                                    className="btn btn-primary" 
+                                    disabled={loading}
+                                >
+                                    {loading ? 'Saving...' : (isEditMode ? 'Update Vehicle' : 'Add Vehicle')}
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
