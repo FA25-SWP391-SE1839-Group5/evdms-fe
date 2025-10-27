@@ -46,6 +46,19 @@ export default function PromotionManagement() {
         }
     }, [error, success]);
 
+    const fetchPromotions = async () => {
+        try {
+            setLoading(true);
+            setError('');
+            const response = await getAllPromotions();
+            setPromotions(response.data?.data?.items || response.data?.items || response.data || []);
+        } catch (err) {
+            setError(err.response?.data?.message || err.message || 'Failed to load promotions');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div>PromotionManagement</div>
     )
