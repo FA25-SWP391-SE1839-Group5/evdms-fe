@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { AlertCircle, ArrowLeft, ArrowRight } from 'lucide-react';
-import { createVehicleVariant, updateVehicleVariant, getAllVehicleModels } from '../../../services/vehicleService';
+import { createVehicleVariant, updateVehicleVariant, getAllVehicleModels } from '../../../../services/vehicleService';
 
 const specCategories = {
     Performance: [

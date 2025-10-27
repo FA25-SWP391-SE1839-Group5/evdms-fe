@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-import VehicleModelList from './VehicleModelList';
-import VehicleVariantList from './VehicleVariantList';
+import VehicleModelList from './models/VehicleModelList';
+import VehicleVariantList from './variants/VehicleVariantList';
 // import VehicleStockList from './stock/VehicleStockList';
 
 export default function VehicleInventoryManagement() {

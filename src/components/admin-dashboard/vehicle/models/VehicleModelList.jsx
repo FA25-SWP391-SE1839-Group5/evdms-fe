@@ -3,8 +3,8 @@ import { AlertCircle, CheckCircle, Plus, Edit, Trash } from 'lucide-react';
 import {
     getAllVehicleModels,
     deleteVehicleModel
-} from '../../../services/vehicleService';
-import VehicleModelModal from './VehicleModelModal';
+} from '../../../../services/vehicleService';
+import VehicleModelModal from '../VehicleModelModal';
 
 export default function VehicleModelList() {
     const [models, setModels] = useState([]);
@@ -162,7 +162,7 @@ export default function VehicleModelList() {
             )}
 
            {/* Table */}
-            <div className="table-responsive text-nowrap">
+            <div className="table-responsive">
                 <table className="table table-hover">
                     <thead>
                         <tr>

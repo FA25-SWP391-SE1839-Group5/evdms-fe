@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { AlertCircle, CheckCircle, Plus } from 'lucide-react';
-import { getAllVehicleVariants, deleteVehicleVariant, getAllVehicleModels } from '../../../services/vehicleService';
+import { getAllVehicleVariants, deleteVehicleVariant, getAllVehicleModels } from '../../../../services/vehicleService';
 import VehicleVariantModal from './VehicleVariantModal';
 
 // Helper format tiền tệ
@@ -154,45 +154,23 @@ export default function VehicleVariantList() {
             
             <div className="card-body pb-0">
                 
-                {/* ==================== SỬA LỖI Ở ĐÂY ==================== */}
-                
-                {/* Chỉ ẩn/hiện Alert messages */}
-                {error && ( 
-                    // 1. Bỏ d-flex và align-items-center khỏi div.alert
-                    <div className="alert alert-danger alert-dismissible mb-3" role="alert">
-                        {/* 2. Thêm d-flex vào div con bên trong */}
-                        <div className="d-flex align-items-center">
-                            <AlertCircle size={20} className="me-2 flex-shrink-0" /> 
-                            <div className="flex-grow-1">{error}</div> 
-                        </div>
-                        {/* 3. Nút close để riêng, class 'alert-dismissible' sẽ tự xử lý */}
-                        <button 
-                            type="button" 
-                            className="btn-close" 
-                            onClick={() => setError('')}
-                            aria-label="Close"
-                        ></button> 
+                {/* Alert messages */}
+                {error && (
+                    <div className="alert alert-danger alert-dismissible d-flex align-items-center" role="alert">
+                        <AlertCircle size={20} className="me-2" />
+                        <div className="flex-grow-1">{error}</div>
+                        <button type="button" className="btn-close" onClick={() => setError('')}></button>
                     </div>
                 )}
-                {success && ( 
-                    // Tương tự cho success alert
-                    <div className="alert alert-success alert-dismissible mb-3" role="alert">
-                        <div className="d-flex align-items-center">
-                            <CheckCircle size={20} className="me-2 flex-shrink-0" /> 
-                            <div className="flex-grow-1">{success}</div>
-                        </div>
-                        <button 
-                            type="button" 
-                            className="btn-close" 
-                            onClick={() => setSuccess('')}
-                            aria-label="Close"
-                        ></button> 
-                    </div> 
+                {success && (
+                    <div className="alert alert-success alert-dismissible d-flex align-items-center" role="alert">
+                        <CheckCircle size={20} className="me-2" />
+                        <div className="flex-grow-1">{success}</div>
+                        <button type="button" className="btn-close" onClick={() => setSuccess('')}></button>
+                    </div>
                 )}
-                {/* ==================== HẾT KHỐI ALERT ==================== */}
-
-
-                {/* Table (Luôn hiển thị) */}
+                
+                {/* Table */}
                 <div className="table-responsive text-nowrap">
                     <table className="table table-hover">
                         <thead>
@@ -225,7 +203,7 @@ export default function VehicleVariantList() {
                     </table>
                 </div>
 
-                {/* Pagination (Luôn hiển thị) */}                
+                {/* Pagination */}                
                 <div className="d-flex justify-content-between align-items-center p-3">
                     <small className="text-muted">
                         Showing {startEntry} to {endEntry} of {filteredVariants.length} entries
@@ -257,7 +235,7 @@ export default function VehicleVariantList() {
                         </ul>
                     </nav>
                 </div>
-            </div> {/* <-- Đóng thẻ card-body */}
+            </div>
             
             {/* Modal */}
             <VehicleVariantModal
