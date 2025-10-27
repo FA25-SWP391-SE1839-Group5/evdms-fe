@@ -188,6 +188,7 @@ export default function SalesOrderManagement() {
                 {/* Header: Show, Search, Filter */}
                 <div className="card-header border-bottom">
                     <div className="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
+
                         {/* Left: Show Entries */}
                         <div className="col-md-auto">
                            <label className="d-flex align-items-center"> 
@@ -203,6 +204,32 @@ export default function SalesOrderManagement() {
                                     <option>50</option> 
                                 </select> 
                             </label>
+                        </div>
+
+                        {/* Right: Search & Status Filter */}
+                        <div className="col-md-auto ms-auto d-flex align-items-center gap-3">
+                            <input 
+                                type="search" 
+                                name="globalSearch" 
+                                value={globalSearch} 
+                                onChange={handleFilterChange} 
+                                className="form-control" 
+                                placeholder="Search Order..." 
+                                style={{width: '200px'}} 
+                            />
+                            <select 
+                                name="statusFilter" 
+                                className="form-select" 
+                                value={statusFilter} 
+                                onChange={handleFilterChange}
+                            >
+                                <option value="">All Status</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Processing">Processing</option>
+                                <option value="Shipped">Shipped</option>
+                                <option value="Delivered">Delivered</option>
+                                <option value="Cancelled">Cancelled</option>
+                             </select>
                         </div>
                     </div>
                 </div>
