@@ -4,7 +4,8 @@ import {
     getAllVehicleModels,
     deleteVehicleModel
 } from '../../../../services/vehicleService';
-import VehicleModelModal from '../VehicleModelModal';
+import VehicleModelModal from './VehicleModelModal';
+import VehicleModelDetailsModal from './VehicleModelDetailsModal';
 
 export default function VehicleModelList() {
     const [models, setModels] = useState([]);

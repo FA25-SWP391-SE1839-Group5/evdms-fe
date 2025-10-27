@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { getVehicleModelById } from '../../../../services/vehicleService';
 
-export default function VehicleModelDetailModal({ show, onClose, modelId }) {
+export default function VehicleModelDetailsModal({ show, onClose, modelId }) {
     const [model, setModel] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
