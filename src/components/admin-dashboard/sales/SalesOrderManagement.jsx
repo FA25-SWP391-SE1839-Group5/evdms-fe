@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { AlertCircle, Truck, Eye } from 'lucide-react';
+import { AlertCircle, Truck, Eye, CheckCircle } from 'lucide-react';
 import { getAllSalesOrders, markOrderDelivered } from '../../../services/orderService';
 import { getAllDealers } from '../../../services/dealerService';
 import { getAllVehicleVariants } from '../../../services/vehicleService';
@@ -69,6 +69,8 @@ export default function SalesOrderManagement() {
 
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [viewingOrder, setViewingOrder] = useState(null);
+
+    const [openDropdownId, setOpenDropdownId] = useState(null);
 
     // Fetch Data (Orders, Customers, Dealers, Variants)
     useEffect(() => {
@@ -240,15 +242,19 @@ export default function SalesOrderManagement() {
         setShowDetailsModal(true);
     };
 
+    const handleDropdownToggle = (orderId) => {
+        setOpenDropdownId(prevId => (prevId === orderId ? null : orderId));
+    };
+
     const handleMarkDelivered = async (orderId, orderNumStr) => {
         if (!window.confirm(`Mark Order ${orderNumStr} as Delivered?`)) return;
-
         try {
             setSuccess(''); // Xóa thông báo cũ
             setError('');
             const response = await markOrderDelivered(orderId);
             
             if (response.data?.success || response.status === 200 || response.status === 204) {
+                setOpenDropdownId(null);
                 setSuccess(`Order ${orderNumStr} marked as Delivered.`);
                 reloadOrders(); // Tải lại danh sách
             } else {
@@ -323,7 +329,7 @@ export default function SalesOrderManagement() {
                         <div className="card-body" style={{ minHeight: '300px' }}>
                             {filteredOrders.length > 0 ? (
                                 <div style={{ position: 'relative', height: '250px', width: '100%' }}>
-                                        <Bar options={barChartOptions} data={reportChartData.salesByRegionChart} />
+                                    <Bar options={barChartOptions} data={reportChartData.salesByRegionChart} />
                                 </div>
                             ) : (
                                 <p className="text-muted text-center mt-4">No sales data to display based on current filters.</p>
@@ -379,7 +385,7 @@ export default function SalesOrderManagement() {
                                 <option value="Shipped">Shipped</option>
                                 <option value="Delivered">Delivered</option>
                                 <option value="Cancelled">Cancelled</option>
-                             </select>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -427,40 +433,56 @@ export default function SalesOrderManagement() {
                                             {/* <td>{formatCurrency(order.totalAmount)}</td> */}
                                             <td><RenderSalesOrderStatus status={order.status} /></td>
                                             <td>
-                                                {/* Actions: View Details */}
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-sm btn-icon btn-text-secondary rounded-pill"
-                                                    title="View Details"
-                                                    onClick={() => handleViewDetails(order)}
-                                                >
-                                                    <Eye size={18} />
-                                                </button>
-                                                {/* More Actions Dropdown */}
-                                                <div className="dropdown">
+                                                <div className="d-flex align-items-center">
+                                                
+                                                    {/* Actions: View Details */}
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-sm btn-icon btn-text-secondary rounded-pill"
+                                                        title="View Details"
+                                                        onClick={() => handleViewDetails(order)}
+                                                    >
+                                                        <Eye size={18} />
+                                                    </button>
+                                                    {/* More Actions Dropdown */}
+                                                    <div className="dropdown">
                                                         <button 
                                                             type="button" 
-                                                            className="btn p-0 dropdown-toggle hide-arrow btn-sm" data-bs-toggle="dropdown"
+                                                            className="btn p-0 dropdown-toggle hide-arrow btn-sm" 
+                                                            onClick={() => handleDropdownToggle(order.id)}
                                                         >
                                                             <i className="bx bx-dots-vertical-rounded"></i>
                                                         </button>
-                                                </div>
-                                                <div className="dropdown-menu dropdown-menu-end">
-                                                    {/* Chỉ hiển thị nếu chưa delivered hoặc cancelled */}
-                                                    {!isDeliveredOrCancelled && (
-                                                        <button
-                                                            className="dropdown-item d-flex align-items-center"
-                                                            onClick={() => handleMarkDelivered(order.id, orderNumStr)}
-                                                        >
-                                                            <Truck size={16} className="me-2 text-success"/> Mark Delivered
-                                                        </button>
-                                                    )}
-                                                    {/* Thêm action khác ở đây, ví dụ Cancel Order */}
-                                                    {/* {!isDeliveredOrCancelled && (
-                                                        <button className="dropdown-item d-flex align-items-center text-danger">
-                                                            <XCircle size={16} className="me-2"/> Cancel Order
-                                                        </button>
-                                                    )} */}
+                                                        {/* Menu (Tự quản lý bằng state 'show') */}
+                                                        <div className={`dropdown-menu dropdown-menu-end ${openDropdownId === order.id ? 'show' : ''}`}>
+                                                            {!isDeliveredOrCancelled && (
+                                                                <button
+                                                                    className="dropdown-item d-flex align-items-center"
+                                                                    onClick={() => handleMarkDelivered(order.id, orderNumStr)}
+                                                                >
+                                                                    <Truck size={16} className="me-2 text-success"/> Mark Delivered
+                                                                </button>
+                                                            )}
+                                                            {/* Thêm các action khác nếu cần */}
+                                                        </div>
+                                                    </div>
+                                                    <div className="dropdown-menu dropdown-menu-end">
+                                                        {/* Chỉ hiển thị nếu chưa delivered hoặc cancelled */}
+                                                        {!isDeliveredOrCancelled && (
+                                                            <button
+                                                                className="dropdown-item d-flex align-items-center"
+                                                                onClick={() => handleMarkDelivered(order.id, orderNumStr)}
+                                                            >
+                                                                <Truck size={16} className="me-2 text-success"/> Mark Delivered
+                                                            </button>
+                                                        )}
+                                                        {/* Thêm action khác ở đây, ví dụ Cancel Order */}
+                                                        {/* {!isDeliveredOrCancelled && (
+                                                            <button className="dropdown-item d-flex align-items-center text-danger">
+                                                                <XCircle size={16} className="me-2"/> Cancel Order
+                                                            </button>
+                                                        )} */}
+                                                    </div>
                                                 </div>
                                             </td>
                                         </tr>
