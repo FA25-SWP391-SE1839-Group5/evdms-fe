@@ -142,7 +142,7 @@ export default function PromotionModal({ show, onClose, onSaveSuccess, promotion
                                 )}
 
                                 <div className="row g-3">
-                                    
+
                                     {/* Description */}
                                     <div className="col-12">
                                         <label htmlFor="promoDescription" className="form-label">Description *</label>
@@ -176,6 +176,21 @@ export default function PromotionModal({ show, onClose, onSaveSuccess, promotion
                                             disabled={loading}
                                         />
                                          <div className="form-text">Enter value between 0-100 or leave empty.</div>
+                                    </div>
+
+                                    {/* Start Date */}
+                                    <div className="col-md-4">
+                                        <label htmlFor="promoStartDate" className="form-label">Start Date *</label>
+                                        <input
+                                            type="datetime-local"
+                                            id="promoStartDate"
+                                            name="startDate"
+                                            className={`form-control ${(!formData.startDate || error.includes('Start Date')) ? 'is-invalid' : ''}`}
+                                            value={formData.startDate}
+                                            onChange={handleChange}
+                                            disabled={loading}
+                                            required
+                                        />
                                     </div>
                                 </div>
                             </div>
