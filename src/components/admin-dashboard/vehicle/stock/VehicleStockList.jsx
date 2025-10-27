@@ -132,6 +132,16 @@ export default function VehicleStockList() {
          }
     };
     const handlePageSizeChange = (e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); };
+
+    if (loading) {
+        return (
+            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+                <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading users from database...</span>
+                </div>
+            </div>
+        );
+    }
     
     return (
         <div>VehicleStockList</div>
