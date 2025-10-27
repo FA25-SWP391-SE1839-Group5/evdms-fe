@@ -258,7 +258,8 @@ export default function VehicleStockModal({ show, onClose, onSaveSuccess, vehicl
                         </form>
                     </div>
                 </div>
-            </div>  
+            </div>
+            {show && <div className="modal-backdrop fade show"></div>}  
         </>
     )
 }
