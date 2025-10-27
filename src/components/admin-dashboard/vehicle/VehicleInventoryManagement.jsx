@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import VehicleModelList from './models/VehicleModelList';
 import VehicleVariantList from './variants/VehicleVariantList';
-// import VehicleStockList from './stock/VehicleStockList';
+import VehicleStockList from './stock/VehicleStockList';
 
 export default function VehicleInventoryManagement() {
     const [activeTab, setActiveTab] = useState('models'); // Bắt đầu với Models
@@ -14,8 +14,7 @@ export default function VehicleInventoryManagement() {
             case 'variants':
                 return <VehicleVariantList />
             case 'stock':
-                // return <VehicleStockList />;
-                return <div>Vehicle Stock/Inventory Management - Coming Soon...</div>;
+                return <VehicleStockList />;
             default:
                 return <div>Select a tab</div>;
         }
