@@ -179,6 +179,24 @@ export default function VehicleStockModal({ show, onClose, onSaveSuccess, vehicl
                                         />
                                         {/* Có thể đổi thành Select nếu màu cố định */}
                                     </div>
+
+                                    {/* Type Select */}
+                                    <div className="col-md-6">
+                                        <label htmlFor="vehicleType" className="form-label">Type *</label>
+                                        <select
+                                            id="vehicleType"
+                                            name="type"
+                                            className="form-select"
+                                            value={formData.type}
+                                            onChange={handleChange}
+                                            disabled={loading}
+                                            required
+                                        >
+                                            <option value="New">New</option>
+                                            <option value="Used">Used</option>
+                                            <option value="Demo">Demo</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                         </form>
