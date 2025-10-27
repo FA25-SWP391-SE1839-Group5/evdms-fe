@@ -160,15 +160,6 @@ export default function VehicleVariantDetailsModal({ show, onClose, variantId, m
                                 </div>
                             )}
                         </div>
-                        <div className="modal-footer">
-                            <button 
-                                type="button" 
-                                className="btn btn-label-secondary" 
-                                onClick={onClose}
-                            >
-                                Close
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
