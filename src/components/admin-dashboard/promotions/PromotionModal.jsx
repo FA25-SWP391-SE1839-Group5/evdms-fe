@@ -192,6 +192,21 @@ export default function PromotionModal({ show, onClose, onSaveSuccess, promotion
                                             required
                                         />
                                     </div>
+
+                                    {/* End Date */}
+                                    <div className="col-md-4">
+                                        <label htmlFor="promoEndDate" className="form-label">End Date *</label>
+                                        <input
+                                            type="datetime-local"
+                                            id="promoEndDate"
+                                            name="endDate"
+                                            className={`form-control ${(!formData.endDate || error.includes('End Date')) ? 'is-invalid' : ''}`}
+                                            value={formData.endDate}
+                                            onChange={handleChange}
+                                            disabled={loading}
+                                            required
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </form>
