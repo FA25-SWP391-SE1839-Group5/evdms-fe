@@ -98,10 +98,31 @@ export default function VehicleStockModal({ show, onClose, onSaveSuccess, vehicl
     };
 
     if (!show) return null;
-    
+
     return (
-        <div>
-            
-        </div>
+        <>
+            <div 
+                className={`modal fade ${show ? 'show d-block' : ''}`} 
+                tabIndex="-1" 
+                style={{ backgroundColor: show ? 'rgba(0,0,0,0.5)' : 'transparent' }}
+            >
+                <div className="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div className="modal-content">
+                        <form onSubmit={handleSubmit}>
+                            <div className="modal-header">
+                                <h5 className="modal-title">{title}</h5>
+                                <button 
+                                    type="button" 
+                                    className="btn-close" 
+                                    onClick={onClose} 
+                                    aria-label="Close" 
+                                    disabled={loading}
+                                ></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>  
+        </>
     )
 }
