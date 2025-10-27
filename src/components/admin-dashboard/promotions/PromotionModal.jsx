@@ -130,6 +130,17 @@ export default function PromotionModal({ show, onClose, onSaveSuccess, promotion
                                     disabled={loading}
                                 ></button>
                             </div>
+
+                            <div className="modal-body">
+                                {/* Alert messages */}
+                                {error && (
+                                    <div className="alert alert-danger alert-dismissible d-flex align-items-center" role="alert">
+                                    <AlertCircle size={20} className="me-2" />
+                                    <div className="flex-grow-1">{error}</div>
+                                    <button type="button" className="btn-close" onClick={() => setError('')}></button>
+                                    </div>
+                                )}
+                            </div>
                         </form>
                     </div>
                 </div>
