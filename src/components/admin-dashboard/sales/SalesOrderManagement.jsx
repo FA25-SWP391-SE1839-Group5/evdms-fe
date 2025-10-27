@@ -32,7 +32,58 @@ const RenderSalesOrderStatus = ({ status }) => {
 };
 
 export default function SalesOrderManagement() {
-  return (
-    <div>SalesOrderManagement</div>
-  )
+    const [orders, setOrders] = useState([]);
+    const [customerMap, setCustomerMap] = useState({}); // { customerId: customerName }
+    const [dealerMap, setDealerMap] = useState({});     // { dealerId: dealerName }
+    const [variantMap, setVariantMap] = useState({});   // { variantId: variantName }
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    // Pagination & Filter State
+    const [pageSize, setPageSize] = useState(10);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [statusFilter, setStatusFilter] = useState('');
+    const [globalSearch, setGlobalSearch] = useState('');
+
+    // Fetch Data (Orders, Customers, Dealers, Variants)
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                setError('');
+                // **Lưu ý:** Cần có API getAllCustomers
+                const [ordersRes, dealersRes, variantsRes , customersRes ] = await Promise.all([
+                    getAllSalesOrders(),
+                    getAllDealers(),
+                    getAllVehicleVariants(),
+                    getAllCustomers(), 
+                ]);
+
+                setOrders(ordersRes.data?.data?.items || ordersRes.data?.items || ordersRes.data || []);
+
+                // Map Dealers
+                const dealerList = dealersRes.data?.data?.items || [];
+                setDealerMap(dealerList.reduce((acc, d) => { acc[d.id] = d.name; return acc; }, {}));
+
+                // Map Variants
+                const variantList = variantsRes.data?.data?.items || [];
+                setVariantMap(variantList.reduce((acc, v) => { acc[v.id] = v.name; return acc; }, {}));
+
+                // Map Customers (Khi có API)
+                const customerList = customersRes.data?.data?.items || [];
+                setCustomerMap(customerList.reduce((acc, c) => { acc[c.id] = { name: c.fullName, email: c.email /* avatar? */ }; return acc; }, {}));
+            } catch (err) {
+                setError(err.response?.data?.message || err.message || 'Failed to load sales orders');
+                console.error("Fetch Sales Orders Error:", err)
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
+
+
+    return (
+        <div>SalesOrderManagement</div>
+    )
 }
