@@ -84,15 +84,6 @@ const VehicleDetailsModal = ({ show, onClose, vehicle, variantsMap = {}, dealers
                                 </tbody>
                             </table>
                         </div>
-                        <div className="modal-footer">
-                            <button 
-                                type="button" 
-                                className="btn btn-outline-secondary" 
-                                onClick={onClose}
-                            >
-                                Close
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>

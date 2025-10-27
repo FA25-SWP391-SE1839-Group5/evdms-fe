@@ -7,6 +7,7 @@ import {
 } from '../../../../services/vehicleService';
 import { getAllDealers } from '../../../../services/dealerService';
 import VehicleStockModal from './VehicleStockModal';
+import VehicleDetailsModal from './VehicleDetailsModal';
 
 // Helper Function - Render Status Badge
 const RenderVehicleStatus = ({ status }) => {
@@ -38,6 +39,9 @@ export default function VehicleStockList() {
     const [searchTerm, setSearchTerm] = useState('');
     const [pageSize, setPageSize] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
+
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
+    const [viewingVehicle, setViewingVehicle] = useState(null);
 
     // Fetch Data (Vehicles, Variants, Dealers)
     useEffect(() => {
@@ -132,6 +136,10 @@ export default function VehicleStockList() {
          }
     };
     const handlePageSizeChange = (e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); };
+    const handleViewDetails = (vehicle) => {
+        setViewingVehicle(vehicle);
+        setShowDetailsModal(true);
+    };
 
     if (loading) {
         return (
@@ -226,7 +234,17 @@ export default function VehicleStockList() {
                         ) : (
                             paginatedVehicles.map(v => (
                                 <tr key={v.id}>
-                                    <td><code className="fw-semibold">{v.vin || 'N/A'}</code></td>
+                                    <td>
+                                        <button
+                                            type="button"
+                                            className="btn btn-link p-0 fw-semibold text-primary"
+                                            onClick={() => handleViewDetails(v)}
+                                            title={`View details for VIN: ${v.vin}`}
+                                            style={{ textDecoration: 'none' }} // Bỏ gạch chân
+                                        >
+                                           <code>{v.vin || 'N/A'}</code>
+                                        </button>
+                                    </td>
                                     <td>{variantsMap[v.variantId] || 'Unknown'}</td>
                                     <td>{v.color}</td>
                                     <td>{v.type}</td>
@@ -282,6 +300,15 @@ export default function VehicleStockList() {
                 vehicleToEdit={vehicleToEdit}
                 variants={allVariants} // Truyền danh sách variants
                 dealers={allDealers}   // Truyền danh sách dealers
+            />
+
+            {/* Modal Details */}
+            <VehicleDetailsModal
+                show={showDetailsModal}
+                onClose={() => setShowDetailsModal(false)}
+                vehicle={viewingVehicle}
+                variantsMap={variantsMap} // Truyền map để hiển thị tên variant
+                dealersMap={dealersMap}   // Truyền map để hiển thị tên dealer
             />
         </div>
     )
