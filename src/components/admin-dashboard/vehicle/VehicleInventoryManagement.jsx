@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import VehicleModelList from './models/VehicleModelList';
 import VehicleVariantList from './variants/VehicleVariantList';
@@ -55,6 +55,9 @@ export default function VehicleInventoryManagement() {
     }, []); // Chỉ chạy 1 lần
 
     const renderTabContent = () => {
+        // Truyền hàm fetch lại data xuống component con để chúng có thể reload khi cần (sau khi Add/Edit/Delete)
+        const reloadData = fetchAllInventoryData;
+
         switch (activeTab) {
             case 'models':
                 return <VehicleModelList />
@@ -69,9 +72,14 @@ export default function VehicleInventoryManagement() {
 
     return (
         <>
-            <h4 className="fw-bold py-3 mb-4">
-              <span className="text-muted fw-light">Vehicle Management /</span> Vehicle Inventory
-            </h4>
+
+            {/* Thông báo lỗi chung */}
+            {error && !loading && (
+                <div className="alert alert-danger d-flex align-items-center mb-4" role="alert">
+                    <AlertCircle size={20} className="me-2" />
+                    <div>{error}</div>
+                </div>
+            )}
 
             <div className="row">
                 <div className="col-md-12">
