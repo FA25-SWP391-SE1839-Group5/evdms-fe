@@ -146,6 +146,22 @@ export default function VehicleStockModal({ show, onClose, onSaveSuccess, vehicl
                                             ))}
                                         </select>
                                     </div>
+
+                                    {/* VIN Input */}
+                                    <div className="col-md-6">
+                                        <label htmlFor="vehicleVin" className="form-label">VIN *</label>
+                                        <input
+                                            type="text"
+                                            id="vehicleVin"
+                                            name="vin"
+                                            className={`form-control ${!formData.vin && error ? 'is-invalid' : ''}`}
+                                            value={formData.vin}
+                                            onChange={handleChange}
+                                            placeholder="Enter Vehicle Identification Number"
+                                            disabled={loading || isEditMode} // Thường VIN không đổi
+                                            required
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </form>
