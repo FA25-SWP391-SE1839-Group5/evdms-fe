@@ -217,6 +217,25 @@ export default function VehicleStockModal({ show, onClose, onSaveSuccess, vehicl
                                             {/* Thêm các trạng thái khác nếu cần */}
                                         </select>
                                     </div>
+
+                                    {/* Assigned Dealer Select */}
+                                    <div className="col-md-6">
+                                        <label htmlFor="vehicleDealerId" className="form-label">Assigned Dealer</label>
+                                        <select
+                                            id="vehicleDealerId"
+                                            name="dealerId"
+                                            className="form-select"
+                                            value={formData.dealerId}
+                                            onChange={handleChange}
+                                            disabled={loading}
+                                        >
+                                            <option value="">-- Unassigned / In Stock --</option>
+                                            {dealers.map(dealer => (
+                                                <option key={dealer.id} value={dealer.id}>{dealer.name}</option>
+                                            ))}
+                                        </select>
+                                        <div className="form-text">Assign this vehicle to a specific dealer (optional).</div>
+                                    </div>
                                 </div>
                             </div>
                         </form>
