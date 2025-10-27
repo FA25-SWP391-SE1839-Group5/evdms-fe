@@ -359,23 +359,23 @@ const VehicleStockList = () => {
             />
 
             {/* Modal Details */}
-           <VehicleDetailsModal
-               show={showDetailsModal}
-               onClose={() => setShowDetailsModal(false)}
-               vehicle={viewingVehicle}
-               variant={viewingVehicle?.variantDetails}
-               dealersMap={dealersMap}
-           />
+            <VehicleDetailsModal
+                show={showDetailsModal}
+                onClose={() => setShowDetailsModal(false)}
+                vehicle={viewingVehicle}
+                variant={viewingVehicle?.variantDetails}
+                dealersMap={dealersMap}
+            />
 
-           {/* Filter Panel */}
-           <VehicleStockFilterPanel
-               show={showFilterPanel}
-               onClose={() => setShowFilterPanel(false)}
-               currentFilters={activeFilters}
-               onApplyFilters={handleApplyFilters}
-               variants={allVariantsData} // Pass variants list
-               dealers={allDealers}     // Pass dealers list
-           />
+            {/* Filter Panel */}
+            <VehicleStockFilterPanel
+                show={showFilterPanel}
+                onClose={() => setShowFilterPanel(false)}
+                currentFilters={activeFilters}
+                onApplyFilters={handleApplyFilters}
+                variants={allVariantsData} // Pass variants list
+                dealers={allDealers}     // Pass dealers list
+            />
         </>
     );
 };
