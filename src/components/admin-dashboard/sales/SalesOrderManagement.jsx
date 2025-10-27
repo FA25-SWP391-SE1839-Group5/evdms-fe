@@ -82,6 +82,16 @@ export default function SalesOrderManagement() {
         fetchData();
     }, []);
 
+    // Auto-hide alerts
+    useEffect(() => {
+        if (error) {
+          const timer = setTimeout(() => {
+            setError('');
+          }, 5000);
+          return () => clearTimeout(timer);
+        }
+      }, [error]);
+
 
     return (
         <div>SalesOrderManagement</div>
