@@ -8,6 +8,7 @@ import {
 import { getAllDealers } from '../../../../services/dealerService';
 import VehicleStockModal from './VehicleStockModal';
 import VehicleDetailsModal from './VehicleDetailsModal';
+import VehicleStockStatsCards from './VehicleStockStatsCards';
 
 // Helper Function - Render Status Badge
 const RenderVehicleStatus = ({ status }) => {
@@ -156,164 +157,167 @@ export default function VehicleStockList() {
     }
     
     return (
-        <div className="card">
-            {/* Header */}
-            <div className="card-header border-bottom d-flex justify-content-between align-items-center">
-                <div> 
-                    <label className="d-flex align-items-center"> 
-                        Show&nbsp; 
-                        <select 
-                            className="form-select" 
-                            value={pageSize} 
-                            onChange={handlePageSizeChange} 
-                            style={{width:'auto'}}
+        <>
+            <VehicleStockStatsCards vehicles={vehicles} />
+            <div className="card">
+                {/* Header */}
+                <div className="card-header border-bottom d-flex justify-content-between align-items-center">
+                    <div> 
+                        <label className="d-flex align-items-center"> 
+                            Show&nbsp; 
+                            <select 
+                                className="form-select" 
+                                value={pageSize} 
+                                onChange={handlePageSizeChange} 
+                                style={{width:'auto'}}
+                            > 
+                                <option>10</option>
+                                <option>25</option>
+                                <option>50</option> 
+                            </select> 
+                            &nbsp;entries 
+                        </label> 
+                    </div>
+                    <div className="d-flex align-items-center gap-3">
+                        <input 
+                            type="search" 
+                            className="form-control" 
+                            placeholder="Search VIN, Color, etc..." 
+                            value={searchTerm} 
+                            onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }} 
+                            style={{width: '250px'}} 
+                        />
+                        <button 
+                            className="btn btn-primary rounded-pill d-flex align-items-center" 
+                            type="button" 
+                            onClick={handleAdd}
                         > 
-                            <option>10</option>
-                            <option>25</option>
-                            <option>50</option> 
-                        </select> 
-                        &nbsp;entries 
-                    </label> 
+                            <Plus size={18} className="me-1"/> Add Vehicle 
+                        </button>
+                    </div>
                 </div>
-                <div className="d-flex align-items-center gap-3">
-                    <input 
-                        type="search" 
-                        className="form-control" 
-                        placeholder="Search VIN, Color, etc..." 
-                        value={searchTerm} 
-                        onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }} 
-                        style={{width: '250px'}} 
-                    />
-                    <button 
-                        className="btn btn-primary rounded-pill d-flex align-items-center" 
-                        type="button" 
-                        onClick={handleAdd}
-                    > 
-                        <Plus size={18} className="me-1"/> Add Vehicle 
-                    </button>
-                 </div>
-            </div>
 
-            {/* Alerts */}
-            {error && (
-                <div className="alert alert-danger alert-dismissible d-flex align-items-center" role="alert">
-                    <AlertCircle size={20} className="me-2" />
-                    <div className="flex-grow-1">{error}</div>
-                    <button 
-                        type="button" 
-                        className="btn-close" 
-                        onClick={() => setError('')}
-                    ></button>
+                {/* Alerts */}
+                {error && (
+                    <div className="alert alert-danger alert-dismissible d-flex align-items-center" role="alert">
+                        <AlertCircle size={20} className="me-2" />
+                        <div className="flex-grow-1">{error}</div>
+                        <button 
+                            type="button" 
+                            className="btn-close" 
+                            onClick={() => setError('')}
+                        ></button>
+                    </div>
+                )}
+                {success && (
+                    <div className="alert alert-success alert-dismissible d-flex align-items-center" role="alert">
+                        <CheckCircle size={20} className="me-2" />
+                        <div className="flex-grow-1">{success}</div>
+                        <button 
+                            type="button" 
+                            className="btn-close" 
+                            onClick={() => setSuccess('')}
+                        ></button>
+                    </div>
+                )}
+
+                {/* Table */}
+                <div className="table-responsive text-nowrap">
+                    <table className="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>VIN</th>
+                                <th>Variant</th>
+                                <th>Color</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Assigned Dealer</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="table-border-bottom-0">
+                            {paginatedVehicles.length === 0 ? (
+                                <tr><td colSpan="7" className="text-center py-4"> No vehicles in stock found. </td></tr>
+                            ) : (
+                                paginatedVehicles.map(v => (
+                                    <tr key={v.id}>
+                                        <td>
+                                            <button
+                                                type="button"
+                                                className="btn btn-link p-0 fw-semibold text-primary"
+                                                onClick={() => handleViewDetails(v)}
+                                                title={`View details for VIN: ${v.vin}`}
+                                                style={{ textDecoration: 'none' }} // Bỏ gạch chân
+                                            >
+                                            <code>{v.vin || 'N/A'}</code>
+                                            </button>
+                                        </td>
+                                        <td>{variantsMap[v.variantId] || 'Unknown'}</td>
+                                        <td>{v.color}</td>
+                                        <td>{v.type}</td>
+                                        <td><RenderVehicleStatus status={v.status} /></td>
+                                        <td>{dealersMap[v.dealerId] || '-'}</td>
+                                        <td>
+                                            <div className="d-inline-block text-nowrap">
+                                                <button className="btn btn-sm btn-icon" title="Edit" onClick={() => handleEdit(v)}><i className="bx bx-edit"></i></button>
+                                                <button className="btn btn-sm btn-icon delete-record" title="Delete" onClick={() => handleDelete(v.id, v.vin)}><i className="bx bx-trash"></i></button>
+                                                {/* Thêm nút View Details nếu cần */}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
                 </div>
-            )}
-            {success && (
-                <div className="alert alert-success alert-dismissible d-flex align-items-center" role="alert">
-                    <CheckCircle size={20} className="me-2" />
-                    <div className="flex-grow-1">{success}</div>
-                    <button 
-                        type="button" 
-                        className="btn-close" 
-                        onClick={() => setSuccess('')}
-                    ></button>
+
+                <div className="d-flex justify-content-between align-items-center p-3">
+                    <small className="text-muted">
+                        Showing {startEntry} to {endEntry} of {filteredVehicles.length} entries
+                    </small>
+                    <nav>
+                        <ul className="pagination pagination-sm mb-0">
+                            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                                <button 
+                                    className="page-link" 
+                                    onClick={() => setCurrentPage(p => p - 1)}
+                                    disabled={currentPage === 1}
+                                >
+                                    &laquo; Previous
+                                </button>
+                            </li>
+                            <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
+                                <button 
+                                    className="page-link" 
+                                    onClick={() => setCurrentPage(p => p + 1)}
+                                    disabled={currentPage === totalPages || totalPages === 0}
+                                >
+                                    Next &raquo;
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
-            )}
 
-            {/* Table */}
-            <div className="table-responsive text-nowrap">
-                <table className="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>VIN</th>
-                            <th>Variant</th>
-                            <th>Color</th>
-                            <th>Type</th>
-                            <th>Status</th>
-                            <th>Assigned Dealer</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="table-border-bottom-0">
-                        {paginatedVehicles.length === 0 ? (
-                            <tr><td colSpan="7" className="text-center py-4"> No vehicles in stock found. </td></tr>
-                        ) : (
-                            paginatedVehicles.map(v => (
-                                <tr key={v.id}>
-                                    <td>
-                                        <button
-                                            type="button"
-                                            className="btn btn-link p-0 fw-semibold text-primary"
-                                            onClick={() => handleViewDetails(v)}
-                                            title={`View details for VIN: ${v.vin}`}
-                                            style={{ textDecoration: 'none' }} // Bỏ gạch chân
-                                        >
-                                           <code>{v.vin || 'N/A'}</code>
-                                        </button>
-                                    </td>
-                                    <td>{variantsMap[v.variantId] || 'Unknown'}</td>
-                                    <td>{v.color}</td>
-                                    <td>{v.type}</td>
-                                    <td><RenderVehicleStatus status={v.status} /></td>
-                                    <td>{dealersMap[v.dealerId] || '-'}</td>
-                                    <td>
-                                        <div className="d-inline-block text-nowrap">
-                                            <button className="btn btn-sm btn-icon" title="Edit" onClick={() => handleEdit(v)}><i className="bx bx-edit"></i></button>
-                                            <button className="btn btn-sm btn-icon delete-record" title="Delete" onClick={() => handleDelete(v.id, v.vin)}><i className="bx bx-trash"></i></button>
-                                            {/* Thêm nút View Details nếu cần */}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+                {/* Modal */}
+                <VehicleStockModal
+                    show={showModal}
+                    onClose={() => { setShowModal(false); setVehicleToEdit(null); }}
+                    onSaveSuccess={handleSaveSuccess}
+                    vehicleToEdit={vehicleToEdit}
+                    variants={allVariantsData} // Truyền danh sách variants
+                    dealers={allDealers}   // Truyền danh sách dealers
+                />
+
+                {/* Modal Details */}
+                <VehicleDetailsModal
+                    show={showDetailsModal}
+                    onClose={() => setShowDetailsModal(false)}
+                    vehicle={viewingVehicle}
+                    variant={viewingVehicle?.variantDetails} // Truyền map để hiển thị tên variant
+                    dealersMap={dealersMap}   // Truyền map để hiển thị tên dealer
+                />
             </div>
-
-            <div className="d-flex justify-content-between align-items-center p-3">
-                <small className="text-muted">
-                    Showing {startEntry} to {endEntry} of {filteredVehicles.length} entries
-                </small>
-                <nav>
-                    <ul className="pagination pagination-sm mb-0">
-                        <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                            <button 
-                                className="page-link" 
-                                onClick={() => setCurrentPage(p => p - 1)}
-                                disabled={currentPage === 1}
-                            >
-                                &laquo; Previous
-                            </button>
-                        </li>
-                        <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
-                            <button 
-                                className="page-link" 
-                                onClick={() => setCurrentPage(p => p + 1)}
-                                disabled={currentPage === totalPages || totalPages === 0}
-                            >
-                                Next &raquo;
-                            </button>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-
-            {/* Modal */}
-            <VehicleStockModal
-                show={showModal}
-                onClose={() => { setShowModal(false); setVehicleToEdit(null); }}
-                onSaveSuccess={handleSaveSuccess}
-                vehicleToEdit={vehicleToEdit}
-                variants={allVariantsData} // Truyền danh sách variants
-                dealers={allDealers}   // Truyền danh sách dealers
-            />
-
-            {/* Modal Details */}
-            <VehicleDetailsModal
-                show={showDetailsModal}
-                onClose={() => setShowDetailsModal(false)}
-                vehicle={viewingVehicle}
-                variant={viewingVehicle?.variantDetails} // Truyền map để hiển thị tên variant
-                dealersMap={dealersMap}   // Truyền map để hiển thị tên dealer
-            />
-        </div>
+        </>
     )
 }
