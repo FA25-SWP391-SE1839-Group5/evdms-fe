@@ -30,8 +30,26 @@ export default function VehicleModelDetailModal({ show, onClose, modelId }) {
     }, [show, modelId]);
 
     return (
-        <div>
-            
-        </div>
+        <>
+            <div 
+                className={`modal fade ${show ? 'show d-block' : ''}`} 
+                tabIndex="-1" 
+                style={{ backgroundColor: show ? 'rgba(0,0,0,0.5)' : 'transparent' }}
+            >
+                <div className="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">Vehicle Model Details</h5>
+                            <button 
+                                type="button" 
+                                className="btn-close" 
+                                onClick={onClose}
+                                aria-label="Close"
+                            ></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
     )
 }
