@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import { AlertCircle, CheckCircle, Plus } from 'lucide-react';
 import { getAllVehicleVariants, deleteVehicleVariant, getAllVehicleModels } from '../../../../services/vehicleService';
 import VehicleVariantModal from './VehicleVariantModal';
-
+import VehicleVariantDetailsModal from './VehicleVariantDetailsModal';
 // Helper format tiền tệ
 const formatCurrency = (amount) => {
     if (typeof amount !== 'number') return 'N/A';
@@ -17,6 +17,9 @@ export default function VehicleVariantList() {
     const [success, setSuccess] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [variantToEdit, setVariantToEdit] = useState(null);
+
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [viewVariantId, setViewVariantId] = useState(null);
 
     // Pagination & Search
     const [searchTerm, setSearchTerm] = useState('');
@@ -82,6 +85,10 @@ export default function VehicleVariantList() {
     // Handlers
     const handleAdd = () => { setVariantToEdit(null); setShowModal(true); };
     const handleEdit = (variant) => { setVariantToEdit(variant); setShowModal(true); };
+    const handleViewDetails = (variantId) => {
+        setViewVariantId(variantId);
+        setShowDetailModal(true);
+    };
     const handleDelete = async (variantId, variantName) => {
         if (!window.confirm(`Delete variant "${variantName}"? This might affect related vehicles and orders.`)) return;
         try {
