@@ -221,7 +221,6 @@ const AuditLogManagement = () => {
 
     return (
         <>
-            {/* Bạn nên chuyển cái này vào file CSS chung của dự án */}
             <style>{`
                 @media print {
                     body, #__next, .layout-wrapper, .layout-navbar, .layout-menu, .layout-footer, .card-header, .card-footer, .alert {
@@ -248,7 +247,6 @@ const AuditLogManagement = () => {
                         width: 100% !important;
                     }
 
-                    /* Ẩn cột 'Actions' khi in */
                     .table th:last-child,
                     .table td:last-child {
                         display: none !important;
