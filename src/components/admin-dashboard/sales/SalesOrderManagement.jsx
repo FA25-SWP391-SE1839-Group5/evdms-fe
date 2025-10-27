@@ -162,6 +162,26 @@ export default function SalesOrderManagement() {
     }
 
     return (
-        <div>SalesOrderManagement</div>
+        <>
+            <h4 className="fw-bold py-3 mb-4">
+              <span className="text-muted fw-light">Sales /</span> Sales Orders
+            </h4>
+
+            {/* Stats Cards */}
+            <SalesOrderStatsCards orders={orders} />
+
+            {/* Alert messages */}
+            {error && (
+                <div className="alert alert-danger alert-dismissible d-flex align-items-center" role="alert">
+                    <AlertCircle size={20} className="me-2" />
+                        <div className="flex-grow-1">{error}</div>
+                        <button 
+                            type="button" 
+                            className="btn-close" 
+                            onClick={() => setError('')}
+                        ></button>
+                </div>
+            )}   
+        </>
     )
 }
