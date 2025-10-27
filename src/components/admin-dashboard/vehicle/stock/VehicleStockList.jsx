@@ -103,6 +103,35 @@ export default function VehicleStockList() {
     }, [filteredVehicles, currentPage, pageSize]);
     const startEntry = filteredVehicles.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
     const endEntry = Math.min(currentPage * pageSize, filteredVehicles.length);
+
+    // Handlers
+    const handleAdd = () => { setVehicleToEdit(null); setShowModal(true); };
+    const handleEdit = (vehicle) => { setVehicleToEdit(vehicle); setShowModal(true); };
+    const handleDelete = async (vehicleId, vehicleVin) => {
+        if (!window.confirm(`Delete vehicle with VIN "${vehicleVin}"?`)) return;
+        try {
+            await deleteVehicle(vehicleId);
+            setSuccess(`Vehicle VIN "${vehicleVin}" deleted.`);
+            // Refetch vehicles
+             const vehiclesRes = await getAllVehicles();
+             setVehicles(vehiclesRes.data?.data?.items || vehiclesRes.data?.items || vehiclesRes.data || []);
+        } catch (err) {
+            setError(err.response?.data?.message || 'Failed to delete vehicle.');
+        }
+    };
+    const handleSaveSuccess = async (isEdit) => {
+        setShowModal(false);
+        setVehicleToEdit(null);
+        setSuccess(`Vehicle ${isEdit ? 'updated' : 'added'} successfully.`);
+        // Refetch vehicles
+         try {
+             const vehiclesRes = await getAllVehicles();
+             setVehicles(vehiclesRes.data?.data?.items || vehiclesRes.data?.items || vehiclesRes.data || []);
+         } catch(err) {
+            setError('Failed to reload vehicles after saving.')
+         }
+    };
+    const handlePageSizeChange = (e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); };
     
     return (
         <div>VehicleStockList</div>
