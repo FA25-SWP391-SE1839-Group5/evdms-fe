@@ -83,6 +83,15 @@ export default function VehicleModelDetailModal({ show, onClose, modelId }) {
                                 </div>
                             )}
                         </div>
+                        <div className="modal-footer">
+                            <button 
+                                type="button" 
+                                className="btn btn-label-secondary" 
+                                onClick={onClose}
+                            >
+                                Close
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
