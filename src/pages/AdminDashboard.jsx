@@ -18,6 +18,10 @@ import RolesPermissionsTab from '../components/admin-dashboard/users/RolesPermis
 import VehicleInventoryManagement from '../components/admin-dashboard/vehicle/VehicleInventoryManagement';
 import AuditLogManagement from '../components/admin-dashboard/audit/AuditLogManagement';
 import PromotionManagement from '../components/admin-dashboard/promotions/PromotionManagement';
+import SalesOrderManagement from '../components/admin-dashboard/sales/SalesOrderManagement';
+
+
+
 
 const AdminDashboard = ({ currentPage = 'dashboard' }) => {
   const renderPageContent = () => {
@@ -98,12 +102,7 @@ const AdminDashboard = ({ currentPage = 'dashboard' }) => {
       case 'orders':
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
-            <h4 className="fw-bold py-3 mb-4">Sales Orders</h4>
-            <div className="card">
-              <div className="card-body">
-                <p>Sales orders page - Coming soon...</p>
-              </div>
-            </div>
+            <SalesOrderManagement />
           </div>
         );
       

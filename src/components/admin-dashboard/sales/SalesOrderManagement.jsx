@@ -5,6 +5,7 @@ import { getAllDealers } from '../../../services/dealerService';
 import { getAllVehicleVariants } from '../../../services/vehicleService';
 import { getAllCustomers } from '../../../services/dashboardService';
 import SalesOrderStatsCards from './SalesOrderStatsCards';
+import SalesOrderDetailsModal from './SalesOrderDetailsModal';
 
 // --- Helper Functions ---
 const formatOrderId = (id) => `#${id?.slice(-6).toUpperCase() || 'N/A'}`;
@@ -27,7 +28,6 @@ const RenderSalesOrderStatus = ({ status }) => {
         case 'delivered': badgeClass = 'success'; break;
         case 'cancelled': badgeClass = 'danger'; break;
     }
-    // Style giống Invoice list
     return <span className={`badge rounded-pill bg-label-${badgeClass} d-flex align-items-center p-1 px-2`}><span className={`dot bg-${badgeClass} me-1`}></span> {status || 'N/A'}</span>;
 };
 
@@ -44,6 +44,9 @@ export default function SalesOrderManagement() {
     const [currentPage, setCurrentPage] = useState(1);
     const [statusFilter, setStatusFilter] = useState('');
     const [globalSearch, setGlobalSearch] = useState('');
+
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
+    const [viewingOrder, setViewingOrder] = useState(null);
 
     // Fetch Data (Orders, Customers, Dealers, Variants)
     useEffect(() => {
@@ -145,9 +148,8 @@ export default function SalesOrderManagement() {
     const handlePageSizeChange = (e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); };
     const handlePageChange = (newPage) => { if (newPage >= 1 && newPage <= totalPages) setCurrentPage(newPage); };
     const handleViewDetails = (order) => {
-        // setViewingOrder(order);
-        // setShowDetailsModal(true);
-        alert(`View details for Order ${formatOrderId(order.id)} - Modal coming soon!`);
+        setViewingOrder(order);
+        setShowDetailsModal(true);
     };
     // Add handler for mark delivered if needed
 
@@ -163,10 +165,6 @@ export default function SalesOrderManagement() {
 
     return (
         <>
-            <h4 className="fw-bold py-3 mb-4">
-              <span className="text-muted fw-light">Sales /</span> Sales Orders
-            </h4>
-
             {/* Stats Cards */}
             <SalesOrderStatsCards orders={orders} />
 
@@ -323,6 +321,16 @@ export default function SalesOrderManagement() {
                     </nav>
                 </div>
             </div>
+
+            {/* Modal Details */}
+            <SalesOrderDetailsModal
+                show={showDetailsModal}
+                onClose={() => setShowDetailsModal(false)}
+                order={viewingOrder}
+                customerMap={customerMap} // Truyền map để hiển thị tên
+                dealerMap={dealerMap}
+                variantMap={variantMap}
+            />
         </>
     )
 }
