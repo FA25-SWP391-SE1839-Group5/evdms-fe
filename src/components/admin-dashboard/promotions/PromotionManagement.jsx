@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AlertCircle, CheckCircle, Plus, Edit, Trash, Percent, Calendar } from 'lucide-react'; 
-import { getAllPromotions, deletePromotion } from '../../../services/promotionService';
+import { getAllPromotions, createPromotion, updatePromotion, deletePromotion } from '../../../services/promotionService';
 import PromotionModal from './PromotionModal';
 
 // --- Helper Functions ---
@@ -75,6 +75,37 @@ export default function PromotionManagement() {
     const startEntry = filteredPromotions.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
     const endEntry = Math.min(currentPage * pageSize, filteredPromotions.length);
 
+    // Handlers
+    const handleAdd = () => { setPromotionToEdit(null); setShowModal(true); };
+    const handleEdit = (promo) => { setPromotionToEdit(promo); setShowModal(true); };
+    const handleDelete = async (promoId, promoDesc) => {
+        if (!window.confirm(`Delete promotion "${promoDesc}"?`)) return;
+        try {
+            await deletePromotion(promoId);
+            setSuccess(`Promotion "${promoDesc}" deleted.`);
+            fetchPromotions(); // Reload
+        } catch (err) {
+            setError(err.response?.data?.message || 'Failed to delete promotion.');
+        }
+    };
+    const handleSaveSuccess = (isEdit) => {
+        setShowModal(false);
+        setPromotionToEdit(null);
+        setSuccess(`Promotion ${isEdit ? 'updated' : 'created'} successfully.`);
+        fetchPromotions(); // Reload
+    };
+    const handlePageSizeChange = (e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); };
+    const handleSearchChange = (e) => { setSearchTerm(e.target.value); setCurrentPage(1); };
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setCurrentPage(newPage);
+        }
+    };
+
+    if (loading) {
+         return <div className="d-flex justify-content-center align-items-center vh-100"><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div></div>;
+    }
+  
     return (
         <div>PromotionManagement</div>
     )
