@@ -59,6 +59,22 @@ export default function PromotionManagement() {
         }
     };
 
+    // Filter & Paginate
+    const filteredPromotions = useMemo(() => {
+        const searchLower = searchTerm.toLowerCase();
+        return promotions.filter(p =>
+            p.description?.toLowerCase().includes(searchLower)
+        );
+    }, [promotions, searchTerm]);
+
+    const totalPages = Math.ceil(filteredPromotions.length / pageSize);
+    const paginatedPromotions = useMemo(() => {
+        const startIndex = (currentPage - 1) * pageSize;
+        return filteredPromotions.slice(startIndex, startIndex + pageSize);
+    }, [filteredPromotions, currentPage, pageSize]);
+    const startEntry = filteredPromotions.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+    const endEntry = Math.min(currentPage * pageSize, filteredPromotions.length);
+
     return (
         <div>PromotionManagement</div>
     )
