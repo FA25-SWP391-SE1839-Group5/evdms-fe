@@ -231,7 +231,21 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                 {/* Tăng kích thước modal cho nhiều nội dung */}
                 <div className="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" role="document">
                     <div className="modal-content">
-                        <form onSubmit={handleSubmit}>
+                        <button 
+                            type="button" 
+                            className="btn-close" 
+                            onClick={onClose} // Gọi hàm onClose khi click
+                            disabled={loading} // Vô hiệu hóa khi đang tải
+                            style={{ 
+                                position: 'absolute', 
+                                top: '1rem', 
+                                right: '1rem', 
+                                zIndex: 10 
+                            }}
+                            aria-label="Close"
+                        ></button>
+                        <div className="modal-body">
+                        <form onSubmit={handleSubmit} noValidate>
                             <div
                                 id="wizard-modern-icons" 
                                 className="bs-stepper wizard-icons wizard-modern mt-2"
@@ -242,7 +256,7 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
 
                                     {/* Step 1: Basic */}
                                     <div 
-                                        className={`step ${currentStep === 1 ? 'active' : ''}`} 
+                                        className={`step ${currentStep >= 1 ? 'active' : ''}`} 
                                         data-target="#basic-details-step"
                                     >
                                         <button 
@@ -262,7 +276,7 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                     </div>
 
                                     {/* Step 2: Specs */}
-                                    <div className={`step ${currentStep === 2 ? 'active' : ''}`} data-target="#specs-step">
+                                    <div className={`step ${currentStep >= 2 ? 'active' : ''}`} data-target="#specs-step">
                                         <button 
                                             type="button" 
                                             className="step-trigger" 
@@ -280,7 +294,7 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                     </div>
 
                                     {/* Step 3: Features */}
-                                    <div className={`step ${currentStep === 3 ? 'active' : ''}`} data-target="#features-step">
+                                    <div className={`step ${currentStep >= 3 ? 'active' : ''}`} data-target="#features-step">
                                         <button 
                                             type="button" 
                                             className="step-trigger" 
@@ -298,7 +312,7 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                     </div>
 
                                     {/* Step 4: Review */}
-                                    <div className={`step ${currentStep === 4 ? 'active' : ''}`} data-target="#review-step">
+                                    <div className={`step ${currentStep >= 4 ? 'active' : ''}`} data-target="#review-step">
                                         <button 
                                             type="button" 
                                             className="step-trigger" 
@@ -478,7 +492,7 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                         ))}
                                         {Object.keys(specs).length === 0 && <p className="text-muted">No specifications entered.</p>}
                                         <hr/>
-                                        
+
                                         {/* Features Summary */}
                                         <h6>Features</h6>
                                         {Object.keys(featureCategories).map(category => (
@@ -489,12 +503,43 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                         ))}
                                         {Object.keys(features).length === 0 && <p className="text-muted">No features selected.</p>}
                                     </div>
+
+                                    {/* Stepper Navigation Buttons (Common Footer) */}
+                                    <div className="d-flex justify-content-between p-4 border-top">
+                                        <button 
+                                            type="button" 
+                                            className="btn btn-primary d-flex align-items-center px-3 py-2" 
+                                            onClick={prevStep} 
+                                            disabled={loading || currentStep === 1}
+                                        >
+                                            <ArrowLeft size={16} className="me-1 scaleX-n1-rtl" /> Previous
+                                        </button>
+                                        {currentStep < 4 ? (
+                                            <button 
+                                                type="button" 
+                                                className="btn btn-primary d-flex align-items-center px-3 py-2" onClick={nextStep} 
+                                                disabled={loading || loadingModels}
+                                            >
+                                                Next <ArrowRight size={16} className="ms-1 scaleX-n1-rtl" />
+                                            </button>
+                                        ) : (
+                                            <button 
+                                                type="submit" 
+                                                className="btn btn-success" 
+                                                disabled={loading}
+                                            >
+                                                {loading ? 'Submitting...' : 'Submit'}
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </form>
+                        </div>
                     </div>
                 </div>
             </div>
+
             {show && <div className="modal-backdrop fade show"></div>}
         </>
     )
