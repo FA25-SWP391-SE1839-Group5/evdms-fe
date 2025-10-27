@@ -135,6 +135,31 @@ export default function SalesOrderManagement() {
     const startEntry = totalItems > 0 ? (currentPage - 1) * pageSize + 1 : 0;
     const endEntry = Math.min(currentPage * pageSize, totalItems);
 
+    // Handlers
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setCurrentPage(1);
+        if (name === 'globalSearch') setGlobalSearch(value);
+        if (name === 'statusFilter') setStatusFilter(value);
+    };
+    const handlePageSizeChange = (e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); };
+    const handlePageChange = (newPage) => { if (newPage >= 1 && newPage <= totalPages) setCurrentPage(newPage); };
+    const handleViewDetails = (order) => {
+        // setViewingOrder(order);
+        // setShowDetailsModal(true);
+        alert(`View details for Order ${formatOrderId(order.id)} - Modal coming soon!`);
+    };
+    // Add handler for mark delivered if needed
+
+    if (loading) {
+    return (
+        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+            <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        );
+    }
 
     return (
         <div>SalesOrderManagement</div>
