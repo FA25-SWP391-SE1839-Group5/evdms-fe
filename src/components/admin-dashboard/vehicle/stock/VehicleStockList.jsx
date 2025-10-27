@@ -273,6 +273,16 @@ export default function VehicleStockList() {
                     </ul>
                 </nav>
             </div>
+            
+            {/* Modal */}
+            <VehicleStockModal
+                show={showModal}
+                onClose={() => { setShowModal(false); setVehicleToEdit(null); }}
+                onSaveSuccess={handleSaveSuccess}
+                vehicleToEdit={vehicleToEdit}
+                variants={allVariants} // Truyền danh sách variants
+                dealers={allDealers}   // Truyền danh sách dealers
+            />
         </div>
     )
 }
