@@ -133,7 +133,7 @@ export default function PromotionManagement() {
                         <label className="d-flex align-items-center"> 
                             Show&nbsp; 
                             <select 
-                                className="form-select form-select-sm" 
+                                className="form-select" 
                                 value={pageSize} 
                                 onChange={handlePageSizeChange} 
                                 style={{width:'auto'}}
@@ -250,6 +250,14 @@ export default function PromotionManagement() {
                     </nav>
                 </div>
             </div>
+
+            {/* Modal */}
+            <PromotionModal
+                show={showModal}
+                onClose={() => { setShowModal(false); setPromotionToEdit(null); }}
+                onSaveSuccess={handleSaveSuccess}
+                promotionToEdit={promotionToEdit}
+            />
         </>
     )
 }
