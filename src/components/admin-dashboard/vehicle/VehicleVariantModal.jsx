@@ -476,6 +476,18 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                                 </ul>
                                             </div>
                                         ))}
+                                        {Object.keys(specs).length === 0 && <p className="text-muted">No specifications entered.</p>}
+                                        <hr/>
+                                        
+                                        {/* Features Summary */}
+                                        <h6>Features</h6>
+                                        {Object.keys(featureCategories).map(category => (
+                                             <div key={category} className="mb-2">
+                                                 <p className="mb-1"><strong>{category}:</strong></p>
+                                                 {renderFeatureList(category)}
+                                             </div>
+                                        ))}
+                                        {Object.keys(features).length === 0 && <p className="text-muted">No features selected.</p>}
                                     </div>
                                 </div>
                             </div>
