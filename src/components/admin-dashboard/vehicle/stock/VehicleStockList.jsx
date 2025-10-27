@@ -82,6 +82,27 @@ export default function VehicleStockList() {
           return () => clearTimeout(timer);
         }
     }, [error, success]);
+
+    // Filter & Paginate
+    const filteredVehicles = useMemo(() => {
+        const searchLower = searchTerm.toLowerCase();
+        return vehicles.filter(v =>
+            v.vin?.toLowerCase().includes(searchLower) ||
+            v.color?.toLowerCase().includes(searchLower) ||
+            v.type?.toLowerCase().includes(searchLower) ||
+            v.status?.toLowerCase().includes(searchLower) ||
+            variantsMap[v.variantId]?.toLowerCase().includes(searchLower) ||
+            dealersMap[v.dealerId]?.toLowerCase().includes(searchLower)
+        );
+    }, [vehicles, variantsMap, dealersMap, searchTerm]);
+
+    const totalPages = Math.ceil(filteredVehicles.length / pageSize);
+    const paginatedVehicles = useMemo(() => {
+        const startIndex = (currentPage - 1) * pageSize;
+        return filteredVehicles.slice(startIndex, startIndex + pageSize);
+    }, [filteredVehicles, currentPage, pageSize]);
+    const startEntry = filteredVehicles.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+    const endEntry = Math.min(currentPage * pageSize, filteredVehicles.length);
     
     return (
         <div>VehicleStockList</div>
