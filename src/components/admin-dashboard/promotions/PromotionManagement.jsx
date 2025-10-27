@@ -125,6 +125,45 @@ export default function PromotionManagement() {
                     <button type="button" className="btn-close" onClick={() => setSuccess('')}></button>
                 </div>
             )}
+
+            <div className="card">
+                {/* Header */}
+                 <div className="card-header border-bottom d-flex justify-content-between align-items-center">
+                     <div> 
+                        <label className="d-flex align-items-center"> 
+                            Show&nbsp; 
+                            <select 
+                                className="form-select form-select-sm" 
+                                value={pageSize} 
+                                onChange={handlePageSizeChange} 
+                                style={{width:'auto'}}
+                            > 
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option> 
+                            </select> 
+                            &nbsp;entries 
+                        </label> 
+                    </div>
+                    <div className="d-flex align-items-center gap-3">
+                        <input 
+                            type="search" 
+                            className="form-control" 
+                            placeholder="Search Description..." 
+                            value={searchTerm} 
+                            onChange={handleSearchChange} 
+                            style={{width: '250px'}} 
+                        />
+                        <button 
+                            className="btn btn-primary rounded-pill d-flex align-items-center" 
+                            type="button" 
+                            onClick={handleAdd}
+                        > 
+                            <Plus size={18} className="me-1"/> Add Promotion 
+                        </button>
+                     </div>
+                </div>
+            </div>
         </>
     )
 }
