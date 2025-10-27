@@ -95,6 +95,9 @@ export default function VehicleModelDetailModal({ show, onClose, modelId }) {
                     </div>
                 </div>
             </div>
+
+            {/* Backdrop */}
+            {show && <div className="modal-backdrop fade show"></div>}
         </>
     )
 }
