@@ -461,6 +461,21 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                             <li><strong>Base Price:</strong> {basicInfo.basePrice ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(basicInfo.basePrice) : 'N/A'}</li>
                                         </ul>
                                         <hr/>
+
+                                        {/* Specs Summary */}
+                                        <h6>Specifications</h6>
+                                        {Object.keys(specCategories).map(category => (
+                                            <div key={category} className="mb-2">
+                                                <p className="mb-1"><strong>{category}:</strong></p>
+                                                <ul className="list-unstyled row row-cols-md-2">
+                                                    {specCategories[category].map(spec => (
+                                                        <li key={spec.key} className="col">
+                                                            <small>{spec.label}: {renderSpecValue(spec.key)}</small>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
