@@ -90,7 +90,40 @@ export default function SalesOrderManagement() {
           }, 5000);
           return () => clearTimeout(timer);
         }
-      }, [error]);
+    }, [error]);
+    
+    // Filter Logic
+    const filteredOrders = useMemo(() => {
+        return orders.filter(order => {
+            const customer = customerMap[order.customerId];
+            const customerName = (customer?.name || order.customerId || '').toLowerCase();
+            const customerEmail = (customer?.email || '').toLowerCase();
+            const dealerName = (dealerMap[order.dealerId] || '').toLowerCase();
+            const variantName = (variantMap[order.variantId] || '').toLowerCase();
+            const status = (order.status || '').toLowerCase();
+            const date = formatDate(order.createdAt || order.updatedAt).toLowerCase();
+            const id = formatOrderId(order.id).toLowerCase();
+            // const total = formatCurrency(order.totalAmount).toLowerCase(); // Nếu có totalAmount
+
+            // Status filter first
+            if (statusFilter && status !== statusFilter.toLowerCase()) return false;
+
+            // Global search
+            if (globalSearch) {
+                const searchLower = globalSearch.toLowerCase();
+                if (
+                    !id.includes(searchLower) &&
+                    !customerName.includes(searchLower) &&
+                    !customerEmail.includes(searchLower) &&
+                    !dealerName.includes(searchLower) &&
+                    !variantName.includes(searchLower) &&
+                    !date.includes(searchLower)
+                    // !total.includes(searchLower)
+                ) return false;
+            }
+            return true;
+        });
+    }, [orders, customerMap, dealerMap, variantMap, statusFilter, globalSearch]);
 
 
     return (
