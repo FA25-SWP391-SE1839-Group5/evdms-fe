@@ -81,6 +81,13 @@ export default function VehicleInventoryManagement() {
                 </div>
             )}
 
+            {/* Stats Cards */}
+            {loading ? (
+                <div className="text-center p-4"><p>Loading stats...</p></div>
+            ) : (
+                <VehicleInventoryStatsCards models={models} variants={variants} vehicles={vehicles} />
+            )}
+
             <div className="row">
                 <div className="col-md-12">
                     <ul className="nav nav-pills flex-column flex-md-row mb-3">
