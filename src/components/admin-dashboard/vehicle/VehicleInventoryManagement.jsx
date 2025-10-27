@@ -88,6 +88,16 @@ export default function VehicleInventoryManagement() {
                 <VehicleInventoryStatsCards models={models} variants={variants} vehicles={vehicles} />
             )}
 
+            {/* Charts (Placeholder) */}
+            {/* {loading ? (
+                 <div className="text-center p-4"><p>Loading charts...</p></div>
+            ) : (
+                 <VehicleInventoryCharts models={models} variants={variants} vehicles={vehicles} />
+            )} */}
+             <div className="card mb-4">
+                <div className="card-body">Placeholder for Charts</div>
+            </div>
+
             <div className="row">
                 <div className="col-md-12">
                     <ul className="nav nav-pills flex-column flex-md-row mb-3">
