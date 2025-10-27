@@ -144,6 +144,43 @@ export default function VehicleStockList() {
     }
     
     return (
-        <div>VehicleStockList</div>
+        <div className="card">
+            {/* Header */}
+            <div className="card-header border-bottom d-flex justify-content-between align-items-center">
+                <div> 
+                    <label className="d-flex align-items-center"> 
+                        Show&nbsp; 
+                        <select 
+                            className="form-select" 
+                            value={pageSize} 
+                            onChange={handlePageSizeChange} 
+                            style={{width:'auto'}}
+                        > 
+                            <option>10</option>
+                            <option>25</option>
+                            <option>50</option> 
+                        </select> 
+                        &nbsp;entries 
+                    </label> 
+                </div>
+                <div className="d-flex align-items-center gap-3">
+                    <input 
+                        type="search" 
+                        className="form-control" 
+                        placeholder="Search VIN, Color, etc..." 
+                        value={searchTerm} 
+                        onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }} 
+                        style={{width: '250px'}} 
+                    />
+                    <button 
+                        className="btn btn-primary rounded-pill d-flex align-items-center" 
+                        type="button" 
+                        onClick={handleAdd}
+                    > 
+                        <Plus size={18} className="me-1"/> Add Vehicle 
+                    </button>
+                 </div>
+            </div>
+        </div>
     )
 }
