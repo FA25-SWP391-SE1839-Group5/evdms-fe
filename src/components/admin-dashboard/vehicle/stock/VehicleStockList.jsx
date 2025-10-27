@@ -3,9 +3,9 @@ import { AlertCircle, CheckCircle, Plus, Edit, Trash } from 'lucide-react';
 import {
     getAllVehicles,
     deleteVehicle,
-    getAllVehicleVariants, 
-    getAllDealers         
+    getAllVehicleVariants,          
 } from '../../../../services/vehicleService';
+import { getAllDealers } from '../../../../services/dealerService';
 import VehicleStockModal from './VehicleStockModal';
 
 // Helper Function - Render Status Badge
@@ -273,7 +273,7 @@ export default function VehicleStockList() {
                     </ul>
                 </nav>
             </div>
-            
+
             {/* Modal */}
             <VehicleStockModal
                 show={showModal}
