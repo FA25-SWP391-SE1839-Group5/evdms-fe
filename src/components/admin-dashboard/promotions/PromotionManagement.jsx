@@ -163,6 +163,57 @@ export default function PromotionManagement() {
                         </button>
                      </div>
                 </div>
+
+                {/* Table */}
+                <div className="table-responsive text-nowrap">
+                    <table className="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Discount</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="table-border-bottom-0">
+                            {paginatedPromotions.length === 0 ? (
+                                <tr><td colSpan="6" className="text-center py-4">
+                                     {filteredPromotions.length === 0 && !searchTerm ? 'No promotions found.' : 'No promotions match your search.'}
+                                </td></tr>
+                            ) : (
+                                paginatedPromotions.map(p => (
+                                    <tr key={p.id}>
+                                        <td><span className="fw-semibold">{p.description}</span></td>
+                                        <td>{formatPercent(p.discountPercent)}</td>
+                                        <td>{formatDate(p.startDate)}</td>
+                                        <td>{formatDate(p.endDate)}</td>
+                                        <td><RenderPromotionStatus startDate={p.startDate} endDate={p.endDate} /></td>
+                                        <td>
+                                            <div className="d-inline-block text-nowrap">
+                                                <button 
+                                                    className="btn btn-sm btn-icon" 
+                                                    title="Edit" 
+                                                    onClick={() => handleEdit(p)}
+                                                >
+                                                    <i className="bx bx-edit"></i>
+                                                </button>
+                                                <button 
+                                                    className="btn btn-sm btn-icon delete-record" 
+                                                    title="Delete" 
+                                                    onClick={() => handleDelete(p.id, p.description)}
+                                                >
+                                                    <i className="bx bx-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </>
     )
