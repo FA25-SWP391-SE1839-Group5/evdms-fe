@@ -142,6 +142,7 @@ export default function PromotionModal({ show, onClose, onSaveSuccess, promotion
                                 )}
 
                                 <div className="row g-3">
+                                    
                                     {/* Description */}
                                     <div className="col-12">
                                         <label htmlFor="promoDescription" className="form-label">Description *</label>
@@ -156,6 +157,25 @@ export default function PromotionModal({ show, onClose, onSaveSuccess, promotion
                                             disabled={loading}
                                             required
                                         />
+                                    </div>
+
+                                    {/* Discount Percent */}
+                                    <div className="col-md-4">
+                                        <label htmlFor="promoDiscount" className="form-label">Discount (%)</label>
+                                        <input
+                                            type="number"
+                                            id="promoDiscount"
+                                            name="discountPercent"
+                                            className={`form-control ${error.includes('Discount') ? 'is-invalid' : ''}`}
+                                            value={formData.discountPercent}
+                                            onChange={handleChange}
+                                            placeholder="e.g., 10 (leave blank if none)"
+                                            min="0"
+                                            max="100"
+                                            step="0.1"
+                                            disabled={loading}
+                                        />
+                                         <div className="form-text">Enter value between 0-100 or leave empty.</div>
                                     </div>
                                 </div>
                             </div>
