@@ -32,7 +32,7 @@ export default function VehicleStockList() {
     const [vehicleToEdit, setVehicleToEdit] = useState(null);
 
     // Temp state to pass data to modal (can be optimized)
-    const [allVariants, setAllVariants] = useState([]);
+    const [allVariantsData, setAllVariantsData] = useState([]);
     const [allDealers, setAllDealers] = useState([]);
 
     // Pagination & Search
@@ -58,7 +58,7 @@ export default function VehicleStockList() {
                 setVehicles(vehiclesRes.data?.data?.items || vehiclesRes.data?.items || vehiclesRes.data || []);
 
                 const variantList = variantsRes.data?.data?.items || variantsRes.data?.items || variantsRes.data || [];
-                setAllVariants(variantList); // Store list for modal
+                setAllVariantsData(variantList); // Store list for modal
                 const vMap = variantList.reduce((acc, v) => { acc[v.id] = v.name; return acc; }, {});
                 setVariantsMap(vMap);
 
@@ -137,7 +137,11 @@ export default function VehicleStockList() {
     };
     const handlePageSizeChange = (e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); };
     const handleViewDetails = (vehicle) => {
-        setViewingVehicle(vehicle);
+        const variantDetail = allVariantsData.find(v => v.id === vehicle.variantId);
+        setViewingVehicle({
+            ...vehicle,
+            variantDetails: variantDetail
+        });
         setShowDetailsModal(true);
     };
 
@@ -298,7 +302,7 @@ export default function VehicleStockList() {
                 onClose={() => { setShowModal(false); setVehicleToEdit(null); }}
                 onSaveSuccess={handleSaveSuccess}
                 vehicleToEdit={vehicleToEdit}
-                variants={allVariants} // Truyền danh sách variants
+                variants={allVariantsData} // Truyền danh sách variants
                 dealers={allDealers}   // Truyền danh sách dealers
             />
 
@@ -307,7 +311,7 @@ export default function VehicleStockList() {
                 show={showDetailsModal}
                 onClose={() => setShowDetailsModal(false)}
                 vehicle={viewingVehicle}
-                variantsMap={variantsMap} // Truyền map để hiển thị tên variant
+                variant={viewingVehicle?.variantDetails} // Truyền map để hiển thị tên variant
                 dealersMap={dealersMap}   // Truyền map để hiển thị tên dealer
             />
         </div>
