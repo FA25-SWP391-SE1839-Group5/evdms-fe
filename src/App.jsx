@@ -1,4 +1,5 @@
 import React, { useReducer, useState, useEffect } from 'react';
+import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import CatalogPage from './pages/CatalogPage';
 import EVDetailPage from './pages/EVDetailPage';
@@ -39,7 +40,7 @@ const App = () => {
     const checkAuthOrReset = () => {
       try {
         // Check if URL has reset token parameter
-        const urlParams = new URLSearchParams(window.location.search);
+        const urlParams = new URLSearchParams(globalThis.location.search);
         const resetToken = urlParams.get('token');
         
         if (resetToken) {
@@ -49,21 +50,43 @@ const App = () => {
           return;
         }
 
-        // Otherwise, check authentication
+        // Check URL path first
+        const path = globalThis.location.pathname.replace('/', '');
+        
+        // If user is on /home or root path, show home page (no auth required)
+        if (path === 'home' || path === '') {
+          dispatch({ type: 'NAVIGATE_TO_HOME' });
+          setIsCheckingAuth(false);
+          return;
+        }
+
+        // If user is on /login, show login page
+        if (path === 'login') {
+          dispatch({ type: 'NAVIGATE_TO_LOGIN' });
+          setIsCheckingAuth(false);
+          return;
+        }
+
+        // For other paths, check authentication
         const stored = getStoredToken();
-        if (stored && stored.user && stored.user.role) {
+        if (stored?.user?.role) {
           // User is logged in, restore session
           dispatch({
             type: 'LOGIN_SUCCESS',
             payload: stored.user
           });
+          
+          // If on catalog page, navigate there
+          if (path === 'catalog') {
+            dispatch({ type: 'NAVIGATE_TO_CATALOG' });
+          }
         } else {
-          // Invalid token or insufficient data
-          dispatch({ type: 'LOGOUT' });
+          // Invalid token or insufficient data - redirect to home
+          dispatch({ type: 'NAVIGATE_TO_HOME' });
         }
       } catch (error) {
         console.error('Auth check failed:', error);
-        dispatch({ type: 'LOGOUT' });
+        dispatch({ type: 'NAVIGATE_TO_HOME' });
       } finally {
         setIsCheckingAuth(false);
       }
@@ -73,29 +96,34 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const path = window.location.pathname.replace('/', '');
+    const path = globalThis.location.pathname.replace('/', '');
 
-    if (!path) return;
+    // Handle URL-based routing
+    if (path === 'home') {
+      dispatch({ type: 'NAVIGATE_TO_HOME' });
+      return;
+    }
+    
+    if (path === 'login') {
+      dispatch({ type: 'NAVIGATE_TO_LOGIN' });
+      return;
+    }
 
-    switch (path) {
-      case 'users':
-        dispatch({ type: 'NAVIGATE', payload: 'users' });
-        break;
-      case 'dealers':
-        dispatch({ type: 'NAVIGATE', payload: 'dealers' });
-        break;
-      case 'customers':
-        dispatch({ type: 'NAVIGATE', payload: 'customers' });
-        break;
-      default:
-        dispatch({ type: 'NAVIGATE', payload: 'dashboard' });
-        break;
+    if (path === 'catalog') {
+      dispatch({ type: 'NAVIGATE_TO_CATALOG' });
+      return;
+    }
+
+    // Admin dashboard sub-pages
+    if (['users', 'dealers', 'customers', 'dashboard'].includes(path)) {
+      // These are handled by the admin dashboard layout
+      return;
     }
   }, []);
 
   const getInitialAdminPage = () => {
-  const path = window.location.pathname.replace('/', '');
-    if (!path) return 'dashboard';
+    const path = globalThis.location.pathname.replace('/', '');
+    if (!path || path === 'admin_dashboard') return 'dashboard';
     return path;
   };
 
@@ -110,8 +138,36 @@ const App = () => {
       }
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    globalThis.addEventListener('storage', handleStorageChange);
+    return () => globalThis.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  // Sync URL with routing state
+  useEffect(() => {
+    const path = `/${routeState.currentPage}`;
+    if (globalThis.location.pathname !== path) {
+      globalThis.history.pushState({}, '', path);
+    }
+  }, [routeState.currentPage]);
+
+  // Handle browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = globalThis.location.pathname.replace('/', '');
+      
+      if (path === 'home' || path === '') {
+        dispatch({ type: 'NAVIGATE_TO_HOME' });
+      } else if (path === 'login') {
+        dispatch({ type: 'NAVIGATE_TO_LOGIN' });
+      } else if (path === 'catalog') {
+        dispatch({ type: 'NAVIGATE_TO_CATALOG' });
+      } else if (path === 'admin_dashboard' || path === 'dashboard') {
+        dispatch({ type: 'NAVIGATE_TO_ADMIN_DASHBOARD' });
+      }
+    };
+
+    globalThis.addEventListener('popstate', handlePopState);
+    return () => globalThis.removeEventListener('popstate', handlePopState);
   }, []);
 
   // ============================================
@@ -134,6 +190,18 @@ const App = () => {
   // ============================================
   // NAVIGATION HANDLERS
   // ============================================
+  const navigateToHome = () => {
+    dispatch({
+      type: 'NAVIGATE_TO_HOME'
+    });
+  };
+
+  const navigateToLogin = () => {
+    dispatch({
+      type: 'NAVIGATE_TO_LOGIN'
+    });
+  };
+
   const navigateToDetail = (vehicle) => {
     dispatch({
       type: 'NAVIGATE_TO_DETAIL',
@@ -192,6 +260,14 @@ const App = () => {
   // ============================================
   return (
     <div className="font-sans">
+      {/* HOME PAGE */}
+      {routeState.currentPage === ROUTES.HOME && (
+        <HomePage 
+          onNavigateToCatalog={navigateToCatalog}
+          onNavigateToLogin={navigateToLogin}
+        />
+      )}
+
       {/* LOGIN PAGE */}
       {routeState.currentPage === ROUTES.LOGIN && (
         <LoginPage onLoginSuccess={handleLoginSuccess} />
@@ -223,6 +299,7 @@ const App = () => {
           onVehicleSelect={navigateToDetail}
           user={routeState.user}
           onLogout={handleLogout}
+          onBackToHome={navigateToHome}
         />
       )}
       
@@ -237,6 +314,7 @@ const App = () => {
           toggleCompare={toggleCompare}
           user={routeState.user}
           onLogout={handleLogout}
+          onBackToHome={navigateToHome}
         />
       )}
     </div>
