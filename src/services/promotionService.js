@@ -21,3 +21,22 @@ export const getPromotionById = (id) => {
     console.log(`📡 API Call: GET /api/promotions/${id}`);
     return api.get(`/promotions/${id}`);
 };
+
+/**
+ * CREATE Promotion
+ * @param {object} promotionData
+ * @param {string} promotionData.description
+ * @param {number | null} promotionData.discountPercent - Allow null
+ * @param {string} promotionData.startDate - ISO Date string
+ * @param {string} promotionData.endDate - ISO Date string
+ */
+export const createPromotion = (promotionData) => {
+    console.log("📡 API Call: POST /api/promotions");
+    // Ensure discountPercent is number or null
+    const dataToSend = {
+        ...promotionData,
+        discountPercent: promotionData.discountPercent === '' || promotionData.discountPercent === null ? null : Number(promotionData.discountPercent)
+    };
+    console.log("📤 Sending data:", dataToSend);
+    return api.post('/promotions', dataToSend);
+};
