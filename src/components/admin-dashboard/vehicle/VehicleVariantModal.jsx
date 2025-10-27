@@ -139,6 +139,15 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
         });
     };
 
+    const handleFormKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            if (currentStep < 4) {
+                e.preventDefault();
+                nextStep(); 
+            }
+        }
+    };
+
     // --- Navigation Handlers ---
     const nextStep = () => {
         setError(''); // Clear previous errors
@@ -245,7 +254,7 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                             aria-label="Close"
                         ></button>
                         <div className="modal-body">
-                        <form onSubmit={handleSubmit} noValidate>
+                        <form onSubmit={handleSubmit} noValidate onKeyDown={handleFormKeyDown}>
                             <div
                                 id="wizard-modern-icons" 
                                 className="bs-stepper wizard-icons wizard-modern mt-2"
