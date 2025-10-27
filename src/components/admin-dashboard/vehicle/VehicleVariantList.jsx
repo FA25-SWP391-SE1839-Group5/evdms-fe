@@ -120,7 +120,7 @@ export default function VehicleVariantList() {
                     <label className="d-flex align-items-center"> 
                         Show&nbsp; 
                         <select 
-                            className="form-select form-select-sm" 
+                            className="form-select" 
                             value={pageSize} 
                             onChange={handlePageSizeChange} 
                             style={{width:'auto'}}
