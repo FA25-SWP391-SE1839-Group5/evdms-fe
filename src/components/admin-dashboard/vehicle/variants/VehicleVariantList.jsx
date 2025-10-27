@@ -195,11 +195,7 @@ export default function VehicleVariantList() {
                                 paginatedVariants.map(variant => (
                                     <tr key={variant.id}>
                                         <td>{modelsMap[variant.modelId] || 'Unknown Model'}</td>
-                                        <td
-                                            onClick={() => handleViewDetails(variant.id)}
-                                            style={{ cursor: 'pointer' }}
-                                            title="View Details"
-                                        >
+                                        <td>
                                             <span className="fw-semibold">
                                                 {variant.name}
                                             </span>
@@ -207,8 +203,28 @@ export default function VehicleVariantList() {
                                         <td>{formatCurrency(variant.basePrice)}</td>
                                         <td>
                                             <div className="d-inline-block text-nowrap">
-                                                <button className="btn btn-sm btn-icon" title="Edit" onClick={() => handleEdit(variant)}><i className="bx bx-edit"></i></button>
-                                                <button className="btn btn-sm btn-icon delete-record" title="Delete" onClick={() => handleDelete(variant.id, variant.name)}><i className="bx bx-trash"></i></button>
+                                                
+                                                <button 
+                                                    className="btn btn-sm btn-icon" 
+                                                    title="Edit" 
+                                                    onClick={() => handleEdit(variant)}
+                                                >
+                                                    <i className="bx bx-edit"></i>
+                                                </button>
+                                                <button 
+                                                    className="btn btn-sm btn-icon" 
+                                                    title="View Details" 
+                                                    onClick={() => handleViewDetails(variant.id)}
+                                                >
+                                                    <i className="bx bx-show"></i>
+                                                </button>
+                                                <button 
+                                                    className="btn btn-sm btn-icon delete-record" 
+                                                    title="Delete" 
+                                                    onClick={() => handleDelete(variant.id, variant.name)}
+                                                >
+                                                    <i className="bx bx-trash"></i>
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
