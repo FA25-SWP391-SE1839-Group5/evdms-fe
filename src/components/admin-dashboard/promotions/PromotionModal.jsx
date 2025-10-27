@@ -53,6 +53,63 @@ export default function PromotionModal({ show, onClose, onSaveSuccess, promotion
         }
     }, [show, promotionToEdit, isEditMode]);
 
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+
+        // Validation
+        if (!formData.description || !formData.startDate || !formData.endDate) {
+            setError('Please fill in Description, Start Date, and End Date.');
+            setLoading(false);
+            return;
+        }
+        if (formData.discountPercent !== '' && (isNaN(Number(formData.discountPercent)) || Number(formData.discountPercent) < 0 || Number(formData.discountPercent) > 100)) {
+            setError('Discount Percent must be a number between 0 and 100, or leave blank.');
+            setLoading(false);
+            return;
+        }
+        if (new Date(formData.endDate) <= new Date(formData.startDate)) {
+            setError('End Date must be after Start Date.');
+            setLoading(false);
+            return;
+        }
+
+        const dataToSend = {
+            description: formData.description,
+            // Chuyển đổi thành số hoặc null trước khi gửi
+            discountPercent: formData.discountPercent === '' ? null : Number(formData.discountPercent),
+            startDate: new Date(formData.startDate).toISOString(),
+            endDate: new Date(formData.endDate).toISOString(),
+        };
+
+        try {
+            let response;
+            if (isEditMode) {
+                response = await updatePromotion(promotionToEdit.id, dataToSend);
+            } else {
+                response = await createPromotion(dataToSend);
+            }
+
+             if (response.data?.success === true || (response.status >= 200 && response.status < 300) ) {
+                onSaveSuccess(isEditMode);
+            } else {
+                throw new Error(response.data?.message || 'Failed to save promotion');
+            }
+        } catch (err) {
+            setError(err.response?.data?.message || err.message || 'Operation failed');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (!show) return null;
+
     return (
         <div>
             
