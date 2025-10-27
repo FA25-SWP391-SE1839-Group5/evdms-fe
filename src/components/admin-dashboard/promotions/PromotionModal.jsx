@@ -209,6 +209,23 @@ export default function PromotionModal({ show, onClose, onSaveSuccess, promotion
                                     </div>
                                 </div>
                             </div>
+                            <div className="modal-footer">
+                                <button 
+                                    type="button" 
+                                    className="btn btn-outline-secondary" 
+                                    onClick={onClose} 
+                                    disabled={loading}
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    type="submit" 
+                                    className="btn btn-primary" 
+                                    disabled={loading}
+                                >
+                                    {loading ? 'Saving...' : (isEditMode ? 'Update Promotion' : 'Create Promotion')}
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
