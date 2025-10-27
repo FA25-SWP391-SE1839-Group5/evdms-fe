@@ -90,7 +90,8 @@ export default function VehicleVariantList() {
             // Refetch variants after delete
             const variantsRes = await getAllVehicleVariants();
             setVariants(variantsRes.data?.data?.items || variantsRes.data?.items || variantsRes.data || []);
-        } catch (err) {
+        } catch (err)
+        {
             setError(err.response?.data?.message || 'Failed to delete variant.');
         }
     };
@@ -153,29 +154,45 @@ export default function VehicleVariantList() {
             
             <div className="card-body pb-0">
                 
-                {/* Alert messages */}
+                {/* ==================== SỬA LỖI Ở ĐÂY ==================== */}
+                
+                {/* Chỉ ẩn/hiện Alert messages */}
                 {error && ( 
-                    <div className="alert alert-danger alert-dismissible d-flex align-items-center mb-3" role="alert">
-                        <AlertCircle size={20} className="me-2" /> 
-                        <div className="flex-grow-1">{error}</div> 
+                    // 1. Bỏ d-flex và align-items-center khỏi div.alert
+                    <div className="alert alert-danger alert-dismissible mb-3" role="alert">
+                        {/* 2. Thêm d-flex vào div con bên trong */}
+                        <div className="d-flex align-items-center">
+                            <AlertCircle size={20} className="me-2 flex-shrink-0" /> 
+                            <div className="flex-grow-1">{error}</div> 
+                        </div>
+                        {/* 3. Nút close để riêng, class 'alert-dismissible' sẽ tự xử lý */}
                         <button 
                             type="button" 
                             className="btn-close" 
-                            onClick={() => setError('')}></button> 
-                        </div>
+                            onClick={() => setError('')}
+                            aria-label="Close"
+                        ></button> 
+                    </div>
                 )}
                 {success && ( 
-                    <div className="alert alert-success alert-dismissible d-flex align-items-center mb-3" role="alert">
-                        <CheckCircle size={20} className="me-2" /> 
-                        <div className="flex-grow-1">{success}</div> 
+                    // Tương tự cho success alert
+                    <div className="alert alert-success alert-dismissible mb-3" role="alert">
+                        <div className="d-flex align-items-center">
+                            <CheckCircle size={20} className="me-2 flex-shrink-0" /> 
+                            <div className="flex-grow-1">{success}</div>
+                        </div>
                         <button 
                             type="button" 
                             className="btn-close" 
-                            onClick={() => setSuccess('')}></button> 
+                            onClick={() => setSuccess('')}
+                            aria-label="Close"
+                        ></button> 
                     </div> 
                 )}
+                {/* ==================== HẾT KHỐI ALERT ==================== */}
 
-                {/* Table */}
+
+                {/* Table (Luôn hiển thị) */}
                 <div className="table-responsive text-nowrap">
                     <table className="table table-hover">
                         <thead>
@@ -208,7 +225,7 @@ export default function VehicleVariantList() {
                     </table>
                 </div>
 
-                {/* Pagination */}                
+                {/* Pagination (Luôn hiển thị) */}                
                 <div className="d-flex justify-content-between align-items-center p-3">
                     <small className="text-muted">
                         Showing {startEntry} to {endEntry} of {filteredVariants.length} entries
@@ -240,7 +257,7 @@ export default function VehicleVariantList() {
                         </ul>
                     </nav>
                 </div>
-            </div>
+            </div> {/* <-- Đóng thẻ card-body */}
             
             {/* Modal */}
             <VehicleVariantModal
