@@ -181,7 +181,32 @@ export default function SalesOrderManagement() {
                             onClick={() => setError('')}
                         ></button>
                 </div>
-            )}   
+            )}
+            
+            <div className="card">
+
+                {/* Header: Show, Search, Filter */}
+                <div className="card-header border-bottom">
+                    <div className="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
+                        {/* Left: Show Entries */}
+                        <div className="col-md-auto">
+                           <label className="d-flex align-items-center"> 
+                                Show&nbsp; 
+                                <select 
+                                    className="form-select" 
+                                    value={pageSize} 
+                                    onChange={handlePageSizeChange} 
+                                    style={{width:'auto'}}
+                                > 
+                                    <option>10</option>
+                                    <option>25</option>
+                                    <option>50</option> 
+                                </select> 
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </>
     )
 }
