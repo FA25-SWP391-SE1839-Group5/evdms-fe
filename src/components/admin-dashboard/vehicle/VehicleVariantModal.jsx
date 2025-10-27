@@ -416,6 +416,32 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                             </div>
                                         ))}
                                     </div>
+
+                                    {/* Content Step 3: Features */}
+                                    <div 
+                                        id="features-step" 
+                                        className={`content ${currentStep === 3 ? 'active dstepper-block' : 'dstepper-none'}`}
+                                    >
+                                        <div className="content-header mb-3">
+                                            <h6 className="mb-0">Features</h6>
+                                            <small>Select available features.</small>
+                                        </div>
+                                        {Object.entries(featureCategories).map(([category, featuresInCategory]) => (
+                                            <div key={category} className="mb-4">
+                                                <h6>{category}</h6>
+                                                <div className="row g-2">
+                                                    {featuresInCategory.map(feature => (
+                                                        <div key={feature} className="col-md-4 col-sm-6">
+                                                            <div className="form-check">
+                                                                <input className="form-check-input" type="checkbox" id={`feature-${category}-${feature}`} checked={features[category]?.includes(feature) || false} onChange={() => handleFeatureChange(category, feature)} disabled={loading} />
+                                                                <label className="form-check-label" htmlFor={`feature-${category}-${feature}`}>{feature.replace(/([A-Z])/g, ' $1').trim()}</label>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         </form>
