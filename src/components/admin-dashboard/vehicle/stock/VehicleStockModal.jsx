@@ -162,6 +162,23 @@ export default function VehicleStockModal({ show, onClose, onSaveSuccess, vehicl
                                             required
                                         />
                                     </div>
+
+                                    {/* Color Input */}
+                                    <div className="col-md-6">
+                                        <label htmlFor="vehicleColor" className="form-label">Color *</label>
+                                        <input
+                                            type="text"
+                                            id="vehicleColor"
+                                            name="color"
+                                            className={`form-control ${!formData.color && error ? 'is-invalid' : ''}`}
+                                            value={formData.color}
+                                            onChange={handleChange}
+                                            placeholder="e.g., Red, Blue, White"
+                                            disabled={loading}
+                                            required
+                                        />
+                                        {/* Có thể đổi thành Select nếu màu cố định */}
+                                    </div>
                                 </div>
                             </div>
                         </form>
