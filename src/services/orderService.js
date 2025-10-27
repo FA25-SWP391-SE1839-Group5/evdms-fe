@@ -22,3 +22,12 @@ export const getSalesOrderById = (id) => {
     console.log(`📡 API Call: GET /api/sales-orders/${id}`);
     return api.get(`/sales-orders/${id}`);
 };
+
+/**
+ * Mark Sales Order as Delivered
+ * @param {string|number} id
+ */
+export const markOrderDelivered = (id) => {
+    console.log(`📡 API Call: POST /api/sales-orders/${id}/deliver`);
+    return api.post(`/sales-orders/${id}/deliver`); // Có thể không cần body
+};
