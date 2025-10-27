@@ -125,6 +125,16 @@ export default function SalesOrderManagement() {
         });
     }, [orders, customerMap, dealerMap, variantMap, statusFilter, globalSearch]);
 
+    // Pagination Logic
+    const totalItems = filteredOrders.length;
+    const totalPages = Math.ceil(totalItems / pageSize) || 1;
+    const paginatedOrders = useMemo(() => {
+        const startIndex = (currentPage - 1) * pageSize;
+        return filteredOrders.slice(startIndex, startIndex + pageSize);
+    }, [filteredOrders, currentPage, pageSize]);
+    const startEntry = totalItems > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+    const endEntry = Math.min(currentPage * pageSize, totalItems);
+
 
     return (
         <div>SalesOrderManagement</div>
