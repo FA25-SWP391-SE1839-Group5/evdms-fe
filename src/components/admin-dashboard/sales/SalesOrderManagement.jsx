@@ -6,6 +6,26 @@ import { getAllVehicleVariants } from '../../../services/vehicleService';
 import { getAllCustomers } from '../../../services/dashboardService';
 import SalesOrderStatsCards from './SalesOrderStatsCards';
 import SalesOrderDetailsModal from './SalesOrderDetailsModal';
+import { Bar } from 'react-chartjs-2';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+} from 'chart.js';
+
+// Đăng ký elements
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend
+);
 
 // --- Helper Functions ---
 const formatOrderId = (id) => `#${id?.slice(-6).toUpperCase() || 'N/A'}`;
@@ -34,10 +54,12 @@ const RenderSalesOrderStatus = ({ status }) => {
 export default function SalesOrderManagement() {
     const [orders, setOrders] = useState([]);
     const [customerMap, setCustomerMap] = useState({}); // { customerId: customerName }
+    const [dealers, setDealers] = useState([]);
     const [dealerMap, setDealerMap] = useState({});     // { dealerId: dealerName }
     const [variantMap, setVariantMap] = useState({});   // { variantId: variantName }
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
     // Pagination & Filter State
     const [pageSize, setPageSize] = useState(10);
@@ -66,6 +88,7 @@ export default function SalesOrderManagement() {
 
                 // Map Dealers
                 const dealerList = dealersRes.data?.data?.items || [];
+                setDealers(dealerList);
                 setDealerMap(dealerList.reduce((acc, d) => { acc[d.id] = d.name; return acc; }, {}));
 
                 // Map Variants
@@ -87,13 +110,14 @@ export default function SalesOrderManagement() {
 
     // Auto-hide alerts
     useEffect(() => {
-        if (error) {
-          const timer = setTimeout(() => {
-            setError('');
-          }, 5000);
-          return () => clearTimeout(timer);
+        if (error || success) {
+            const timer = setTimeout(() => {
+                setError('');
+                setSuccess('');
+            }, 5000);
+            return () => clearTimeout(timer);
         }
-    }, [error]);
+    }, [error, success]);
     
     // Filter Logic
     const filteredOrders = useMemo(() => {
@@ -138,6 +162,60 @@ export default function SalesOrderManagement() {
     const startEntry = totalItems > 0 ? (currentPage - 1) * pageSize + 1 : 0;
     const endEntry = Math.min(currentPage * pageSize, totalItems);
 
+    // 5. Logic tính toán dữ liệu cho biểu đồ báo cáo
+    const reportChartData = useMemo(() => {
+        // Báo cáo theo Dealer
+        const salesByDealer = filteredOrders.reduce((acc, order) => {
+            const dealerId = order.dealerId;
+            const amount = order.totalAmount || 0;
+            if (dealerId) {
+                acc[dealerId] = (acc[dealerId] || 0) + amount;
+            }
+            return acc;
+        }, {});
+
+        const dealerLabels = Object.keys(salesByDealer).map(id => dealerMap[id] || `ID: ${id.slice(0,5)}..`);
+        const dealerDataValues = Object.values(salesByDealer);
+
+        const salesByDealerChart = {
+            labels: dealerLabels,
+            datasets: [{ label: 'Total Sales (VND)', data: dealerDataValues, backgroundColor: 'rgba(113, 102, 240, 0.8)' }]
+        };
+
+        // Báo cáo theo Khu vực (Region)
+        const dealerIdToRegionMap = dealers.reduce((acc, dealer) => {
+            acc[dealer.id] = dealer.region || 'Unknown Region';
+            return acc;
+        }, {});
+
+        const salesByRegion = filteredOrders.reduce((acc, order) => {
+            const dealerId = order.dealerId;
+            const region = dealerId ? dealerIdToRegionMap[dealerId] : 'Unknown Region';
+            const amount = order.totalAmount || 0;
+            acc[region] = (acc[region] || 0)  + amount;
+            return acc;
+        }, {});
+
+        const regionLabels = Object.keys(salesByRegion);
+        const regionDataValues = Object.values(salesByRegion);
+
+            const salesByRegionChart = {
+            labels: regionLabels,
+            datasets: [{ label: 'Total Sales (VND)', data: regionDataValues, backgroundColor: 'rgba(40, 208, 148, 0.8)' }] // Màu khác
+        };
+
+       return { salesByDealerChart, salesByRegionChart };
+
+   }, [filteredOrders, dealerMap, dealers]); // Phụ thuộc vào orders đã lọc và dealers
+
+   // Cấu hình chung cho Bar Chart
+   const barChartOptions = {
+       responsive: true,
+       maintainAspectRatio: false,
+       plugins: { legend: { display: false } },
+       scales: { y: { beginAtZero: true, ticks: { callback: (value) => formatCurrency(value) } } } // Format trục Y
+   };
+
     // Handlers
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
@@ -180,7 +258,53 @@ export default function SalesOrderManagement() {
                         ></button>
                 </div>
             )}
-            
+            {success && ( // Thêm success alert
+                <div className="alert alert-success alert-dismissible d-flex align-items-center mb-4" role="alert">
+                    <CheckCircle size={20} className="me-2" /><div className="flex-grow-1">{success}</div>
+                    <button 
+                        type="button" 
+                        className="btn-close" 
+                        onClick={() => setSuccess('')}
+                    ></button>
+                </div>
+            )}
+
+            {/* 6. Chart */}
+            <div className="row g-4 mb-4">
+
+                {/* Sales by Dealer Chart */}
+                <div className="col-lg-6 col-md-12">
+                    <div className="card h-100">
+                        <div className="card-header"><h5 className="card-title mb-0">Sales by Dealer</h5></div>
+                        <div className="card-body" style={{ minHeight: '300px' }}>
+                                {filteredOrders.length > 0 ? (
+                                    <div style={{ position: 'relative', height: '250px', width: '100%' }}>
+                                        <Bar options={barChartOptions} data={reportChartData.salesByDealerChart} />
+                                    </div>
+                                ) : (
+                                    <p className="text-muted text-center mt-4">No sales data to display based on current filters.</p>
+                                )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Sales by Region Chart */}
+                <div className="col-lg-6 col-md-12">
+                        <div className="card h-100">
+                        <div className="card-header"><h5 className="card-title mb-0">Sales by Region</h5></div>
+                        <div className="card-body" style={{ minHeight: '300px' }}>
+                            {filteredOrders.length > 0 ? (
+                                <div style={{ position: 'relative', height: '250px', width: '100%' }}>
+                                        <Bar options={barChartOptions} data={reportChartData.salesByRegionChart} />
+                                </div>
+                            ) : (
+                                <p className="text-muted text-center mt-4">No sales data to display based on current filters.</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+                
             <div className="card">
 
                 {/* Header: Show, Search, Filter */}
