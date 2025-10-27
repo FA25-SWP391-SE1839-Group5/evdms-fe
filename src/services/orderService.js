@@ -13,3 +13,12 @@ export const getAllSalesOrders = (params = {}) => {
     // Giả định API trả về { data: { items: [...] } }
     return api.get('/sales-orders', { params });
 };
+
+/**
+ * Get Sales Order by ID
+ * @param {string|number} id
+ */
+export const getSalesOrderById = (id) => {
+    console.log(`📡 API Call: GET /api/sales-orders/${id}`);
+    return api.get(`/sales-orders/${id}`);
+};
