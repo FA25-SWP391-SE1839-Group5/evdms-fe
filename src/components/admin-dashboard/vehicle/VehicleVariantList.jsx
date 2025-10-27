@@ -151,11 +151,9 @@ export default function VehicleVariantList() {
                 </div>
             </div>
             
-            {/* ==================== SỬA LỖI Ở ĐÂY ==================== */}
-            {/* Dời card-body ra ngoài để nó LUÔN LUÔN hiển thị */}
             <div className="card-body pb-0">
                 
-                {/* Chỉ ẩn/hiện Alert messages */}
+                {/* Alert messages */}
                 {error && ( 
                     <div className="alert alert-danger alert-dismissible d-flex align-items-center mb-3" role="alert">
                         <AlertCircle size={20} className="me-2" /> 
@@ -176,10 +174,8 @@ export default function VehicleVariantList() {
                             onClick={() => setSuccess('')}></button> 
                     </div> 
                 )}
-                {/* ==================== HẾT KHỐI ALERT ==================== */}
 
-
-                {/* Table (Luôn hiển thị) */}
+                {/* Table */}
                 <div className="table-responsive text-nowrap">
                     <table className="table table-hover">
                         <thead>
@@ -212,7 +208,7 @@ export default function VehicleVariantList() {
                     </table>
                 </div>
 
-                {/* Pagination (Luôn hiển thị) */}                
+                {/* Pagination */}                
                 <div className="d-flex justify-content-between align-items-center p-3">
                     <small className="text-muted">
                         Showing {startEntry} to {endEntry} of {filteredVariants.length} entries
@@ -244,10 +240,8 @@ export default function VehicleVariantList() {
                         </ul>
                     </nav>
                 </div>
-            </div> {/* <-- Đóng thẻ card-body */}
-            {/* ==================== KẾT THÚC SỬA LỖI ==================== */}
-
-
+            </div>
+            
             {/* Modal */}
             <VehicleVariantModal
                 show={showModal}
