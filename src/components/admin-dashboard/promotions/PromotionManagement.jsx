@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AlertCircle, CheckCircle, Plus, Edit, Trash, Percent, Calendar } from 'lucide-react'; 
-import { getAllPromotions, createPromotion, updatePromotion, deletePromotion } from '../../../services/promotionService';
+import { getAllPromotions, deletePromotion } from '../../../services/promotionService';
 import PromotionModal from './PromotionModal';
+import PromotionStatsCards from './PromotionStatsCards';
 
 // --- Helper Functions ---
 const formatDate = (isoString) => isoString ? new Date(isoString).toLocaleString('en-GB') : 'N/A';
@@ -108,9 +109,7 @@ export default function PromotionManagement() {
   
     return (
         <>
-            <h4 className="fw-bold py-3 mb-4">
-              <span className="text-muted fw-light">Financial /</span> Promotions
-            </h4>
+            <PromotionStatsCards promotions={promotions} />
 
             {/* Alerts */}
             {error && (
