@@ -150,99 +150,103 @@ export default function VehicleVariantList() {
                     </button>
                 </div>
             </div>
+            
+            {/* ==================== SỬA LỖI Ở ĐÂY ==================== */}
+            {/* Dời card-body ra ngoài để nó LUÔN LUÔN hiển thị */}
+            <div className="card-body pb-0">
+                
+                {/* Chỉ ẩn/hiện Alert messages */}
+                {error && ( 
+                    <div className="alert alert-danger alert-dismissible d-flex align-items-center mb-3" role="alert">
+                        <AlertCircle size={20} className="me-2" /> 
+                        <div className="flex-grow-1">{error}</div> 
+                        <button 
+                            type="button" 
+                            className="btn-close" 
+                            onClick={() => setError('')}></button> 
+                        </div>
+                )}
+                {success && ( 
+                    <div className="alert alert-success alert-dismissible d-flex align-items-center mb-3" role="alert">
+                        <CheckCircle size={20} className="me-2" /> 
+                        <div className="flex-grow-1">{success}</div> 
+                        <button 
+                            type="button" 
+                            className="btn-close" 
+                            onClick={() => setSuccess('')}></button> 
+                    </div> 
+                )}
+                {/* ==================== HẾT KHỐI ALERT ==================== */}
 
-            {/* Alerts */}
-            {(error || success) && (
-                <div className="card-body pb-0">
-                    {error && ( 
-                        <div className="alert alert-danger alert-dismissible d-flex align-items-center mb-0" role="alert">
-                            <AlertCircle size={20} className="me-2" /> 
-                            <div className="flex-grow-1">{error}</div> 
-                            <button 
-                                type="button" 
-                                className="btn-close" 
-                                onClick={() => setError('')}></button> 
-                            </div>
-                    )}
-                    {success && ( 
-                        <div className="alert alert-success alert-dismissible d-flex align-items-center mb-0" role="alert">
-                            <CheckCircle size={20} className="me-2" /> 
-                            <div className="flex-grow-1">{success}</div> 
-                            <button 
-                                type="button" 
-                                className="btn-close" 
-                                onClick={() => setSuccess('')}></button> 
-                        </div> 
-                    )}
 
-                    {/* Table */}
-                    <div className="table-responsive text-nowrap">
-                        <table className="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Model</th>
-                                    <th>Variant Name</th>
-                                    <th>Base Price</th>
-                                    {/* Thêm các cột tóm tắt specs/features nếu muốn */}
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="table-border-bottom-0">
-                                {paginatedVariants.length === 0 ? (
-                                    <tr><td colSpan="4" className="text-center py-4"> No variants found. </td></tr>
-                                ) : (
-                                    paginatedVariants.map(variant => (
-                                        <tr key={variant.id}>
-                                            <td>{modelsMap[variant.modelId] || 'Unknown Model'}</td>
-                                            <td><span className="fw-semibold">{variant.name}</span></td>
-                                            <td>{formatCurrency(variant.basePrice)}</td>
-                                            <td>
-                                                <div className="d-inline-block text-nowrap">
-                                                    <button className="btn btn-sm btn-icon" title="Edit" onClick={() => handleEdit(variant)}><i className="bx bx-edit"></i></button>
-                                                    <button className="btn btn-sm btn-icon delete-record" title="Delete" onClick={() => handleDelete(variant.id, variant.name)}><i className="bx bx-trash"></i></button>
-                                                    {/* Thêm nút View Details nếu cần */}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* Pagination */}                
-                    <div className="d-flex justify-content-between align-items-center p-3">
-                        <small className="text-muted">
-                            Showing {startEntry} to {endEntry} of {filteredVariants.length} entries
-                        </small>
-                        <nav>
-                            <ul className="pagination pagination-sm mb-0">
-                                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                                    <button 
-                                        className="page-link" 
-                                        onClick={() => setCurrentPage(p=>p-1)} 
-                                        disabled={currentPage === 1}
-                                    >
-                                        &laquo;
-                                    </button>
-                                </li>
-                                <li className="page-item active">
-                                    <span className="page-link">{currentPage}</span>
-                                </li>
-                                <li className={`page-item ${currentPage >= totalPages ? 'disabled' : ''}`}>
-                                    <button 
-                                        className="page-link" 
-                                        onClick={() => setCurrentPage(p=>p+1)} 
-                                        disabled={currentPage >= totalPages}
-                                    >
-                                        &raquo;
-                                    </button>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
+                {/* Table (Luôn hiển thị) */}
+                <div className="table-responsive text-nowrap">
+                    <table className="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Model</th>
+                                <th>Variant Name</th>
+                                <th>Base Price</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="table-border-bottom-0">
+                            {paginatedVariants.length === 0 ? (
+                                <tr><td colSpan="4" className="text-center py-4"> No variants found. </td></tr>
+                            ) : (
+                                paginatedVariants.map(variant => (
+                                    <tr key={variant.id}>
+                                        <td>{modelsMap[variant.modelId] || 'Unknown Model'}</td>
+                                        <td><span className="fw-semibold">{variant.name}</span></td>
+                                        <td>{formatCurrency(variant.basePrice)}</td>
+                                        <td>
+                                            <div className="d-inline-block text-nowrap">
+                                                <button className="btn btn-sm btn-icon" title="Edit" onClick={() => handleEdit(variant)}><i className="bx bx-edit"></i></button>
+                                                <button className="btn btn-sm btn-icon delete-record" title="Delete" onClick={() => handleDelete(variant.id, variant.name)}><i className="bx bx-trash"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
                 </div>
-            )}
+
+                {/* Pagination (Luôn hiển thị) */}                
+                <div className="d-flex justify-content-between align-items-center p-3">
+                    <small className="text-muted">
+                        Showing {startEntry} to {endEntry} of {filteredVariants.length} entries
+                    </small>
+                    <nav>
+                        <ul className="pagination pagination-sm mb-0">
+                            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                                <button 
+                                    className="page-link" 
+                                    onClick={() => setCurrentPage(p=>p-1)} 
+                                    disabled={currentPage === 1}
+                                >
+                                    &laquo;
+                                </button>
+                            </li>
+                            {/* TODO: Thêm logic render nhiều trang nếu muốn */}
+                            <li className="page-item active">
+                                <span className="page-link">{currentPage}</span>
+                            </li>
+                            <li className={`page-item ${currentPage >= totalPages ? 'disabled' : ''}`}>
+                                <button 
+                                    className="page-link" 
+                                    onClick={() => setCurrentPage(p=>p+1)} 
+                                    disabled={currentPage >= totalPages}
+                                >
+                                    &raquo;
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div> {/* <-- Đóng thẻ card-body */}
+            {/* ==================== KẾT THÚC SỬA LỖI ==================== */}
+
 
             {/* Modal */}
             <VehicleVariantModal
