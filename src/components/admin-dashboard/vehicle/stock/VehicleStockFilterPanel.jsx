@@ -52,6 +52,12 @@ const VehicleStockFilterPanel = ({ show, onClose, currentFilters, onApplyFilters
                 tabIndex="-1"
                 id="vehicleStockFilterOffcanvas"
                 aria-labelledby="vehicleStockFilterOffcanvasLabel"
+                style={{
+                    visibility: show ? 'visible' : 'hidden',
+                    transform: show ? 'translateX(0)' : 'translateX(100%)',
+                    transition: 'transform 0.3s ease-in-out',
+                    display: 'block', // bắt buộc để nó render
+                }}
             >
                 <div className="offcanvas-header border-bottom">
                     <h5 id="vehicleStockFilterOffcanvasLabel" className="offcanvas-title">Filters</h5>
