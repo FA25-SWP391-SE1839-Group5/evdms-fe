@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { AlertCircle, Search, MoreVertical, Eye } from 'lucide-react';
-import { getAllSalesOrders } from '../../../services/orderService';
+import { AlertCircle, Truck, Eye } from 'lucide-react';
+import { getAllSalesOrders, markOrderDelivered } from '../../../services/orderService';
 import { getAllDealers } from '../../../services/dealerService';
 import { getAllVehicleVariants } from '../../../services/vehicleService';
 import { getAllCustomers } from '../../../services/dashboardService';
@@ -216,6 +216,15 @@ export default function SalesOrderManagement() {
        scales: { y: { beginAtZero: true, ticks: { callback: (value) => formatCurrency(value) } } } // Format trục Y
    };
 
+    const reloadOrders = async () => {
+        try {
+            const ordersRes = await getAllSalesOrders();
+            setOrders(ordersRes.data?.data?.items || ordersRes.data?.items || ordersRes.data || []);
+        } catch (err) {
+            setError(err.response?.data?.message || err.message || 'Failed to reload orders');
+        }
+   };
+
     // Handlers
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
@@ -225,11 +234,30 @@ export default function SalesOrderManagement() {
     };
     const handlePageSizeChange = (e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); };
     const handlePageChange = (newPage) => { if (newPage >= 1 && newPage <= totalPages) setCurrentPage(newPage); };
+
     const handleViewDetails = (order) => {
         setViewingOrder(order);
         setShowDetailsModal(true);
     };
-    // Add handler for mark delivered if needed
+
+    const handleMarkDelivered = async (orderId, orderNumStr) => {
+        if (!window.confirm(`Mark Order ${orderNumStr} as Delivered?`)) return;
+
+        try {
+            setSuccess(''); // Xóa thông báo cũ
+            setError('');
+            const response = await markOrderDelivered(orderId);
+            
+            if (response.data?.success || response.status === 200 || response.status === 204) {
+                setSuccess(`Order ${orderNumStr} marked as Delivered.`);
+                reloadOrders(); // Tải lại danh sách
+            } else {
+                throw new Error(response.data?.message || 'Operation failed');
+            }
+        } catch (err) {
+            setError(err.response?.data?.message || err.message || 'Failed to mark as delivered');
+        }
+    };
 
     if (loading) {
     return (
@@ -377,6 +405,8 @@ export default function SalesOrderManagement() {
                             ) : (
                                 paginatedOrders.map(order => {
                                     const customer = customerMap[order.customerId];
+                                    const orderNumStr = formatOrderId(order.id);
+                                    const isDeliveredOrCancelled = order.status?.toLowerCase() === 'delivered' || order.status?.toLowerCase() === 'cancelled';
                                     return (
                                         <tr key={order.id}>
                                             <td><span className="fw-semibold text-primary">{formatOrderId(order.id)}</span></td>
@@ -398,16 +428,40 @@ export default function SalesOrderManagement() {
                                             <td><RenderSalesOrderStatus status={order.status} /></td>
                                             <td>
                                                 {/* Actions: View Details */}
-                                                 <button
+                                                <button
                                                     type="button"
                                                     className="btn btn-sm btn-icon btn-text-secondary rounded-pill"
                                                     title="View Details"
                                                     onClick={() => handleViewDetails(order)}
                                                 >
-                                                   <Eye size={18} />
+                                                    <Eye size={18} />
                                                 </button>
-                                                {/* Thêm dropdown nếu cần action khác (Mark Delivered...) */}
-                                                {/* <div className="dropdown"> ... </div> */}
+                                                {/* More Actions Dropdown */}
+                                                <div className="dropdown">
+                                                        <button 
+                                                            type="button" 
+                                                            className="btn p-0 dropdown-toggle hide-arrow btn-sm" data-bs-toggle="dropdown"
+                                                        >
+                                                            <i className="bx bx-dots-vertical-rounded"></i>
+                                                        </button>
+                                                </div>
+                                                <div className="dropdown-menu dropdown-menu-end">
+                                                    {/* Chỉ hiển thị nếu chưa delivered hoặc cancelled */}
+                                                    {!isDeliveredOrCancelled && (
+                                                        <button
+                                                            className="dropdown-item d-flex align-items-center"
+                                                            onClick={() => handleMarkDelivered(order.id, orderNumStr)}
+                                                        >
+                                                            <Truck size={16} className="me-2 text-success"/> Mark Delivered
+                                                        </button>
+                                                    )}
+                                                    {/* Thêm action khác ở đây, ví dụ Cancel Order */}
+                                                    {/* {!isDeliveredOrCancelled && (
+                                                        <button className="dropdown-item d-flex align-items-center text-danger">
+                                                            <XCircle size={16} className="me-2"/> Cancel Order
+                                                        </button>
+                                                    )} */}
+                                                </div>
                                             </td>
                                         </tr>
                                     );
