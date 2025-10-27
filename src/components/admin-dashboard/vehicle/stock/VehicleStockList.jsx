@@ -205,6 +205,46 @@ export default function VehicleStockList() {
                     ></button>
                 </div>
             )}
+
+            {/* Table */}
+            <div className="table-responsive text-nowrap">
+                <table className="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>VIN</th>
+                            <th>Variant</th>
+                            <th>Color</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Assigned Dealer</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody className="table-border-bottom-0">
+                        {paginatedVehicles.length === 0 ? (
+                            <tr><td colSpan="7" className="text-center py-4"> No vehicles in stock found. </td></tr>
+                        ) : (
+                            paginatedVehicles.map(v => (
+                                <tr key={v.id}>
+                                    <td><code className="fw-semibold">{v.vin || 'N/A'}</code></td>
+                                    <td>{variantsMap[v.variantId] || 'Unknown'}</td>
+                                    <td>{v.color}</td>
+                                    <td>{v.type}</td>
+                                    <td><RenderVehicleStatus status={v.status} /></td>
+                                    <td>{dealersMap[v.dealerId] || '-'}</td>
+                                    <td>
+                                        <div className="d-inline-block text-nowrap">
+                                            <button className="btn btn-sm btn-icon" title="Edit" onClick={() => handleEdit(v)}><i className="bx bx-edit"></i></button>
+                                            <button className="btn btn-sm btn-icon delete-record" title="Delete" onClick={() => handleDelete(v.id, v.vin)}><i className="bx bx-trash"></i></button>
+                                            {/* Thêm nút View Details nếu cần */}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
         </div>
     )
 }
