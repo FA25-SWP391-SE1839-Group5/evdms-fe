@@ -126,6 +126,27 @@ export default function VehicleStockModal({ show, onClose, onSaveSuccess, vehicl
                                         <div>{error}</div>
                                     </div>
                                 )}
+                                <div className="row g-3">
+
+                                    {/* Variant Select */}
+                                    <div className="col-md-6">
+                                        <label htmlFor="vehicleVariantId" className="form-label">Vehicle Variant *</label>
+                                        <select
+                                            id="vehicleVariantId"
+                                            name="variantId"
+                                            className={`form-select ${!formData.variantId && error ? 'is-invalid' : ''}`}
+                                            value={formData.variantId}
+                                            onChange={handleChange}
+                                            disabled={loading || isEditMode} // Không cho đổi variant khi edit?
+                                            required
+                                        >
+                                            <option value="">-- Select Variant --</option>
+                                            {variants.map(variant => (
+                                                <option key={variant.id} value={variant.id}>{variant.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </form>
                     </div>
