@@ -399,6 +399,22 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                             <h6 className="mb-0">Specifications</h6>
                                             <small>Enter technical specifications.</small>
                                         </div>
+                                        {Object.entries(specCategories).map(([category, specsInCategory]) => (
+                                            <div key={category} className="mb-4">
+                                                <h6>{category}</h6>
+                                                <div className="row g-3">
+                                                    {specsInCategory.map(spec => (
+                                                        <div key={spec.key} className="col-md-6">
+                                                            <label htmlFor={`spec-${spec.key}`} className="form-label">{spec.label}</label>
+                                                            <div className="input-group input-group-sm"> {/* Use input-group-sm */}
+                                                                <input type={spec.unit ? 'number' : 'text'} step={spec.unit === 's' || spec.unit === 'kWh' || spec.unit === 'Wh/km' ? '0.1' : '1'} id={`spec-${spec.key}`} name={spec.key} className="form-control" value={specs[spec.key]?.value || ''} onChange={(e) => handleSpecChange(spec.key, e.target.value)} placeholder={spec.unit ? `Enter value` : `e.g., AWD`} disabled={loading} />
+                                                                {spec.unit && <span className="input-group-text">{spec.unit}</span>}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
