@@ -5,7 +5,9 @@ import CatalogPage from './pages/CatalogPage';
 import EVDetailPage from './pages/EVDetailPage';
 import VehicleModelPage from './pages/VehicleModelPage';
 import AdminDashboard from './pages/AdminDashboard';
+import EVMDashboard from './pages/EVMDashboard';
 import Layout from './components/admin-dashboard/layout/Layout';
+import EVMLayout from './components/evm-dashboard/layout/EVMLayout';
 import { routeReducer, initialState, ROUTES } from './routes';
 import { logout, getStoredToken } from './services/authService';
 
@@ -278,6 +280,13 @@ const App = () => {
         <Layout initialPage={getInitialAdminPage()}>
           <AdminDashboard />
         </Layout>
+      )}
+
+      {/* EVM DASHBOARD */}
+      {routeState.currentPage === ROUTES.EVM_DASHBOARD && (
+        <EVMLayout initialPage={getInitialEVMPage()}>
+          <EVMDashboard />
+        </EVMLayout>
       )}
 
       {/* VEHICLE MODELS PAGE */}

@@ -3,9 +3,10 @@ export const ROUTES = {
     LOGIN: 'login',
     CATALOG: 'catalog',
     DETAIL: 'detail',
-    ADMIN_DASHBOARD: 'admin_dashboard',
-    VEHICLE_MODELS: 'vehicle_models',
-    RESET_PASSWORD: 'reset_password',
+    ADMIN_DASHBOARD: 'admin-dashboard',
+    EVM_DASHBOARD: 'evm-dashboard',
+    VEHICLE_MODELS: 'vehicle-models',
+    RESET_PASSWORD: 'reset-password',
 };
 
 // Admin Dashboard sub-pages
@@ -52,6 +53,11 @@ export const routeReducer = (state, action) => {
             // Route dựa theo role
             const user = action.payload;
             
+            console.log('LOGIN_SUCCESS - Full action:', action);
+            console.log('LOGIN_SUCCESS - User data:', user);
+            console.log('LOGIN_SUCCESS - User role:', user?.role);
+            console.log('LOGIN_SUCCESS - User keys:', user ? Object.keys(user) : 'no user');
+            
             // Safety check - nếu không có user data thì về login
             if (!user || !user.role) {
                 return {
@@ -72,8 +78,10 @@ export const routeReducer = (state, action) => {
             } else if (user.role === 'dealer_staff') {
                 targetPage = ROUTES.ADMIN_DASHBOARD;
             } else if (user.role === 'evm_staff') {
-                targetPage = ROUTES.VEHICLE_MODELS;
+                targetPage = ROUTES.EVM_DASHBOARD;
             }
+            
+            console.log('LOGIN_SUCCESS - Target page:', targetPage);
             
             return {
                 ...state,
@@ -87,6 +95,14 @@ export const routeReducer = (state, action) => {
             return {
                 ...state,
                 currentPage: ROUTES.ADMIN_DASHBOARD
+            };
+        
+        case 'NAVIGATE_TO_EVM_DASHBOARD':
+            return {
+                ...state,
+                currentPage: ROUTES.EVM_DASHBOARD,
+                user: action.payload?.user || state.user,
+                isAuthenticated: true
             };
         
         case 'NAVIGATE_TO_VEHICLE_MODELS':
@@ -114,7 +130,9 @@ export const routeReducer = (state, action) => {
             return {
                 ...state,
                 currentPage: ROUTES.CATALOG,
-                selectedVehicle: null
+                selectedVehicle: null,
+                user: action.payload?.user || state.user,
+                isAuthenticated: state.user ? true : false
             };
             
         case 'NAVIGATE_TO_DETAIL':
