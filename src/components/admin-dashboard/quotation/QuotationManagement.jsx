@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { AlertCircle, Search, Eye, CheckCircle } from 'lucide-react';
+import { AlertCircle, Search, Eye, CheckCircle, Download } from 'lucide-react';
 import {
     getAllQuotations,
     getAllDealers,
@@ -9,6 +9,11 @@ import {
 import { getAllVehicleVariants } from '../../../services/vehicleService'; 
 import QuotationStatsCards from './QuotationStatsCards';
 import QuotationDetailsModal from './QuotationDetailsModal';
+
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import './print.css';
 
 // --- Helper Functions ---
 const formatQuoteId = (id) => `#${id?.slice(-6).toUpperCase() || 'N/A'}`;
@@ -148,6 +153,128 @@ const QuotationManagement = () => {
         setShowDetailsModal(true); // Mở modal
     };
 
+    const getExportRows = () => {
+        if (filteredQuotations.length === 0) {
+            setError('No data to export.');
+            return null;
+        }
+        
+        // Dòng header
+        const headers = ['Quote #', 'Date', 'Customer Name', 'Customer Email', 'Dealer', 'Vehicle', 'Status'];
+        
+        // Dòng data
+        const dataRows = filteredQuotations.map(quote => {
+            const customer = customerMap[quote.customerId] || {};
+            return [
+                formatQuoteId(quote.id),
+                formatDate(quote.createdAt || quote.updatedAt),
+                customer.name || 'N/A',
+                customer.email || 'N/A',
+                dealerMap[quote.dealerId] || 'N/A',
+                variantMap[quote.variantId] || 'N/A',
+                quote.status || 'N/A'
+            ];
+        });
+        
+        return [headers, ...dataRows]; // Trả về 2D array, dòng đầu là header
+    };
+
+    // [MỚI] Helper để escape CSV (xử lý dấu phẩy, dấu nháy trong data)
+    const escapeCSVValue = (field) => {
+        if (field === null || field === undefined) return '';
+        let str = String(field);
+        if (str.includes(',') || str.includes('\n') || str.includes('"')) {
+            str = str.replace(/"/g, '""');
+            return `"${str}"`;
+        }
+        return str;
+    };
+
+    // [MỚI] Hàm lấy timestamp cho tên file
+    const getFileTimestamp = () => {
+        const aMoment = new Date();
+        const timestamp = `${aMoment.getFullYear().toString().padStart(4, '0')}${(aMoment.getMonth() + 1).toString().padStart(2, '0')}${aMoment.getDate().toString().padStart(2, '0')}`;
+        return timestamp;
+    };
+
+    // 1. Logic cho CSV
+    const handleExportCSV = () => {
+        const rows = getExportRows();
+        if (!rows) return;
+
+        const csvString = rows.map(row => row.map(escapeCSVValue).join(',')).join('\n');
+        
+        // Thêm BOM \uFEFF để Excel đọc UTF-8 (tiếng Việt) cho đúng
+        const blob = new Blob(["\uFEFF" + csvString], { type: 'text/csv;charset=utf-8;' });
+        
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        const timestamp = getFileTimestamp();
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', `Quotations_${timestamp}.csv`);
+        link.style.visibility = 'hidden';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        setSuccess('Exported to CSV successfully.');
+    };
+
+    // 2. Logic cho Excel 
+    const handleExportExcel = () => {
+        const rows = getExportRows();
+        if (!rows) return;
+        
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Quotations");
+        
+        const timestamp = getFileTimestamp();
+        XLSX.writeFile(wb, `Quotations_${timestamp}.xlsx`);
+        setSuccess('Exported to Excel successfully.');
+    };
+
+    // 3. Logic cho PDF 
+    const handleExportPDF = () => {
+        const rows = getExportRows();
+        if (!rows) return;
+        
+        const headers = rows[0];
+        const data = rows.slice(1);
+        
+        const doc = new jsPDF();
+        doc.autoTable({
+            head: [headers],
+            body: data,
+        });
+        
+        const timestamp = getFileTimestamp();
+        doc.save(`Quotations_${timestamp}.pdf`);
+        setSuccess('Exported to PDF successfully.');
+    };
+
+    // 4. Logic cho Print
+    const handlePrint = () => {
+        window.print()
+    };
+
+    // 5. Logic cho Copy
+    const handleCopy = () => {
+        const rows = getExportRows();
+        if (!rows) return;
+
+        // Dùng tab-separated values (TSV) để paste vào Excel/Sheets
+        const tsvString = rows.map(row => row.join('\t')).join('\n');
+        
+        navigator.clipboard.writeText(tsvString).then(() => {
+            setSuccess('Đã sao chép vào clipboard.');
+        }, (err) => {
+            setError('Không thể sao chép. Lỗi: ' + err);
+        });
+    };
+
     if (loading) {
         return <div className="d-flex justify-content-center align-items-center vh-100"><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div></div>;
     }
@@ -164,6 +291,17 @@ const QuotationManagement = () => {
                         type="button" 
                         className="btn-close" 
                         onClick={() => setError('')}
+                    ></button>
+                </div>
+            )}
+            {success && (
+                <div className="alert alert-success alert-dismissible d-flex align-items-center mb-4" role="alert">
+                    <CheckCircle size={20} className="me-2" />
+                    <div className="flex-grow-1">{success}</div>
+                    <button 
+                        type="button" 
+                        className="btn-close" 
+                        onClick={() => setSuccess('')}
                     ></button>
                 </div>
             )}
@@ -208,7 +346,60 @@ const QuotationManagement = () => {
                                 <option value="Pending">Pending</option>
                                 <option value="Accepted">Accepted</option>
                                 <option value="Expired">Expired</option>
-                             </select>
+                            </select>
+                            <button
+                                type="button"
+                                className="btn btn-outline-secondary dropdown-toggle d-flex align-items-center"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                                disabled={loading}
+                            >
+                                <Download size={16} className="me-1" />
+                                Export
+                            </button>
+                            <ul className="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <button 
+                                        className="dropdown-item d-flex align-items-center" 
+                                        onClick={handlePrint}
+                                    >
+                                        <i className='bx bx-printer me-2'></i> Print
+                                    </button>
+                                </li>
+                                <li>
+                                    <button 
+                                        className="dropdown-item d-flex align-items-center" 
+                                        onClick={handleExportCSV}
+                                    >
+                                        <i className='bx bx-file me-2'></i> Csv
+                                    </button>
+                                </li>
+                                <li>
+                                    <button 
+                                        className="dropdown-item d-flex align-items-center" 
+                                        onClick={handleExportExcel}
+                                    >
+                                       <i className='bx bx-file-blank me-2'></i> Excel
+                                    </button>
+                                </li>
+                                <li>
+                                    <button 
+                                        className="dropdown-item d-flex align-items-center" 
+                                        onClick={handleExportPDF}
+                                    >
+                                        <i className='bx bxs-file-pdf me-2'></i> Pdf
+                                    </button>
+                                </li>
+                                <li><hr className="dropdown-divider" /></li>
+                                <li>
+                                    <button 
+                                        className="dropdown-item d-flex align-items-center" 
+                                        onClick={handleCopy}
+                                    >
+                                        <i className='bx bx-copy me-2'></i> Copy
+                                    </button>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>

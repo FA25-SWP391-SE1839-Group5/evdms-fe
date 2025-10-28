@@ -1,0 +1,6 @@
+@media print {
+    body * { visibility: hidden; }
+    .card, .card * { visibility: visible; }
+    .card { position: absolute; left: 0; top: 0; }
+    .card-header, .pagination { display: none; } /* Ẩn header, pagination khi in */
+}
