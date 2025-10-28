@@ -3,8 +3,9 @@ import { AlertCircle, CheckCircle, Plus, Edit, Trash } from 'lucide-react';
 import {
     getAllVehicleModels,
     deleteVehicleModel
-} from '../../../services/vehicleService';
+} from '../../../../services/vehicleService';
 import VehicleModelModal from './VehicleModelModal';
+import VehicleModelDetailsModal from './VehicleModelDetailsModal';
 
 export default function VehicleModelList() {
     const [models, setModels] = useState([]);
@@ -13,6 +14,9 @@ export default function VehicleModelList() {
     const [success, setSuccess] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [modelToEdit, setModelToEdit] = useState(null);
+
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [viewModelId, setViewModelId] = useState(null);
 
     // Pagination & Search (Simple)
     const [searchTerm, setSearchTerm] = useState('');
@@ -72,6 +76,11 @@ export default function VehicleModelList() {
     const handleEdit = (model) => {
         setModelToEdit(model);
         setShowModal(true);
+    };
+
+    const handleViewDetails = (modelId) => {
+        setViewModelId(modelId);
+        setShowDetailModal(true);
     };
 
     const handleDelete = async (modelId, modelName) => {
@@ -162,7 +171,7 @@ export default function VehicleModelList() {
             )}
 
            {/* Table */}
-            <div className="table-responsive text-nowrap">
+            <div className="table-responsive">
                 <table className="table table-hover">
                     <thead>
                         <tr>
@@ -180,7 +189,11 @@ export default function VehicleModelList() {
                         ) : (
                             paginatedModels.map(model => (
                                 <tr key={model.id}>
-                                    <td>
+                                    <td
+                                        onClick={() => handleViewDetails(model.id)} 
+                                        style={{ cursor: 'pointer' }}
+                                        title="View Details"
+                                    >
                                         {model.imageUrl ? (
                                             <>
                                                 <img
@@ -223,12 +236,19 @@ export default function VehicleModelList() {
                 </nav>
             </div>
 
-            {/* Modal */}
+            {/* Modal Edit */}
             <VehicleModelModal
                 show={showModal}
                 onClose={() => { setShowModal(false); setModelToEdit(null); }}
                 onSaveSuccess={handleSaveSuccess}
                 modelToEdit={modelToEdit}
+            />
+
+             {/* Modal View */}
+            <VehicleModelDetailsModal
+                show={showDetailModal}
+                onClose={() => setShowDetailModal(false)}
+                modelId={viewModelId}
             />
         </div>
     )

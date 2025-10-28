@@ -72,34 +72,15 @@ const App = () => {
         // For other paths, check authentication
         const stored = getStoredToken();
         if (stored?.user?.role) {
-          console.log('Restoring session for user:', stored.user);
-          console.log('Current path:', path);
+          // User is logged in, restore session
+          dispatch({
+            type: 'LOGIN_SUCCESS',
+            payload: stored.user
+          });
           
-          // Special handling for specific paths - don't use role-based routing
-          if (path === 'evm-dashboard' || path === 'vehicle-models' || path === 'dealers' || path === 'dealer-contracts' || path === 'oem-inventories' || path === 'vehicle-variants' || path === 'specifications') {
-            // Directly set to EVM Dashboard, bypass role-based routing
-            dispatch({ 
-              type: 'NAVIGATE_TO_EVM_DASHBOARD',
-              payload: { user: stored.user }
-            });
-          } else if (path === 'catalog') {
-            // Directly set to Catalog, bypass role-based routing
-            dispatch({ 
-              type: 'NAVIGATE_TO_CATALOG',
-              payload: { user: stored.user }
-            });
-          } else if (path === 'admin-dashboard' || path === 'dashboard' || path === 'users' || path === 'dealers' || path === 'customers') {
-            // Admin dashboard pages
-            dispatch({
-              type: 'LOGIN_SUCCESS',
-              payload: stored.user
-            });
-          } else {
-            // Let LOGIN_SUCCESS handle routing based on role
-            dispatch({
-              type: 'LOGIN_SUCCESS',
-              payload: stored.user
-            });
+          // If on catalog page, navigate there
+          if (path === 'catalog') {
+            dispatch({ type: 'NAVIGATE_TO_CATALOG' });
           }
         } else {
           // Invalid token or insufficient data - redirect to home
@@ -135,12 +116,6 @@ const App = () => {
       return;
     }
 
-    // EVM Dashboard pages
-    if (['evm-dashboard', 'vehicle-models', 'dealers', 'dealer-contracts', 'oem-inventories', 'vehicle-variants', 'specifications'].includes(path)) {
-      dispatch({ type: 'NAVIGATE_TO_EVM_DASHBOARD' });
-      return;
-    }
-
     // Admin dashboard sub-pages
     if (['users', 'dealers', 'customers', 'dashboard'].includes(path)) {
       // These are handled by the admin dashboard layout
@@ -150,13 +125,7 @@ const App = () => {
 
   const getInitialAdminPage = () => {
     const path = globalThis.location.pathname.replace('/', '');
-    if (!path || path === 'admin-dashboard') return 'dashboard';
-    return path;
-  };
-
-  const getInitialEVMPage = () => {
-    const path = globalThis.location.pathname.replace('/', '');
-    if (!path || path === 'evm-dashboard') return 'evm-dashboard';
+    if (!path || path === 'admin_dashboard') return 'dashboard';
     return path;
   };
 
@@ -177,24 +146,8 @@ const App = () => {
 
   // Sync URL with routing state
   useEffect(() => {
-    // Sub-pages that don't need URL syncing (managed by layout components)
-    const evmSubPages = ['vehicle-models', 'dealers', 'dealer-contracts', 'oem-inventories', 'vehicle-variants', 'specifications'];
-    const adminSubPages = ['users', 'dealers', 'customers', 'dashboard'];
-    const currentPath = globalThis.location.pathname.replace('/', '');
-    
-    // Don't sync if we're on a sub-page
-    if (evmSubPages.includes(currentPath) || adminSubPages.includes(currentPath)) {
-      console.log('Sync URL - Skipping sync for sub-page:', currentPath);
-      return;
-    }
-    
     const path = `/${routeState.currentPage}`;
-    console.log('Sync URL - currentPage:', routeState.currentPage);
-    console.log('Sync URL - target path:', path);
-    console.log('Sync URL - current location:', globalThis.location.pathname);
-    
     if (globalThis.location.pathname !== path) {
-      console.log('Sync URL - Pushing state to:', path);
       globalThis.history.pushState({}, '', path);
     }
   }, [routeState.currentPage]);
@@ -210,10 +163,8 @@ const App = () => {
         dispatch({ type: 'NAVIGATE_TO_LOGIN' });
       } else if (path === 'catalog') {
         dispatch({ type: 'NAVIGATE_TO_CATALOG' });
-      } else if (path === 'admin-dashboard' || path === 'dashboard') {
+      } else if (path === 'admin_dashboard' || path === 'dashboard') {
         dispatch({ type: 'NAVIGATE_TO_ADMIN_DASHBOARD' });
-      } else if (path === 'evm-dashboard') {
-        dispatch({ type: 'NAVIGATE_TO_EVM_DASHBOARD' });
       }
     };
 

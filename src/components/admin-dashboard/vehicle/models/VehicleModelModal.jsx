@@ -5,7 +5,7 @@ import {
     updateVehicleModel,
     uploadVehicleModelImage,
     deleteVehicleModelImage
-} from '../../../services/vehicleService';
+} from '../../../../services/vehicleService';
 
 export default function VehicleModelModal({ show, onClose, onSaveSuccess, modelToEdit }) {
     const isEditMode = Boolean(modelToEdit);
@@ -86,7 +86,7 @@ export default function VehicleModelModal({ show, onClose, onSaveSuccess, modelT
                 // Cập nhật lại state formData và preview
                 setFormData(prev => ({ ...prev, imageUrl: '', imagePublicId: '' }));
                 setImagePreview('');
-                setSuccess('Image removed successfully.'); // Cần thêm state success nếu muốn
+                // setSuccess('Image removed successfully.'); // Cần thêm state success nếu muốn
             } catch (err) {
                 setError(err.response?.data?.message || err.message || 'Failed to remove image.');
             } finally {

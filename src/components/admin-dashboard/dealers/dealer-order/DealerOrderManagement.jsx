@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { AlertCircle, CheckCircle, Plus, Edit, Trash, FileText } from 'lucide-react';
+import { AlertCircle, CheckCircle, Plus, Edit, Trash } from 'lucide-react';
 import { getAllDealerOrders, deleteDealerOrder, getAllDealers, getAllVehicleVariants } from '../../../../services/dealerService';
 import DealerOrderModal from './DealerOrderModal';
 import OrderStatsCards from './OrdersStatsCards';
+import DealerOrderDetailsModal from './DealerOrderDetailsModal';
 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -44,6 +45,9 @@ export default function DealerOrderManagement() {
     const [success, setSuccess] = useState('');
     const [showFormModal, setShowFormModal] = useState(false);
     const [orderToEdit, setOrderToEdit] = useState(null);
+
+    const [showViewModal, setShowViewModal] = useState(false);
+    const [orderToView, setOrderToView] = useState(null);
 
     const [pageSize, setPageSize] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
@@ -294,6 +298,14 @@ export default function DealerOrderManagement() {
         }
     };
 
+    const handleViewDetails = (orderId) => {
+        const order = orders.find(o => o.id === orderId);
+        if (order) {
+            setOrderToView(order);
+            setShowViewModal(true);
+        }
+    };
+
     if (loadingPageData) {
         return <div className="d-flex justify-content-center align-items-center vh-100"><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div></div>;
     }
@@ -420,7 +432,17 @@ export default function DealerOrderManagement() {
                                 paginatedOrders.map(order => (
                                     <tr key={order.id}>
                                         <td>
-                                            <span className="fw-semibold text-primary">{formatOrderId(order.id)}</span>
+                                            <a 
+                                                href="#" 
+                                                className="fw-semibold text-primary"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    handleViewDetails(order.id);
+                                                }}
+                                                title="View Details"
+                                            >
+                                                {formatOrderId(order.id)}
+                                            </a>
                                         </td>
                                         <td>{formatDate(order.createdAt || order.updatedAt)}</td>
                                         <td>{dealerMap[order.dealerId] || 'N/A'}</td>
@@ -434,10 +456,10 @@ export default function DealerOrderManagement() {
                                                     <i className="bx bx-dots-vertical-rounded"></i>
                                                 </button>
                                                 <div className="dropdown-menu">
-                                                    <button className="dropdown-item" onClick={() => handleEdit(order.id)}>
+                                                    <button className="dropdown-item d-flex align-items-center gap-2" onClick={() => handleEdit(order.id)}>
                                                         <Edit size={16} className="me-1"/> Edit
                                                     </button>
-                                                    <button className="dropdown-item text-danger" onClick={() => handleDelete(order.id)}>
+                                                    <button className="dropdown-item text-danger d-flex align-items-center gap-2" onClick={() => handleDelete(order.id)}>
                                                         <Trash size={16} className="me-1"/> Delete
                                                     </button>
                                                 </div>
@@ -475,6 +497,15 @@ export default function DealerOrderManagement() {
                 onSaveSuccess={handleSaveSuccess}
                 dealers={dealers} 
                 orderToEdit={orderToEdit}
+            />
+
+            {/* Modal Views */}
+            <DealerOrderDetailsModal
+                show={showViewModal}
+                onClose={() => { setShowViewModal(false); setOrderToView(null); }}
+                order={orderToView}
+                dealerName={orderToView ? dealerMap[orderToView.dealerId] : 'N/A'}
+                variantName={orderToView ? variantMap[orderToView.variantId] : 'N/A'}
             />
         </>
     )

@@ -778,7 +778,6 @@ const UserManagement = () => {
                     </ul>
                   </nav>
                 </div>
-                
             </div>
           </div>
       ) : (
