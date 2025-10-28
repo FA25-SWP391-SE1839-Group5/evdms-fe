@@ -422,7 +422,7 @@ export default function SalesOrderManagement() {
                         {/* Left: Show Entries */}
                         <div className="col-md-auto">
                             <label className="d-flex align-items-center"> 
-                                Show&nbsp; 
+                                Show &nbsp; 
                                 <select 
                                     className="form-select" 
                                     value={pageSize} 
@@ -432,8 +432,13 @@ export default function SalesOrderManagement() {
                                     <option>10</option>
                                     <option>25</option>
                                     <option>50</option> 
-                                </select> 
+                                </select>
+                                 &nbsp; entries
                             </label>
+                        </div>
+
+                        {/* Right: Search & Export */}
+                        <div className="col-md-auto ms-auto d-flex align-items-center gap-3">
                             <button
                                 className="btn btn-outline-secondary d-flex align-items-center"
                                 type="button"
@@ -441,10 +446,6 @@ export default function SalesOrderManagement() {
                             >
                                <Filter size={16} className="me-1" /> Filter
                             </button>
-                        </div>
-
-                        {/* Right: Search & Export */}
-                        <div className="col-md-auto ms-auto d-flex align-items-center gap-3">
                             <input 
                                 type="search" 
                                 name="globalSearch" 
