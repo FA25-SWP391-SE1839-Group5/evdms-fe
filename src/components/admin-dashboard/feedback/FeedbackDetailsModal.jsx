@@ -20,7 +20,7 @@ const RenderFeedbackStatus = ({ status }) => {
     return <span className={`badge bg-label-${badgeClass}`}>{status || 'N/A'}</span>;
 };
 
-const FeedbackViewModal = ({ show, onClose, feedback, customerMap, dealerMap }) => {
+const FeedbackDetailsModal = ({ show, onClose, feedback, customerMap, dealerMap }) => {
     if (!show || !feedback) return null;
 
     const customerName = customerMap[feedback.customerId] || 'N/A';
@@ -73,13 +73,15 @@ const FeedbackViewModal = ({ show, onClose, feedback, customerMap, dealerMap }) 
 
                     </div>
                     <div className="modal-footer">
-                        <button 
-                            type="button" 
-                            className="btn btn-label-secondary" 
-                            onClick={onClose}
-                        >
-                            Close
-                        </button>
+                        <div className="modal-footer">
+                            <button 
+                                type="button" 
+                                className="btn btn-secondary" 
+                                onClick={onClose}
+                            >
+                                Close
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -87,4 +89,4 @@ const FeedbackViewModal = ({ show, onClose, feedback, customerMap, dealerMap }) 
     );
 };
 
-export default FeedbackViewModal;
+export default FeedbackDetailsModal;

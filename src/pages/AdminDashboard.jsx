@@ -21,6 +21,8 @@ import PromotionManagement from '../components/admin-dashboard/promotions/Promot
 import SalesOrderManagement from '../components/admin-dashboard/sales/SalesOrderManagement';
 import QuotationManagement from '../components/admin-dashboard/quotation/QuotationManagement';
 import CustomerManagement from '../components/admin-dashboard/customers/CustomerManagement';
+import FeedbackManagement from '../components/admin-dashboard/feedback/FeedbackManagement';
+
 
 
 const AdminDashboard = ({ currentPage = 'dashboard' }) => {
@@ -137,12 +139,7 @@ const AdminDashboard = ({ currentPage = 'dashboard' }) => {
       case 'feedback':
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
-            <h4 className="fw-bold py-3 mb-4">Feedback</h4>
-            <div className="card">
-              <div className="card-body">
-                <p>Feedback page - Coming soon...</p>
-              </div>
-            </div>
+            <FeedbackManagement />
           </div>
         );
       

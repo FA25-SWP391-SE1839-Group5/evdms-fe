@@ -57,8 +57,8 @@ const FeedbackStatusModal = ({ show, onClose, onSave, currentStatus }) => {
                         <div className="modal-footer">
                             <button 
                                 type="button" 
-                                className="btn btn-label-secondary" 
-                                onClick={onClose} 
+                                className="btn btn-secondary" 
+                                onClick={onClose}
                                 disabled={isSaving}
                             >
                                 Cancel
