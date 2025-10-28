@@ -8,6 +8,7 @@ import {
 } from '../../../services/dashboardService'; 
 import { getAllVehicleVariants } from '../../../services/vehicleService'; 
 import QuotationStatsCards from './QuotationStatsCards';
+import QuotationDetailsModal from './QuotationDetailsModal';
 
 // --- Helper Functions ---
 const formatQuoteId = (id) => `#${id?.slice(-6).toUpperCase() || 'N/A'}`;
@@ -49,8 +50,8 @@ const QuotationManagement = () => {
     const [globalSearch, setGlobalSearch] = useState('');
 
     // State cho modal (tạm thời)
-    // const [showDetailsModal, setShowDetailsModal] = useState(false);
-    // const [viewingQuote, setViewingQuote] = useState(null);
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
+    const [viewingQuoteId, setViewingQuoteId] = useState(null);
 
     // Fetch Data
     useEffect(() => {
@@ -142,8 +143,9 @@ const QuotationManagement = () => {
     };
     const handlePageSizeChange = (e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); };
     const handlePageChange = (newPage) => { if (newPage >= 1 && newPage <= totalPages) setCurrentPage(newPage); };
-    const handleViewDetails = (quote) => {
-        alert(`View details for Quotation ${formatQuoteId(quote.id)} - Modal coming soon!`);
+    const handleViewDetails = (quoteId) => {
+        setViewingQuoteId(quoteId); // Chỉ set ID
+        setShowDetailsModal(true); // Mở modal
     };
 
     if (loading) {
@@ -305,8 +307,15 @@ const QuotationManagement = () => {
                 </div>
             </div>
 
-            {/* Modal Chi tiết (Chưa tạo) */}
-            {/* <QuotationDetailsModal show={showDetailsModal} onClose={() => setShowDetailsModal(false)} quote={viewingQuote} ... /> */}
+            {/* Render Modal Details */}
+            <QuotationDetailsModal
+               show={showDetailsModal}
+               onClose={() => setShowDetailsModal(false)}
+               quoteId={viewingQuoteId} // Truyền ID vào modal
+               customerMap={customerMap}
+               dealerMap={dealerMap}
+               variantMap={variantMap}
+           />
         </>
     );
 };
