@@ -354,7 +354,7 @@ const CustomerManagement = () => {
                                                                         className="dropdown-item d-flex align-items-center" 
                                                                         onClick={() => handleView(customer)}
                                                                     >
-                                                                        <i className="bx bx-show" /> View Details
+                                                                        <i className="bx bx-show me-2" /> View Details
                                                                     </button>
                                                                 </li>
                                                                 {/* Edit */}
