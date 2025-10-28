@@ -340,7 +340,7 @@ const PaymentManagement = () => {
                                             <td>{p.method}</td>
                                             <td>{formatShortDate(p.createdAt)}</td>
                                             <td><RenderPaymentStatus status={p.status} /></td>
-                                            <td style={{ position: 'static' }}>
+                                            <td>
                                                 <div className="d-flex gap-1">
                                                     <button 
                                                         type="button" 
