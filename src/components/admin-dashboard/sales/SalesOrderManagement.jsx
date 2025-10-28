@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AlertCircle, Truck, Eye, CheckCircle, Filter, Download, XCircle } from 'lucide-react';
-import { getAllSalesOrders, markOrderDelivered } from '../../../services/orderService';
+import { getAllSalesOrders, markOrderDelivered, deleteOrder } from '../../../services/orderService';
 import { getAllDealers } from '../../../services/dealerService';
 import { getAllVehicleVariants } from '../../../services/vehicleService';
 import { getAllCustomers } from '../../../services/dashboardService';
 import SalesOrderStatsCards from './SalesOrderStatsCards';
 import SalesOrderDetailsModal from './SalesOrderDetailsModal';
 import SalesOrderFilterPanel from './SalesOrderFilterPanel';
+
 import { Bar } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
@@ -235,7 +236,7 @@ export default function SalesOrderManagement() {
 
        return { salesByDealerChart, salesByRegionChart };
 
-   }, [filteredOrders, dealerMap]); // Phụ thuộc vào orders đã lọc và dealers
+   }, [filteredOrders, dealerMap, dealers]); // Phụ thuộc vào orders đã lọc và dealers
 
    // Cấu hình chung cho Bar Chart
    const barChartOptions = {
@@ -339,6 +340,25 @@ export default function SalesOrderManagement() {
         }
     };
 
+    const handleDeleteOrder = async (orderId, orderNumStr) => {
+        if (!window.confirm(`Are you sure you want to CANCEL/DELETE Order ${orderNumStr}? This action cannot be undone.`)) return;
+
+        try {
+            setSuccess(''); // Xóa thông báo cũ
+            setError('');
+            const response = await deleteOrder(orderId); 
+            if (response.success || response.data?.success || response.status === 200 || response.status === 204) {
+                setOpenDropdownId(null); // Đóng dropdown
+                setSuccess(`Order ${orderNumStr} has been cancelled/deleted.`);
+                reloadOrders(); // Tải lại danh sách
+            } else {
+                throw new Error(response.message || response.data?.message || 'Operation failed');
+            }
+        } catch (err) {
+            setError(err.response?.data?.message || err.message || 'Failed to delete order');
+        }
+    };
+
     if (loading) {
     return (
         <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
@@ -433,7 +453,7 @@ export default function SalesOrderManagement() {
                                     <option>25</option>
                                     <option>50</option> 
                                 </select>
-                                 &nbsp; entries
+                                &nbsp; entries
                             </label>
                         </div>
 
@@ -566,12 +586,13 @@ export default function SalesOrderManagement() {
                                                                     <Truck size={16} className="me-2 text-success"/> Mark Delivered
                                                                 </button>
                                                             )}
-                                                            {!isDeliveredOrCancelled && (
-                                                                <button className="dropdown-menu dropdown-menu-end">
-                                                                    <XCircle size={16} className="me-2"/> Cancel Order
-                                                                </button>
-                                                            )}
-                                                        </div>
+                                                            <button
+                                                                className="dropdown-item d-flex align-items-center text-danger"
+                                                                onClick={() => handleDeleteOrder(order.id, orderNumStr)}
+                                                            >
+                                                                <X size={16} className="me-2"/> Cancel Order
+                                                            </button>
+                                                        </div>    
                                                     </div>
                                                 </div>
                                             </td>
