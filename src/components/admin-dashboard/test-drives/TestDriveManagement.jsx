@@ -401,7 +401,7 @@ const TestDriveManagement = () => {
                                                         onClick={() => handleDelete(td)}
                                                         disabled={isProcessing}
                                                     >
-                                                        <Trash size={18} />
+                                                        <i className="bx bx-trash" />
                                                     </button>
                                                     <div className="dropdown">
                                                         <button
@@ -419,7 +419,7 @@ const TestDriveManagement = () => {
                                                                     className="dropdown-item d-flex align-items-center" 
                                                                     onClick={() => handleView(td)}
                                                                 >
-                                                                    <Eye size={16} className="me-2" /> View Details
+                                                                   <i className="bx bx-show me-2" /> View Details
                                                                 </button>
                                                             </li>
                                                             <li>
@@ -427,7 +427,7 @@ const TestDriveManagement = () => {
                                                                     className="dropdown-item d-flex align-items-center" 
                                                                     onClick={() => handleEdit(td)}
                                                                 >
-                                                                    <Edit size={16} className="me-2" /> Edit Booking
+                                                                   <i className="bx bx-edit-alt me-2" /> Edit Booking
                                                                 </button>
                                                             </li>
                                                             <li>

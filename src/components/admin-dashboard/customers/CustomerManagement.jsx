@@ -3,11 +3,9 @@ import {
     Plus,
     Search,
     Edit,
-    // Trash, // [BỎ] Không cần icon Trash nữa
     AlertCircle,
     CheckCircle,
     MoreVertical,
-    Eye // [MỚI] Thêm icon Eye
 } from 'lucide-react';
 import {
     getAllCustomers,
@@ -356,7 +354,7 @@ const CustomerManagement = () => {
                                                                         className="dropdown-item d-flex align-items-center" 
                                                                         onClick={() => handleView(customer)}
                                                                     >
-                                                                        <Eye size={16} className="me-2" /> View Details
+                                                                        <i className="bx bx-show" /> View Details
                                                                     </button>
                                                                 </li>
                                                                 {/* Edit */}
@@ -365,7 +363,7 @@ const CustomerManagement = () => {
                                                                         className="dropdown-item d-flex align-items-center" 
                                                                         onClick={() => handleEdit(customer)}
                                                                     >
-                                                                        <Edit size={16} className="me-2" /> Edit
+                                                                        <i className="bx bx-edit-alt me-2" /> Edit
                                                                     </button>
                                                                 </li>
                                                             </ul>

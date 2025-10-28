@@ -457,10 +457,10 @@ export default function DealerOrderManagement() {
                                                 </button>
                                                 <div className="dropdown-menu">
                                                     <button className="dropdown-item d-flex align-items-center gap-2" onClick={() => handleEdit(order.id)}>
-                                                        <Edit size={16} className="me-1"/> Edit
+                                                       <i className="bx bx-edit-alt me-1" /> Edit
                                                     </button>
                                                     <button className="dropdown-item text-danger d-flex align-items-center gap-2" onClick={() => handleDelete(order.id)}>
-                                                        <Trash size={16} className="me-1"/> Delete
+                                                        <i className="bx bx-trash" /> Delete
                                                     </button>
                                                 </div>
                                             </div>

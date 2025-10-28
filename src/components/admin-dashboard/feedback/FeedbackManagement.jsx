@@ -148,7 +148,7 @@ const FeedbackManagement = () => {
         setCurrentPage(1);
         setStatusFilter(e.target.value);
     };
-    
+
     const handlePageSizeChange = (e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); };
     const handlePageChange = (newPage) => { if (newPage >= 1 && newPage <= totalPages) setCurrentPage(newPage); };
     
@@ -341,7 +341,7 @@ const FeedbackManagement = () => {
                                                         onClick={() => handleDelete(fb)}
                                                         disabled={isProcessing}
                                                     >
-                                                        <Trash size={18} />
+                                                        <i className="bx bx-trash" />
                                                     </button>
                                                     <div className="dropdown">
                                                         <button
@@ -359,7 +359,7 @@ const FeedbackManagement = () => {
                                                                     className="dropdown-item d-flex align-items-center" 
                                                                     onClick={() => handleView(fb)}
                                                                 >
-                                                                    <Eye size={16} className="me-2" /> View Details
+                                                                   <i className="bx bx-show me-2" /> View Details
                                                                 </button>
                                                             </li>
                                                             <li>

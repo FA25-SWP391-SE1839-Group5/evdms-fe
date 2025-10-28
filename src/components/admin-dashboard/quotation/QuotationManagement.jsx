@@ -453,7 +453,7 @@ const QuotationManagement = () => {
                                                     title="View Details"
                                                     onClick={() => handleViewDetails(quote.id)}
                                                 >
-                                                   <Eye size={18} />
+                                                    <i className="bx bx-show" />
                                                 </button>
                                             </td>
                                         </tr>
