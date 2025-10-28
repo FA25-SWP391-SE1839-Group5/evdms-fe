@@ -22,7 +22,7 @@ import SalesOrderManagement from '../components/admin-dashboard/sales-orders/Sal
 import QuotationManagement from '../components/admin-dashboard/quotation/QuotationManagement';
 import CustomerManagement from '../components/admin-dashboard/customers/CustomerManagement';
 import FeedbackManagement from '../components/admin-dashboard/feedback/FeedbackManagement';
-
+import TestDriveManagement from '../components/admin-dashboard/test-drives/TestDriveManagement';
 
 
 const AdminDashboard = ({ currentPage = 'dashboard' }) => {
@@ -101,12 +101,7 @@ const AdminDashboard = ({ currentPage = 'dashboard' }) => {
       case 'testdrives':
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
-            <h4 className="fw-bold py-3 mb-4">Test Drives</h4>
-            <div className="card">
-              <div className="card-body">
-                <p>Test drives page - Coming soon...</p>
-              </div>
-            </div>
+            <TestDriveManagement />
           </div>
         );
       
