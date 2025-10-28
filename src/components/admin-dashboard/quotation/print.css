@@ -1,0 +1,33 @@
+/* @media print chỉ áp dụng các style này KHI người dùng nhấn in */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .printable-area,
+  .printable-area * {
+    visibility: visible;
+  }
+
+  .printable-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+
+  .printable-area .card-header {
+    display: none;
+  }
+
+  .printable-area .d-flex.justify-content-between.align-items-center.p-3.border-top {
+    display: none;
+  }
+
+  .printable-area .table th:last-child, 
+  .printable-area .table td:last-child { 
+    display: none;
+  }
+}
