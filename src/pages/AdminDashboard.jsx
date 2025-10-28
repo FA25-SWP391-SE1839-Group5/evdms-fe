@@ -19,7 +19,7 @@ import VehicleInventoryManagement from '../components/admin-dashboard/vehicle/Ve
 import AuditLogManagement from '../components/admin-dashboard/audit/AuditLogManagement';
 import PromotionManagement from '../components/admin-dashboard/promotions/PromotionManagement';
 import SalesOrderManagement from '../components/admin-dashboard/sales/SalesOrderManagement';
-
+import QuotationManagement from '../components/admin-dashboard/quotation/QuotationManagement';
 
 
 
@@ -90,12 +90,7 @@ const AdminDashboard = ({ currentPage = 'dashboard' }) => {
       case 'quotations':
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
-            <h4 className="fw-bold py-3 mb-4">Quotations</h4>
-            <div className="card">
-              <div className="card-body">
-                <p>Quotations page - Coming soon...</p>
-              </div>
-            </div>
+            <QuotationManagement />
           </div>
         );
       
