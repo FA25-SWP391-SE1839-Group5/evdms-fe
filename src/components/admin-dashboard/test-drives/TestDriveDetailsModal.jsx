@@ -80,7 +80,11 @@ const TestDriveDetailsModal = ({ show, onClose, testDrive, customerMap, dealerMa
 
                     </div>
                     <div className="modal-footer">
-                        <button type="button" className="btn btn-label-secondary" onClick={onClose}>
+                        <button 
+                            type="button" 
+                            className="btn btn-secondary" 
+                            onClick={onClose}
+                        >
                             Close
                         </button>
                     </div>
