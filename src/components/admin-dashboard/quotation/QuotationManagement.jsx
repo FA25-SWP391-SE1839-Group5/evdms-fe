@@ -306,7 +306,7 @@ const QuotationManagement = () => {
                 </div>
             )}
 
-            <div className="card">
+            <div className="card printable-area">
                 {/* Header: Show, Search, Filter */}
                 <div className="card-header border-bottom">
                     <div className="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
