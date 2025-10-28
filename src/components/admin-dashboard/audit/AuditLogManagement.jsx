@@ -381,7 +381,9 @@ const AuditLogManagement = () => {
                                             </td>
                                             <td><code className="text-muted">{log.id ? log.id.slice(0, 8) + '...' : '-'}</code></td>
                                             <td><span className="badge bg-label-primary text-uppercase">{log.action || 'N/A'}</span></td>
-                                            <td>{log.description || '-'}</td>
+                                            <td style={{ whiteSpace: 'normal', maxWidth: '400px' }}>
+                                                {log.description || '-'}
+                                            </td>
                                             <td>{formatDateTimestamp(log.createdAt)}</td>
                                             <td>
                                                <button
