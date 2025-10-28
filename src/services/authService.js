@@ -10,6 +10,34 @@ export const roleRoutes = {
   evm_staff: '/vehicle-models'
 };
 
+// Decode JWT token to get payload
+const decodeJWT = (token) => {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error('Failed to decode JWT:', error);
+    return null;
+  }
+};
+
+// Normalize role from API to internal format
+const normalizeRole = (role) => {
+  if (!role) return 'admin';
+  
+  // Convert PascalCase to snake_case
+  const normalized = role
+    .replace(/([A-Z])/g, '_$1')
+    .toLowerCase()
+    .replace(/^_/, '');
+  
+  return normalized;
+};
+
 // ============================================
 // TOKEN MANAGEMENT
 // ============================================
@@ -23,12 +51,34 @@ export const saveLoginToken = (userData) => {
     throw new Error('Invalid login data');
   }
 
+  console.log('saveLoginToken - userData from API:', userData);
+  console.log('saveLoginToken - role from API:', userData.role);
+
+  // Decode JWT to get role (since API doesn't return it in response body)
+  let roleFromToken = null;
+  const decodedToken = decodeJWT(userData.accessToken);
+  if (decodedToken) {
+    console.log('saveLoginToken - decoded JWT:', decodedToken);
+    roleFromToken = decodedToken.role;
+    console.log('saveLoginToken - role from JWT:', roleFromToken);
+  }
+
+  // Use role from JWT token, fallback to API response, then default to admin
+  const role = roleFromToken || userData.role;
+
+  // Normalize role from API (e.g., "EvmStaff" -> "evm_staff")
+  const normalizedRole = normalizeRole(role);
+
+  console.log('saveLoginToken - normalized role:', normalizedRole);
+
   const user = {
     id: userData.id,
     name: userData.fullName,
     email: userData.email,
-    role: userData.role || 'admin'
+    role: normalizedRole
   };
+
+  console.log('saveLoginToken - user object to save:', user);
 
   const tokenData = {
     accessToken: userData.accessToken,
@@ -98,7 +148,10 @@ export const refreshAccessToken = async () => {
     if (response.data.success) {
       const { accessToken, id, fullName, email, role } = response.data.data;
 
-      const user = { id, name: fullName, email, role: role || 'admin' };
+      // Normalize role from API
+      const normalizedRole = normalizeRole(role);
+
+      const user = { id, name: fullName, email, role: normalizedRole };
       localStorage.setItem(TOKEN_KEY, accessToken);
       localStorage.setItem(USER_KEY, JSON.stringify(user));
       api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;

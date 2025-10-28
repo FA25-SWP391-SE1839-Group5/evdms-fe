@@ -24,26 +24,25 @@ const LoginPage = ({ onLoginSuccess }) => {
     setLoginError("");
 
     try {
-      // API returns: { accessToken, refreshToken, user: { id, email, name, role } }
+      // API returns: { accessToken, refreshToken, id, fullName, email, role }
       const userData = await validateLogin(formData.email, formData.password);
 
-      // Save token to localStorage
+      console.log('LoginPage - userData from API:', userData);
+
+      // Save token to localStorage (this will normalize the role)
       saveLoginToken(userData);
 
-      // Normalize user data for display
-      const user = {
-        id: userData.id,
-        name: userData.fullName,
-        email: userData.email,
-        role: userData.role
-      };
+      // Get the normalized user from localStorage
+      const savedUser = JSON.parse(localStorage.getItem('evdms_user'));
+      
+      console.log('LoginPage - savedUser from localStorage:', savedUser);
 
-      setUserRole(userData.user);
+      setUserRole(savedUser);
       setShowSuccess(true);
 
       // Delay redirect để show success message
       setTimeout(() => {
-        onLoginSuccess(user);
+        onLoginSuccess(savedUser);
       }, 1500);
     } catch (error) {
       setLoginError(error.message || "Invalid email or password. Please try again.");
