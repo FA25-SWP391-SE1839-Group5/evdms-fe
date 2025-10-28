@@ -18,7 +18,7 @@ import RolesPermissionsTab from '../components/admin-dashboard/users/RolesPermis
 import VehicleInventoryManagement from '../components/admin-dashboard/vehicle/VehicleInventoryManagement';
 import AuditLogManagement from '../components/admin-dashboard/audit/AuditLogManagement';
 import PromotionManagement from '../components/admin-dashboard/promotions/PromotionManagement';
-import SalesOrderManagement from '../components/admin-dashboard/sales/SalesOrderManagement';
+import SalesOrderManagement from '../components/admin-dashboard/sales-orders/SalesOrderManagement';
 import QuotationManagement from '../components/admin-dashboard/quotation/QuotationManagement';
 import CustomerManagement from '../components/admin-dashboard/customers/CustomerManagement';
 import FeedbackManagement from '../components/admin-dashboard/feedback/FeedbackManagement';
