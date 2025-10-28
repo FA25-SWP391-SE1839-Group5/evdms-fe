@@ -47,7 +47,7 @@ const TestDriveStatusModal = ({ show, onClose, onSave, currentStatus }) => {
                             </select>
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-label-secondary" onClick={onClose} disabled={isSaving}>
+                            <button type="button" className="btn btn-secondary" onClick={onClose}>
                                 Cancel
                             </button>
                             <button type="submit" className="btn btn-primary" disabled={isSaving}>
