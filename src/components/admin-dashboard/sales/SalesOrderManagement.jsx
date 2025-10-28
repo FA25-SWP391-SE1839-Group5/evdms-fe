@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { AlertCircle, Truck, Eye, CheckCircle } from 'lucide-react';
+import { AlertCircle, Truck, Eye, CheckCircle, Filter, Download, XCircle } from 'lucide-react';
 import { getAllSalesOrders, markOrderDelivered } from '../../../services/orderService';
 import { getAllDealers } from '../../../services/dealerService';
 import { getAllVehicleVariants } from '../../../services/vehicleService';
 import { getAllCustomers } from '../../../services/dashboardService';
 import SalesOrderStatsCards from './SalesOrderStatsCards';
 import SalesOrderDetailsModal from './SalesOrderDetailsModal';
+import SalesOrderFilterPanel from './SalesOrderFilterPanel';
 import { Bar } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
@@ -16,6 +17,11 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js';
+
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
+import FileSaver from 'file-saver';
 
 // Đăng ký elements
 ChartJS.register(
@@ -64,11 +70,20 @@ export default function SalesOrderManagement() {
     // Pagination & Filter State
     const [pageSize, setPageSize] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
-    const [statusFilter, setStatusFilter] = useState('');
+
     const [globalSearch, setGlobalSearch] = useState('');
+    const [exporting, setExporting] = useState(false);
 
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [viewingOrder, setViewingOrder] = useState(null);
+
+    const [showFilterPanel, setShowFilterPanel] = useState(false);
+    const [activeFilters, setActiveFilters] = useState({
+        timePeriod: 'all',
+        status: '',
+        dealerId: '',
+        region: '',
+    });
 
     const [openDropdownId, setOpenDropdownId] = useState(null);
 
@@ -123,36 +138,49 @@ export default function SalesOrderManagement() {
     
     // Filter Logic
     const filteredOrders = useMemo(() => {
+        // Báo cáo theo Khu vực (Region)
+        const dealerIdToRegionMap = dealers.reduce((acc, dealer) => {
+            acc[dealer.id] = dealer.region || 'Unknown Region';
+            return acc;
+        }, {});
+
         return orders.filter(order => {
             const customer = customerMap[order.customerId];
             const customerName = (customer?.name || order.customerId || '').toLowerCase();
-            const customerEmail = (customer?.email || '').toLowerCase();
             const dealerName = (dealerMap[order.dealerId] || '').toLowerCase();
             const variantName = (variantMap[order.variantId] || '').toLowerCase();
             const status = (order.status || '').toLowerCase();
             const date = formatDate(order.createdAt || order.updatedAt).toLowerCase();
             const id = formatOrderId(order.id).toLowerCase();
-            // const total = formatCurrency(order.totalAmount).toLowerCase(); // Nếu có totalAmount
+            const logDate = order.createdAt ? new Date(order.createdAt) : null;
+            const region = dealerIdToRegionMap[order.dealerId] || 'Unknown Region';
 
-            // Status filter first
-            if (statusFilter && status !== statusFilter.toLowerCase()) return false;
+            // --- Áp dụng Filter Panel ---
+            // Time Period
+            let matchesTime = true;
+            if (logDate && activeFilters.timePeriod !== 'all') {
+                const now = new Date();
+                const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                if (activeFilters.timePeriod === 'today') { matchesTime = logDate >= todayStart; }
+                else if (activeFilters.timePeriod === 'last7days') { const d = new Date(todayStart); d.setDate(todayStart.getDate() - 7); matchesTime = logDate >= d; }
+                else if (activeFilters.timePeriod === 'last30days') { const d = new Date(todayStart); d.setDate(todayStart.getDate() - 30); matchesTime = logDate >= d; }
+            }
+            if (!matchesTime) return false;
+            // Status
+            if (activeFilters.status && status !== activeFilters.status.toLowerCase()) return false;
+            // Dealer
+            if (activeFilters.dealerId && order.dealerId !== activeFilters.dealerId) return false;
+            // Region
+            if (activeFilters.region && region !== activeFilters.region) return false;
 
-            // Global search
+            // --- Áp dụng Global Search ---
             if (globalSearch) {
                 const searchLower = globalSearch.toLowerCase();
-                if (
-                    !id.includes(searchLower) &&
-                    !customerName.includes(searchLower) &&
-                    !customerEmail.includes(searchLower) &&
-                    !dealerName.includes(searchLower) &&
-                    !variantName.includes(searchLower) &&
-                    !date.includes(searchLower)
-                    // !total.includes(searchLower)
-                ) return false;
+                if (!id.includes(searchLower) && !customerName.includes(searchLower) && !dealerName.includes(searchLower) && !variantName.includes(searchLower) && !date.includes(searchLower)) return false;
             }
             return true;
         });
-    }, [orders, customerMap, dealerMap, variantMap, statusFilter, globalSearch]);
+    }, [orders, customerMap, dealerMap, variantMap, globalSearch, activeFilters, dealers]);
 
     // Pagination Logic
     const totalItems = filteredOrders.length;
@@ -184,7 +212,6 @@ export default function SalesOrderManagement() {
             datasets: [{ label: 'Total Sales (VND)', data: dealerDataValues, backgroundColor: 'rgba(113, 102, 240, 0.8)' }]
         };
 
-        // Báo cáo theo Khu vực (Region)
         const dealerIdToRegionMap = dealers.reduce((acc, dealer) => {
             acc[dealer.id] = dealer.region || 'Unknown Region';
             return acc;
@@ -208,7 +235,7 @@ export default function SalesOrderManagement() {
 
        return { salesByDealerChart, salesByRegionChart };
 
-   }, [filteredOrders, dealerMap, dealers]); // Phụ thuộc vào orders đã lọc và dealers
+   }, [filteredOrders, dealerMap]); // Phụ thuộc vào orders đã lọc và dealers
 
    // Cấu hình chung cho Bar Chart
    const barChartOptions = {
@@ -228,22 +255,17 @@ export default function SalesOrderManagement() {
    };
 
     // Handlers
-    const handleFilterChange = (e) => {
-        const { name, value } = e.target;
+    const handleSearchChange = (e) => {
         setCurrentPage(1);
-        if (name === 'globalSearch') setGlobalSearch(value);
-        if (name === 'statusFilter') setStatusFilter(value);
+        setGlobalSearch(e.target.value);
     };
+
     const handlePageSizeChange = (e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); };
     const handlePageChange = (newPage) => { if (newPage >= 1 && newPage <= totalPages) setCurrentPage(newPage); };
 
     const handleViewDetails = (order) => {
         setViewingOrder(order);
         setShowDetailsModal(true);
-    };
-
-    const handleDropdownToggle = (orderId) => {
-        setOpenDropdownId(prevId => (prevId === orderId ? null : orderId));
     };
 
     const handleMarkDelivered = async (orderId, orderNumStr) => {
@@ -262,6 +284,58 @@ export default function SalesOrderManagement() {
             }
         } catch (err) {
             setError(err.response?.data?.message || err.message || 'Failed to mark as delivered');
+        }
+    };
+
+    const handleApplyFilters = (newFilters) => {
+        setActiveFilters(newFilters);
+        setCurrentPage(1);
+    };
+
+    // 10. Thêm handler cho Export
+    const handleExport = (format) => {
+        setExporting(true);
+        setError(''); setSuccess('');
+
+        // Chuẩn bị dữ liệu (dựa trên filteredOrders)
+        const exportData = filteredOrders.map(order => {
+             const customer = customerMap[order.customerId];
+             return {
+                "Order #": formatOrderId(order.id),
+                "Date": formatDate(order.createdAt || order.updatedAt),
+                "Customer Name": customer?.name || order.customerId,
+                "Customer Email": customer?.email || 'N/A',
+                "Dealer": dealerMap[order.dealerId] || 'N/A',
+                "Vehicle": variantMap[order.variantId] || 'N/A',
+                "Status": order.status || 'N/A',
+                // "TotalAmount": order.totalAmount || 0 // Bỏ total amount
+             };
+        });
+
+        if (exportData.length === 0) {
+            setError("No data to export based on current filters.");
+            setExporting(false);
+            return;
+        }
+
+        try {
+            if (format === 'csv' || format === 'excel') {
+                const ws = XLSX.utils.json_to_sheet(exportData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Sales Orders");
+                const fileExtension = format === 'csv' ? 'csv' : 'xlsx';
+                const mimeType = format === 'csv' ? 'text/csv;charset=utf-8;' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+                
+                const excelBuffer = XLSX.write(wb, { bookType: fileExtension, type: 'array' });
+                const blob = new Blob([excelBuffer], { type: mimeType });
+                FileSaver.saveAs(blob, `sales-orders.${fileExtension}`);
+            }
+            // (Thêm logic cho PDF/Print nếu cần)
+            setSuccess(`Exported data as ${format.toUpperCase()}.`);
+        } catch (err) {
+            setError(`Failed to export data: ${err.message}`);
+        } finally {
+            setExporting(false);
         }
     };
 
@@ -347,7 +421,7 @@ export default function SalesOrderManagement() {
 
                         {/* Left: Show Entries */}
                         <div className="col-md-auto">
-                           <label className="d-flex align-items-center"> 
+                            <label className="d-flex align-items-center"> 
                                 Show&nbsp; 
                                 <select 
                                     className="form-select" 
@@ -360,32 +434,59 @@ export default function SalesOrderManagement() {
                                     <option>50</option> 
                                 </select> 
                             </label>
+                            <button
+                                className="btn btn-outline-secondary d-flex align-items-center"
+                                type="button"
+                                onClick={() => setShowFilterPanel(true)}
+                            >
+                               <Filter size={16} className="me-1" /> Filter
+                            </button>
                         </div>
 
-                        {/* Right: Search & Status Filter */}
+                        {/* Right: Search & Export */}
                         <div className="col-md-auto ms-auto d-flex align-items-center gap-3">
                             <input 
                                 type="search" 
                                 name="globalSearch" 
                                 value={globalSearch} 
-                                onChange={handleFilterChange} 
+                                onChange={handleSearchChange} 
                                 className="form-control" 
                                 placeholder="Search Order..." 
                                 style={{width: '200px'}} 
                             />
-                            <select 
-                                name="statusFilter" 
-                                className="form-select" 
-                                value={statusFilter} 
-                                onChange={handleFilterChange}
-                            >
-                                <option value="">All Status</option>
-                                <option value="Pending">Pending</option>
-                                <option value="Processing">Processing</option>
-                                <option value="Shipped">Shipped</option>
-                                <option value="Delivered">Delivered</option>
-                                <option value="Cancelled">Cancelled</option>
-                            </select>
+                            <div className="btn-group">
+                               <button
+                                    type="button"
+                                    className="btn btn-outline-secondary dropdown-toggle d-flex align-items-center"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                    disabled={exporting}
+                               >
+                                   <Download size={18} className="me-1" /> Export {exporting ? '...' : ''}
+                               </button>
+                               <ul className="dropdown-menu dropdown-menu-end">
+                                   <li>
+                                        <button 
+                                            type="button" 
+                                            className="dropdown-item" 
+                                            onClick={() => handleExport('csv')} 
+                                            disabled={exporting}
+                                        >
+                                            <i className='bx bx-file me-2'></i> CSV
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button 
+                                            type="button" 
+                                            className="dropdown-item" 
+                                            onClick={() => handleExport('excel')} 
+                                            disabled={exporting}
+                                        >
+                                            <i className='bx bx-file-blank me-2'></i> Excel
+                                        </button>
+                                    </li>
+                               </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -518,6 +619,15 @@ export default function SalesOrderManagement() {
                 customerMap={customerMap} // Truyền map để hiển thị tên
                 dealerMap={dealerMap}
                 variantMap={variantMap}
+            />
+
+            {/* Render Filter Panel */}
+            <SalesOrderFilterPanel
+                show={showFilterPanel}
+                onClose={() => setShowFilterPanel(false)}
+                currentFilters={activeFilters}
+                onApplyFilters={handleApplyFilters}
+                dealers={dealers} // Truyền danh sách dealers
             />
         </>
     )
