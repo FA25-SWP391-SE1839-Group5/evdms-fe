@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { AlertCircle, Search, Eye } from 'lucide-react';
+import { AlertCircle, Search, Eye, CheckCircle } from 'lucide-react';
 import {
     getAllQuotations,
     getAllDealers,
     // getAllVehicleVariants, // Lấy từ vehicleService hoặc service khác
     getAllCustomers
-} from '../../../services/dashboardService'; // Giả sử getAllCustomers ở đây
-import { getAllVehicleVariants } from '../../../services/vehicleService'; // Giả sử bạn có file này
+} from '../../../services/dashboardService'; 
+import { getAllVehicleVariants } from '../../../services/vehicleService'; 
+import QuotationStatsCards from './QuotationStatsCards';
 
 // --- Helper Functions ---
 const formatQuoteId = (id) => `#${id?.slice(-6).toUpperCase() || 'N/A'}`;
@@ -39,6 +40,7 @@ const QuotationManagement = () => {
     const [variantMap, setVariantMap] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
     // Pagination & Filter State
     const [pageSize, setPageSize] = useState(10);
@@ -90,11 +92,11 @@ const QuotationManagement = () => {
 
     // Auto-hide alerts
     useEffect(() => {
-        if (error) {
-           const timer = setTimeout(() => { setError(''); }, 5000);
+        if (error || success) {
+           const timer = setTimeout(() => { setError(''); setSuccess(''); }, 5000);
            return () => clearTimeout(timer);
          }
-    }, [error]);
+    }, [error, success]);
 
     // Filter Logic
     const filteredQuotations = useMemo(() => {
@@ -150,16 +152,17 @@ const QuotationManagement = () => {
 
     return (
         <>
-            <h4 className="fw-bold py-3 mb-4">
-              <span className="text-muted fw-light">Vehicle Management /</span> Quotations
-            </h4>
-
-            {/* Có thể thêm Stats Cards ở đây */}
-
+            {/* Stats Cards */}
+            <QuotationStatsCards quotations={quotations} />
             {error && (
                 <div className="alert alert-danger alert-dismissible d-flex align-items-center mb-4" role="alert">
-                  <AlertCircle size={20} className="me-2" /><div className="flex-grow-1">{error}</div>
-                  <button type="button" className="btn-close" onClick={() => setError('')}></button>
+                    <AlertCircle size={20} className="me-2" />
+                    <div className="flex-grow-1">{error}</div>
+                    <button 
+                        type="button" 
+                        className="btn-close" 
+                        onClick={() => setError('')}
+                    ></button>
                 </div>
             )}
 
