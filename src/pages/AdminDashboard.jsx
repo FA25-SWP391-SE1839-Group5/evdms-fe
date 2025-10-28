@@ -23,7 +23,7 @@ import QuotationManagement from '../components/admin-dashboard/quotation/Quotati
 import CustomerManagement from '../components/admin-dashboard/customers/CustomerManagement';
 import FeedbackManagement from '../components/admin-dashboard/feedback/FeedbackManagement';
 import TestDriveManagement from '../components/admin-dashboard/test-drives/TestDriveManagement';
-
+import PaymentManagement from '../components/admin-dashboard/payments/PaymentManagement';
 
 const AdminDashboard = ({ currentPage = 'dashboard' }) => {
   const renderPageContent = () => {
@@ -108,12 +108,7 @@ const AdminDashboard = ({ currentPage = 'dashboard' }) => {
       case 'payments':
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
-            <h4 className="fw-bold py-3 mb-4">Payments</h4>
-            <div className="card">
-              <div className="card-body">
-                <p>Payments page - Coming soon...</p>
-              </div>
-            </div>
+            <PaymentManagement />
           </div>
         );
       
