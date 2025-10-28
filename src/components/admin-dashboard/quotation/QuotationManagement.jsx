@@ -260,7 +260,7 @@ const QuotationManagement = () => {
                                                     type="button"
                                                     className="btn btn-sm btn-icon btn-text-secondary rounded-pill"
                                                     title="View Details"
-                                                    onClick={() => handleViewDetails(quote)}
+                                                    onClick={() => handleViewDetails(quote.id)}
                                                 >
                                                    <Eye size={18} />
                                                 </button>
