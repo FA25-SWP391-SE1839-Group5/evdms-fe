@@ -7,7 +7,7 @@ const StatCard = ({ title, value, icon, colorClass }) => (
             <div className="card-body">
                 <div className="d-flex justify-content-between align-items-center">
                     <div className="card-title mb-0">
-                        <h5 className="mb-1">{value}</h5>
+                        <h4 className="mb-1">{value}</h4>
                         <small>{title}</small>
                     </div>
                     <div className={`avatar-initial bg-label-${colorClass} rounded`}>
