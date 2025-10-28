@@ -34,6 +34,7 @@ const CustomerManagement = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [isProcessing, setIsProcessing] = useState(false);
 
     // Pagination & Filter
     const [pageSize, setPageSize] = useState(10);
@@ -152,6 +153,7 @@ const CustomerManagement = () => {
     const handleModalSave = async (formData) => {
         setError('');
         setSuccess('');
+        setIsProcessing(true);
         try {
             if (formData.id) {
                 await updateCustomer(formData.id, formData);
@@ -166,6 +168,8 @@ const CustomerManagement = () => {
             const errMsg = err.response?.data?.message || err.message || 'Failed to save customer';
             setError(errMsg);
             throw err;
+        } finally {
+            setIsProcessing(false); // [MỚI]
         }
     };
 
@@ -180,9 +184,26 @@ const CustomerManagement = () => {
         setViewingCustomer(null);
     };
 
-    // [BỎ] Delete Handlers
-    // const handleDelete = (id) => { ... };
-    // const handleConfirmDelete = async () => { ... };
+    const handleDelete = async (customer) => {
+        const customerName = customer.fullName || 'this customer';
+        
+        // Dùng confirm dialog của trình duyệt
+        if (window.confirm(`Are you sure you want to delete "${customerName}"?`)) {
+            setIsProcessing(true);
+            setError('');
+            setSuccess('');
+            try {
+                await deleteCustomer(customer.id);
+                setSuccess('Customer deleted successfully!');
+                await fetchData(); // Refetch data
+            } catch (err) {
+                const errMsg = err.response?.data?.message || err.message || 'Failed to delete customer';
+                setError(errMsg);
+            } finally {
+                setIsProcessing(false);
+            }
+        }
+    };
     
     // --- Render ---
 
@@ -258,6 +279,7 @@ const CustomerManagement = () => {
                                             type="checkbox" 
                                             onChange={handleSelectAll}
                                             checked={paginatedCustomers.length > 0 && selectedCustomers.size === paginatedCustomers.length}
+                                            disabled={isProcessing}
                                         />
                                     </th>
                                     <th>Customer</th>
@@ -306,35 +328,48 @@ const CustomerManagement = () => {
                                             
                                                 {/* Actions Dropdown */}
                                                 <td>
-                                                    <div className="dropdown">
+                                                    <div className="d-flex gap-1">
+                                                        {/* Delete Button */}
                                                         <button
                                                             type="button"
-                                                            className="btn btn-sm btn-icon btn-text-secondary rounded-pill"
-                                                            data-bs-toggle="dropdown"
-                                                            aria-expanded="false"
+                                                            className="btn btn-sm btn-icon btn-text-danger rounded-pill"
+                                                            title="Delete"
+                                                            onClick={() => handleDelete(customer)}
+                                                            disabled={isProcessing}
                                                         >
-                                                            <MoreVertical size={18} />
+                                                            <i className="bx bx-trash" />
                                                         </button>
-                                                        <ul className="dropdown-menu dropdown-menu-end">
-                                                            {/* Nút View */}
-                                                            <li>
-                                                                <button 
-                                                                    className="dropdown-item d-flex align-items-center" 
-                                                                    onClick={() => handleView(customer)}
-                                                                >
-                                                                    <Eye size={16} className="me-2" /> View Details
-                                                                </button>
-                                                            </li>
-                                                            {/* Edit */}
-                                                            <li>
-                                                                <button 
-                                                                    className="dropdown-item d-flex align-items-center" 
-                                                                    onClick={() => handleEdit(customer)}
-                                                                >
-                                                                    <Edit size={16} className="me-2" /> Edit
-                                                                </button>
-                                                            </li>
-                                                        </ul>
+                                                        <div className="dropdown">
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-sm btn-icon btn-text-secondary rounded-pill"
+                                                                data-bs-toggle="dropdown"
+                                                                aria-expanded="false"
+                                                                disabled={isProcessing}
+                                                            >
+                                                                <MoreVertical size={18} />
+                                                            </button>
+                                                            <ul className="dropdown-menu dropdown-menu-end">
+                                                                {/* Nút View */}
+                                                                <li>
+                                                                    <button 
+                                                                        className="dropdown-item d-flex align-items-center" 
+                                                                        onClick={() => handleView(customer)}
+                                                                    >
+                                                                        <Eye size={16} className="me-2" /> View Details
+                                                                    </button>
+                                                                </li>
+                                                                {/* Edit */}
+                                                                <li>
+                                                                    <button 
+                                                                        className="dropdown-item d-flex align-items-center" 
+                                                                        onClick={() => handleEdit(customer)}
+                                                                    >
+                                                                        <Edit size={16} className="me-2" /> Edit
+                                                                    </button>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
                                                     </div>
                                                 </td>
                                             </tr>

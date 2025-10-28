@@ -55,7 +55,11 @@ const CustomerDetailsModal = ({ show, onClose, customer }) => {
                         <DetailItem label="Address" value={customer.address} />
                     </div>
                     <div className="modal-footer">
-                        <button type="button" className="btn btn-label-secondary" onClick={onClose}>
+                        <button 
+                            type="button" 
+                            className="btn btn-secondary" 
+                            onClick={onClose}
+                        >
                             Close
                         </button>
                     </div>
