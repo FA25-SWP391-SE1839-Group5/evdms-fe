@@ -1,7 +1,5 @@
-// File: components/admin-dashboard/quotations/QuotationManagement.jsx
 import React, { useState, useEffect, useMemo } from 'react';
 import { AlertCircle, Search, Eye } from 'lucide-react';
-// Import các service cần thiết từ service file của bạn
 import {
     getAllQuotations,
     getAllDealers,
@@ -170,11 +168,36 @@ const QuotationManagement = () => {
                 <div className="card-header border-bottom">
                     <div className="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
                         <div className="col-md-auto">
-                           <label className="d-flex align-items-center"> Show&nbsp; <select className="form-select form-select-sm" value={pageSize} onChange={handlePageSizeChange} style={{width:'auto'}}> <option value="10">10</option><option value="25">25</option><option value="50">50</option> </select> </label>
+                           <label className="d-flex align-items-center"> 
+                                Show &nbsp; 
+                                <select 
+                                    className="form-select" 
+                                    value={pageSize} 
+                                    onChange={handlePageSizeChange} 
+                                    style={{width:'auto'}}
+                                > 
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option> 
+                                </select> 
+                            </label>
                         </div>
                         <div className="col-md-auto ms-auto d-flex align-items-center gap-3">
-                             <input type="search" name="globalSearch" value={globalSearch} onChange={handleFilterChange} className="form-control" placeholder="Search..." style={{width: '200px'}} />
-                             <select name="statusFilter" className="form-select" value={statusFilter} onChange={handleFilterChange}>
+                            <input 
+                                type="search" 
+                                name="globalSearch" 
+                                value={globalSearch} 
+                                onChange={handleFilterChange} 
+                                className="form-control" 
+                                placeholder="Search..." 
+                                style={{width: '200px'}} 
+                            />
+                            <select 
+                                name="statusFilter" 
+                                className="form-select" 
+                                value={statusFilter} 
+                                onChange={handleFilterChange}
+                            >
                                 <option value="">All Status</option>
                                 <option value="Draft">Draft</option>
                                 <option value="Pending">Pending</option>
@@ -214,7 +237,9 @@ const QuotationManagement = () => {
                                             <td>
                                                 {customer ? (
                                                      <div className="d-flex justify-content-start align-items-center">
-                                                        <div className="avatar avatar-sm me-3"> <span className="avatar-initial rounded-circle bg-label-secondary">{getAvatarInitials(customer.name)}</span> </div>
+                                                        <div className="avatar avatar-sm me-3"> 
+                                                            <span className="avatar-initial rounded-circle bg-label-secondary">{getAvatarInitials(customer.name)}</span> 
+                                                        </div>
                                                         <div className="d-flex flex-column">
                                                             <span className="fw-semibold">{customer.name}</span>
                                                             <small className="text-muted">{customer.email || 'No Email'}</small>
@@ -248,10 +273,30 @@ const QuotationManagement = () => {
                     <small className="text-muted">Showing {startEntry} to {endEntry} of {totalItems} entries</small>
                      <nav>
                         <ul className="pagination pagination-sm mb-0">
-                            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}> <button className="page-link" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>&laquo;</button> </li>
-                            <li className="page-item active"><span className="page-link">{currentPage}</span></li>
-                            <li className="page-item disabled"><span className="page-link text-muted">of {totalPages}</span></li>
-                            <li className={`page-item ${currentPage >= totalPages ? 'disabled' : ''}`}> <button className="page-link" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage >= totalPages}>&raquo;</button> </li>
+                            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}> 
+                                <button 
+                                    className="page-link" 
+                                    onClick={() => handlePageChange(currentPage - 1)} 
+                                    disabled={currentPage === 1}
+                                >
+                                    &laquo;
+                                </button> 
+                            </li>
+                            <li className="page-item active">
+                                <span className="page-link">{currentPage}</span>
+                            </li>
+                            <li className="page-item disabled">
+                                <span className="page-link text-muted">of {totalPages}</span>
+                                </li>
+                            <li className={`page-item ${currentPage >= totalPages ? 'disabled' : ''}`}> 
+                                <button 
+                                    className="page-link" 
+                                    onClick={() => handlePageChange(currentPage + 1)} 
+                                    disabled={currentPage >= totalPages}
+                                >
+                                    &raquo;
+                                </button> 
+                            </li>
                         </ul>
                     </nav>
                 </div>
