@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
-const TestDriveFilterPanel = ({ show, onClose, onApplyFilters, currentFilters, dealerMap }) => {
+const TestDriveFilterPanel = ({ 
+    show, 
+    onClose, 
+    onApplyFilters, 
+    currentFilters, 
+    dealerMap, 
+    customerMap, // [MỚI]
+    variantMap  // [MỚI]
+}) => {
     
+    // [CẬP NHẬT] Thêm state cho các filter mới
     const [localFilters, setLocalFilters] = useState(currentFilters);
 
-    // Cập nhật state nội bộ khi filter bên ngoài thay đổi
     useEffect(() => {
         setLocalFilters(currentFilters);
     }, [currentFilters, show]);
@@ -16,13 +24,21 @@ const TestDriveFilterPanel = ({ show, onClose, onApplyFilters, currentFilters, d
     };
 
     const handleApply = () => {
-        onApplyFilters(localFilters); // Gửi state nội bộ ra ngoài
+        onApplyFilters(localFilters);
     };
 
     const handleClear = () => {
-        const clearedFilters = { dealerId: '', status: '' };
+        // [CẬP NHẬT] Xóa tất cả filter
+        const clearedFilters = { 
+            dealerId: '', 
+            status: '', 
+            customerId: '', 
+            variantId: '',
+            startDate: '',
+            endDate: ''
+        };
         setLocalFilters(clearedFilters);
-        onApplyFilters(clearedFilters); // Gửi state đã clear ra ngoài
+        onApplyFilters(clearedFilters);
     };
 
     return (
@@ -41,23 +57,32 @@ const TestDriveFilterPanel = ({ show, onClose, onApplyFilters, currentFilters, d
                     ></button>
                 </div>
                 <div className="offcanvas-body">
-                    
-                    <div className="mb-3">
-                        <label htmlFor="filterDealerId" className="form-label">Dealer</label>
-                        <select
-                            id="filterDealerId"
-                            name="dealerId"
-                            className="form-select"
-                            value={localFilters.dealerId}
-                            onChange={handleChange}
-                        >
-                            <option value="">All Dealers</option>
-                            {Object.entries(dealerMap).map(([id, name]) => (
-                                <option key={id} value={id}>{name}</option>
-                            ))}
-                        </select>
+                    <div className="row">
+                        <div className="col-6 mb-3">
+                            <label htmlFor="filterStartDate" className="form-label">From Date</label>
+                            <input
+                                type="date"
+                                id="filterStartDate"
+                                name="startDate"
+                                className="form-control"
+                                value={localFilters.startDate || ''}
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div className="col-6 mb-3">
+                            <label htmlFor="filterEndDate" className="form-label">To Date</label>
+                            <input
+                                type="date"
+                                id="filterEndDate"
+                                name="endDate"
+                                className="form-control"
+                                value={localFilters.endDate || ''}
+                                onChange={handleChange}
+                            />
+                        </div>
                     </div>
 
+                    {/* Lọc theo Status */}
                     <div className="mb-3">
                         <label htmlFor="filterStatus" className="form-label">Status</label>
                         <select
@@ -74,13 +99,65 @@ const TestDriveFilterPanel = ({ show, onClose, onApplyFilters, currentFilters, d
                         </select>
                     </div>
 
+                    {/* Lọc theo Dealer */}
+                    <div className="mb-3">
+                        <label htmlFor="filterDealerId" className="form-label">Dealer</label>
+                        <select
+                            id="filterDealerId"
+                            name="dealerId"
+                            className="form-select"
+                            value={localFilters.dealerId}
+                            onChange={handleChange}
+                        >
+                            <option value="">All Dealers</option>
+                            {Object.entries(dealerMap).map(([id, name]) => (
+                                <option key={id} value={id}>{name}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* [MỚI] Lọc theo Customer */}
+                    <div className="mb-3">
+                        <label htmlFor="filterCustomerId" className="form-label">Customer</label>
+                        <select
+                            id="filterCustomerId"
+                            name="customerId"
+                            className="form-select"
+                            value={localFilters.customerId}
+                            onChange={handleChange}
+                        >
+                            <option value="">All Customers</option>
+                            {Object.entries(customerMap).map(([id, name]) => (
+                                <option key={id} value={id}>{name}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* [MỚI] Lọc theo Vehicle */}
+                    <div className="mb-3">
+                        <label htmlFor="filterVariantId" className="form-label">Vehicle</label>
+                        <select
+                            id="filterVariantId"
+                            name="variantId"
+                            className="form-select"
+                            value={localFilters.variantId}
+                            onChange={handleChange}
+                        >
+                            <option value="">All Vehicles</option>
+                            {Object.entries(variantMap).map(([id, name]) => (
+                                <option key={id} value={id}>{name}</option>
+                            ))}
+                        </select>
+                    </div>
+
+
                     <div className="d-flex justify-content-between mt-4">
                         <button 
                             type="button" 
                             className="btn btn-secondary" 
                             onClick={onClose}
                         >
-                            Clear
+                            Clear all
                         </button>
                         <button 
                             type="button" 

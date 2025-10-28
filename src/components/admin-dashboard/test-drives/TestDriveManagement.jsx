@@ -65,7 +65,11 @@ const TestDriveManagement = () => {
     const [globalSearch, setGlobalSearch] = useState('');
     const [activeFilters, setActiveFilters] = useState({
         dealerId: '',
-        status: ''
+        status: '',
+        customerId: '',
+        variantId: '',
+        startDate: '',
+        endDate: ''
     });
     const [showFilterPanel, setShowFilterPanel] = useState(false); // State cho panel
 
@@ -127,12 +131,30 @@ const TestDriveManagement = () => {
 
     // Filter Logic
     const filteredTestDrives = useMemo(() => {
+        // [MỚI] Chuyển đổi date filter một lần
+        const startDateFilter = activeFilters.startDate ? new Date(activeFilters.startDate) : null;
+        if (startDateFilter) startDateFilter.setHours(0, 0, 0, 0); // Bắt đầu ngày
+
+        const endDateFilter = activeFilters.endDate ? new Date(activeFilters.endDate) : null;
+        if (endDateFilter) endDateFilter.setHours(23, 59, 59, 999); // Kết thúc ngày
+
         return testDrives.filter(td => {
+            // Lọc theo Panel
             if (activeFilters.dealerId && td.dealerId !== activeFilters.dealerId) return false;
+            if (activeFilters.customerId && td.customerId !== activeFilters.customerId) return false;
+            if (activeFilters.variantId && td.variantId !== activeFilters.variantId) return false;
             
             const status = (td.status || '').toLowerCase();
             if (activeFilters.status && status !== activeFilters.status.toLowerCase()) return false;
 
+            // Lọc theo Date Range
+            if (startDateFilter || endDateFilter) {
+                const scheduledDate = new Date(td.scheduledAt);
+                if (startDateFilter && scheduledDate < startDateFilter) return false;
+                if (endDateFilter && scheduledDate > endDateFilter) return false;
+            }
+
+            // Lọc theo Search
             const searchLower = globalSearch.toLowerCase();
             if (searchLower) {
                 const customerName = (customerMap[td.customerId] || '').toLowerCase();
@@ -254,6 +276,8 @@ const TestDriveManagement = () => {
             }
         }
     };
+
+    const activeFilterCount = Object.values(activeFilters).filter(Boolean).length;
     
     // --- Render ---
     if (loading) {
@@ -322,6 +346,11 @@ const TestDriveManagement = () => {
                             >
                                 <Filter size={16} className="me-1" />
                                     Filters
+                                {activeFilterCount > 0 && (
+                                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                        {activeFilterCount}
+                                    </span>
+                                )}
                             </button>
 
                             <div className="input-group" style={{ minWidth: '200px' }}>
@@ -354,7 +383,7 @@ const TestDriveManagement = () => {
                         <tbody className="table-border-bottom-0">
                             {paginatedTestDrives.length === 0 ? (
                                 <tr><td colSpan="6" className="text-center py-4">
-                                    {totalItems === 0 && !globalSearch && !activeFilters.dealerId && !activeFilters.status
+                                    {totalItems === 0 && !globalSearch && !activeFilterCount.dealerId && !activeFilters.status
                                         ? 'No test drives found.' 
                                         : 'No test drives match your filters.'}
                                 </td></tr>
@@ -395,8 +424,10 @@ const TestDriveManagement = () => {
                                                         <i className="bx bx-trash" />
                                                     </button>
                                                     <button 
-                                                        className="btn btn-sm btn-icon btn-text-danger rounded-pill" 
+                                                        className="btn btn-sm btn-icon btn-text-secondary rounded-pill"
+                                                        title="Update Status"
                                                         onClick={() => handleEditStatus(td)}
+                                                        disabled={isProcessing}
                                                     >
                                                         <Edit size={16} />
                                                     </button>
@@ -490,6 +521,8 @@ const TestDriveManagement = () => {
                 onApplyFilters={handleApplyFilters}
                 currentFilters={activeFilters}
                 dealerMap={dealerMap}
+                customerMap={customerMap} 
+                variantMap={variantMap} 
             />
 
             {(showViewModal || showStatusModal || showFormModal) && <div className="modal-backdrop fade show"></div>}
