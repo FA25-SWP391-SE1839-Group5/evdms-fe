@@ -4,8 +4,7 @@ import {
     AlertCircle,
     CheckCircle,
     MoreVertical,
-    Eye,
-    Trash,
+    Filter,
     Edit,
     Plus
 } from 'lucide-react';
@@ -25,6 +24,7 @@ import TestDriveStatsCards from './TestDriveStatsCards';
 import TestDriveDetailsModal from './TestDriveDetailsModal';
 import TestDriveStatusModal from './TestDriveStatusModal';
 import TestDriveFormModal from './TestDriveFormModal';
+import TestDriveFilterPanel from './TestDriveFilterPanel';
 
 // --- Helper Functions ---
 const getAvatarInitials = (name) => {
@@ -63,8 +63,11 @@ const TestDriveManagement = () => {
     const [pageSize, setPageSize] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     const [globalSearch, setGlobalSearch] = useState('');
-    const [statusFilter, setStatusFilter] = useState('');
-    const [dealerFilter, setDealerFilter] = useState('');
+    const [activeFilters, setActiveFilters] = useState({
+        dealerId: '',
+        status: ''
+    });
+    const [showFilterPanel, setShowFilterPanel] = useState(false); // State cho panel
 
     // Modal States
     const [showViewModal, setShowViewModal] = useState(false);
@@ -125,10 +128,10 @@ const TestDriveManagement = () => {
     // Filter Logic
     const filteredTestDrives = useMemo(() => {
         return testDrives.filter(td => {
-            if (dealerFilter && td.dealerId !== dealerFilter) return false;
+            if (activeFilters.dealerId && td.dealerId !== activeFilters.dealerId) return false;
             
             const status = (td.status || '').toLowerCase();
-            if (statusFilter && status !== statusFilter.toLowerCase()) return false;
+            if (activeFilters.status && status !== activeFilters.status.toLowerCase()) return false;
 
             const searchLower = globalSearch.toLowerCase();
             if (searchLower) {
@@ -145,7 +148,7 @@ const TestDriveManagement = () => {
             }
             return true;
         });
-    }, [testDrives, globalSearch, statusFilter, dealerFilter, customerMap, dealerMap, variantMap]);
+    }, [testDrives, globalSearch, activeFilters, customerMap, dealerMap, variantMap]);
 
     // Pagination Logic
     const totalItems = filteredTestDrives.length;
@@ -159,10 +162,13 @@ const TestDriveManagement = () => {
 
     // --- Handlers ---
     const handleFilterChange = (e) => { setCurrentPage(1); setGlobalSearch(e.target.value); };
-    const handleStatusFilterChange = (e) => { setCurrentPage(1); setStatusFilter(e.target.value); };
-    const handleDealerFilterChange = (e) => { setCurrentPage(1); setDealerFilter(e.target.value); };
     const handlePageSizeChange = (e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); };
     const handlePageChange = (newPage) => { if (newPage >= 1 && newPage <= totalPages) setCurrentPage(newPage); };
+    const handleApplyFilters = (newFilters) => {
+        setCurrentPage(1);
+        setActiveFilters(newFilters);
+        setShowFilterPanel(false); // Ẩn panel sau khi apply
+    };
     
     // View Modal
     const handleView = (td) => {
@@ -307,31 +313,16 @@ const TestDriveManagement = () => {
 
                         {/* Search & Filter (BÊN PHẢI) */}
                         <div className="col-md-auto ms-auto d-flex align-items-center gap-3">
-                            <select 
-                                className="form-select" 
-                                value={dealerFilter} 
-                                onChange={handleDealerFilterChange}
+                            {/* [MỚI] Nút Filter */}
+                            <button
+                                type="button"
+                                className="btn btn-outline-secondary d-flex align-items-center"
+                                onClick={() => setShowFilterPanel(true)}
                                 disabled={isProcessing}
-                                style={{width: '180px'}}
                             >
-                                <option value="">All Dealers</option>
-                                {Object.entries(dealerMap).map(([id, name]) => (
-                                    <option key={id} value={id}>{name}</option>
-                                ))}
-                            </select>
-
-                            <select 
-                                className="form-select" 
-                                value={statusFilter} 
-                                onChange={handleStatusFilterChange}
-                                disabled={isProcessing}
-                                style={{width: '150px'}}
-                            >
-                                <option value="">All Status</option>
-                                <option value="Scheduled">Scheduled</option>
-                                <option value="Completed">Completed</option>
-                                <option value="Cancelled">Cancelled</option>
-                            </select>
+                                <Filter size={16} className="me-1" />
+                                    Filters
+                            </button>
 
                             <div className="input-group" style={{ minWidth: '200px' }}>
                                 <span className="input-group-text"><Search size={16} /></span>
@@ -363,7 +354,7 @@ const TestDriveManagement = () => {
                         <tbody className="table-border-bottom-0">
                             {paginatedTestDrives.length === 0 ? (
                                 <tr><td colSpan="6" className="text-center py-4">
-                                    {totalItems === 0 && !globalSearch && !statusFilter && !dealerFilter
+                                    {totalItems === 0 && !globalSearch && !activeFilters.dealerId && !activeFilters.status
                                         ? 'No test drives found.' 
                                         : 'No test drives match your filters.'}
                                 </td></tr>
@@ -403,6 +394,12 @@ const TestDriveManagement = () => {
                                                     >
                                                         <i className="bx bx-trash" />
                                                     </button>
+                                                    <button 
+                                                        className="btn btn-sm btn-icon btn-text-danger rounded-pill" 
+                                                        onClick={() => handleEditStatus(td)}
+                                                    >
+                                                        <Edit size={16} />
+                                                    </button>
                                                     <div className="dropdown">
                                                         <button
                                                             type="button"
@@ -428,14 +425,6 @@ const TestDriveManagement = () => {
                                                                     onClick={() => handleEdit(td)}
                                                                 >
                                                                    <i className="bx bx-edit-alt me-2" /> Edit Booking
-                                                                </button>
-                                                            </li>
-                                                            <li>
-                                                                <button 
-                                                                    className="dropdown-item d-flex align-items-center" 
-                                                                    onClick={() => handleEditStatus(td)}
-                                                                >
-                                                                    <Edit size={16} className="me-2" /> Update Status
                                                                 </button>
                                                             </li>
                                                         </ul>
@@ -493,6 +482,14 @@ const TestDriveManagement = () => {
                 customerMap={customerMap}
                 dealerMap={dealerMap}
                 variantMap={variantMap}
+            />
+
+            <TestDriveFilterPanel
+                show={showFilterPanel}
+                onClose={() => setShowFilterPanel(false)}
+                onApplyFilters={handleApplyFilters}
+                currentFilters={activeFilters}
+                dealerMap={dealerMap}
             />
 
             {(showViewModal || showStatusModal || showFormModal) && <div className="modal-backdrop fade show"></div>}
