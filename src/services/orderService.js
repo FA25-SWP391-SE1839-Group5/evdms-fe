@@ -31,3 +31,18 @@ export const markOrderDelivered = (id) => {
     console.log(`📡 API Call: POST /api/sales-orders/${id}/deliver`);
     return api.post(`/sales-orders/${id}/deliver`); // Có thể không cần body
 };
+
+/**
+ * DELETE SALES ORDER
+ * @param {string|number} id
+ */
+export const deleteOrder = async (id) => {
+    try {
+        // API endpoint này khớp với API của bạn
+        const response = await api.delete(`/sales-orders/${id}`);
+        return response.data; // Giả định trả về { success: true }
+    } catch (error) {
+        console.error('Error deleting order:', error);
+        throw error;
+    }
+};
