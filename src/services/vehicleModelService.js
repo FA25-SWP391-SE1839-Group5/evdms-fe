@@ -4,10 +4,35 @@ import api from "./api";
 // VEHICLE MODEL CRUD
 // ============================================
 
-export const getAllVehicleModels = async () => {
+export const getAllVehicleModels = async (params = {}) => {
   try {
-    const response = await api.get("/vehicle-models");
-    return response.data?.data?.items || [];
+    const {
+      page = 1,
+      pageSize = 10,
+      sortBy = '',
+      sortOrder = '',
+      search = '',
+      filters = ''
+    } = params;
+
+    // Build query string
+    const queryParams = new URLSearchParams();
+    queryParams.append('page', page.toString());
+    queryParams.append('pageSize', pageSize.toString());
+    if (sortBy) queryParams.append('sortBy', sortBy);
+    if (sortOrder) queryParams.append('sortOrder', sortOrder);
+    if (search) queryParams.append('search', search);
+    if (filters) queryParams.append('filters', filters);
+
+    const response = await api.get(`/vehicle-models?${queryParams.toString()}`);
+    
+    // Return full response data structure
+    return {
+      items: response.data?.data?.items || [],
+      totalResults: response.data?.data?.totalResults || 0,
+      page: response.data?.data?.page || 1,
+      pageSize: response.data?.data?.pageSize || 10
+    };
   } catch (error) {
     console.error("Error fetching vehicle models:", error);
     throw error;
@@ -17,7 +42,7 @@ export const getAllVehicleModels = async () => {
 export const getVehicleModelById = async (id) => {
   try {
     const response = await api.get(`/vehicle-models/${id}`);
-    return response.data;
+    return response.data?.data || response.data;
   } catch (error) {
     console.error("Error fetching vehicle model:", error);
     throw error;
@@ -81,7 +106,7 @@ export const deleteVehicleModel = async (id) => {
 export const uploadVehicleImage = async (file) => {
   try {
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append("Image", file); // Note: Capital 'I' as per API spec
 
     const response = await api.post("/vehicle-models/upload-image", formData, {
       headers: {
@@ -89,8 +114,8 @@ export const uploadVehicleImage = async (file) => {
       },
     });
 
-    // Response structure: { success: true, imageUrl: "...", message: "..." }
-    return response.data;
+    // Response structure: { success: true, message: "...", data: { imageUrl: "..." } }
+    return response.data?.data || response.data;
   } catch (error) {
     console.error("Error uploading image:", error);
     throw error;
