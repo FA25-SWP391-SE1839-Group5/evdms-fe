@@ -303,7 +303,7 @@ export default function SalesOrderManagement() {
                 </div>
             )}
 
-            {/* 6. Chart */}
+            {/* Chart */}
             <div className="row g-4 mb-4">
 
                 {/* Sales by Dealer Chart */}
@@ -434,54 +434,42 @@ export default function SalesOrderManagement() {
                                             <td><RenderSalesOrderStatus status={order.status} /></td>
                                             <td>
                                                 <div className="d-flex align-items-center">
-                                                
-                                                    {/* Actions: View Details */}
-                                                    <button
-                                                        type="button"
-                                                        className="btn btn-sm btn-icon btn-text-secondary rounded-pill"
-                                                        title="View Details"
+                                                    {/* View */}
+                                                    <button 
+                                                        type="button" 
+                                                        className="btn btn-icon btn-text-secondary rounded-pill btn-sm"
+                                                        title="View"
                                                         onClick={() => handleViewDetails(order)}
                                                     >
-                                                        <Eye size={18} />
+                                                        <i className="bx bx-show" /> 
                                                     </button>
-                                                    {/* More Actions Dropdown */}
-                                                    <div className="dropdown">
+
+                                                    {/* Menu */}
+                                                    <div className="dropdown position-relative">
                                                         <button 
                                                             type="button" 
                                                             className="btn p-0 dropdown-toggle hide-arrow btn-sm" 
-                                                            onClick={() => handleDropdownToggle(order.id)}
+                                                            data-bs-toggle="dropdown"
+                                                            aria-expanded="false"
                                                         >
-                                                            <i className="bx bx-dots-vertical-rounded"></i>
+                                                            <i className="bx bx-dots-vertical-rounded" />
                                                         </button>
-                                                        {/* Menu (Tự quản lý bằng state 'show') */}
-                                                        <div className={`dropdown-menu dropdown-menu-end ${openDropdownId === order.id ? 'show' : ''}`}>
+                                                        <div className="dropdown-menu dropdown-menu-end">
                                                             {!isDeliveredOrCancelled && (
-                                                                <button
-                                                                    className="dropdown-item d-flex align-items-center"
+                                                                <button 
+                                                                    type="button" 
+                                                                    className="dropdown-item" 
                                                                     onClick={() => handleMarkDelivered(order.id, orderNumStr)}
                                                                 >
                                                                     <Truck size={16} className="me-2 text-success"/> Mark Delivered
                                                                 </button>
                                                             )}
-                                                            {/* Thêm các action khác nếu cần */}
+                                                            {!isDeliveredOrCancelled && (
+                                                                <button className="dropdown-menu dropdown-menu-end">
+                                                                    <XCircle size={16} className="me-2"/> Cancel Order
+                                                                </button>
+                                                            )}
                                                         </div>
-                                                    </div>
-                                                    <div className="dropdown-menu dropdown-menu-end">
-                                                        {/* Chỉ hiển thị nếu chưa delivered hoặc cancelled */}
-                                                        {!isDeliveredOrCancelled && (
-                                                            <button
-                                                                className="dropdown-item d-flex align-items-center"
-                                                                onClick={() => handleMarkDelivered(order.id, orderNumStr)}
-                                                            >
-                                                                <Truck size={16} className="me-2 text-success"/> Mark Delivered
-                                                            </button>
-                                                        )}
-                                                        {/* Thêm action khác ở đây, ví dụ Cancel Order */}
-                                                        {/* {!isDeliveredOrCancelled && (
-                                                            <button className="dropdown-item d-flex align-items-center text-danger">
-                                                                <XCircle size={16} className="me-2"/> Cancel Order
-                                                            </button>
-                                                        )} */}
                                                     </div>
                                                 </div>
                                             </td>
