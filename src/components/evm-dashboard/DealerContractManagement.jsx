@@ -15,6 +15,10 @@ const DealerContractManagement = () => {
   const [totalResults, setTotalResults] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [statusFilter, setStatusFilter] = useState("");
+
+  // Handle sort for table headers
 
   // Modal state
   const [showModal, setShowModal] = useState(false);
@@ -58,7 +62,7 @@ const DealerContractManagement = () => {
           pageSize,
           search: searchTerm,
           sortBy,
-          sortOrder: "desc",
+          sortOrder,
         });
         setContracts(data.items);
         setTotalResults(data.totalResults);
@@ -70,7 +74,7 @@ const DealerContractManagement = () => {
       }
     };
     fetchData();
-  }, [page, pageSize, searchTerm, sortBy]);
+  }, [page, pageSize, searchTerm, sortBy, sortOrder]);
 
   // Fetch contracts
   const fetchContracts = async () => {
@@ -82,7 +86,7 @@ const DealerContractManagement = () => {
         pageSize,
         search: searchTerm,
         sortBy,
-        sortOrder: "desc",
+        sortOrder,
       });
       setContracts(data.items);
       setTotalResults(data.totalResults);
@@ -260,12 +264,6 @@ const DealerContractManagement = () => {
     }
   };
 
-  // Get dealer name by ID
-  const getDealerName = (dealerId) => {
-    const dealer = dealers.find((d) => d.id === dealerId);
-    return dealer ? dealer.name : dealerId;
-  };
-
   // Calculate total pages
   const totalPages = Math.ceil(totalResults / pageSize);
 
@@ -289,14 +287,6 @@ const DealerContractManagement = () => {
     }).format(amount);
   };
 
-  // Check if contract is active
-  const isContractActive = (startDate, endDate) => {
-    const now = new Date();
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    return now >= start && now <= end;
-  };
-
   // Get contract status badge
   const getContractStatus = (startDate, endDate) => {
     const now = new Date();
@@ -310,6 +300,17 @@ const DealerContractManagement = () => {
     } else {
       return { label: "Active", color: "success" };
     }
+  };
+
+  // Handle sort for table headers
+  const handleSort = (field) => {
+    if (sortBy === field) {
+      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+    setPage(1);
   };
 
   return (
@@ -327,7 +328,7 @@ const DealerContractManagement = () => {
       </div>
 
       {/* Alerts */}
-      {error && (
+      {!showModal && error && (
         <div className="alert alert-danger alert-dismissible fade show" role="alert">
           <i className="bx bx-error me-2" />
           {error}
@@ -370,12 +371,18 @@ const DealerContractManagement = () => {
               </select>
             </div>
             <div className="col-md-3">
-              <select className="form-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-                <option value="">Sort by...</option>
-                <option value="startDate">Start Date</option>
-                <option value="endDate">End Date</option>
-                <option value="salesTarget">Sales Target</option>
-                <option value="outstandingDebt">Outstanding Debt</option>
+              <select
+                className="form-select"
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                  setPage(1);
+                }}
+              >
+                <option value="">All Statuses</option>
+                <option value="Active">Active</option>
+                <option value="Upcoming">Upcoming</option>
+                <option value="Expired">Expired</option>
               </select>
             </div>
           </div>
@@ -397,30 +404,59 @@ const DealerContractManagement = () => {
                 <table className="table table-hover">
                   <thead>
                     <tr>
-                      <th>Dealer</th>
-                      <th>Status</th>
-                      <th>Start Date</th>
-                      <th>End Date</th>
-                      <th>Sales Target</th>
-                      <th>Outstanding Debt</th>
+                      <th style={{ cursor: "pointer" }} onClick={() => handleSort("dealerId")}>
+                        Dealer {sortBy === "dealerId" && (sortOrder === "asc" ? "▲" : "▼")}
+                      </th>
+                      <th style={{ cursor: "pointer" }} onClick={() => handleSort("status")}>
+                        Status {sortBy === "status" && (sortOrder === "asc" ? "▲" : "▼")}
+                      </th>
+                      <th style={{ cursor: "pointer" }} onClick={() => handleSort("startDate")}>
+                        Start Date {sortBy === "startDate" && (sortOrder === "asc" ? "▲" : "▼")}
+                      </th>
+                      <th style={{ cursor: "pointer" }} onClick={() => handleSort("endDate")}>
+                        End Date {sortBy === "endDate" && (sortOrder === "asc" ? "▲" : "▼")}
+                      </th>
+                      <th style={{ cursor: "pointer" }} onClick={() => handleSort("salesTarget")}>
+                        Sales Target {sortBy === "salesTarget" && (sortOrder === "asc" ? "▲" : "▼")}
+                      </th>
+                      <th style={{ cursor: "pointer" }} onClick={() => handleSort("outstandingDebt")}>
+                        Outstanding Debt {sortBy === "outstandingDebt" && (sortOrder === "asc" ? "▲" : "▼")}
+                      </th>
                       <th style={{ width: "150px" }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {contracts.length === 0 ? (
-                      <tr>
-                        <td colSpan="7" className="text-center py-5 text-muted">
-                          <i className="bx bx-file bx-lg mb-2" />
-                          <p>No dealer contracts found</p>
-                        </td>
-                      </tr>
-                    ) : (
-                      contracts.map((contract) => {
+                    {(() => {
+                      // Filter contracts by status if needed
+                      let filteredContracts = statusFilter ? contracts.filter((contract) => getContractStatus(contract.startDate, contract.endDate).label === statusFilter) : contracts;
+
+                      // Sort by status on frontend if needed
+                      if (sortBy === "status") {
+                        filteredContracts = [...filteredContracts].sort((a, b) => {
+                          const statusA = getContractStatus(a.startDate, a.endDate).label;
+                          const statusB = getContractStatus(b.startDate, b.endDate).label;
+                          if (statusA < statusB) return sortOrder === "asc" ? -1 : 1;
+                          if (statusA > statusB) return sortOrder === "asc" ? 1 : -1;
+                          return 0;
+                        });
+                      }
+
+                      if (filteredContracts.length === 0) {
+                        return (
+                          <tr>
+                            <td colSpan="7" className="text-center py-5 text-muted">
+                              <i className="bx bx-file bx-lg mb-2" />
+                              <p>No dealer contracts found</p>
+                            </td>
+                          </tr>
+                        );
+                      }
+                      return filteredContracts.map((contract) => {
                         const status = getContractStatus(contract.startDate, contract.endDate);
                         return (
                           <tr key={contract.id}>
                             <td>
-                              <strong>{getDealerName(contract.dealerId)}</strong>
+                              <strong>{contract.dealerName}</strong>
                             </td>
                             <td>
                               <span className={`badge bg-label-${status.color}`}>{status.label}</span>
@@ -448,8 +484,8 @@ const DealerContractManagement = () => {
                             </td>
                           </tr>
                         );
-                      })
-                    )}
+                      });
+                    })()}
                   </tbody>
                 </table>
               </div>
@@ -530,6 +566,14 @@ const DealerContractManagement = () => {
               </div>
               <form onSubmit={handleSubmit}>
                 <div className="modal-body">
+                  {/* Error message inside modal */}
+                  {error && (
+                    <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                      <i className="bx bx-error me-2" />
+                      {error}
+                      <button type="button" className="btn-close" onClick={() => setError(null)} />
+                    </div>
+                  )}
                   {/* Dealer Selection */}
                   <div className="mb-3">
                     <label className="form-label">
@@ -675,7 +719,7 @@ const DealerContractManagement = () => {
                 {contractToDelete && (
                   <div className="alert alert-warning">
                     <p className="mb-2">
-                      <strong>Dealer:</strong> {getDealerName(contractToDelete.dealerId)}
+                      <strong>Dealer:</strong> {contractToDelete?.dealerName}
                     </p>
                     <p className="mb-2">
                       <strong>Period:</strong> {formatDate(contractToDelete.startDate)} - {formatDate(contractToDelete.endDate)}
