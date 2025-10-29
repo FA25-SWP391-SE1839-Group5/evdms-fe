@@ -42,11 +42,16 @@ const InventoryModal = ({ show, loading, modalMode, formData, variants, currentI
                 ) : (
                   <select className="form-select" name="variantId" value={formData.variantId} onChange={onChange} required>
                     <option value="">Select a variant...</option>
-                    {variants.map((variant) => (
-                      <option key={variant.id} value={variant.id}>
-                        {variant.modelName || variant.name || "Unknown"} - {variant.variantName || variant.trim || ""}
-                      </option>
-                    ))}
+                    {variants.map((variant) => {
+                      const model = variant.modelName || variant.name || "Unknown";
+                      const sub = variant.variantName || variant.trim || "";
+                      return (
+                        <option key={variant.id} value={variant.id}>
+                          {model}
+                          {sub ? ` - ${sub}` : ""}
+                        </option>
+                      );
+                    })}
                   </select>
                 )}
               </div>

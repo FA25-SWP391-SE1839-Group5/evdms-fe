@@ -58,6 +58,8 @@ const InventoryManagement = () => {
     sortOrder
   );
   const { variants } = useVariants();
+  // Only show variants that do not already have an inventory
+  const variantsWithoutInventory = variants.filter((variant) => !inventories.some((inv) => inv.variantId === variant.id));
   const [success, setSuccess] = useState(null);
 
   // Handle search input change
@@ -70,7 +72,7 @@ const InventoryManagement = () => {
   const handleCreate = () => {
     setModalMode("create");
     setFormData({
-      variantId: variants[0]?.id || "",
+      variantId: variantsWithoutInventory[0]?.id || "",
       quantity: 0,
     });
     setCurrentInventory(null);
@@ -144,15 +146,16 @@ const InventoryManagement = () => {
       if (modalMode === "create") {
         await createInventory(payload);
         setSuccess("Inventory created successfully!");
+        setShowModal(false);
       } else if (modalMode === "edit") {
         await updateInventory(currentInventory.id, payload);
         setSuccess("Inventory updated successfully!");
+        setShowModal(false);
       }
 
-      // Refresh list and close modal
+      // Refresh list
       await fetchInventories();
       setTimeout(() => {
-        setShowModal(false);
         setSuccess(null);
       }, 1500);
     } catch (err) {
@@ -183,11 +186,10 @@ const InventoryManagement = () => {
     try {
       await adjustInventoryQuantity(adjustData.inventoryId, adjustData.variantId, newQuantity);
       setSuccess(`Successfully ${adjustData.action === "add" ? "added" : "removed"} ${Math.abs(quantityChange)} units!`);
-
-      // Refresh list and close modal
+      setShowAdjustModal(false);
+      // Refresh list
       await fetchInventories();
       setTimeout(() => {
-        setShowAdjustModal(false);
         setSuccess(null);
       }, 1500);
     } catch (err) {
@@ -369,7 +371,7 @@ const InventoryManagement = () => {
         loading={loading}
         modalMode={modalMode}
         formData={formData}
-        variants={variants}
+        variants={modalMode === "create" ? variantsWithoutInventory : variants}
         currentInventory={currentInventory}
         onClose={() => setShowModal(false)}
         onChange={handleInputChange}

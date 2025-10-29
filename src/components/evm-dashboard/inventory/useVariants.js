@@ -1,5 +1,3 @@
-// useVariants.js
-// Custom hook for fetching vehicle variants
 import { useEffect, useState } from "react";
 import { getAllVehicleVariants } from "../../../services/evm/vehicleVariantService";
 
@@ -14,8 +12,7 @@ const useVariants = () => {
       setError(null);
       try {
         const response = await getAllVehicleVariants({ page: 1, pageSize: 100 });
-        const variantsList = response.data?.data?.items || response.data?.items || response.data || [];
-        setVariants(variantsList);
+        setVariants(response.items || []);
       } catch (err) {
         setError(err + "Error fetching variants");
       } finally {
