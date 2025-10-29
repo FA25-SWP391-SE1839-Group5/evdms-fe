@@ -206,3 +206,20 @@ export const markDealerPaymentFailed = async (paymentId) => {
       throw error;
     }
 };
+
+/**
+ * Hủy một đơn đặt hàng
+ * @param {string} orderId - ID của đơn hàng cần hủy
+ */
+export const cancelDealerOrder = async (orderId) => {
+  try {
+    console.log(`📡 API Call: PATCH /api/dealer-orders/${orderId} to cancel`);
+    // Tui giả định API cần một body để thay đổi status
+    // ví dụ: { status: "Canceled" }
+    const response = await api.patch(`/dealer-orders/${orderId}`, { status: "Canceled" });
+    return response.data;
+  } catch (error) {
+    console.error("❌ cancelDealerOrder error:", error.response?.data || error.message);
+    throw new Error(error.response?.data?.message || "Failed to cancel order.");
+  }
+};

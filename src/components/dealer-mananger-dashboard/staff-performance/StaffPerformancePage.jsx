@@ -97,7 +97,7 @@ const StaffPerformancePage = () => {
         </thead>
         <tbody>
           {data.map((staff, index) => (
-            <tr key={staff.id || index}> {/* API nên trả về một ID duy nhất */}
+            <tr key={staff.id || index}>
               <td>{index + 1}</td>
               <td>{staff.staffName}</td>
               <td>{staff.salesCount}</td>
