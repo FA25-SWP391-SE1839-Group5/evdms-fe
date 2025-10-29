@@ -2,8 +2,8 @@ export default function UserModal({ show, onClose, onSubmit, user, formData, onF
   if (!show) {
     return null;
   }
-  const isEditMode = Boolean(user);
 
+  const isEditMode = Boolean(user);
   const shouldShowDealerSelect = ["DealerStaff", "DealerManager"].includes(formData?.role);
 
   return (
@@ -46,7 +46,7 @@ export default function UserModal({ show, onClose, onSubmit, user, formData, onF
                 {errors.email && <div className="invalid-feedback">{errors.email}</div>}
               </div>
 
-              {/* Password (only show in edit mode) */}
+              {/* Password field removed for user creation. Only show for edit if needed. */}
               {isEditMode && (
                 <div className="mb-3">
                   <label className="form-label">Password (leave blank to keep current)</label>
