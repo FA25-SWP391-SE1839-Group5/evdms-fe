@@ -387,7 +387,7 @@ const VehicleVariantManagement = () => {
       setTimeout(() => {
         setShowModal(false);
         setSuccess(null);
-      }, 1500);
+      });
     } catch (err) {
       setError("Failed to save variant: " + (err.response?.data?.message || err.message || "Unknown error"));
       console.error("Save error:", err);

@@ -211,7 +211,7 @@ const VehicleModelManagement = () => {
       setTimeout(() => {
         setShowModal(false);
         setSuccess(null);
-      }, 1500);
+      });
     } catch (err) {
       setError("Failed to save vehicle model: " + (err.response?.data?.message || err.message || "Unknown error"));
       console.error("Save error:", err);
@@ -505,7 +505,9 @@ const VehicleModelManagement = () => {
 
                   {/* Description */}
                   <div className="mb-3">
-                    <label className="form-label">Description</label>
+                    <label className="form-label">
+                      Description <span className="text-danger">*</span>
+                    </label>
                     <textarea
                       className="form-control"
                       name="description"
@@ -513,6 +515,7 @@ const VehicleModelManagement = () => {
                       value={formData.description}
                       onChange={handleInputChange}
                       disabled={modalMode === "view"}
+                      required
                       placeholder="Enter vehicle model description..."
                     />
                   </div>
