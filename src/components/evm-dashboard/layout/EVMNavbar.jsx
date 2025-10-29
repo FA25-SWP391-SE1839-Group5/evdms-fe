@@ -48,24 +48,7 @@ const EVMNavbar = () => {
     }
   };
 
-  const handleNavigation = (path) => {
-    window.location.href = path;
-  };
-
   const userMenuItems = [
-    {
-      icon: "bx-user",
-      label: "My Profile",
-      onClick: () => handleNavigation("/profile"),
-    },
-    {
-      icon: "bx-cog",
-      label: "Settings",
-      onClick: () => handleNavigation("/settings"),
-    },
-    {
-      divider: true,
-    },
     {
       icon: "bx-power-off",
       label: "Log Out",
@@ -81,7 +64,7 @@ const EVMNavbar = () => {
       dealer_staff: "Dealer Staff",
       evm_staff: "EVM Staff",
     };
-    return roleMap[role] || "User";
+    return roleMap[role] || "EVM Staff";
   };
 
   return (
@@ -103,43 +86,6 @@ const EVMNavbar = () => {
 
         {/* Right Side - Style Switcher & User Menu */}
         <ul className="navbar-nav flex-row align-items-center ms-auto">
-          {/* Style Switcher */}
-          <li className="nav-item dropdown me-2 me-xl-0">
-            <a className="nav-link dropdown-toggle hide-arrow" id="nav-theme" href="javascript:void(0);" data-bs-toggle="dropdown">
-              <i className="icon-base bx bx-sun icon-md theme-icon-active" />
-              <span className="d-none ms-2" id="nav-theme-text">
-                Toggle theme
-              </span>
-            </a>
-            <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="nav-theme-text">
-              <li>
-                <button type="button" className="dropdown-item align-items-center active" data-bs-theme-value="light" aria-pressed="false">
-                  <span>
-                    <i className="icon-base bx bx-sun icon-md me-3" data-icon="sun" />
-                    Light
-                  </span>
-                </button>
-              </li>
-              <li>
-                <button type="button" className="dropdown-item align-items-center" data-bs-theme-value="dark" aria-pressed="true">
-                  <span>
-                    <i className="icon-base bx bx-moon icon-md me-3" data-icon="moon" />
-                    Dark
-                  </span>
-                </button>
-              </li>
-              <li>
-                <button type="button" className="dropdown-item align-items-center" data-bs-theme-value="system" aria-pressed="false">
-                  <span>
-                    <i className="icon-base bx bx-desktop icon-md me-3" data-icon="desktop" />
-                    System
-                  </span>
-                </button>
-              </li>
-            </ul>
-          </li>
-          {/* / Style Switcher */}
-
           {/* User Dropdown */}
           <li className="nav-item navbar-dropdown dropdown-user dropdown">
             <a className="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
@@ -171,7 +117,7 @@ const EVMNavbar = () => {
                       ) : (
                         <>
                           <span className="fw-semibold d-block">Guest</span>
-                          <small className="text-muted">No role</small>
+                          <small className="text-muted">{getRoleDisplay(user?.role)}</small>
                         </>
                       )}
                     </div>
