@@ -9,7 +9,7 @@ import {
   Row,
   Col,
 } from "react-bootstrap";
-import { getDealerStaffSales } from "../../services/reportService"; // <-- Điều chỉnh đường dẫn
+import { getDealerStaffSales } from "../../../services/reportService";
 
 const StaffPerformancePage = () => {
   const [data, setData] = useState([]);
@@ -32,10 +32,10 @@ const StaffPerformancePage = () => {
       if (filters.startDate) queryParams.startDate = filters.startDate;
       if (filters.endDate) queryParams.endDate = filters.endDate;
 
-      const report = await getDealerStaffSales(queryParams);
+      const response = await getDealerStaffSales(queryParams);
       
       // Giả sử API trả về một mảng
-      setData(report || []); 
+      setData(response.data.items || []); 
     } catch (err) {
       setError(err.message);
     } finally {
@@ -66,7 +66,7 @@ const StaffPerformancePage = () => {
       return (
         <div className="text-center">
           <Spinner animation="border" variant="primary" />
-          <p>Đang tải báo cáo...</p>
+          <p>Loading</p>
         </div>
       );
     }
@@ -89,9 +89,9 @@ const StaffPerformancePage = () => {
         <thead>
           <tr>
             <th>#</th>
-            <th>Tên Nhân viên</th>
-            <th>Số đơn hàng</th>
-            <th>Tổng Doanh thu (VND)</th>
+            <th>Staff name</th>
+            <th>Quantity</th>
+            <th>Amount (VND)</th>
             {/* Cậu có thể thêm các cột khác mà API trả về */}
           </tr>
         </thead>
@@ -101,7 +101,7 @@ const StaffPerformancePage = () => {
               <td>{index + 1}</td>
               <td>{staff.staffName}</td>
               <td>{staff.salesCount}</td>
-              <td>{staff.totalRevenue.toLocaleString("vi-VN")}</td>
+              <td>{(staff.totalRevenue || 0).toLocaleString("vi-VN")}</td>
             </tr>
           ))}
         </tbody>
@@ -120,7 +120,7 @@ const StaffPerformancePage = () => {
           <Row className="align-items-end g-3">
             <Col md={4}>
               <Form.Group controlId="startDate">
-                <Form.Label>Từ ngày</Form.Label>
+                <Form.Label>Start Date</Form.Label>
                 <Form.Control
                   type="date"
                   name="startDate"
@@ -131,7 +131,7 @@ const StaffPerformancePage = () => {
             </Col>
             <Col md={4}>
               <Form.Group controlId="endDate">
-                <Form.Label>Đến ngày</Form.Label>
+                <Form.Label>End Date</Form.Label>
                 <Form.Control
                   type="date"
                   name="endDate"
@@ -143,7 +143,7 @@ const StaffPerformancePage = () => {
             <Col md={4} className="d-grid">
               <Button type="submit" variant="primary" disabled={isLoading}>
                 {isLoading ? <Spinner as="span" size="sm" /> : <i className="bx bx-filter-alt me-1"></i>}
-                Lọc Báo cáo
+                Filter
               </Button>
             </Col>
           </Row>

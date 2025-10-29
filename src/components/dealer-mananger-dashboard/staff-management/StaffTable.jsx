@@ -6,7 +6,7 @@ const StaffTable = ({ users, isLoading, onEdit, onDelete }) => {
     return (
       <div className="text-center">
         <Spinner animation="border" />
-        <p>Đang tải danh sách...</p>
+        <p>Loading...</p>
       </div>
     );
   }

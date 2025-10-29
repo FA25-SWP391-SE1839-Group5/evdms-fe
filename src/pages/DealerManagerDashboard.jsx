@@ -2,11 +2,10 @@ import React from 'react';
 
 // Import the specific page components you will create
 import StaffManagement from '../components/dealer-mananger-dashboard/staff-management/StaffManagement';
-// import StaffPerformancePage from '../components/dealer-manager-dashboard/staff/StaffPerformancePage';
+import StaffPerformancePage from '../components/dealer-mananger-dashboard/staff-performance/StaffPerformancePage';
 // import DealerOrdersPage from '../components/dealer-manager-dashboard/orders/DealerOrdersPage';
 
 // Placeholder components for now
-const StaffPerformancePage = () => <div className="card"><div className="card-body">Staff Performance - Coming Soon...</div></div>;
 const DealerOrdersPage = () => <div className="card"><div className="card-body">Dealer Orders - Coming Soon...</div></div>;
 
 
