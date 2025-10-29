@@ -1,31 +1,38 @@
-const Sidebar = ({ currentPage }) => {
+const Sidebar = ({ currentPage, onNavigate }) => {
   // Only Users and Audit Logs
   const sidebarMenu = [
     {
       id: "users",
       label: "Users",
       icon: "bx-user",
-      page: "admin/users",
+      pageKey: "users",
     },
     {
       id: "audit",
       label: "Audit Logs",
       icon: "bx-history",
-      page: "admin/audit",
+      pageKey: "audit",
     },
   ];
 
-  const handleMenuClick = (e, page) => {
+  const handleMenuClick = (e, pageKey) => {
     e.preventDefault();
-    window.location.href = `/${page}`;
+    if (onNavigate) {
+      onNavigate(pageKey); // [SỬA] Gọi onNavigate thay vì reload
+    }
   };
 
   const renderMenuItem = (item) => {
-    const isActive = currentPage === item.page;
+    const isActive = currentPage === item.pageKey;
 
     return (
       <li key={item.id} className={`menu-item ${isActive ? "active" : ""}`}>
-        <a href={`/${item.page}`} className="menu-link" onClick={(e) => handleMenuClick(e, item.page)}>
+        {/* [SỬA] href có thể để # hoặc gọi handleMenuClick trực tiếp */}
+        <a
+           href="#" // Hoặc `/${item.pageKey}` nếu vẫn muốn URL thay đổi (cần xử lý thêm ở Layout)
+           className="menu-link"
+           onClick={(e) => handleMenuClick(e, item.pageKey)} // Truyền pageKey
+         >
           <i className={`menu-icon tf-icons bx ${item.icon}`} />
           <div data-i18n={item.label}>{item.label}</div>
         </a>
@@ -39,7 +46,8 @@ const Sidebar = ({ currentPage }) => {
     <aside id="layout-menu" className="layout-menu menu-vertical menu bg-menu-theme">
       {/* Logo */}
       <div className="app-brand demo">
-        <a href="#" className="app-brand-link" onClick={(e) => handleMenuClick(e, "admin/users")}>
+         {/* [SỬA] Logo nên điều hướng về trang mặc định, vd: "users" */}
+        <a href="#" className="app-brand-link" onClick={(e) => handleMenuClick(e, "users")}>
           <span className="app-brand-logo demo">
             <img src="/assets/images/elecar_logo.svg" alt="EVDMS Logo" className="img-fluid" style={{ maxHeight: "56px" }} />
           </span>
@@ -52,7 +60,7 @@ const Sidebar = ({ currentPage }) => {
 
       <div className="menu-inner-shadow" />
 
-      {/* Only Users and Audit Logs */}
+      {/* Menu Items */}
       <ul className="menu-inner py-1">{sidebarMenu.map(renderMenuItem)}</ul>
     </aside>
   );
