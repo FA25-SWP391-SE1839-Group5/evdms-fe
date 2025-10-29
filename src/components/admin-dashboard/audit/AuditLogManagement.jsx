@@ -1,6 +1,6 @@
 import { AlertCircle, Filter, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { exportAuditLogs, getAllAuditLogs } from "../../../services/systemService";
+import { exportAuditLogs, getAllAuditLogs } from "../../../services/auditLogService";
 import { getUserById } from "../../../services/userService";
 import AuditLogDetailsModal from "./AuditLogDetailsModal";
 import AuditLogFilterPanel from "./AuditLogFilterPanel";
@@ -177,43 +177,20 @@ const AuditLogManagement = () => {
     setShowDetailsModal(true);
   };
 
-  // --- Logic xử lý Export ---
-  const handleExport = async (format) => {
-    // 1. Xử lý trường hợp PRINT (chỉ phía client)
-    if (format === "print") {
-      window.print();
-      return;
-    }
-
-    // 2. Xử lý các trường hợp gọi API (CSV, Excel, PDF)
-    setExportStatus((prev) => ({ ...prev, [format]: true }));
+  // --- Logic xử lý Export CSV only ---
+  const handleExport = async () => {
+    setExportStatus((prev) => ({ ...prev, csv: true }));
     setError("");
-
     try {
       const filters = {};
-
-      if (activeFilters.timePeriod !== "all") {
-        filters.timePeriod = activeFilters.timePeriod;
-      }
-      if (searchTerm) {
-        // Đảm bảo tên key khớp với backend, ví dụ: 'search' hoặc 'q'
-        filters.search = searchTerm;
-      }
-      if (activeFilters.roles.length > 0) {
-        filters.roles = activeFilters.roles;
-      }
-      if (activeFilters.actions.length > 0) {
-        filters.actions = activeFilters.actions;
-      }
-
-      await exportAuditLogs(format, filters);
-
-      // 3. Không cần xử lý blob ở đây nữa
+      // Only pass startDate and endDate if you want to filter by date
+      // Example: filters.startDate = "2025-01-01"; filters.endDate = "2026-01-01";
+      await exportAuditLogs(filters);
     } catch (err) {
       console.error("Export failed:", err);
       setError(err.message || "Failed to generate export file.");
     } finally {
-      setExportStatus((prev) => ({ ...prev, [format]: false }));
+      setExportStatus((prev) => ({ ...prev, csv: false }));
     }
   };
 
@@ -280,46 +257,10 @@ const AuditLogManagement = () => {
               <button className="btn btn-outline-secondary d-flex align-items-center" type="button" onClick={() => setShowFilterPanel(true)}>
                 <Filter size={16} className="me-1" /> Filter
               </button>
-              <div className="btn-group">
-                <button type="button" className="btn btn-outline-secondary dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i className="bx bx-export me-1"></i> Export
-                </button>
-                <ul className="dropdown-menu">
-                  {/* CSV */}
-                  <li>
-                    <button className="dropdown-item" onClick={() => handleExport("csv")} disabled={exportStatus.csv}>
-                      {exportStatus.csv ? <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> : null}
-                      <i className="bx bx-file me-2"></i> CSV
-                    </button>
-                  </li>
-
-                  {/* Excel */}
-                  <li>
-                    <button className="dropdown-item" onClick={() => handleExport("excel")} disabled={exportStatus.excel}>
-                      {exportStatus.excel ? <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> : null}
-                      <i className="bx bx-file-blank me-2"></i> Excel
-                    </button>
-                  </li>
-
-                  {/* PDF */}
-                  <li>
-                    <button className="dropdown-item" onClick={() => handleExport("pdf")} disabled={exportStatus.pdf}>
-                      {exportStatus.pdf ? <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> : null}
-                      <i className="bx bxs-file-pdf me-2"></i> PDF
-                    </button>
-                  </li>
-
-                  {/* Print */}
-                  <li>
-                    <hr className="dropdown-divider" />
-                  </li>
-                  <li>
-                    <button className="dropdown-item" onClick={() => handleExport("print")}>
-                      <i className="bx bx-printer me-2"></i> Print
-                    </button>
-                  </li>
-                </ul>
-              </div>
+              <button type="button" className="btn btn-outline-secondary d-flex align-items-center" onClick={handleExport} disabled={exportStatus.csv}>
+                {exportStatus.csv ? <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> : null}
+                <i className="bx bx-export me-1"></i> Export
+              </button>
             </div>
 
             {/* Search Bar */}
