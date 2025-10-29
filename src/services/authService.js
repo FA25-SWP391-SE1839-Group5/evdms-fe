@@ -75,7 +75,7 @@ export const saveLoginToken = (userData) => {
     id: userData.id,
     name: userData.fullName,
     email: userData.email,
-    role: normalizedRole
+    role: normalizedRole,
   };
 
   console.log('saveLoginToken - user object to save:', user);

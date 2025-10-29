@@ -1,12 +1,8 @@
 export const ROUTES = {
-    HOME: 'home',
     LOGIN: 'login',
-    CATALOG: 'catalog',
-    DETAIL: 'detail',
     ADMIN_DASHBOARD: 'admin-dashboard',
     EVM_DASHBOARD: 'evm-dashboard',
     DEALER_MANAGER_DASHBOARD: 'dealer-dashboard',
-    VEHICLE_MODELS: 'vehicle-models',
     RESET_PASSWORD: 'reset-password',
 };
 
@@ -27,7 +23,7 @@ const ADMIN_PAGES = {
 };
 
 export const initialState = {
-    currentPage: ROUTES.HOME,
+    currentPage: ROUTES.LOGIN,
     selectedVehicle: null,
     user: null,
     isAuthenticated: false
@@ -35,13 +31,6 @@ export const initialState = {
 
 export const routeReducer = (state, action) => {
     switch (action.type) {
-        case 'NAVIGATE_TO_HOME':
-            return {
-                ...state,
-                currentPage: ROUTES.HOME,
-                selectedVehicle: null
-            };
-            
         case 'NAVIGATE_TO_LOGIN':
             return {
                 ...state,
@@ -69,7 +58,7 @@ export const routeReducer = (state, action) => {
                 };
             }
             
-            let targetPage = ROUTES.CATALOG;
+            let targetPage = ROUTES.LOGIN;
             
             // Route based on role
             if (user.role === 'admin') {
@@ -115,12 +104,6 @@ export const routeReducer = (state, action) => {
                 return {...initialState, currentPage: ROUTES.LOGIN };
             }
             
-        case 'NAVIGATE_TO_VEHICLE_MODELS':
-            return {
-                ...state,
-                currentPage: ROUTES.VEHICLE_MODELS
-            };
-            
         case 'NAVIGATE_TO_RESET_PASSWORD':
             return {
                 ...state,
@@ -130,28 +113,12 @@ export const routeReducer = (state, action) => {
         case 'LOGOUT':
             return {
                 ...state,
-                currentPage: ROUTES.HOME,
+                currentPage: ROUTES.LOGIN,
                 user: null,
                 isAuthenticated: false,
                 selectedVehicle: null
             };
-            
-        case 'NAVIGATE_TO_CATALOG':
-            return {
-                ...state,
-                currentPage: ROUTES.CATALOG,
-                selectedVehicle: null,
-                user: action.payload?.user || state.user,
-                isAuthenticated: state.user ? true : false
-            };
-            
-        case 'NAVIGATE_TO_DETAIL':
-            return {
-                ...state,
-                currentPage: ROUTES.DETAIL,
-                selectedVehicle: action.payload
-            };
-            
+
         default:
             return state;
     }
