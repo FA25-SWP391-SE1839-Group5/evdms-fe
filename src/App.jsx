@@ -1,20 +1,3 @@
-<<<<<<< Updated upstream
-import { useEffect, useReducer, useState } from "react";
-import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Layout from "./components/admin-dashboard/layout/Layout";
-import AdminDashboard from "./pages/AdminDashboard";
-import CatalogPage from "./pages/CatalogPage";
-import DealerManagerDashboard from "./pages/DealerManagerDashboard";
-import DealerStaffDashboard from "./pages/DealerStaffDashboard";
-import EVDetailPage from "./pages/EVDetailPage";
-import EvmStaffDashboard from "./pages/EvmStaffDashboard";
-import LoginPage from "./pages/LoginPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-import VehicleModelPage from "./pages/VehicleModelPage";
-import { initialState, routeReducer } from "./routes";
-import { getStoredToken, logout } from "./services/authService";
-=======
 import React, { useReducer, useState, useEffect } from 'react';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -27,7 +10,6 @@ import Layout from './components/admin-dashboard/layout/Layout';
 import EVMLayout from './components/evm-dashboard/layout/EVMLayout';
 import { routeReducer, initialState, ROUTES } from './routes';
 import { logout, getStoredToken } from './services/authService';
->>>>>>> Stashed changes
 
 const App = () => {
   const [routeState, dispatch] = useReducer(routeReducer, initialState);
@@ -48,7 +30,7 @@ const App = () => {
       "/assets/js/dashboards-analytics.js",
     ];
 
-    scripts.forEach((src) => {
+    scripts.forEach(src => {
       const script = document.createElement("script");
       script.src = src;
       script.async = false; // đảm bảo load theo thứ tự
@@ -60,75 +42,6 @@ const App = () => {
     const checkAuthAndRoute = () => {
       console.log('--- Running Initial Auth Check ---');
       try {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        // Check if URL has reset token parameter
-        const urlParams = new URLSearchParams(window.location.search);
-        const resetToken = urlParams.get("token");
-
-        if (resetToken) {
-          // User is trying to reset password
-          dispatch({ type: "NAVIGATE_TO_RESET_PASSWORD" });
-          setIsCheckingAuth(false);
-          return;
-        }
-
-        // Otherwise, check authentication
-        const stored = getStoredToken();
-        if (stored && stored.user && stored.user.role) {
-          // User is logged in, restore session
-          dispatch({
-            type: "LOGIN_SUCCESS",
-            payload: stored.user,
-          });
-        } else {
-          // Invalid token or insufficient data
-          dispatch({ type: "LOGOUT" });
-=======
-        const stored = getStoredToken();
-
-        // ƯU TIÊN 1: Có token hợp lệ?
-        if (stored?.user?.role) {
-          console.log('Token found. Dispatching LOGIN_SUCCESS:', stored.user);
-          dispatch({ type: 'LOGIN_SUCCESS', payload: stored.user });
-          // Không set isCheckingAuth = false ở đây vội
-          return; // Kết thúc sớm nếu đã đăng nhập
-        }
-
-        // ƯU TIÊN 2: Không có token, kiểm tra URL đặc biệt
-        console.log('No token found. Checking URL:', window.location.pathname, window.location.search);
-        const urlParams = new URLSearchParams(window.location.search);
-        const resetToken = urlParams.get('token');
-        const path = window.location.pathname.replace('/', '');
-
-        if (resetToken /* && path === 'reset-password' */) { // Có thể thêm check path nếu muốn
-          console.log('Reset token detected.');
-          dispatch({ type: 'NAVIGATE_TO_RESET_PASSWORD' });
-        } else if (path === 'login') {
-          console.log('No token, on /login path.');
-          dispatch({ type: 'NAVIGATE_TO_LOGIN' });
-        } else if (path === 'catalog') {
-          console.log('No token, on /catalog path.');
-          dispatch({ type: 'NAVIGATE_TO_CATALOG' });
-        } else if (path === '' || path === 'home') {
-           console.log('No token, on root or /home path.');
-           dispatch({ type: 'NAVIGATE_TO_HOME' });
-        } else {
-           // Các URL khác mà không có token -> Chuyển về Home (hoặc Login tùy ý)
-           console.log(`No token, on protected path /${path}. Redirecting to HOME.`);
-           dispatch({ type: 'NAVIGATE_TO_HOME' });
->>>>>>> Stashed changes
-        }
-
-      } catch (error) {
-<<<<<<< Updated upstream
-        console.error("Auth check failed:", error);
-        dispatch({ type: "LOGOUT" });
-=======
-        console.error('Initial Auth check failed:', error);
-        dispatch({ type: 'NAVIGATE_TO_HOME' }); // Lỗi thì về home
->>>>>>> Stashed changes
-=======
         const stored = getStoredToken();
 
         // ƯU TIÊN 1: Có token hợp lệ?
@@ -166,7 +79,6 @@ const App = () => {
       } catch (error) {
         console.error('Initial Auth check failed:', error);
         dispatch({ type: 'NAVIGATE_TO_HOME' }); // Lỗi thì về home
->>>>>>> Stashed changes
       } finally {
         // Luôn tắt loading sau khi kiểm tra xong
         // Dùng setTimeout để đảm bảo dispatch kịp xử lý trước khi tắt loading
@@ -177,47 +89,6 @@ const App = () => {
       }
     };
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    checkAuthOrReset();
-  }, []);
-
-  useEffect(() => {
-    const path = window.location.pathname.replace("/", "");
-
-    if (!path) return;
-
-    switch (path) {
-      case "users":
-        dispatch({ type: "NAVIGATE", payload: "users" });
-        break;
-      case "dealers":
-        dispatch({ type: "NAVIGATE", payload: "dealers" });
-        break;
-      case "customers":
-        dispatch({ type: "NAVIGATE", payload: "customers" });
-        break;
-      default:
-        dispatch({ type: "NAVIGATE", payload: "dashboard" });
-        break;
-    }
-  }, []);
-
-  // Sync logout across tabs
-  useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === "evdms_auth_token" && !e.newValue) {
-        // Token was cleared in another tab
-        dispatch({ type: "LOGOUT" });
-        setFavorites(new Set());
-        setCompareList([]);
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
-=======
     checkAuthAndRoute();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Hook này chỉ chạy 1 lần khi mount
@@ -245,35 +116,6 @@ const App = () => {
   //     }
   //   };
 
-=======
-    checkAuthAndRoute();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Hook này chỉ chạy 1 lần khi mount
-
-  const getInitialAdminPage = () => {
-    const path = globalThis.location.pathname.replace('/', '');
-    if (!path || path === 'admin-dashboard') return 'dashboard';
-    return path;
-  };
-
-  const getInitialEVMPage = () => {
-    const path = globalThis.location.pathname.replace('/', '');
-    if (!path || path === 'evm-dashboard') return 'evm-dashboard';
-    return path;
-  };
-
-  // Sync logout across tabs
-  // useEffect(() => {
-  //   const handleStorageChange = (e) => {
-  //     if (e.key === 'evdms_auth_token' && !e.newValue) {
-  //       // Token was cleared in another tab
-  //       dispatch({ type: 'LOGOUT' });
-  //       setFavorites(new Set());
-  //       setCompareList([]);
-  //     }
-  //   };
-
->>>>>>> Stashed changes
   //   globalThis.addEventListener('storage', handleStorageChange);
   //   return () => globalThis.removeEventListener('storage', handleStorageChange);
   // }, []);
@@ -323,29 +165,11 @@ const App = () => {
   //   globalThis.addEventListener('popstate', handlePopState);
   //   return () => globalThis.removeEventListener('popstate', handlePopState);
   // }, []);
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
   // ============================================
   // AUTHENTICATION HANDLERS
   // ============================================
   const handleLoginSuccess = (userData) => {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    dispatch({
-      type: "LOGIN_SUCCESS",
-      payload: userData,
-    });
-    // Redirect based on role
-    if (userData.role && userData.role.toLowerCase() === "admin") {
-      window.location.href = "/admin/users";
-    }
-    // You can add more role-based redirects here if needed
-=======
-=======
->>>>>>> Stashed changes
     console.log('handleLoginSuccess called with:', userData);
      // Đảm bảo userData có role
      if (userData && userData.role) {
@@ -355,15 +179,11 @@ const App = () => {
          // Có thể dispatch về login hoặc hiển thị lỗi
          dispatch({ type: 'NAVIGATE_TO_LOGIN' });
      }
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
   };
 
   const handleLogout = async () => {
     await logout();
-    dispatch({ type: "LOGOUT" });
+    dispatch({ type: 'LOGOUT' });
     setFavorites(new Set());
     setCompareList([]);
   };
@@ -385,14 +205,14 @@ const App = () => {
 
   const navigateToDetail = (vehicle) => {
     dispatch({
-      type: "NAVIGATE_TO_DETAIL",
-      payload: vehicle,
+      type: 'NAVIGATE_TO_DETAIL',
+      payload: vehicle
     });
   };
 
   const navigateToCatalog = () => {
     dispatch({
-      type: "NAVIGATE_TO_CATALOG",
+      type: 'NAVIGATE_TO_CATALOG'
     });
   };
 
@@ -400,7 +220,7 @@ const App = () => {
   // FAVORITES & COMPARE HANDLERS
   // ============================================
   const toggleFavorite = (vehicleId) => {
-    setFavorites((prev) => {
+    setFavorites(prev => {
       const newFavorites = new Set(prev);
       if (newFavorites.has(vehicleId)) {
         newFavorites.delete(vehicleId);
@@ -412,13 +232,13 @@ const App = () => {
   };
 
   const toggleCompare = (vehicleId) => {
-    setCompareList((prev) => {
+    setCompareList(prev => {
       if (prev.includes(vehicleId)) {
-        return prev.filter((id) => id !== vehicleId);
+        return prev.filter(id => id !== vehicleId);
       } else if (prev.length < 3) {
         return [...prev, vehicleId];
       } else {
-        alert("Only compare to 3 cars");
+        alert('Only compare to 3 cars');
         return prev;
       }
     });
@@ -437,65 +257,9 @@ const App = () => {
   }
 
   // ============================================
-  // RENDER PAGES WITH ROUTER
+  // RENDER PAGES
   // ============================================
   return (
-<<<<<<< Updated upstream
-    <Router>
-      <div className="font-sans">
-        <Routes>
-          <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
-          {/* Admin dashboard routes */}
-          <Route
-            path="/admin/users"
-            element={
-              <ProtectedRoute>
-                <Layout initialPage="users">
-                  <AdminDashboard currentPage="users" />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/audit"
-            element={
-              <ProtectedRoute>
-                <Layout initialPage="audit">
-                  <AdminDashboard currentPage="audit" />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          {/* EVM Staff dashboard routes */}
-          <Route path="/evmstaff/dashboard" element={<EvmStaffDashboard />} />
-          {/* Dealer Manager dashboard routes */}
-          <Route path="/dealermanager/dashboard" element={<DealerManagerDashboard />} />
-          {/* Dealer Staff dashboard routes */}
-          <Route path="/dealerstaff/dashboard" element={<DealerStaffDashboard />} />
-          <Route path="/vehicle-models" element={<VehicleModelPage user={routeState.user} onLogout={handleLogout} />} />
-          <Route path="/reset_password" element={<ResetPasswordPage />} />
-          <Route path="/catalog" element={<CatalogPage onVehicleSelect={navigateToDetail} user={routeState.user} onLogout={handleLogout} />} />
-          <Route
-            path="/detail"
-            element={
-              <EVDetailPage
-                vehicle={routeState.selectedVehicle}
-                onBack={navigateToCatalog}
-                favorites={favorites}
-                toggleFavorite={toggleFavorite}
-                compareList={compareList}
-                toggleCompare={toggleCompare}
-                user={routeState.user}
-                onLogout={handleLogout}
-              />
-            }
-          />
-          {/* Default redirect: if authenticated, go to /admin/users; else, go to /login */}
-          <Route path="*" element={getStoredToken() && getStoredToken().user && getStoredToken().user.role ? <Navigate to="/admin/users" replace /> : <Navigate to="/login" replace />} />
-        </Routes>
-      </div>
-    </Router>
-=======
     <div className="font-sans">
       {/* HOME PAGE */}
       {routeState.currentPage === ROUTES.HOME && (
@@ -562,7 +326,6 @@ const App = () => {
         />
       )}
     </div>
->>>>>>> Stashed changes
   );
 };
 

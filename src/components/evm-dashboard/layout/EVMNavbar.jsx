@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getCurrentUser as getCurrentUserFromAuth, logout } from '../../../services/authService';
-import { getCurrentUser as getCurrentUserFromAPI } from '../../../services/dashboardService';
+import { getCurrentUser as getCurrentUserFromAPI } from '../../../services/evm/dashboardService';
 
 const EVMNavbar = () => {
   const [user, setUser] = useState(null);
