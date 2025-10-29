@@ -1,14 +1,13 @@
-import React from 'react';
-import VehicleModelManagement from '../components/evm-dashboard/VehicleModelManagement';
-import DealerManagement from '../components/evm-dashboard/DealerManagement';
-import DealerContractManagement from '../components/evm-dashboard/DealerContractManagement';
-import InventoryManagement from '../components/evm-dashboard/InventoryManagement';
-import VehicleVariantManagement from '../components/evm-dashboard/VehicleVariantManagement';
+import DealerContractManagement from "../components/evm-dashboard/DealerContractManagement";
+import DealerManagement from "../components/evm-dashboard/DealerManagement";
+import InventoryManagement from "../components/evm-dashboard/InventoryManagement";
+import VehicleModelManagement from "../components/evm-dashboard/VehicleModelManagement";
+import VehicleVariantManagement from "../components/evm-dashboard/VehicleVariantManagement";
 
 const EVMDashboard = ({ currentPage }) => {
   const renderContent = () => {
     switch (currentPage) {
-      case 'evm-dashboard':
+      case "evm-dashboard":
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
             <div className="row">
@@ -21,9 +20,7 @@ const EVMDashboard = ({ currentPage }) => {
                       </div>
                       <div>
                         <h4 className="mb-1">Welcome to EVM Dashboard</h4>
-                        <p className="mb-0 text-muted">
-                          Manage vehicle models, variants, and specifications
-                        </p>
+                        <p className="mb-0 text-muted">Manage vehicle models and variants</p>
                       </div>
                     </div>
 
@@ -98,26 +95,13 @@ const EVMDashboard = ({ currentPage }) => {
                     <div className="mt-4">
                       <h5 className="mb-3">Quick Actions</h5>
                       <div className="d-flex flex-wrap gap-2">
-                        <button 
-                          className="btn btn-primary"
-                          onClick={() => window.location.href = '/vehicle-models'}
-                        >
+                        <button className="btn btn-primary" onClick={() => (window.location.href = "/vehicle-models")}>
                           <i className="bx bx-plus me-2" />
                           Add New Model
                         </button>
-                        <button 
-                          className="btn btn-outline-primary"
-                          onClick={() => window.location.href = '/vehicle-variants'}
-                        >
+                        <button className="btn btn-outline-primary" onClick={() => (window.location.href = "/vehicle-variants")}>
                           <i className="bx bx-customize me-2" />
                           Manage Variants
-                        </button>
-                        <button 
-                          className="btn btn-outline-primary"
-                          onClick={() => window.location.href = '/specifications'}
-                        >
-                          <i className="bx bx-list-ul me-2" />
-                          View Specifications
                         </button>
                       </div>
                     </div>
@@ -128,55 +112,38 @@ const EVMDashboard = ({ currentPage }) => {
           </div>
         );
 
-      case 'vehicle-models':
+      case "vehicle-models":
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
             <VehicleModelManagement />
           </div>
         );
 
-      case 'dealers':
+      case "dealers":
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
             <DealerManagement />
           </div>
         );
 
-      case 'dealer-contracts':
+      case "dealer-contracts":
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
             <DealerContractManagement />
           </div>
         );
 
-      case 'oem-inventories':
+      case "oem-inventories":
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
             <InventoryManagement />
           </div>
         );
 
-      case 'vehicle-variants':
+      case "vehicle-variants":
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
             <VehicleVariantManagement />
-          </div>
-        );
-
-      case 'specifications':
-        return (
-          <div className="container-xxl flex-grow-1 container-p-y">
-            <div className="card">
-              <div className="card-header">
-                <h5 className="mb-0">Vehicle Specifications</h5>
-              </div>
-              <div className="card-body">
-                <div className="alert alert-info">
-                  <i className="bx bx-info-circle me-2" />
-                  Specifications management coming soon...
-                </div>
-              </div>
-            </div>
           </div>
         );
 
