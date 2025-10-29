@@ -1,7 +1,18 @@
-// AdjustQuantityModal.jsx
-// Modal for adjusting inventory quantity
-
-const AdjustQuantityModal = ({ show, loading, adjustData, onClose, onChange, onSubmit }) => {
+const AdjustQuantityModal = ({
+  show,
+  loading,
+  adjustData,
+  onClose,
+  onChange,
+  onSubmit,
+  forecast,
+  forecastLoading,
+  forecastError,
+  forecastHorizon,
+  onForecastHorizonChange,
+  onRetrainForecast,
+  retrainLoading,
+}) => {
   if (!show) return null;
   return (
     <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
@@ -12,10 +23,69 @@ const AdjustQuantityModal = ({ show, loading, adjustData, onClose, onChange, onS
               <i className="bx bx-adjust me-2" />
               Adjust Inventory Quantity
             </h5>
-            <button type="button" className="btn-close btn-close-white" onClick={onClose} disabled={loading} />
           </div>
           <form onSubmit={onSubmit}>
             <div className="modal-body">
+              {/* Forecast Demand Section */}
+              <div className="mb-3">
+                <label className="form-label">Forecasted Demand (next {forecastHorizon} days since last order)</label>
+                <div className="d-flex align-items-center mb-2">
+                  <input
+                    type="number"
+                    min="1"
+                    max="60"
+                    value={forecastHorizon}
+                    onChange={onForecastHorizonChange}
+                    className="form-control me-2"
+                    style={{ width: 100 }}
+                    disabled={forecastLoading || retrainLoading}
+                  />
+                  <button type="button" className="btn btn-outline-primary btn-sm me-2" onClick={onRetrainForecast} disabled={retrainLoading || forecastLoading}>
+                    {retrainLoading ? <span className="spinner-border spinner-border-sm me-1" /> : <i className="bx bx-refresh me-1" />}
+                    Retrain Model
+                  </button>
+                  {forecastLoading && <span className="spinner-border spinner-border-sm text-primary" />}
+                </div>
+                {forecastError && (
+                  <div className="alert alert-danger py-2 mb-2">
+                    {typeof forecastError === "string"
+                      ? forecastError.includes("404")
+                        ? "This variant doesn't have enough data to generate a forecast."
+                        : forecastError.includes("400")
+                        ? "This variant doesn't have enough data to retrain the model."
+                        : forecastError
+                      : forecastError}
+                  </div>
+                )}
+                {forecast && forecast.forecasts && forecast.forecasts.length > 0 && (
+                  <div style={{ maxHeight: 150, overflowY: "auto" }}>
+                    <table className="table table-sm table-bordered mb-0">
+                      <thead>
+                        <tr>
+                          <th>Date</th>
+                          <th>Predicted Demand</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {forecast.forecasts.map((f) => (
+                          <tr key={f.step}>
+                            <td>{f.timestamp}</td>
+                            <td>{f.predictedDemand}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+                {forecast && forecast.modelInfo && (
+                  <div className="text-muted small mt-1">
+                    <span>
+                      Model: {forecast.modelInfo.algorithm} (v{forecast.modelInfo.version})
+                    </span>
+                    {forecast.modelInfo.trainedOn && <span className="ms-3">Last trained: {new Date(forecast.modelInfo.trainedOn).toLocaleString()}</span>}
+                  </div>
+                )}
+              </div>
               <div className="alert alert-info">
                 <strong>Current Stock:</strong> {adjustData.currentQuantity} units
               </div>

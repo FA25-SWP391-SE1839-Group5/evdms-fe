@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getForecast, retrainForecast } from "../../services/forecastService";
 import AdjustQuantityModal from "./inventory/AdjustQuantityModal";
 import DeleteConfirmationModal from "./inventory/DeleteConfirmationModal";
 import InventoryModal from "./inventory/InventoryModal";
@@ -16,6 +17,12 @@ const InventoryManagement = () => {
   const [sortBy, setSortBy] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
 
+  // Forecast state for Adjust modal
+  const [forecast, setForecast] = useState(null);
+  const [forecastLoading, setForecastLoading] = useState(false);
+  const [forecastError, setForecastError] = useState(null);
+  const [forecastHorizon, setForecastHorizon] = useState(14);
+  const [retrainLoading, setRetrainLoading] = useState(false);
   // Modal state
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState("create"); // 'create', 'edit', 'view', 'adjust'
@@ -106,9 +113,55 @@ const InventoryManagement = () => {
         adjustment: 0,
         action: "add",
       });
+      setForecastHorizon(14);
       setShowAdjustModal(true);
+      // Fetch forecast
+      fetchForecast(inventory.variantId, 14);
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  // Fetch forecast helper
+  const fetchForecast = async (variantId, horizon) => {
+    setForecastLoading(true);
+    setForecastError(null);
+    try {
+      const data = await getForecast(variantId, horizon);
+      if (data && data.message && data.message.includes("Not enough data")) {
+        setForecast(null);
+        setForecastError("Not enough data to forecast for this variant. Please try again after more sales data is available.");
+      } else {
+        setForecast(data);
+      }
+    } catch (err) {
+      setForecastError(err + "Failed to fetch forecast");
+      setForecast(null);
+    } finally {
+      setForecastLoading(false);
+    }
+  };
+
+  // Handle horizon change
+  const handleForecastHorizonChange = (e) => {
+    const newHorizon = Number(e.target.value) || 14;
+    setForecastHorizon(newHorizon);
+    if (adjustData.variantId) {
+      fetchForecast(adjustData.variantId, newHorizon);
+    }
+  };
+
+  // Handle retrain
+  const handleRetrainForecast = async () => {
+    setRetrainLoading(true);
+    try {
+      await retrainForecast(adjustData.variantId, forecastHorizon);
+      // Refetch forecast after retrain
+      await fetchForecast(adjustData.variantId, forecastHorizon);
+    } catch (err) {
+      setForecastError(err + "Failed to retrain model");
+    } finally {
+      setRetrainLoading(false);
     }
   };
 
@@ -379,7 +432,21 @@ const InventoryManagement = () => {
       />
 
       {/* Adjust Quantity Modal */}
-      <AdjustQuantityModal show={showAdjustModal} loading={loading} adjustData={adjustData} onClose={() => setShowAdjustModal(false)} onChange={handleAdjustChange} onSubmit={handleAdjustSubmit} />
+      <AdjustQuantityModal
+        show={showAdjustModal}
+        loading={loading}
+        adjustData={adjustData}
+        onClose={() => setShowAdjustModal(false)}
+        onChange={handleAdjustChange}
+        onSubmit={handleAdjustSubmit}
+        forecast={forecast}
+        forecastLoading={forecastLoading}
+        forecastError={forecastError}
+        forecastHorizon={forecastHorizon}
+        onForecastHorizonChange={handleForecastHorizonChange}
+        onRetrainForecast={handleRetrainForecast}
+        retrainLoading={retrainLoading}
+      />
 
       {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal
