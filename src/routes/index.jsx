@@ -1,5 +1,6 @@
 export const ROUTES = {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   LOGIN: "login",
   CATALOG: "catalog",
   DETAIL: "detail",
@@ -10,6 +11,8 @@ export const ROUTES = {
   VEHICLE_MODELS: "vehicle_models",
   RESET_PASSWORD: "reset_password",
 =======
+=======
+>>>>>>> Stashed changes
     HOME: 'home',
     LOGIN: 'login',
     CATALOG: 'catalog',
@@ -18,6 +21,9 @@ export const ROUTES = {
     EVM_DASHBOARD: 'evm-dashboard',
     VEHICLE_MODELS: 'vehicle-models',
     RESET_PASSWORD: 'reset-password',
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 };
 
@@ -38,6 +44,7 @@ const ADMIN_PAGES = {
 };
 
 export const initialState = {
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
   currentPage: ROUTES.LOGIN,
   selectedVehicle: null,
@@ -80,6 +87,8 @@ export const routeReducer = (state, action) => {
           targetPage = ROUTES.DEALER_STAFF_DASHBOARD;
           break;
 =======
+=======
+>>>>>>> Stashed changes
     currentPage: ROUTES.HOME,
     selectedVehicle: null,
     user: null,

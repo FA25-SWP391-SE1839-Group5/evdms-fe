@@ -61,6 +61,7 @@ const App = () => {
       console.log('--- Running Initial Auth Check ---');
       try {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         // Check if URL has reset token parameter
         const urlParams = new URLSearchParams(window.location.search);
         const resetToken = urlParams.get("token");
@@ -127,6 +128,45 @@ const App = () => {
         console.error('Initial Auth check failed:', error);
         dispatch({ type: 'NAVIGATE_TO_HOME' }); // Lỗi thì về home
 >>>>>>> Stashed changes
+=======
+        const stored = getStoredToken();
+
+        // ƯU TIÊN 1: Có token hợp lệ?
+        if (stored?.user?.role) {
+          console.log('Token found. Dispatching LOGIN_SUCCESS:', stored.user);
+          dispatch({ type: 'LOGIN_SUCCESS', payload: stored.user });
+          // Không set isCheckingAuth = false ở đây vội
+          return; // Kết thúc sớm nếu đã đăng nhập
+        }
+
+        // ƯU TIÊN 2: Không có token, kiểm tra URL đặc biệt
+        console.log('No token found. Checking URL:', window.location.pathname, window.location.search);
+        const urlParams = new URLSearchParams(window.location.search);
+        const resetToken = urlParams.get('token');
+        const path = window.location.pathname.replace('/', '');
+
+        if (resetToken /* && path === 'reset-password' */) { // Có thể thêm check path nếu muốn
+          console.log('Reset token detected.');
+          dispatch({ type: 'NAVIGATE_TO_RESET_PASSWORD' });
+        } else if (path === 'login') {
+          console.log('No token, on /login path.');
+          dispatch({ type: 'NAVIGATE_TO_LOGIN' });
+        } else if (path === 'catalog') {
+          console.log('No token, on /catalog path.');
+          dispatch({ type: 'NAVIGATE_TO_CATALOG' });
+        } else if (path === '' || path === 'home') {
+           console.log('No token, on root or /home path.');
+           dispatch({ type: 'NAVIGATE_TO_HOME' });
+        } else {
+           // Các URL khác mà không có token -> Chuyển về Home (hoặc Login tùy ý)
+           console.log(`No token, on protected path /${path}. Redirecting to HOME.`);
+           dispatch({ type: 'NAVIGATE_TO_HOME' });
+        }
+
+      } catch (error) {
+        console.error('Initial Auth check failed:', error);
+        dispatch({ type: 'NAVIGATE_TO_HOME' }); // Lỗi thì về home
+>>>>>>> Stashed changes
       } finally {
         // Luôn tắt loading sau khi kiểm tra xong
         // Dùng setTimeout để đảm bảo dispatch kịp xử lý trước khi tắt loading
@@ -137,6 +177,7 @@ const App = () => {
       }
     };
 
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
     checkAuthOrReset();
   }, []);
@@ -204,6 +245,35 @@ const App = () => {
   //     }
   //   };
 
+=======
+    checkAuthAndRoute();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Hook này chỉ chạy 1 lần khi mount
+
+  const getInitialAdminPage = () => {
+    const path = globalThis.location.pathname.replace('/', '');
+    if (!path || path === 'admin-dashboard') return 'dashboard';
+    return path;
+  };
+
+  const getInitialEVMPage = () => {
+    const path = globalThis.location.pathname.replace('/', '');
+    if (!path || path === 'evm-dashboard') return 'evm-dashboard';
+    return path;
+  };
+
+  // Sync logout across tabs
+  // useEffect(() => {
+  //   const handleStorageChange = (e) => {
+  //     if (e.key === 'evdms_auth_token' && !e.newValue) {
+  //       // Token was cleared in another tab
+  //       dispatch({ type: 'LOGOUT' });
+  //       setFavorites(new Set());
+  //       setCompareList([]);
+  //     }
+  //   };
+
+>>>>>>> Stashed changes
   //   globalThis.addEventListener('storage', handleStorageChange);
   //   return () => globalThis.removeEventListener('storage', handleStorageChange);
   // }, []);
@@ -253,12 +323,16 @@ const App = () => {
   //   globalThis.addEventListener('popstate', handlePopState);
   //   return () => globalThis.removeEventListener('popstate', handlePopState);
   // }, []);
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
   // ============================================
   // AUTHENTICATION HANDLERS
   // ============================================
   const handleLoginSuccess = (userData) => {
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
     dispatch({
       type: "LOGIN_SUCCESS",
@@ -270,6 +344,8 @@ const App = () => {
     }
     // You can add more role-based redirects here if needed
 =======
+=======
+>>>>>>> Stashed changes
     console.log('handleLoginSuccess called with:', userData);
      // Đảm bảo userData có role
      if (userData && userData.role) {
@@ -279,6 +355,9 @@ const App = () => {
          // Có thể dispatch về login hoặc hiển thị lỗi
          dispatch({ type: 'NAVIGATE_TO_LOGIN' });
      }
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
   };
 
