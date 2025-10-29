@@ -8,6 +8,7 @@ import BackgroundElements from "../components/common/BackgroundElements";
 import BrandHeader from "../components/common/BrandHeader";
 import NeumorphismCard from "../components/ui/NeumorphismCard";
 import { saveLoginToken, sendResetPasswordLink, validateLogin } from "../services/authService";
+import { decodeJwt } from "../utils/jwt";
 
 const LoginPage = ({ onLoginSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -15,8 +16,7 @@ const LoginPage = ({ onLoginSuccess }) => {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [userRole, setUserRole] = useState(null);
-  const [forgotMessage, setForgotMessage] = useState('');
-
+  const [forgotMessage, setForgotMessage] = useState("");
 
   // Handle main login
   const handleLogin = async (formData) => {
@@ -24,21 +24,29 @@ const LoginPage = ({ onLoginSuccess }) => {
     setLoginError("");
 
     try {
-      // API returns: { accessToken, refreshToken, user: { id, email, name, role } }
+      // API returns: { accessToken, ... }
       const userData = await validateLogin(formData.email, formData.password);
 
       // Save token to localStorage
       saveLoginToken(userData);
 
-      // Normalize user data for display
+      // Decode JWT to get role and other info
+      const jwtPayload = decodeJwt(userData.accessToken);
       const user = {
         id: userData.id,
         name: userData.fullName,
         email: userData.email,
-        role: userData.role
+        role: jwtPayload.role || jwtPayload.Role || jwtPayload.ROLE || undefined,
+        dealerId: jwtPayload.dealerId || jwtPayload.dealerID || undefined,
       };
 
-      setUserRole(userData.user);
+      if (!user.role) {
+        setLoginError("No user role found in token. Cannot redirect.");
+        setIsLoading(false);
+        return;
+      }
+
+      setUserRole(user);
       setShowSuccess(true);
 
       // Delay redirect để show success message
@@ -68,7 +76,7 @@ const LoginPage = ({ onLoginSuccess }) => {
       setForgotMessage("✅ Password reset link has been sent! Please check your email.");
       setTimeout(() => {
         setShowForgotPassword(false);
-      }, 3000);;
+      }, 3000);
     } catch (e) {
       setLoginError(e.message || "An error occurred. Please try again.");
     } finally {
@@ -101,15 +109,11 @@ const LoginPage = ({ onLoginSuccess }) => {
                 {!showSuccess ? (
                   <>
                     {showForgotPassword ? (
-                    <div className="flex flex-col items-center">
-                      <ForgotPasswordForm onSubmit={handleForgotPassword} onBack={() => setShowForgotPassword(false)} isLoading={isLoading} />
-                      {forgotMessage && (
-                        <p className="text-green-600 text-sm mt-4 text-center">{forgotMessage}</p>
-                      )}
-                      {loginError && (
-                        <p className="text-red-500 text-sm mt-4 text-center">{loginError}</p>
-                      )}
-                    </div>
+                      <div className="flex flex-col items-center">
+                        <ForgotPasswordForm onSubmit={handleForgotPassword} onBack={() => setShowForgotPassword(false)} isLoading={isLoading} />
+                        {forgotMessage && <p className="text-green-600 text-sm mt-4 text-center">{forgotMessage}</p>}
+                        {loginError && <p className="text-red-500 text-sm mt-4 text-center">{loginError}</p>}
+                      </div>
                     ) : (
                       <>
                         <LoginAvatar />
