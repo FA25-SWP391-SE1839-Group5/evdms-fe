@@ -1,12 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import {
-  getAllDealerContracts,
-  getDealerContractById,
-  createDealerContract,
-  updateDealerContract,
-  deleteDealerContract,
-  getAllDealers
-} from '../../services/evm/dealerService';
+import { useEffect, useState } from "react";
+import { createDealerContract, deleteDealerContract, getAllDealerContracts, getAllDealers, getDealerContractById, updateDealerContract } from "../../services/dealerService";
 
 const DealerContractManagement = () => {
   // State management
@@ -20,21 +13,21 @@ const DealerContractManagement = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalResults, setTotalResults] = useState(0);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("");
 
   // Modal state
   const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState('create'); // 'create', 'edit', 'view'
+  const [modalMode, setModalMode] = useState("create"); // 'create', 'edit', 'view'
   const [currentContract, setCurrentContract] = useState(null);
 
   // Form state
   const [formData, setFormData] = useState({
-    dealerId: '',
-    startDate: '',
-    endDate: '',
+    dealerId: "",
+    startDate: "",
+    endDate: "",
     salesTarget: 0,
-    outstandingDebt: 0
+    outstandingDebt: 0,
   });
 
   // Delete confirmation
@@ -48,7 +41,7 @@ const DealerContractManagement = () => {
         const data = await getAllDealers({ page: 1, pageSize: 100 });
         setDealers(data.items);
       } catch (err) {
-        console.error('Error fetching dealers:', err);
+        console.error("Error fetching dealers:", err);
       }
     };
     fetchDealersData();
@@ -65,13 +58,13 @@ const DealerContractManagement = () => {
           pageSize,
           search: searchTerm,
           sortBy,
-          sortOrder: 'desc'
+          sortOrder: "desc",
         });
         setContracts(data.items);
         setTotalResults(data.totalResults);
       } catch (err) {
-        setError('Failed to fetch dealer contracts: ' + (err.message || 'Unknown error'));
-        console.error('Fetch error:', err);
+        setError("Failed to fetch dealer contracts: " + (err.message || "Unknown error"));
+        console.error("Fetch error:", err);
       } finally {
         setLoading(false);
       }
@@ -89,13 +82,13 @@ const DealerContractManagement = () => {
         pageSize,
         search: searchTerm,
         sortBy,
-        sortOrder: 'desc'
+        sortOrder: "desc",
       });
       setContracts(data.items);
       setTotalResults(data.totalResults);
     } catch (err) {
-      setError('Failed to fetch dealer contracts: ' + (err.message || 'Unknown error'));
-      console.error('Fetch error:', err);
+      setError("Failed to fetch dealer contracts: " + (err.message || "Unknown error"));
+      console.error("Fetch error:", err);
     } finally {
       setLoading(false);
     }
@@ -109,18 +102,18 @@ const DealerContractManagement = () => {
 
   // Open modal for create
   const handleCreate = () => {
-    setModalMode('create');
-    const today = new Date().toISOString().split('T')[0];
+    setModalMode("create");
+    const today = new Date().toISOString().split("T")[0];
     const nextYear = new Date();
     nextYear.setFullYear(nextYear.getFullYear() + 1);
-    const endDate = nextYear.toISOString().split('T')[0];
-    
-    setFormData({ 
-      dealerId: dealers[0]?.id || '', 
+    const endDate = nextYear.toISOString().split("T")[0];
+
+    setFormData({
+      dealerId: dealers[0]?.id || "",
       startDate: today,
       endDate: endDate,
       salesTarget: 0,
-      outstandingDebt: 0
+      outstandingDebt: 0,
     });
     setCurrentContract(null);
     setShowModal(true);
@@ -132,22 +125,22 @@ const DealerContractManagement = () => {
       setLoading(true);
       const contract = await getDealerContractById(id);
       setCurrentContract(contract);
-      
+
       // Convert ISO dates to YYYY-MM-DD for input fields
-      const startDate = contract.startDate ? new Date(contract.startDate).toISOString().split('T')[0] : '';
-      const endDate = contract.endDate ? new Date(contract.endDate).toISOString().split('T')[0] : '';
-      
+      const startDate = contract.startDate ? new Date(contract.startDate).toISOString().split("T")[0] : "";
+      const endDate = contract.endDate ? new Date(contract.endDate).toISOString().split("T")[0] : "";
+
       setFormData({
         dealerId: contract.dealerId,
         startDate: startDate,
         endDate: endDate,
         salesTarget: contract.salesTarget,
-        outstandingDebt: contract.outstandingDebt
+        outstandingDebt: contract.outstandingDebt,
       });
-      setModalMode('edit');
+      setModalMode("edit");
       setShowModal(true);
     } catch (err) {
-      setError('Failed to fetch contract details: ' + (err.message || 'Unknown error'));
+      setError("Failed to fetch contract details: " + (err.message || "Unknown error"));
     } finally {
       setLoading(false);
     }
@@ -159,21 +152,21 @@ const DealerContractManagement = () => {
       setLoading(true);
       const contract = await getDealerContractById(id);
       setCurrentContract(contract);
-      
-      const startDate = contract.startDate ? new Date(contract.startDate).toISOString().split('T')[0] : '';
-      const endDate = contract.endDate ? new Date(contract.endDate).toISOString().split('T')[0] : '';
-      
+
+      const startDate = contract.startDate ? new Date(contract.startDate).toISOString().split("T")[0] : "";
+      const endDate = contract.endDate ? new Date(contract.endDate).toISOString().split("T")[0] : "";
+
       setFormData({
         dealerId: contract.dealerId,
         startDate: startDate,
         endDate: endDate,
         salesTarget: contract.salesTarget,
-        outstandingDebt: contract.outstandingDebt
+        outstandingDebt: contract.outstandingDebt,
       });
-      setModalMode('view');
+      setModalMode("view");
       setShowModal(true);
     } catch (err) {
-      setError('Failed to fetch contract details: ' + (err.message || 'Unknown error'));
+      setError("Failed to fetch contract details: " + (err.message || "Unknown error"));
     } finally {
       setLoading(false);
     }
@@ -182,7 +175,7 @@ const DealerContractManagement = () => {
   // Handle form input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   // Handle form submit
@@ -193,19 +186,19 @@ const DealerContractManagement = () => {
 
     // Validation
     if (!formData.dealerId) {
-      setError('Please select a dealer');
+      setError("Please select a dealer");
       return;
     }
     if (!formData.startDate) {
-      setError('Start date is required');
+      setError("Start date is required");
       return;
     }
     if (!formData.endDate) {
-      setError('End date is required');
+      setError("End date is required");
       return;
     }
     if (new Date(formData.endDate) <= new Date(formData.startDate)) {
-      setError('End date must be after start date');
+      setError("End date must be after start date");
       return;
     }
 
@@ -218,15 +211,15 @@ const DealerContractManagement = () => {
         startDate: new Date(formData.startDate).toISOString(),
         endDate: new Date(formData.endDate).toISOString(),
         salesTarget: Number(formData.salesTarget) || 0,
-        outstandingDebt: Number(formData.outstandingDebt) || 0
+        outstandingDebt: Number(formData.outstandingDebt) || 0,
       };
 
-      if (modalMode === 'create') {
+      if (modalMode === "create") {
         await createDealerContract(payload);
-        setSuccess('Dealer contract created successfully!');
-      } else if (modalMode === 'edit') {
+        setSuccess("Dealer contract created successfully!");
+      } else if (modalMode === "edit") {
         await updateDealerContract(currentContract.id, payload);
-        setSuccess('Dealer contract updated successfully!');
+        setSuccess("Dealer contract updated successfully!");
       }
 
       // Refresh list and close modal
@@ -236,8 +229,8 @@ const DealerContractManagement = () => {
         setSuccess(null);
       }, 1500);
     } catch (err) {
-      setError('Failed to save contract: ' + (err.response?.data?.message || err.message || 'Unknown error'));
-      console.error('Save error:', err);
+      setError("Failed to save contract: " + (err.response?.data?.message || err.message || "Unknown error"));
+      console.error("Save error:", err);
     } finally {
       setLoading(false);
     }
@@ -255,13 +248,13 @@ const DealerContractManagement = () => {
     try {
       setLoading(true);
       await deleteDealerContract(contractToDelete.id);
-      setSuccess('Dealer contract deleted successfully!');
+      setSuccess("Dealer contract deleted successfully!");
       setShowDeleteModal(false);
       setContractToDelete(null);
       await fetchContracts();
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      setError('Failed to delete contract: ' + (err.message || 'Unknown error'));
+      setError("Failed to delete contract: " + (err.message || "Unknown error"));
     } finally {
       setLoading(false);
     }
@@ -269,7 +262,7 @@ const DealerContractManagement = () => {
 
   // Get dealer name by ID
   const getDealerName = (dealerId) => {
-    const dealer = dealers.find(d => d.id === dealerId);
+    const dealer = dealers.find((d) => d.id === dealerId);
     return dealer ? dealer.name : dealerId;
   };
 
@@ -278,21 +271,21 @@ const DealerContractManagement = () => {
 
   // Format date
   const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return "N/A";
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
   // Format currency
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 0,
     }).format(amount);
   };
 
@@ -309,13 +302,13 @@ const DealerContractManagement = () => {
     const now = new Date();
     const start = new Date(startDate);
     const end = new Date(endDate);
-    
+
     if (now < start) {
-      return { label: 'Upcoming', color: 'info' };
+      return { label: "Upcoming", color: "info" };
     } else if (now > end) {
-      return { label: 'Expired', color: 'danger' };
+      return { label: "Expired", color: "danger" };
     } else {
-      return { label: 'Active', color: 'success' };
+      return { label: "Active", color: "success" };
     }
   };
 
@@ -358,19 +351,13 @@ const DealerContractManagement = () => {
                 <span className="input-group-text">
                   <i className="bx bx-search" />
                 </span>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Search by dealer or contract..."
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                />
+                <input type="text" className="form-control" placeholder="Search by dealer or contract..." value={searchTerm} onChange={handleSearchChange} />
               </div>
             </div>
             <div className="col-md-3">
-              <select 
-                className="form-select" 
-                value={pageSize} 
+              <select
+                className="form-select"
+                value={pageSize}
                 onChange={(e) => {
                   setPageSize(Number(e.target.value));
                   setPage(1);
@@ -383,11 +370,7 @@ const DealerContractManagement = () => {
               </select>
             </div>
             <div className="col-md-3">
-              <select 
-                className="form-select" 
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-              >
+              <select className="form-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
                 <option value="">Sort by...</option>
                 <option value="startDate">Start Date</option>
                 <option value="endDate">End Date</option>
@@ -420,7 +403,7 @@ const DealerContractManagement = () => {
                       <th>End Date</th>
                       <th>Sales Target</th>
                       <th>Outstanding Debt</th>
-                      <th style={{ width: '150px' }}>Actions</th>
+                      <th style={{ width: "150px" }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -440,43 +423,25 @@ const DealerContractManagement = () => {
                               <strong>{getDealerName(contract.dealerId)}</strong>
                             </td>
                             <td>
-                              <span className={`badge bg-label-${status.color}`}>
-                                {status.label}
-                              </span>
+                              <span className={`badge bg-label-${status.color}`}>{status.label}</span>
                             </td>
                             <td>{formatDate(contract.startDate)}</td>
                             <td>{formatDate(contract.endDate)}</td>
                             <td>
-                              <strong className="text-primary">
-                                {formatCurrency(contract.salesTarget)}
-                              </strong>
+                              <strong className="text-primary">{formatCurrency(contract.salesTarget)}</strong>
                             </td>
                             <td>
-                              <strong className={contract.outstandingDebt > 0 ? 'text-danger' : 'text-success'}>
-                                {formatCurrency(contract.outstandingDebt)}
-                              </strong>
+                              <strong className={contract.outstandingDebt > 0 ? "text-danger" : "text-success"}>{formatCurrency(contract.outstandingDebt)}</strong>
                             </td>
                             <td>
                               <div className="btn-group" role="group">
-                                <button
-                                  className="btn btn-sm btn-outline-info"
-                                  onClick={() => handleView(contract.id)}
-                                  title="View Details"
-                                >
+                                <button className="btn btn-sm btn-outline-info" onClick={() => handleView(contract.id)} title="View Details">
                                   <i className="bx bx-show" />
                                 </button>
-                                <button
-                                  className="btn btn-sm btn-outline-primary"
-                                  onClick={() => handleEdit(contract.id)}
-                                  title="Edit"
-                                >
+                                <button className="btn btn-sm btn-outline-primary" onClick={() => handleEdit(contract.id)} title="Edit">
                                   <i className="bx bx-edit" />
                                 </button>
-                                <button
-                                  className="btn btn-sm btn-outline-danger"
-                                  onClick={() => handleDeleteClick(contract)}
-                                  title="Delete"
-                                >
+                                <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteClick(contract)} title="Delete">
                                   <i className="bx bx-trash" />
                                 </button>
                               </div>
@@ -493,50 +458,36 @@ const DealerContractManagement = () => {
               {totalPages > 1 && (
                 <div className="d-flex justify-content-between align-items-center mt-4">
                   <div className="text-muted">
-                    Showing {((page - 1) * pageSize) + 1} to {Math.min(page * pageSize, totalResults)} of {totalResults} results
+                    Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, totalResults)} of {totalResults} results
                   </div>
                   <nav>
                     <ul className="pagination mb-0">
-                      <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
-                        <button 
-                          className="page-link" 
-                          onClick={() => setPage(page - 1)}
-                          disabled={page === 1}
-                        >
+                      <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
+                        <button className="page-link" onClick={() => setPage(page - 1)} disabled={page === 1}>
                           Previous
                         </button>
                       </li>
                       {Array.from({ length: totalPages }, (_, i) => {
                         const pageNum = i + 1;
-                        if (
-                          pageNum === 1 || 
-                          pageNum === totalPages || 
-                          (pageNum >= page - 1 && pageNum <= page + 1)
-                        ) {
+                        if (pageNum === 1 || pageNum === totalPages || (pageNum >= page - 1 && pageNum <= page + 1)) {
                           return (
-                            <li 
-                              key={pageNum} 
-                              className={`page-item ${page === pageNum ? 'active' : ''}`}
-                            >
-                              <button 
-                                className="page-link" 
-                                onClick={() => setPage(pageNum)}
-                              >
+                            <li key={pageNum} className={`page-item ${page === pageNum ? "active" : ""}`}>
+                              <button className="page-link" onClick={() => setPage(pageNum)}>
                                 {pageNum}
                               </button>
                             </li>
                           );
                         } else if (pageNum === page - 2 || pageNum === page + 2) {
-                          return <li key={pageNum} className="page-item disabled"><span className="page-link">...</span></li>;
+                          return (
+                            <li key={pageNum} className="page-item disabled">
+                              <span className="page-link">...</span>
+                            </li>
+                          );
                         }
                         return null;
                       })}
-                      <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
-                        <button 
-                          className="page-link" 
-                          onClick={() => setPage(page + 1)}
-                          disabled={page === totalPages}
-                        >
+                      <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
+                        <button className="page-link" onClick={() => setPage(page + 1)} disabled={page === totalPages}>
                           Next
                         </button>
                       </li>
@@ -551,21 +502,31 @@ const DealerContractManagement = () => {
 
       {/* Create/Edit Modal */}
       {showModal && (
-        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
           <div className="modal-dialog modal-lg">
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
-                  {modalMode === 'create' && <><i className="bx bx-plus me-2" />Create New Contract</>}
-                  {modalMode === 'edit' && <><i className="bx bx-edit me-2" />Edit Contract</>}
-                  {modalMode === 'view' && <><i className="bx bx-show me-2" />View Contract</>}
+                  {modalMode === "create" && (
+                    <>
+                      <i className="bx bx-plus me-2" />
+                      Create New Contract
+                    </>
+                  )}
+                  {modalMode === "edit" && (
+                    <>
+                      <i className="bx bx-edit me-2" />
+                      Edit Contract
+                    </>
+                  )}
+                  {modalMode === "view" && (
+                    <>
+                      <i className="bx bx-show me-2" />
+                      View Contract
+                    </>
+                  )}
                 </h5>
-                <button 
-                  type="button" 
-                  className="btn-close" 
-                  onClick={() => setShowModal(false)}
-                  disabled={loading}
-                />
+                <button type="button" className="btn-close" onClick={() => setShowModal(false)} disabled={loading} />
               </div>
               <form onSubmit={handleSubmit}>
                 <div className="modal-body">
@@ -574,16 +535,9 @@ const DealerContractManagement = () => {
                     <label className="form-label">
                       Dealer <span className="text-danger">*</span>
                     </label>
-                    <select
-                      className="form-select"
-                      name="dealerId"
-                      value={formData.dealerId}
-                      onChange={handleInputChange}
-                      disabled={modalMode === 'view'}
-                      required
-                    >
+                    <select className="form-select" name="dealerId" value={formData.dealerId} onChange={handleInputChange} disabled={modalMode === "view"} required>
                       <option value="">Select a dealer...</option>
-                      {dealers.map(dealer => (
+                      {dealers.map((dealer) => (
                         <option key={dealer.id} value={dealer.id}>
                           {dealer.name} - {dealer.region}
                         </option>
@@ -597,61 +551,41 @@ const DealerContractManagement = () => {
                       <label className="form-label">
                         Start Date <span className="text-danger">*</span>
                       </label>
-                      <input
-                        type="date"
-                        className="form-control"
-                        name="startDate"
-                        value={formData.startDate}
-                        onChange={handleInputChange}
-                        disabled={modalMode === 'view'}
-                        required
-                      />
+                      <input type="date" className="form-control" name="startDate" value={formData.startDate} onChange={handleInputChange} disabled={modalMode === "view"} required />
                     </div>
                     <div className="col-md-6 mb-3">
                       <label className="form-label">
                         End Date <span className="text-danger">*</span>
                       </label>
-                      <input
-                        type="date"
-                        className="form-control"
-                        name="endDate"
-                        value={formData.endDate}
-                        onChange={handleInputChange}
-                        disabled={modalMode === 'view'}
-                        required
-                      />
+                      <input type="date" className="form-control" name="endDate" value={formData.endDate} onChange={handleInputChange} disabled={modalMode === "view"} required />
                     </div>
                   </div>
 
                   {/* Sales Target & Outstanding Debt */}
                   <div className="row">
                     <div className="col-md-6 mb-3">
-                      <label className="form-label">
-                        Sales Target (USD)
-                      </label>
+                      <label className="form-label">Sales Target (USD)</label>
                       <input
                         type="number"
                         className="form-control"
                         name="salesTarget"
                         value={formData.salesTarget}
                         onChange={handleInputChange}
-                        disabled={modalMode === 'view'}
+                        disabled={modalMode === "view"}
                         min="0"
                         step="1000"
                         placeholder="0"
                       />
                     </div>
                     <div className="col-md-6 mb-3">
-                      <label className="form-label">
-                        Outstanding Debt (USD)
-                      </label>
+                      <label className="form-label">Outstanding Debt (USD)</label>
                       <input
                         type="number"
                         className="form-control"
                         name="outstandingDebt"
                         value={formData.outstandingDebt}
                         onChange={handleInputChange}
-                        disabled={modalMode === 'view'}
+                        disabled={modalMode === "view"}
                         min="0"
                         step="100"
                         placeholder="0"
@@ -660,19 +594,21 @@ const DealerContractManagement = () => {
                   </div>
 
                   {/* View mode details */}
-                  {modalMode === 'view' && currentContract && (
+                  {modalMode === "view" && currentContract && (
                     <div className="mt-3">
                       <hr />
                       <div className="row">
                         <div className="col-md-6">
                           <p className="mb-2">
-                            <strong>Contract ID:</strong><br />
+                            <strong>Contract ID:</strong>
+                            <br />
                             <code className="text-muted">{currentContract.id}</code>
                           </p>
                         </div>
                         <div className="col-md-6">
                           <p className="mb-2">
-                            <strong>Status:</strong><br />
+                            <strong>Status:</strong>
+                            <br />
                             <span className={`badge bg-label-${getContractStatus(currentContract.startDate, currentContract.endDate).color}`}>
                               {getContractStatus(currentContract.startDate, currentContract.endDate).label}
                             </span>
@@ -680,13 +616,15 @@ const DealerContractManagement = () => {
                         </div>
                         <div className="col-md-6 mt-2">
                           <p className="mb-2">
-                            <strong>Created At:</strong><br />
+                            <strong>Created At:</strong>
+                            <br />
                             {formatDate(currentContract.createdAt)}
                           </p>
                         </div>
                         <div className="col-md-6 mt-2">
                           <p className="mb-2">
-                            <strong>Updated At:</strong><br />
+                            <strong>Updated At:</strong>
+                            <br />
                             {formatDate(currentContract.updatedAt)}
                           </p>
                         </div>
@@ -695,20 +633,11 @@ const DealerContractManagement = () => {
                   )}
                 </div>
                 <div className="modal-footer">
-                  <button 
-                    type="button" 
-                    className="btn btn-secondary" 
-                    onClick={() => setShowModal(false)}
-                    disabled={loading}
-                  >
-                    {modalMode === 'view' ? 'Close' : 'Cancel'}
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)} disabled={loading}>
+                    {modalMode === "view" ? "Close" : "Cancel"}
                   </button>
-                  {modalMode !== 'view' && (
-                    <button 
-                      type="submit" 
-                      className="btn btn-primary"
-                      disabled={loading}
-                    >
+                  {modalMode !== "view" && (
+                    <button type="submit" className="btn btn-primary" disabled={loading}>
                       {loading ? (
                         <>
                           <span className="spinner-border spinner-border-sm me-2" />
@@ -717,7 +646,7 @@ const DealerContractManagement = () => {
                       ) : (
                         <>
                           <i className="bx bx-save me-1" />
-                          {modalMode === 'create' ? 'Create' : 'Update'}
+                          {modalMode === "create" ? "Create" : "Update"}
                         </>
                       )}
                     </button>
@@ -731,7 +660,7 @@ const DealerContractManagement = () => {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
-        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header bg-danger text-white">
@@ -739,12 +668,7 @@ const DealerContractManagement = () => {
                   <i className="bx bx-trash me-2" />
                   Confirm Delete
                 </h5>
-                <button 
-                  type="button" 
-                  className="btn-close btn-close-white" 
-                  onClick={() => setShowDeleteModal(false)}
-                  disabled={loading}
-                />
+                <button type="button" className="btn-close btn-close-white" onClick={() => setShowDeleteModal(false)} disabled={loading} />
               </div>
               <div className="modal-body">
                 <p>Are you sure you want to delete this dealer contract?</p>
@@ -759,27 +683,15 @@ const DealerContractManagement = () => {
                     <p className="mb-2">
                       <strong>Sales Target:</strong> {formatCurrency(contractToDelete.salesTarget)}
                     </p>
-                    <p className="mb-0 mt-2 text-danger small">
-                      This action cannot be undone.
-                    </p>
+                    <p className="mb-0 mt-2 text-danger small">This action cannot be undone.</p>
                   </div>
                 )}
               </div>
               <div className="modal-footer">
-                <button 
-                  type="button" 
-                  className="btn btn-secondary" 
-                  onClick={() => setShowDeleteModal(false)}
-                  disabled={loading}
-                >
+                <button type="button" className="btn btn-secondary" onClick={() => setShowDeleteModal(false)} disabled={loading}>
                   Cancel
                 </button>
-                <button 
-                  type="button" 
-                  className="btn btn-danger"
-                  onClick={confirmDelete}
-                  disabled={loading}
-                >
+                <button type="button" className="btn btn-danger" onClick={confirmDelete} disabled={loading}>
                   {loading ? (
                     <>
                       <span className="spinner-border spinner-border-sm me-2" />

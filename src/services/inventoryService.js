@@ -1,4 +1,4 @@
-import api from "../api";
+import api from "./api";
 
 // ============================================
 // API CALLS - OEM INVENTORIES
@@ -16,40 +16,33 @@ import api from "../api";
  * @returns {Promise<object>} - { items, totalResults, page, pageSize }
  */
 export const getAllInventories = async (params = {}) => {
-    const {
-        page = 1,
-        pageSize = 10,
-        sortBy = '',
-        sortOrder = '',
-        search = '',
-        filters = ''
-    } = params;
+  const { page = 1, pageSize = 10, sortBy = "", sortOrder = "", search = "", filters = "" } = params;
 
-    // Build query string
-    const queryParams = new URLSearchParams();
-    queryParams.append('page', page.toString());
-    queryParams.append('pageSize', pageSize.toString());
-    if (sortBy) queryParams.append('sortBy', sortBy);
-    if (sortOrder) queryParams.append('sortOrder', sortOrder);
-    if (search) queryParams.append('search', search);
-    if (filters) queryParams.append('filters', filters);
+  // Build query string
+  const queryParams = new URLSearchParams();
+  queryParams.append("page", page.toString());
+  queryParams.append("pageSize", pageSize.toString());
+  if (sortBy) queryParams.append("sortBy", sortBy);
+  if (sortOrder) queryParams.append("sortOrder", sortOrder);
+  if (search) queryParams.append("search", search);
+  if (filters) queryParams.append("filters", filters);
 
-    console.log("📡 API Call: GET /api/oem-inventories?" + queryParams.toString());
-    
-    try {
-        const response = await api.get(`/oem-inventories?${queryParams.toString()}`);
-        
-        // Return full response data structure
-        return {
-            items: response.data?.data?.items || [],
-            totalResults: response.data?.data?.totalResults || 0,
-            page: response.data?.data?.page || 1,
-            pageSize: response.data?.data?.pageSize || 10
-        };
-    } catch (error) {
-        console.error("Error fetching inventories:", error);
-        throw error;
-    }
+  console.log("📡 API Call: GET /api/oem-inventories?" + queryParams.toString());
+
+  try {
+    const response = await api.get(`/oem-inventories?${queryParams.toString()}`);
+
+    // Return full response data structure
+    return {
+      items: response.data?.data?.items || [],
+      totalResults: response.data?.data?.totalResults || 0,
+      page: response.data?.data?.page || 1,
+      pageSize: response.data?.data?.pageSize || 10,
+    };
+  } catch (error) {
+    console.error("Error fetching inventories:", error);
+    throw error;
+  }
 };
 
 /**
@@ -78,14 +71,14 @@ export const getInventoryById = async (inventoryId) => {
 export const createInventory = async (inventoryData) => {
   console.log("📡 API Call: POST /api/oem-inventories");
   console.log("📤 Sending data:", inventoryData);
-  
+
   const dataToSend = {
     variantId: inventoryData.variantId,
-    quantity: Number(inventoryData.quantity) || 0
+    quantity: Number(inventoryData.quantity) || 0,
   };
-  
+
   try {
-    const response = await api.post('/oem-inventories', dataToSend);
+    const response = await api.post("/oem-inventories", dataToSend);
     return response.data;
   } catch (error) {
     console.error("Error creating inventory:", error);
@@ -102,12 +95,12 @@ export const createInventory = async (inventoryData) => {
 export const updateInventory = async (inventoryId, inventoryData) => {
   console.log(`📡 API Call: PUT /api/oem-inventories/${inventoryId}`);
   console.log("📤 Sending update data:", inventoryData);
-  
+
   const dataToSend = {
     variantId: inventoryData.variantId,
-    quantity: Number(inventoryData.quantity) || 0
+    quantity: Number(inventoryData.quantity) || 0,
   };
-  
+
   try {
     const response = await api.put(`/oem-inventories/${inventoryId}`, dataToSend);
     return response.data;
@@ -129,11 +122,11 @@ export const adjustInventoryQuantity = async (inventoryId, variantId, newQuantit
   try {
     const response = await api.patch(`/oem-inventories/${inventoryId}`, {
       variantId,
-      quantity: newQuantity
+      quantity: newQuantity,
     });
     return response.data?.data || response.data;
   } catch (error) {
-    console.error('Error adjusting inventory quantity:', error);
+    console.error("Error adjusting inventory quantity:", error);
     throw error;
   }
 };

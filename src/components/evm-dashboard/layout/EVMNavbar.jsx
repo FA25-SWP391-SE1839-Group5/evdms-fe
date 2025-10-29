@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { getCurrentUser as getCurrentUserFromAuth, logout } from '../../../services/authService';
-import { getCurrentUser as getCurrentUserFromAPI } from '../../../services/evm/dashboardService';
+import { useEffect, useState } from "react";
+import { getCurrentUser as getCurrentUserFromAuth, logout } from "../../../services/authService";
+import { getCurrentUser as getCurrentUserFromAPI } from "../../../services/dashboardService";
 
 const EVMNavbar = () => {
   const [user, setUser] = useState(null);
@@ -23,11 +23,11 @@ const EVMNavbar = () => {
             id: userData.id,
             name: userData.fullName || userData.name,
             email: userData.email,
-            role: userData.role
+            role: userData.role,
           });
         }
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error("Error fetching user data:", error);
         // Keep using localStorage data if API fails
       } finally {
         setLoading(false);
@@ -40,69 +40,60 @@ const EVMNavbar = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      window.location.href = '/';
+      window.location.href = "/";
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
       // Still navigate to login even if logout API fails
-      window.location.href = '/';
+      window.location.href = "/";
     }
   };
-  
+
   const handleNavigation = (path) => {
     window.location.href = path;
   };
 
   const userMenuItems = [
     {
-      icon: 'bx-user',
-      label: 'My Profile',
-      onClick: () => handleNavigation('/profile')
+      icon: "bx-user",
+      label: "My Profile",
+      onClick: () => handleNavigation("/profile"),
     },
     {
-      icon: 'bx-cog',
-      label: 'Settings',
-      onClick: () => handleNavigation('/settings')
+      icon: "bx-cog",
+      label: "Settings",
+      onClick: () => handleNavigation("/settings"),
     },
     {
-      divider: true
+      divider: true,
     },
     {
-      icon: 'bx-power-off',
-      label: 'Log Out',
-      onClick: handleLogout
-    }
+      icon: "bx-power-off",
+      label: "Log Out",
+      onClick: handleLogout,
+    },
   ];
 
   // Get role display name
   const getRoleDisplay = (role) => {
     const roleMap = {
-      'admin': 'Admin',
-      'dealer_manager': 'Dealer Manager',
-      'dealer_staff': 'Dealer Staff',
-      'evm_staff': 'EVM Staff'
+      admin: "Admin",
+      dealer_manager: "Dealer Manager",
+      dealer_staff: "Dealer Staff",
+      evm_staff: "EVM Staff",
     };
-    return roleMap[role] || 'User';
+    return roleMap[role] || "User";
   };
 
   return (
-    <nav
-      className="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
-      id="layout-navbar"
-    >
+    <nav className="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
       {/* Mobile Menu Toggle */}
       <div className="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
-        <a
-          className="nav-item nav-link px-0 me-xl-4"
-          href="javascript:void(0)"
-        >
+        <a className="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
           <i className="bx bx-menu bx-sm" />
         </a>
       </div>
 
-      <div
-        className="navbar-nav-right d-flex align-items-center"
-        id="navbar-collapse"
-      >
+      <div className="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
         {/* Page Title - No Search Bar */}
         <div className="navbar-nav align-items-center">
           <div className="nav-item d-flex align-items-center">
@@ -114,28 +105,15 @@ const EVMNavbar = () => {
         <ul className="navbar-nav flex-row align-items-center ms-auto">
           {/* Style Switcher */}
           <li className="nav-item dropdown me-2 me-xl-0">
-            <a
-              className="nav-link dropdown-toggle hide-arrow"
-              id="nav-theme"
-              href="javascript:void(0);"
-              data-bs-toggle="dropdown"
-            >
+            <a className="nav-link dropdown-toggle hide-arrow" id="nav-theme" href="javascript:void(0);" data-bs-toggle="dropdown">
               <i className="icon-base bx bx-sun icon-md theme-icon-active" />
               <span className="d-none ms-2" id="nav-theme-text">
                 Toggle theme
               </span>
             </a>
-            <ul
-              className="dropdown-menu dropdown-menu-end"
-              aria-labelledby="nav-theme-text"
-            >
+            <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="nav-theme-text">
               <li>
-                <button
-                  type="button"
-                  className="dropdown-item align-items-center active"
-                  data-bs-theme-value="light"
-                  aria-pressed="false"
-                >
+                <button type="button" className="dropdown-item align-items-center active" data-bs-theme-value="light" aria-pressed="false">
                   <span>
                     <i className="icon-base bx bx-sun icon-md me-3" data-icon="sun" />
                     Light
@@ -143,12 +121,7 @@ const EVMNavbar = () => {
                 </button>
               </li>
               <li>
-                <button
-                  type="button"
-                  className="dropdown-item align-items-center"
-                  data-bs-theme-value="dark"
-                  aria-pressed="true"
-                >
+                <button type="button" className="dropdown-item align-items-center" data-bs-theme-value="dark" aria-pressed="true">
                   <span>
                     <i className="icon-base bx bx-moon icon-md me-3" data-icon="moon" />
                     Dark
@@ -156,17 +129,9 @@ const EVMNavbar = () => {
                 </button>
               </li>
               <li>
-                <button
-                  type="button"
-                  className="dropdown-item align-items-center"
-                  data-bs-theme-value="system"
-                  aria-pressed="false"
-                >
+                <button type="button" className="dropdown-item align-items-center" data-bs-theme-value="system" aria-pressed="false">
                   <span>
-                    <i
-                      className="icon-base bx bx-desktop icon-md me-3"
-                      data-icon="desktop"
-                    />
+                    <i className="icon-base bx bx-desktop icon-md me-3" data-icon="desktop" />
                     System
                   </span>
                 </button>
@@ -177,17 +142,9 @@ const EVMNavbar = () => {
 
           {/* User Dropdown */}
           <li className="nav-item navbar-dropdown dropdown-user dropdown">
-            <a
-              className="nav-link dropdown-toggle hide-arrow"
-              href="javascript:void(0);"
-              data-bs-toggle="dropdown"
-            >
+            <a className="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
               <div className="avatar avatar-online">
-                <img
-                  src="../assets/img/avatars/1.png"
-                  alt="User Avatar"
-                  className="w-px-40 h-auto rounded-circle"
-                />
+                <img src="../assets/img/avatars/1.png" alt="User Avatar" className="w-px-40 h-auto rounded-circle" />
               </div>
             </a>
             <ul className="dropdown-menu dropdown-menu-end">
@@ -197,11 +154,7 @@ const EVMNavbar = () => {
                   <div className="d-flex">
                     <div className="flex-shrink-0 me-3">
                       <div className="avatar avatar-online">
-                        <img
-                          src="../assets/img/avatars/1.png"
-                          alt="User Avatar"
-                          className="w-px-40 h-auto rounded-circle"
-                        />
+                        <img src="../assets/img/avatars/1.png" alt="User Avatar" className="w-px-40 h-auto rounded-circle" />
                       </div>
                     </div>
                     <div className="flex-grow-1">
@@ -229,18 +182,22 @@ const EVMNavbar = () => {
               {/* Menu Items */}
               {userMenuItems.map((item, idx) => {
                 if (item.divider) {
-                  return <li key={idx}><div className="dropdown-divider" /></li>;
+                  return (
+                    <li key={idx}>
+                      <div className="dropdown-divider" />
+                    </li>
+                  );
                 }
                 return (
                   <li key={idx}>
-                    <a 
-                      className="dropdown-item" 
+                    <a
+                      className="dropdown-item"
                       href="#"
                       onClick={(e) => {
                         e.preventDefault();
                         item.onClick();
                       }}
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: "pointer" }}
                     >
                       <i className={`bx ${item.icon} me-2`} />
                       <span className="align-middle">{item.label}</span>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAllVehicleVariants } from "../../../services/evm/vehicleVariantService";
+import { getAllVehicleVariants } from "../../../services/vehicleVariantService";
 
 const useVariants = () => {
   const [variants, setVariants] = useState([]);

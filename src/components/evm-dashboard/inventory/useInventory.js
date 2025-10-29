@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { adjustInventoryQuantity, createInventory, deleteInventory, getAllInventories, getInventoryById, updateInventory } from "../../../services/evm/inventoryService";
+import { adjustInventoryQuantity, createInventory, deleteInventory, getAllInventories, getInventoryById, updateInventory } from "../../../services/inventoryService";
 
 const useInventory = (page, pageSize, searchTerm, sortBy, sortOrder) => {
   const [inventories, setInventories] = useState([]);

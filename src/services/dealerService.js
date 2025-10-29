@@ -5,22 +5,67 @@ import api from "./api";
 // ============================================
 
 /**
- * Get All Dealers
- * @returns {Promise<AxiosResponse<any>>}
+ * Get All Dealers with pagination and filters
+ * @param {object} params - Query parameters
+ * @param {number} params.page - Page number (default: 1)
+ * @param {number} params.pageSize - Items per page (default: 10)
+ * @param {string} params.sortBy - Sort field
+ * @param {string} params.sortOrder - Sort order (asc/desc)
+ * @param {string} params.search - Search term
+ * @param {string} params.filters - Additional filters
+ * @returns {Promise<object>} - { items, totalResults, page, pageSize }
  */
-export const getAllDealers = async () => {
-    console.log("📡 API Call: GET /api/dealers");
-    return api.get('/dealers');
+export const getAllDealers = async (params = {}) => {
+    const {
+        page = 1,
+        pageSize = 10,
+        sortBy = '',
+        sortOrder = '',
+        search = '',
+        filters = ''
+    } = params;
+
+    // Build query string
+    const queryParams = new URLSearchParams();
+    queryParams.append('page', page.toString());
+    queryParams.append('pageSize', pageSize.toString());
+    if (sortBy) queryParams.append('sortBy', sortBy);
+    if (sortOrder) queryParams.append('sortOrder', sortOrder);
+    if (search) queryParams.append('search', search);
+    if (filters) queryParams.append('filters', filters);
+
+    console.log("📡 API Call: GET /api/dealers?" + queryParams.toString());
+    
+    try {
+        const response = await api.get(`/dealers?${queryParams.toString()}`);
+        
+        // Return full response data structure
+        return {
+            items: response.data?.data?.items || [],
+            totalResults: response.data?.data?.totalResults || 0,
+            page: response.data?.data?.page || 1,
+            pageSize: response.data?.data?.pageSize || 10
+        };
+    } catch (error) {
+        console.error("Error fetching dealers:", error);
+        throw error;
+    }
 };
 
 /**
- * Get Dealer's ID
+ * Get Dealer by ID
  * @param {string|number} dealerId - ID của Dealer
- * @returns {Promise<AxiosResponse<any>>}
+ * @returns {Promise<object>} - Dealer data
  */
-export const getDealerById = (dealerId) => {
+export const getDealerById = async (dealerId) => {
   console.log(`📡 API Call: GET /api/dealers/${dealerId}`);
-  return api.get(`/dealers/${dealerId}`);
+  try {
+    const response = await api.get(`/dealers/${dealerId}`);
+    return response.data?.data || response.data;
+  } catch (error) {
+    console.error(`Error fetching dealer ${dealerId}:`, error);
+    throw error;
+  }
 };
 
 /**
@@ -29,102 +74,209 @@ export const getDealerById = (dealerId) => {
  * @param {string} dealerData.name - Tên Dealer (bắt buộc)
  * @param {string} dealerData.region - Khu vực (bắt buộc)
  * @param {string} dealerData.address - Địa chỉ (bắt buộc)
- * @param {string} [dealerData.email] - Email (tùy chọn)
- * @param {string} [dealerData.phone] - Số điện thoại (tùy chọn)
- * @param {string} [dealerData.contactPerson] - Người liên hệ (tùy chọn)
- * @param {string} [dealerData.taxCode] - Mã số thuế (tùy chọn)
- * @param {boolean} [dealerData.isActive] - Trạng thái hoạt động (tùy chọn, mặc định là true)
- * @returns {Promise<AxiosResponse<any>>}
+ * @returns {Promise<object>}
  */
-export const createDealer = (dealerData) => {
+export const createDealer = async (dealerData) => {
   console.log("📡 API Call: POST /api/dealers");
   console.log("📤 Sending data:", dealerData);
-  // Đảm bảo chỉ gửi các trường API cần (name, region, address và các trường tùy chọn khác nếu có)
+  
+  // Only send required fields: name, region, address
   const dataToSend = {
       name: dealerData.name,
       region: dealerData.region,
-      address: dealerData.address,
-      ...(dealerData.email && { email: dealerData.email }),
-      ...(dealerData.phone && { phone: dealerData.phone }),
-      ...(dealerData.contactPerson && { contactPerson: dealerData.contactPerson }),
-      ...(dealerData.taxCode && { taxCode: dealerData.taxCode }),
-      // Gửi isActive nếu có trong form, nếu không backend có thể tự đặt mặc định
-      ...(typeof dealerData.isActive === 'boolean' && { isActive: dealerData.isActive }), 
+      address: dealerData.address
   };
-  return api.post('/dealers', dataToSend);
+  
+  try {
+    const response = await api.post('/dealers', dataToSend);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating dealer:", error);
+    throw error;
+  }
 };
 
 /**
  * UPDATE Dealer
  * @param {string|number} dealerId - ID của Dealer cần cập nhật
- * @param {object} dealerData - Dữ liệu cập nhật (chỉ chứa các trường cần thay đổi)
- * @returns {Promise<AxiosResponse<any>>}
+ * @param {object} dealerData - Dữ liệu cập nhật
+ * @returns {Promise<object>}
  */
-export const updateDealer = (dealerId, dealerData) => {
-  console.log(`📡 API Call: PUT /api/dealers/${dealerId}`); // Hoặc PATCH nếu API hỗ trợ
+export const updateDealer = async (dealerId, dealerData) => {
+  console.log(`📡 API Call: PUT /api/dealers/${dealerId}`);
   console.log("📤 Sending update data:", dealerData);
-  // Gửi toàn bộ dữ liệu hoặc chỉ các trường thay đổi tùy thuộc vào API (PUT thường gửi toàn bộ)
-  return api.put(`/dealers/${dealerId}`, dealerData); 
+  
+  const dataToSend = {
+      name: dealerData.name,
+      region: dealerData.region,
+      address: dealerData.address
+  };
+  
+  try {
+    const response = await api.put(`/dealers/${dealerId}`, dataToSend);
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating dealer ${dealerId}:`, error);
+    throw error;
+  }
 };
 
 /**
  * DELETE Dealer
  * @param {string|number} dealerId - ID của Dealer cần xóa
- * @returns {Promise<AxiosResponse<any>>}
+ * @returns {Promise<object>}
  */
-export const deleteDealer = (dealerId) => {
+export const deleteDealer = async (dealerId) => {
   console.log(`📡 API Call: DELETE /api/dealers/${dealerId}`);
-  return api.delete(`/dealers/${dealerId}`);
+  try {
+    const response = await api.delete(`/dealers/${dealerId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleting dealer ${dealerId}:`, error);
+    throw error;
+  }
 };
 
 // ============================================
-// API CALLS - DEALER CONTRACTS (MỚI)
+// API CALLS - DEALER CONTRACTS
 // ============================================
 
 /**
- * Get All Dealer Contracts
- * @returns {Promise<AxiosResponse<any>>}
+ * Get All Dealer Contracts with pagination and filters
+ * @param {object} params - Query parameters
+ * @param {number} params.page - Page number (default: 1)
+ * @param {number} params.pageSize - Items per page (default: 10)
+ * @param {string} params.sortBy - Sort field
+ * @param {string} params.sortOrder - Sort order (asc/desc)
+ * @param {string} params.search - Search term
+ * @param {string} params.filters - Additional filters
+ * @returns {Promise<object>} - { items, totalResults, page, pageSize }
  */
-export const getAllDealerContracts = () => {
-    console.log("📡 API Call: GET /api/dealer-contracts");
-    return api.get('/dealer-contracts');
+export const getAllDealerContracts = async (params = {}) => {
+    const {
+        page = 1,
+        pageSize = 10,
+        sortBy = '',
+        sortOrder = '',
+        search = '',
+        filters = ''
+    } = params;
+
+    // Build query string
+    const queryParams = new URLSearchParams();
+    queryParams.append('page', page.toString());
+    queryParams.append('pageSize', pageSize.toString());
+    if (sortBy) queryParams.append('sortBy', sortBy);
+    if (sortOrder) queryParams.append('sortOrder', sortOrder);
+    if (search) queryParams.append('search', search);
+    if (filters) queryParams.append('filters', filters);
+
+    console.log("📡 API Call: GET /api/dealer-contracts?" + queryParams.toString());
+    
+    try {
+        const response = await api.get(`/dealer-contracts?${queryParams.toString()}`);
+        
+        // Return full response data structure
+        return {
+            items: response.data?.data?.items || [],
+            totalResults: response.data?.data?.totalResults || 0,
+            page: response.data?.data?.page || 1,
+            pageSize: response.data?.data?.pageSize || 10
+        };
+    } catch (error) {
+        console.error("Error fetching dealer contracts:", error);
+        throw error;
+    }
+};
+
+/**
+ * Get Dealer Contract by ID
+ * @param {string|number} contractId - ID của Contract
+ * @returns {Promise<object>} - Contract data
+ */
+export const getDealerContractById = async (contractId) => {
+  console.log(`📡 API Call: GET /api/dealer-contracts/${contractId}`);
+  try {
+    const response = await api.get(`/dealer-contracts/${contractId}`);
+    return response.data?.data || response.data;
+  } catch (error) {
+    console.error(`Error fetching dealer contract ${contractId}:`, error);
+    throw error;
+  }
 };
 
 /**
  * CREATE Dealer Contract
  * @param {object} contractData - Dữ liệu của Hợp đồng mới
  * @param {string} contractData.dealerId
- * @param {string} contractData.startDate
- * @param {string} contractData.endDate
+ * @param {string} contractData.startDate - ISO date string
+ * @param {string} contractData.endDate - ISO date string
  * @param {number} contractData.salesTarget
- * @returns {Promise<AxiosResponse<any>>}
+ * @param {number} contractData.outstandingDebt
+ * @returns {Promise<object>}
  */
-export const createDealerContract = (contractData) => {
+export const createDealerContract = async (contractData) => {
   console.log("📡 API Call: POST /api/dealer-contracts");
   console.log("📤 Sending data:", contractData);
-  return api.post('/dealer-contracts', contractData);
+  
+  const dataToSend = {
+    dealerId: contractData.dealerId,
+    startDate: contractData.startDate,
+    endDate: contractData.endDate,
+    salesTarget: Number(contractData.salesTarget) || 0,
+    outstandingDebt: Number(contractData.outstandingDebt) || 0
+  };
+  
+  try {
+    const response = await api.post('/dealer-contracts', dataToSend);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating dealer contract:", error);
+    throw error;
+  }
 };
 
 /**
  * UPDATE Dealer Contract
  * @param {string|number} contractId
  * @param {object} contractData
- * @returns {Promise<AxiosResponse<any>>}
+ * @returns {Promise<object>}
  */
-export const updateDealerContract = (contractId, contractData) => {
+export const updateDealerContract = async (contractId, contractData) => {
   console.log(`📡 API Call: PUT /api/dealer-contracts/${contractId}`);
   console.log("📤 Sending update data:", contractData);
-  return api.put(`/dealer-contracts/${contractId}`, contractData);
+  
+  const dataToSend = {
+    dealerId: contractData.dealerId,
+    startDate: contractData.startDate,
+    endDate: contractData.endDate,
+    salesTarget: Number(contractData.salesTarget) || 0,
+    outstandingDebt: Number(contractData.outstandingDebt) || 0
+  };
+  
+  try {
+    const response = await api.put(`/dealer-contracts/${contractId}`, dataToSend);
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating dealer contract ${contractId}:`, error);
+    throw error;
+  }
 };
 
 /**
  * DELETE Dealer Contract
  * @param {string|number} contractId
- * @returns {Promise<AxiosResponse<any>>}
+ * @returns {Promise<object>}
  */
-export const deleteDealerContract = (contractId) => {
+export const deleteDealerContract = async (contractId) => {
   console.log(`📡 API Call: DELETE /api/dealer-contracts/${contractId}`);
-  return api.delete(`/dealer-contracts/${contractId}`);
+  try {
+    const response = await api.delete(`/dealer-contracts/${contractId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleting dealer contract ${contractId}:`, error);
+    throw error;
+  }
 };
 
 // ============================================
