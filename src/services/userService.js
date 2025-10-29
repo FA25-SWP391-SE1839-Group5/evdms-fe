@@ -42,18 +42,15 @@ export const createUser = async (userData) => {
     const dataToSend = {
       fullName: userData.fullName,
       email: userData.email,
-      password: userData.password,
       role: userData.role || "DealerStaff", // Mặc định nếu không có
-      // Chỉ gửi dealerId nếu nó tồn tại và không rỗng
       ...(userData.dealerId && { dealerId: userData.dealerId }),
-      // isActive có thể do backend xử lý mặc định
       ...(typeof userData.isActive === "boolean" && { isActive: userData.isActive }),
     };
     console.log("📤 Request body:", dataToSend);
 
     // Validate required fields
-    if (!userData.fullName || !userData.email || !userData.password) {
-      throw new Error("Missing required fields: fullName, email, password");
+    if (!userData.fullName || !userData.email) {
+      throw new Error("Missing required fields: fullName, email");
     }
 
     const response = await api.post("/users", dataToSend);

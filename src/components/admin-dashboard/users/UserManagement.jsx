@@ -35,9 +35,8 @@ const UserManagement = () => {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
-    password: "",
     role: "DealerStaff",
-    dealerI: "",
+    dealerId: "",
     isActive: true,
   });
   const [error, setError] = useState("");
@@ -60,7 +59,7 @@ const UserManagement = () => {
       setError("");
       const [userResponse, dealerResponse] = await Promise.all([getAllUsers(currentPage, pageSize), getAllDealers()]);
       setUsers(userResponse?.data?.items || []);
-      setDealers(dealerResponse.data?.data?.items || dealerResponse.data?.items || []);
+      setDealers(dealerResponse.items || []);
     } catch (err) {
       const errorMsg = err.message || "Failed to load initial data";
       setError(errorMsg);
@@ -90,15 +89,7 @@ const UserManagement = () => {
       errors.email = "Please enter a valid email address";
     }
 
-    if (!editingUser || (formData.password && formData.password.trim() !== "")) {
-      if (!formData.password || formData.password.length < 6) {
-        errors.password = "Password must be at least 6 characters";
-      }
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]/;
-      if (formData.password && !passwordRegex.test(formData.password)) {
-        errors.password = "Password must contain uppercase, lowercase, number, and special character";
-      }
-    }
+    // No password validation for create user
 
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
@@ -150,14 +141,8 @@ const UserManagement = () => {
           throw new Error(response.message || "Update failed");
         }
       } else {
-        // CREATE NEW USER
-        if (!formData.password || formData.password.trim() === "") {
-          setError("Password is required for new users");
-          return;
-        }
-
+        // CREATE NEW USER (no password)
         const response = await createUser(formData);
-
         if (response.success) {
           setSuccess(`User "${formData.fullName}" created successfully! They can now login with their credentials.`);
           await fetchInitialData();
@@ -240,7 +225,6 @@ const UserManagement = () => {
     setFormData({
       fullName: user.fullName || "",
       email: user.email || "",
-      password: "",
       role: user.role || "DealerStaff",
       dealerId: user.dealerId || "",
       isActive: user.isActive !== undefined ? user.isActive : true,
@@ -256,7 +240,6 @@ const UserManagement = () => {
     setFormData({
       fullName: "",
       email: "",
-      password: "",
       role: "DealerStaff",
       dealerId: "",
       isActive: true,
