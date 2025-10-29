@@ -1,8 +1,53 @@
-const DealerManagerDashboard = () => {
+import React from 'react';
+
+// Import the specific page components you will create
+// import StaffManagementPage from '../components/dealer-manager-dashboard/staff/StaffManagementPage';
+// import StaffPerformancePage from '../components/dealer-manager-dashboard/staff/StaffPerformancePage';
+// import DealerOrdersPage from '../components/dealer-manager-dashboard/orders/DealerOrdersPage';
+
+// Placeholder components for now
+const StaffManagementPage = () => <div className="card"><div className="card-body">Staff Management - Coming Soon...</div></div>;
+const StaffPerformancePage = () => <div className="card"><div className="card-body">Staff Performance - Coming Soon...</div></div>;
+const DealerOrdersPage = () => <div className="card"><div className="card-body">Dealer Orders - Coming Soon...</div></div>;
+
+
+const DealerManagerDashboard = ({ currentPage }) => {
+
+  // Simple Dashboard Overview (Can be expanded later)
+  const renderDashboardOverview = () => (
+    <div className="row">
+      <div className="col-12">
+          <div className="card mb-4">
+              <div className="card-body">
+                   <h4 className="mb-1">Welcome, Dealer Manager!</h4>
+                   <p className="mb-0 text-muted">Manage your staff, orders, and performance.</p>
+                   {/* Add quick stats or links here */}
+              </div>
+          </div>
+           {/* Maybe add some quick stat cards here */}
+      </div>
+    </div>
+  );
+
+  // Render content based on the currentPage prop from DealerLayout
+  const renderContent = () => {
+    console.log("DealerManagerDashboard: Rendering content for page:", currentPage);
+    switch (currentPage) {
+      case 'dealer-staff':
+        return <StaffManagementPage />;
+      case 'dealer-performance':
+        return <StaffPerformancePage />;
+      case 'dealer-orders':
+        return <DealerOrdersPage />;
+      case 'dealer-dashboard':
+      default:
+        return renderDashboardOverview(); // Default to overview
+    }
+  };
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Dealer Manager Dashboard</h1>
-      <p>Welcome, Dealer Manager! This is your dashboard.</p>
+    <div className="container-xxl flex-grow-1 container-p-y">
+      {renderContent()}
     </div>
   );
 };

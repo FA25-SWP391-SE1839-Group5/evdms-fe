@@ -6,8 +6,10 @@ import EVDetailPage from './pages/EVDetailPage';
 import VehicleModelPage from './pages/VehicleModelPage';
 import AdminDashboard from './pages/AdminDashboard';
 import EVMDashboard from './pages/EVMDashboard';
+import DealerManagerDashboard from './pages/DealerManagerDashboard';
 import Layout from './components/admin-dashboard/layout/Layout';
 import EVMLayout from './components/evm-dashboard/layout/EVMLayout';
+import DealerLayout from './components/dealer-mananger-dashboard/layout/DealerLayout';
 import { routeReducer, initialState, ROUTES } from './routes';
 import { logout, getStoredToken } from './services/authService';
 
@@ -103,6 +105,16 @@ const App = () => {
     const path = globalThis.location.pathname.replace('/', '');
     if (!path || path === 'evm-dashboard') return 'evm-dashboard';
     return path;
+  };
+
+  const getInitialDealerPage = () => {
+    const path = globalThis.location.pathname.replace('/', '');
+    // Các trang hợp lệ này được định nghĩa trong DealerLayout và DealerSidebar
+    const validPages = ['dealer-dashboard', 'dealer-staff', 'dealer-performance', 'dealer-orders'];
+    if (validPages.includes(path)) {
+      return path;
+    }
+    return 'dealer-dashboard'; // Trang mặc định
   };
 
   // Sync logout across tabs
@@ -286,6 +298,14 @@ const App = () => {
         <EVMLayout initialPage={getInitialEVMPage()}>
           <EVMDashboard />
         </EVMLayout>
+      )}
+
+      {/* DEALER MANAGER DASHBOARD */}
+      {routeState.currentPage === ROUTES.DEALER_MANAGER_DASHBOARD && (
+        <DealerLayout initialPage={getInitialDealerPage()}>
+          {/* DealerManagerDashboard là component children */}
+          <DealerManagerDashboard />
+        </DealerLayout>
       )}
 
       {/* VEHICLE MODELS PAGE */}

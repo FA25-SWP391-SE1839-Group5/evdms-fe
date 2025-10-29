@@ -5,6 +5,7 @@ export const ROUTES = {
     DETAIL: 'detail',
     ADMIN_DASHBOARD: 'admin-dashboard',
     EVM_DASHBOARD: 'evm-dashboard',
+    DEALER_MANAGER_DASHBOARD: 'dealer-dashboard',
     VEHICLE_MODELS: 'vehicle-models',
     RESET_PASSWORD: 'reset-password',
 };
@@ -74,7 +75,7 @@ export const routeReducer = (state, action) => {
             if (user.role === 'admin') {
                 targetPage = ROUTES.ADMIN_DASHBOARD;
             } else if (user.role === 'dealer_manager') {
-                targetPage = ROUTES.ADMIN_DASHBOARD;
+                targetPage = ROUTES.DEALER_MANAGER_DASHBOARD;
             } else if (user.role === 'dealer_staff') {
                 targetPage = ROUTES.ADMIN_DASHBOARD;
             } else if (user.role === 'evm_staff') {
@@ -105,6 +106,15 @@ export const routeReducer = (state, action) => {
                 isAuthenticated: true
             };
         
+        case 'NAVIGATE_TO_DEALER_DASHBOARD':
+            if (state.isAuthenticated && state.user?.role === 'dealer_manager') {
+                // DÙNG return thay vì gán biến và break
+                return { ...state, currentPage: ROUTES.DEALER_MANAGER_DASHBOARD };
+            } else {
+                // DÙNG return thay vì gán biến và break
+                return {...initialState, currentPage: ROUTES.LOGIN };
+            }
+            
         case 'NAVIGATE_TO_VEHICLE_MODELS':
             return {
                 ...state,
