@@ -1,4 +1,3 @@
-// src/components/StaffManagement/StaffTable.js
 import React from "react";
 import { Table, Spinner, Button } from "react-bootstrap";
 

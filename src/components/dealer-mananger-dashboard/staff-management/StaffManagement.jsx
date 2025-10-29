@@ -7,7 +7,6 @@ import {
   deleteUser,
 } from "../../../services/userService";
 
-// Import các component con
 import StaffTable from "./StaffTable";
 import StaffFormModal from "./StaffFormModal";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
