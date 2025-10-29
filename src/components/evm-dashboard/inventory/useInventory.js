@@ -1,9 +1,7 @@
-// useInventory.js
-// Custom hook for inventory CRUD and state management
 import { useEffect, useState } from "react";
 import { adjustInventoryQuantity, createInventory, deleteInventory, getAllInventories, getInventoryById, updateInventory } from "../../../services/evm/inventoryService";
 
-const useInventory = (page, pageSize, searchTerm, sortBy) => {
+const useInventory = (page, pageSize, searchTerm, sortBy, sortOrder) => {
   const [inventories, setInventories] = useState([]);
   const [totalResults, setTotalResults] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -12,7 +10,7 @@ const useInventory = (page, pageSize, searchTerm, sortBy) => {
   useEffect(() => {
     fetchInventories();
     // eslint-disable-next-line
-  }, [page, pageSize, searchTerm, sortBy]);
+  }, [page, pageSize, searchTerm, sortBy, sortOrder]);
 
   const fetchInventories = async () => {
     setLoading(true);
@@ -23,7 +21,7 @@ const useInventory = (page, pageSize, searchTerm, sortBy) => {
         pageSize,
         search: searchTerm,
         sortBy,
-        sortOrder: "asc",
+        sortOrder: sortOrder || "asc",
       });
       setInventories(data.items);
       setTotalResults(data.totalResults);

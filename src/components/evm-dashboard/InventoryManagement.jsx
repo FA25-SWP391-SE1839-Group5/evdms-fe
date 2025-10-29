@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AdjustQuantityModal from "./inventory/AdjustQuantityModal";
 import DeleteConfirmationModal from "./inventory/DeleteConfirmationModal";
 import InventoryModal from "./inventory/InventoryModal";
@@ -12,7 +12,9 @@ const InventoryManagement = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
 
   // Modal state
   const [showModal, setShowModal] = useState(false);
@@ -40,11 +42,20 @@ const InventoryManagement = () => {
   const [inventoryToDelete, setInventoryToDelete] = useState(null);
 
   // Inventory and variants hooks
+  // Debounce searchTerm
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 150);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
   const { inventories, totalResults, loading, error, fetchInventories, getInventoryById, createInventory, updateInventory, deleteInventory, adjustInventoryQuantity } = useInventory(
     page,
     pageSize,
-    searchTerm,
-    sortBy
+    debouncedSearchTerm,
+    sortBy,
+    sortOrder
   );
   const { variants } = useVariants();
   const [success, setSuccess] = useState(null);
@@ -270,14 +281,6 @@ const InventoryManagement = () => {
                 <option value="50">50 per page</option>
               </select>
             </div>
-            <div className="col-md-3">
-              <select className="form-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-                <option value="">Sort by...</option>
-                <option value="quantity">Quantity</option>
-                <option value="createdAt">Created Date</option>
-                <option value="updatedAt">Updated Date</option>
-              </select>
-            </div>
           </div>
         </div>
       </div>
@@ -300,6 +303,18 @@ const InventoryManagement = () => {
                 handleAdjust={handleAdjust}
                 handleView={handleView}
                 handleDeleteClick={handleDeleteClick}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                onSort={(column) => {
+                  if (sortBy !== column) {
+                    setSortBy(column);
+                    setSortOrder("asc");
+                  } else {
+                    setSortBy(column);
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                  }
+                  setPage(1);
+                }}
               />
 
               {/* Pagination */}

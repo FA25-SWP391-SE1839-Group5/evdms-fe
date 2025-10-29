@@ -1,14 +1,21 @@
-// InventoryTable.jsx
-// Table for displaying inventory list and actions
+const InventoryTable = ({ inventories, getStockStatus, formatDate, handleAdjust, handleView, handleDeleteClick, sortBy, sortOrder, onSort }) => {
+  // Helper to render sort icon
+  const renderSortIcon = (column) => {
+    if (sortBy !== column) return <i className="bx bx-sort" />;
+    return sortOrder === "asc" ? <i className="bx bx-up-arrow-alt" /> : <i className="bx bx-down-arrow-alt" />;
+  };
 
-const InventoryTable = ({ inventories, loading, getStockStatus, formatDate, handleAdjust, handleView, handleDeleteClick }) => {
   return (
     <div className="table-responsive">
       <table className="table table-hover">
         <thead>
           <tr>
-            <th>Vehicle Variant</th>
-            <th>Quantity</th>
+            <th style={{ cursor: "pointer" }} onClick={() => onSort && onSort("variantName")} scope="col">
+              Vehicle Variant {renderSortIcon("variantName")}
+            </th>
+            <th style={{ cursor: "pointer" }} onClick={() => onSort && onSort("quantity")} scope="col">
+              Quantity {renderSortIcon("quantity")}
+            </th>
             <th>Status</th>
             <th>Created At</th>
             <th>Updated At</th>
