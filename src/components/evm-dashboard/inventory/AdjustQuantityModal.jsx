@@ -113,10 +113,11 @@ const AdjustQuantityModal = ({
                   value={adjustData.adjustment}
                   onChange={onChange}
                   min="1"
-                  max={adjustData.action === "remove" ? adjustData.currentQuantity : undefined}
+                  max={adjustData.action === "remove" ? adjustData.currentQuantity : ""}
                   step="1"
                   required
                   placeholder="Enter quantity"
+                  disabled={adjustData.action === "remove" && adjustData.currentQuantity === 0}
                 />
               </div>
               {adjustData.adjustment > 0 && (

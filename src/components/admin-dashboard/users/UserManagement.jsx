@@ -26,6 +26,7 @@ const UserManagement = () => {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
+  const [submitting, setSubmitting] = useState(false);
   const [sortColumn, setSortColumn] = useState("fullName");
   const [sortDirection, setSortDirection] = useState("asc");
 
@@ -55,6 +56,7 @@ const UserManagement = () => {
 
   const fetchInitialData = async () => {
     try {
+      setSubmitting(true);
       setLoading(true);
       setError("");
       const [userResponse, dealerResponse] = await Promise.all([getAllUsers(currentPage, pageSize), getAllDealers()]);
@@ -88,8 +90,6 @@ const UserManagement = () => {
     if (!formData.email || !emailRegex.test(formData.email)) {
       errors.email = "Please enter a valid email address";
     }
-
-    // No password validation for create user
 
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
@@ -605,7 +605,8 @@ const UserManagement = () => {
         formData={formData || {}}
         onFormChange={handleChange}
         errors={validationErrors}
-        dealers={dealers} // Pass dealers list
+        dealers={dealers}
+        submitting={submitting}
       />
 
       {/* Details Modal */}
