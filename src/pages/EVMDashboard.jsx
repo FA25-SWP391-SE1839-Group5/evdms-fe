@@ -17,14 +17,9 @@ const EVMDashboard = ({ currentPage }) => {
               <div className="col-12">
                 <div className="card mb-4">
                   <div className="card-body">
-                    <div className="d-flex align-items-center mb-4">
-                      <div className="avatar avatar-xl me-3 bg-label-primary rounded">
-                        <i className="bx bx-car bx-lg" />
-                      </div>
-                      <div>
-                        <h4 className="mb-1">Welcome to EVM Dashboard</h4>
-                        <p className="mb-0 text-muted">Manage vehicle models and variants</p>
-                      </div>
+                    <div className="mb-4">
+                      <h4 className="mb-1">Welcome to EVM Dashboard</h4>
+                      <p className="mb-0 text-muted">Manage vehicle models and variants</p>
                     </div>
 
                     {/* Quick Stats */}
@@ -37,8 +32,8 @@ const EVMDashboard = ({ currentPage }) => {
                                 <h5 className="text-white mb-1">45</h5>
                                 <p className="mb-0 small">Vehicle Models</p>
                               </div>
-                              <div className="avatar bg-white bg-opacity-25">
-                                <i className="bx bx-car text-white" />
+                              <div className="avatar d-flex align-items-center justify-content-center" style={{ width: 40, height: 40 }}>
+                                <i className="bx bx-car text-white bx-lg d-flex align-items-center justify-content-center w-100 h-100" />
                               </div>
                             </div>
                           </div>
@@ -53,8 +48,8 @@ const EVMDashboard = ({ currentPage }) => {
                                 <h5 className="text-white mb-1">128</h5>
                                 <p className="mb-0 small">Variants</p>
                               </div>
-                              <div className="avatar bg-white bg-opacity-25">
-                                <i className="bx bx-customize text-white" />
+                              <div className="avatar d-flex align-items-center justify-content-center" style={{ width: 40, height: 40 }}>
+                                <i className="bx bx-customize text-white bx-lg d-flex align-items-center justify-content-center w-100 h-100" />
                               </div>
                             </div>
                           </div>
@@ -69,8 +64,8 @@ const EVMDashboard = ({ currentPage }) => {
                                 <h5 className="text-white mb-1">12</h5>
                                 <p className="mb-0 small">Active Models</p>
                               </div>
-                              <div className="avatar bg-white bg-opacity-25">
-                                <i className="bx bx-check-circle text-white" />
+                              <div className="avatar d-flex align-items-center justify-content-center" style={{ width: 40, height: 40 }}>
+                                <i className="bx bx-check-circle text-white bx-lg d-flex align-items-center justify-content-center w-100 h-100" />
                               </div>
                             </div>
                           </div>
@@ -85,8 +80,8 @@ const EVMDashboard = ({ currentPage }) => {
                                 <h5 className="text-white mb-1">8</h5>
                                 <p className="mb-0 small">Pending Review</p>
                               </div>
-                              <div className="avatar bg-white bg-opacity-25">
-                                <i className="bx bx-time text-white" />
+                              <div className="avatar d-flex align-items-center justify-content-center" style={{ width: 40, height: 40 }}>
+                                <i className="bx bx-time text-white bx-lg d-flex align-items-center justify-content-center w-100 h-100" />
                               </div>
                             </div>
                           </div>
