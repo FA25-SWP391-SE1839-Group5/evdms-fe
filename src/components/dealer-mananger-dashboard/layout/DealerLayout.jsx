@@ -20,7 +20,17 @@ const DealerLayout = ({ children, initialPage = 'dealer-dashboard' }) => {
     const handlePopState = () => {
       const path = window.location.pathname.replace('/', '');
       // Check if path is a valid dealer page
-      const validPages = ['dealer-dashboard', 'staff-dashboard', 'sales-orders', 'test-drives', 'feedbacks', 'dealer-staff', 'dealer-performance', 'dealer-orders'];
+      const validPages = [
+        'dealer-dashboard',
+        'staff-dashboard',
+        'sales-orders',
+        'test-drives',
+        'feedbacks',
+        'quotations',
+        'dealer-staff',
+        'dealer-performance',
+        'dealer-orders',
+      ];
       if (validPages.includes(path)) {
         console.log("DealerLayout: PopState detected, setting page to", path);
         setCurrentPage(path);
@@ -44,14 +54,18 @@ const DealerLayout = ({ children, initialPage = 'dealer-dashboard' }) => {
 
   // Render appropriate content based on currentPage
   const renderContent = () => {
-    if (currentPage === 'staff-dashboard') {
+    // Pages handled by DealerStaffDashboard
+    const staffPages = ['staff-dashboard', 'sales-orders', 'test-drives', 'feedbacks', 'quotations'];
+    if (staffPages.includes(currentPage)) {
       return <DealerStaffDashboard currentPage={currentPage} onNavigate={handleNavigate} />;
     }
+
     // For dealer-dashboard, dealer-staff, dealer-performance, dealer-orders
     // Check if children was provided (for backward compatibility)
     if (children) {
       return React.cloneElement(children, { currentPage, onNavigate: handleNavigate });
     }
+
     // Default: render DealerManagerDashboard
     return <DealerManagerDashboard currentPage={currentPage} onNavigate={handleNavigate} />;
   };

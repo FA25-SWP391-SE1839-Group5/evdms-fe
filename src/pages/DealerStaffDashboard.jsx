@@ -5,8 +5,28 @@ import { getAllFeedbacks } from "../services/feebackService";
 import FeedbackManagement from "../components/dealer-dashboard/FeedbackManagement";
 import TestDriveManagement from "../components/dealer-dashboard/TestDriveManagement";
 import SalesOrderManagement from "../components/dealer-dashboard/SalesOrderManagement";
+import QuotationManagement from "../components/dealer-dashboard/QuotationManagement";
 
-const DealerStaffDashboard = ({ currentPage }) => {
+const DealerStaffDashboard = ({ currentPage, onNavigate }) => {
+  const handleNavigate = (page) => {
+    // prefer parent handler
+    if (typeof onNavigate === "function") {
+      onNavigate(page);
+      return;
+    }
+
+    // fallback: update hash and dispatch a custom event
+    try {
+      window.location.hash = `#${page}`;
+    } catch (e) {
+      // ignore
+    }
+    try {
+      window.dispatchEvent(new CustomEvent("evdms-navigate", { detail: { page } }));
+    } catch (e) {
+      // ignore
+    }
+  };
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -197,6 +217,11 @@ const DealerStaffDashboard = ({ currentPage }) => {
         newFeedbacks,
         reviewedFeedbacks,
         resolvedFeedbacks,
+
+        // Quotations (placeholders — replace with real data/service when available)
+        totalQuotations: 0,
+        pendingQuotations: 0,
+        approvedQuotations: 0,
       };
 
       setStats(statsData);
@@ -391,7 +416,37 @@ const DealerStaffDashboard = ({ currentPage }) => {
                       </div>
                     </div>
                   </div>
+
+                  {/* Quotations */}
+                  <div className="col-xl-3 col-md-6">
+                    <div className="card">
+                      <div className="card-body">
+                        <div className="d-flex justify-content-between align-items-start">
+                          <div className="flex-grow-1">
+                            <span className="badge bg-label-secondary mb-2">QUOTATIONS</span>
+                            <h3 className="mb-1">{stats.totalQuotations}</h3>
+                            <p className="mb-0 text-muted small">Total Quotations</p>
+                          </div>
+                          <div className="avatar">
+                            <div className="avatar-initial rounded bg-label-secondary">
+                              <i className="bx bx-file bx-sm" />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="mt-3">
+                          <span className="text-warning small">
+                            <i className="bx bx-time" /> {stats.pendingQuotations} Pending
+                          </span>
+                          <span className="text-success small ms-2">
+                            <i className="bx bx-check" /> {stats.approvedQuotations} Approved
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+
+                
 
                 {/* Charts Row */}
                 <div className="row g-4 mb-4">
@@ -549,6 +604,9 @@ const DealerStaffDashboard = ({ currentPage }) => {
 
       case "sales-orders":
         return <SalesOrderManagement />;
+
+      case "quotations":
+        return <QuotationManagement />;
 
       default:
         return (
