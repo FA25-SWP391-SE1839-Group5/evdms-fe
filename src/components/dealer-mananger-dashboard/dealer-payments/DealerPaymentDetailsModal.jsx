@@ -70,13 +70,13 @@ const DealerPaymentDetailsModal = ({ show, onClose, payment, uploading = false, 
         <Form onSubmit={onUpload}>
           <Form.Group controlId="paymentFile">
             <Form.Label>Upload/Replace PDF Document</Form.Label>
-            <Form.Control type="file" accept=".pdf" onChange={onFileSelect} disabled={uploading} />
+            <Form.Control type="file" accept=".pdf" onChange={onFileSelect} disabled={uploading || payment.status?.toLowerCase() !== "pending"} />
           </Form.Group>
           <div className="mt-3 d-flex justify-content-end">
             <Button variant="secondary" onClick={onClose} className="me-2" disabled={uploading}>
               Cancel
             </Button>
-            <Button type="submit" variant="primary" disabled={uploading}>
+            <Button type="submit" variant="primary" disabled={uploading || payment.status?.toLowerCase() !== "pending"}>
               {uploading ? <Spinner as="span" size="sm" /> : "Upload PDF"}
             </Button>
           </div>
