@@ -1,5 +1,7 @@
 import { getAllVehicleModels } from "../../services/vehicleModelService";
 import { createVehicleVariant, deleteVehicleVariant, getAllVehicleVariants, getVehicleVariantById, updateVehicleVariant } from "../../services/vehicleVariantService";
+import VehicleVariantDeleteModal from "./vehicle-variant/VehicleVariantDeleteModal";
+import VehicleVariantSearchFilter from "./vehicle-variant/VehicleVariantSearchFilter";
 
 // Specs configuration with categories and units
 const SPECS_CONFIG = {
@@ -68,6 +70,8 @@ const FEATURES_CONFIG = {
 };
 
 import { useEffect, useRef, useState } from "react";
+import VehicleVariantHeader from "./vehicle-variant/VehicleVariantHeader";
+import VehicleVariantTable from "./vehicle-variant/VehicleVariantTable";
 
 const VehicleVariantManagement = () => {
   // Open create modal if ?create=1 is in the URL
@@ -96,7 +100,16 @@ const VehicleVariantManagement = () => {
   const [pageSize, setPageSize] = useState(10);
   const [totalResults, setTotalResults] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+
+  // Debounce search term
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 400); // 400ms debounce
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+  // Removed sortBy state. Sorting is now handled locally in the table.
 
   // Modal state
   const [showModal, setShowModal] = useState(false);
@@ -122,7 +135,7 @@ const VehicleVariantManagement = () => {
     fetchModels();
   }, []);
 
-  // Fetch variants when filters change
+  // Fetch variants when filters change (debounced search)
   useEffect(() => {
     const loadVariants = async () => {
       setLoading(true);
@@ -131,9 +144,7 @@ const VehicleVariantManagement = () => {
         const data = await getAllVehicleVariants({
           page,
           pageSize,
-          search: searchTerm,
-          sortBy,
-          sortOrder: "asc",
+          search: debouncedSearchTerm,
         });
         setVariants(data.items);
         setTotalResults(data.totalResults);
@@ -144,7 +155,7 @@ const VehicleVariantManagement = () => {
       }
     };
     loadVariants();
-  }, [page, pageSize, searchTerm, sortBy]);
+  }, [page, pageSize, debouncedSearchTerm]);
 
   const fetchModels = async () => {
     try {
@@ -163,8 +174,6 @@ const VehicleVariantManagement = () => {
         page,
         pageSize,
         search: searchTerm,
-        sortBy,
-        sortOrder: "asc",
       });
       setVariants(data.items);
       setTotalResults(data.totalResults);
@@ -883,16 +892,7 @@ const VehicleVariantManagement = () => {
   return (
     <div className="container-xxl flex-grow-1 container-p-y">
       {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h4 className="fw-bold mb-1">Vehicle Variant Management</h4>
-          <p className="text-muted mb-0">Manage vehicle variants with specs and features</p>
-        </div>
-        <button className="btn btn-primary" onClick={handleCreate}>
-          <i className="bx bx-plus me-1" />
-          Add New Variant
-        </button>
-      </div>
+      <VehicleVariantHeader onCreate={handleCreate} />
 
       {/* Alerts (only show in background if modal is not open) */}
       {!showModal && error && (
@@ -911,159 +911,32 @@ const VehicleVariantManagement = () => {
       )}
 
       {/* Search and Filter */}
-      <div className="card mb-4">
-        <div className="card-body">
-          <div className="row g-3">
-            <div className="col-md-6">
-              <div className="input-group">
-                <span className="input-group-text">
-                  <i className="bx bx-search" />
-                </span>
-                <input type="text" className="form-control" placeholder="Search variants..." value={searchTerm} onChange={handleSearchChange} />
-              </div>
-            </div>
-            <div className="col-md-3">
-              <select
-                className="form-select"
-                value={pageSize}
-                onChange={(e) => {
-                  setPageSize(Number(e.target.value));
-                  setPage(1);
-                }}
-              >
-                <option value="5">5 per page</option>
-                <option value="10">10 per page</option>
-                <option value="20">20 per page</option>
-                <option value="50">50 per page</option>
-              </select>
-            </div>
-            <div className="col-md-3">
-              <select className="form-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-                <option value="">Sort by...</option>
-                <option value="name">Name</option>
-                <option value="basePrice">Base Price</option>
-                <option value="createdAt">Created Date</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
+      <VehicleVariantSearchFilter
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
+        pageSize={pageSize}
+        onPageSizeChange={(e) => {
+          setPageSize(Number(e.target.value));
+          setPage(1);
+        }}
+      />
 
       {/* Table */}
-      <div className="card">
-        <div className="card-body">
-          {loading && !showModal ? (
-            <div className="text-center py-5">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className="table-responsive">
-                <table className="table table-hover">
-                  <thead>
-                    <tr>
-                      <th>Variant Name</th>
-                      <th>Parent Model</th>
-                      <th>Base Price</th>
-                      <th>Specs</th>
-                      <th>Features</th>
-                      <th style={{ width: "150px" }}>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {variants.length === 0 ? (
-                      <tr>
-                        <td colSpan="6" className="text-center py-5 text-muted">
-                          <i className="bx bx-customize bx-lg mb-2" />
-                          <p>No variants found</p>
-                        </td>
-                      </tr>
-                    ) : (
-                      variants.map((variant) => {
-                        const specsCount = variant.specs ? Object.keys(variant.specs).length : 0;
-                        const featuresCount = variant.features ? Object.values(variant.features).reduce((sum, arr) => sum + arr.length, 0) : 0;
-
-                        return (
-                          <tr key={variant.id}>
-                            <td>
-                              <strong>{variant.name}</strong>
-                            </td>
-                            <td>{getModelName(variant.modelId)}</td>
-                            <td className="text-primary fw-semibold">{formatPrice(variant.basePrice)}</td>
-                            <td>
-                              <span className="badge bg-label-info">{specsCount} specs</span>
-                            </td>
-                            <td>
-                              <span className="badge bg-label-success">{featuresCount} features</span>
-                            </td>
-                            <td>
-                              <div className="btn-group" role="group">
-                                <button className="btn btn-sm btn-outline-info" onClick={() => handleView(variant.id)} title="View">
-                                  <i className="bx bx-show" />
-                                </button>
-                                <button className="btn btn-sm btn-outline-primary" onClick={() => handleEdit(variant.id)} title="Edit">
-                                  <i className="bx bx-edit" />
-                                </button>
-                                <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteClick(variant)} title="Delete">
-                                  <i className="bx bx-trash" />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="d-flex justify-content-between align-items-center mt-4">
-                  <div className="text-muted">
-                    Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, totalResults)} of {totalResults} results
-                  </div>
-                  <nav>
-                    <ul className="pagination mb-0">
-                      <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
-                        <button className="page-link" onClick={() => setPage(page - 1)} disabled={page === 1}>
-                          Previous
-                        </button>
-                      </li>
-                      {Array.from({ length: totalPages }, (_, i) => {
-                        const pageNum = i + 1;
-                        if (pageNum === 1 || pageNum === totalPages || (pageNum >= page - 1 && pageNum <= page + 1)) {
-                          return (
-                            <li key={pageNum} className={`page-item ${page === pageNum ? "active" : ""}`}>
-                              <button className="page-link" onClick={() => setPage(pageNum)}>
-                                {pageNum}
-                              </button>
-                            </li>
-                          );
-                        } else if (pageNum === page - 2 || pageNum === page + 2) {
-                          return (
-                            <li key={pageNum} className="page-item disabled">
-                              <span className="page-link">...</span>
-                            </li>
-                          );
-                        }
-                        return null;
-                      })}
-                      <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
-                        <button className="page-link" onClick={() => setPage(page + 1)} disabled={page === totalPages}>
-                          Next
-                        </button>
-                      </li>
-                    </ul>
-                  </nav>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      </div>
+      <VehicleVariantTable
+        variants={variants}
+        getModelName={getModelName}
+        formatPrice={formatPrice}
+        handleView={handleView}
+        handleEdit={handleEdit}
+        handleDeleteClick={handleDeleteClick}
+        loading={loading}
+        showModal={showModal}
+        page={page}
+        pageSize={pageSize}
+        totalResults={totalResults}
+        totalPages={totalPages}
+        setPage={setPage}
+      />
 
       {/* Create/Edit/View Modal */}
       {showModal && (
@@ -1221,50 +1094,7 @@ const VehicleVariantManagement = () => {
       )}
 
       {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header bg-danger text-white">
-                <h5 className="modal-title">
-                  <i className="bx bx-trash me-2" />
-                  Confirm Delete
-                </h5>
-                <button type="button" className="btn-close btn-close-white" onClick={() => setShowDeleteModal(false)} disabled={loading} />
-              </div>
-              <div className="modal-body">
-                <p>Are you sure you want to delete this variant?</p>
-                {variantToDelete && (
-                  <div className="alert alert-warning">
-                    <p className="mb-0">
-                      <strong>{variantToDelete.name}</strong>
-                    </p>
-                    <p className="mb-0 text-danger small mt-2">This action cannot be undone.</p>
-                  </div>
-                )}
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowDeleteModal(false)} disabled={loading}>
-                  Cancel
-                </button>
-                <button type="button" className="btn btn-danger" onClick={confirmDelete} disabled={loading}>
-                  {loading ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm me-2" />
-                      Deleting...
-                    </>
-                  ) : (
-                    <>
-                      <i className="bx bx-trash me-1" />
-                      Delete
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <VehicleVariantDeleteModal show={showDeleteModal} loading={loading} variant={variantToDelete} onCancel={() => setShowDeleteModal(false)} onConfirm={confirmDelete} />
     </div>
   );
 };
