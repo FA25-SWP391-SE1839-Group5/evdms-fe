@@ -42,6 +42,22 @@ const DealerOrderReviewModal = ({ open, order, onClose, onAccept, onDecline, onD
     });
   };
 
+  // Status badge coloring like table
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case "Pending":
+        return <span className="badge bg-label-warning">Pending</span>;
+      case "Confirmed":
+        return <span className="badge bg-label-info">Confirmed</span>;
+      case "Delivered":
+        return <span className="badge bg-label-success">Delivered</span>;
+      case "Canceled":
+        return <span className="badge bg-label-danger">Canceled</span>;
+      default:
+        return <span className="badge bg-label-secondary">{status}</span>;
+    }
+  };
+
   return (
     <div className="modal fade show d-block" tabIndex="-1" style={{ background: "rgba(0,0,0,0.0)" }}>
       <div className="modal-dialog">
@@ -57,7 +73,7 @@ const DealerOrderReviewModal = ({ open, order, onClose, onAccept, onDecline, onD
             <div className="row">
               {Object.entries(order).map(([key, value]) => (
                 <div className="col-12 mb-2" key={key}>
-                  <strong>{prettyField(key)}:</strong> {key === "createdAt" || key === "updatedAt" ? formatDate(value) : String(value)}
+                  <strong>{prettyField(key)}:</strong> {key === "createdAt" || key === "updatedAt" ? formatDate(value) : key === "status" ? getStatusBadge(value) : String(value)}
                 </div>
               ))}
             </div>

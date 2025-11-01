@@ -16,6 +16,20 @@ const DealerPaymentReviewModal = ({ open, payment, onClose, onPaid, onFailed, lo
     });
   };
 
+  // Status badge coloring like table
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case "Pending":
+        return <span className="badge bg-label-warning">Pending</span>;
+      case "Paid":
+        return <span className="badge bg-label-success">Paid</span>;
+      case "Failed":
+        return <span className="badge bg-label-danger">Failed</span>;
+      default:
+        return <span className="badge bg-label-secondary">{status}</span>;
+    }
+  };
+
   return (
     <Modal show={open} onHide={onClose} centered>
       <Modal.Header closeButton>
@@ -29,7 +43,7 @@ const DealerPaymentReviewModal = ({ open, payment, onClose, onPaid, onFailed, lo
           <strong>Amount:</strong> {payment.amount?.toLocaleString()} USD
         </div>
         <div className="mb-3">
-          <strong>Status:</strong> {payment.status}
+          <strong>Status:</strong> {getStatusBadge(payment.status)}
         </div>
         <div className="mb-3">
           <strong>Created At:</strong> {formatDate(payment.createdAt)}
