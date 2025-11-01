@@ -7,10 +7,45 @@ const formatCurrency = (amount) => {
   return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount);
 };
 
+// Mapping for dropdown spec display labels
+const DROPDOWN_SPEC_LABELS = {
+  driveType: {
+    FWD: "FWD (Front-Wheel Drive)",
+    RWD: "RWD (Rear-Wheel Drive)",
+    AWD: "AWD (All-Wheel Drive)",
+  },
+  motorType: {
+    "Single PMSM": "Single PMSM",
+    "Dual PMSM": "Dual PMSM",
+    "Induction Motor": "Induction Motor",
+  },
+  batteryChemistry: {
+    NMC: "NMC",
+    NCA: "NCA",
+    LFP: "LFP",
+  },
+  regenerativeBrakingCapacity: {
+    "Standard (1-pedal)": "Standard (1-pedal)",
+    "Enhanced (1-pedal)": "Enhanced (1-pedal)",
+  },
+  chargingPortTypes: {
+    NACS: "NACS",
+    CCS: "CCS",
+  },
+  heatPump: {
+    Standard: "Standard",
+    Optional: "Optional",
+  },
+};
+
 // Helper render Specs
-const renderSpecValue = (spec) => {
+const renderSpecValue = (spec, specKey) => {
   if (!spec) return <span className="text-muted">N/A</span>;
-  return `${spec.value}${spec.unit ? ` ${spec.unit}` : ""}`;
+  let displayValue = spec.value;
+  if (DROPDOWN_SPEC_LABELS[specKey] && DROPDOWN_SPEC_LABELS[specKey][spec.value]) {
+    displayValue = DROPDOWN_SPEC_LABELS[specKey][spec.value];
+  }
+  return `${displayValue}${spec.unit ? ` ${spec.unit}` : ""}`;
 };
 
 // Helper render Features
@@ -143,7 +178,7 @@ export default function VehicleVariantDetailsModal({ show, onClose, variantId, m
                         {keys.map((specKey) => (
                           <li key={specKey} className="col">
                             <small>
-                              {specLabels[specKey] || specKey}: {renderSpecValue(variant.specs[specKey])}
+                              {specLabels[specKey] || specKey}: {renderSpecValue(variant.specs[specKey], specKey)}
                             </small>
                           </li>
                         ))}

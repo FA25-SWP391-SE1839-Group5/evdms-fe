@@ -2,6 +2,36 @@ import { AlertCircle, ArrowLeft, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createVehicleVariant, getAllVehicleModels, updateVehicleVariant } from "../../../../services/vehicleService";
 
+const DROPDOWN_SPEC_OPTIONS = {
+  DriveType: [
+    { value: "FWD", label: "FWD (Front-Wheel Drive)" },
+    { value: "RWD", label: "RWD (Rear-Wheel Drive)" },
+    { value: "AWD", label: "AWD (All-Wheel Drive)" },
+  ],
+  MotorType: [
+    { value: "Single PMSM", label: "Single PMSM" },
+    { value: "Dual PMSM", label: "Dual PMSM" },
+    { value: "Induction Motor", label: "Induction Motor" },
+  ],
+  BatteryChemistry: [
+    { value: "NMC", label: "NMC (Nickel Manganese Cobalt)" },
+    { value: "NCA", label: "NCA (Nickel Cobalt Aluminum)" },
+    { value: "LFP", label: "LFP (Lithium Iron Phosphate)" },
+  ],
+  RegenerativeBrakingCapacity: [
+    { value: "Standard (1-pedal)", label: "Standard (1-pedal)" },
+    { value: "Enhanced (1-pedal)", label: "Enhanced (1-pedal)" },
+  ],
+  ChargingPortTypes: [
+    { value: "NACS", label: "NACS (Tesla's North American Charging Standard)" },
+    { value: "CCS", label: "CCS (Combined Charging System)" },
+  ],
+  HeatPump: [
+    { value: "Standard", label: "Standard" },
+    { value: "Optional", label: "Optional" },
+  ],
+};
+
 const specCategories = {
   Performance: [
     { key: "horsepower", label: "Horsepower", unit: "hp" },
@@ -442,21 +472,37 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
                                   {spec.label}
                                 </label>
                                 <div className="input-group input-group-sm">
-                                  {" "}
-                                  {/* Use input-group-sm */}
-                                  <input
-                                    type={spec.unit ? "number" : "text"}
-                                    inputMode={spec.unit ? "decimal" : undefined}
-                                    pattern={spec.unit ? "[0-9]*" : undefined}
-                                    step={spec.unit === "s" || spec.unit === "kWh" || spec.unit === "Wh/km" ? "0.1" : "1"}
-                                    id={`spec-${spec.key}`}
-                                    name={spec.key}
-                                    className="form-control"
-                                    value={specs[spec.key]?.value || ""}
-                                    onChange={(e) => handleSpecChange(spec.key, e.target.value)}
-                                    placeholder={spec.unit ? `Enter value` : `e.g., AWD`}
-                                    disabled={loading}
-                                  />
+                                  {DROPDOWN_SPEC_OPTIONS[spec.key] ? (
+                                    <select
+                                      id={`spec-${spec.key}`}
+                                      name={spec.key}
+                                      className="form-select"
+                                      value={specs[spec.key]?.value || ""}
+                                      onChange={(e) => handleSpecChange(spec.key, e.target.value)}
+                                      disabled={loading}
+                                    >
+                                      <option value="">Select...</option>
+                                      {DROPDOWN_SPEC_OPTIONS[spec.key].map((opt) => (
+                                        <option key={opt} value={opt}>
+                                          {opt}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  ) : (
+                                    <input
+                                      type={spec.unit ? "number" : "text"}
+                                      inputMode={spec.unit ? "decimal" : undefined}
+                                      pattern={spec.unit ? "[0-9]*" : undefined}
+                                      step={spec.unit === "s" || spec.unit === "kWh" || spec.unit === "Wh/km" ? "0.1" : "1"}
+                                      id={`spec-${spec.key}`}
+                                      name={spec.key}
+                                      className="form-control"
+                                      value={specs[spec.key]?.value || ""}
+                                      onChange={(e) => handleSpecChange(spec.key, e.target.value)}
+                                      placeholder={spec.unit ? `Enter value` : `e.g., AWD`}
+                                      disabled={loading}
+                                    />
+                                  )}
                                   {spec.unit && <span className="input-group-text">{spec.unit}</span>}
                                 </div>
                               </div>

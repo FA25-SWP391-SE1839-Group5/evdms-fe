@@ -336,11 +336,12 @@ const VehicleVariantManagement = () => {
     Object.keys(SPECS_CONFIG).forEach((category) => {
       Object.keys(SPECS_CONFIG[category]).forEach((specName) => {
         const spec = formData.specs[specName];
+        const config = SPECS_CONFIG[category][specName];
         if (spec && spec.value !== undefined && spec.value !== "" && spec.value !== null) {
           const camelKey = specName.charAt(0).toLowerCase() + specName.slice(1);
           specs[camelKey] = {
-            value: String(spec.value),
-            ...(spec.unit && { unit: spec.unit }),
+            value: config.unit ? Number(spec.value) : String(spec.value),
+            ...(config.unit ? { unit: config.unit } : {}),
           };
         }
       });
@@ -441,8 +442,6 @@ const VehicleVariantManagement = () => {
     if (modalMode === "view") {
       return (
         <div className="step-content">
-          <h6 className="mb-3">Basic Information</h6>
-
           <div className="row">
             <div className="col-md-6 mb-3">
               <label className="form-label text-muted small">Parent Model</label>
@@ -481,8 +480,6 @@ const VehicleVariantManagement = () => {
 
     return (
       <div className="step-content">
-        <h6 className="mb-3">Basic Information</h6>
-
         {/* Model Selection */}
         <div className="mb-3">
           <label className="form-label">
@@ -548,7 +545,6 @@ const VehicleVariantManagement = () => {
       if (!hasSpecs) {
         return (
           <div className="step-content">
-            <h6 className="mb-3">Specifications</h6>
             <div className="alert alert-info">
               <i className="bx bx-info-circle me-2" />
               No specifications available for this variant.
@@ -557,19 +553,52 @@ const VehicleVariantManagement = () => {
         );
       }
 
+      // Mapping for dropdown spec display labels
+      const DROPDOWN_SPEC_LABELS = {
+        DriveType: {
+          FWD: "FWD (Front-Wheel Drive)",
+          RWD: "RWD (Rear-Wheel Drive)",
+          AWD: "AWD (All-Wheel Drive)",
+        },
+        MotorType: {
+          "Single PMSM": "Single PMSM",
+          "Dual PMSM": "Dual PMSM",
+          "Induction Motor": "Induction Motor",
+        },
+        BatteryChemistry: {
+          NMC: "NMC (Nickel Manganese Cobalt)",
+          NCA: "NCA (Nickel Cobalt Aluminum)",
+          LFP: "LFP (Lithium Iron Phosphate)",
+        },
+        RegenerativeBrakingCapacity: {
+          "Standard (1-pedal)": "Standard (1-pedal)",
+          "Enhanced (1-pedal)": "Enhanced (1-pedal)",
+        },
+        ChargingPortTypes: {
+          NACS: "NACS (Tesla's North American Charging Standard)",
+          CCS: "CCS (Combined Charging System)",
+        },
+        HeatPump: {
+          Standard: "Standard",
+          Optional: "Optional",
+        },
+      };
+      const getDisplaySpecValue = (specName, specValue) => {
+        if (!specValue) return "N/A";
+        let label = specValue.value;
+        if (DROPDOWN_SPEC_LABELS[specName] && DROPDOWN_SPEC_LABELS[specName][specValue.value]) {
+          label = DROPDOWN_SPEC_LABELS[specName][specValue.value];
+        }
+        return `${label}${specValue.unit ? ` ${specValue.unit}` : ""}`;
+      };
       return (
         <div className="step-content">
-          <h6 className="mb-3">Specifications</h6>
-
           {Object.entries(SPECS_CONFIG).map(([category, specs]) => {
             // Check if this category has any specs
             const categorySpecs = Object.keys(specs).filter((specName) => {
               const specValue = formData.specs[specName];
-              console.log(`🔍 Checking spec: ${specName}, value:`, specValue);
               return specValue && specValue.value !== undefined && specValue.value !== "";
             });
-
-            console.log(`🔍 Category ${category} - found specs:`, categorySpecs);
 
             if (categorySpecs.length === 0) return null;
 
@@ -579,8 +608,6 @@ const VehicleVariantManagement = () => {
                 <div className="row g-3">
                   {categorySpecs.map((specName) => {
                     const specValue = formData.specs[specName];
-                    const config = specs[specName];
-
                     return (
                       <div key={specName} className="col-md-6">
                         <div className="card">
@@ -588,12 +615,9 @@ const VehicleVariantManagement = () => {
                             <div className="d-flex justify-content-between align-items-start">
                               <div className="flex-grow-1">
                                 <label className="form-label text-muted small mb-1">{specName.replace(/([A-Z])/g, " $1").trim()}</label>
-                                <p className="mb-0 fw-semibold fs-5">
-                                  {specValue.value}
-                                  {config.unit && <span className="text-muted ms-1">{config.unit}</span>}
-                                </p>
+                                <p className="mb-0 fw-semibold fs-5">{getDisplaySpecValue(specName, specValue)}</p>
                               </div>
-                              <i className="bx bx-check-circle text-success fs-4" />
+                              {/* Removed checkmark icon */}
                             </div>
                           </div>
                         </div>
@@ -613,45 +637,93 @@ const VehicleVariantManagement = () => {
         <h6 className="mb-3">Specifications (Optional)</h6>
         <small className="text-muted d-block mb-3">Fill in the specs you want to include. Leave empty to skip.</small>
 
-        {Object.entries(SPECS_CONFIG).map(([category, specs]) => (
-          <div key={category} className="mb-4">
-            <h6 className="text-primary mb-2">{category}</h6>
-            <div className="row g-2">
-              {Object.entries(specs).map(([specName, config]) => {
-                const specValue = formData.specs[specName];
-                const hasValue = specValue && specValue.value !== undefined && specValue.value !== "";
-
-                return (
-                  <div key={specName} className="col-md-6">
-                    <div className="card">
-                      <div className="card-body p-2">
-                        <div className="d-flex justify-content-between align-items-center mb-1">
-                          <label className="form-label mb-0 small">{specName.replace(/([A-Z])/g, " $1").trim()}</label>
-                          {hasValue && modalMode !== "view" && (
-                            <button type="button" className="btn btn-sm btn-outline-danger" onClick={() => removeSpec(specName)} title="Remove">
-                              <i className="bx bx-x" />
-                            </button>
-                          )}
-                        </div>
-                        <div className="input-group input-group-sm">
-                          <input
-                            type={config.type}
-                            className="form-control"
-                            value={specValue?.value || ""}
-                            onChange={(e) => handleSpecChange(category, specName, "value", e.target.value)}
-                            disabled={modalMode === "view"}
-                            placeholder={config.unit ? `Value` : "Enter value"}
-                          />
-                          {config.unit && <span className="input-group-text">{config.unit}</span>}
+        {/* Dropdown options for specific specs */}
+        {(() => {
+          const DROPDOWN_SPEC_OPTIONS = {
+            DriveType: [
+              { value: "FWD", label: "FWD (Front-Wheel Drive)" },
+              { value: "RWD", label: "RWD (Rear-Wheel Drive)" },
+              { value: "AWD", label: "AWD (All-Wheel Drive)" },
+            ],
+            MotorType: [
+              { value: "Single PMSM", label: "Single PMSM" },
+              { value: "Dual PMSM", label: "Dual PMSM" },
+              { value: "Induction Motor", label: "Induction Motor" },
+            ],
+            BatteryChemistry: [
+              { value: "NMC", label: "NMC (Nickel Manganese Cobalt)" },
+              { value: "NCA", label: "NCA (Nickel Cobalt Aluminum)" },
+              { value: "LFP", label: "LFP (Lithium Iron Phosphate)" },
+            ],
+            RegenerativeBrakingCapacity: [
+              { value: "Standard (1-pedal)", label: "Standard (1-pedal)" },
+              { value: "Enhanced (1-pedal)", label: "Enhanced (1-pedal)" },
+            ],
+            ChargingPortTypes: [
+              { value: "NACS", label: "NACS (Tesla's North American Charging Standard)" },
+              { value: "CCS", label: "CCS (Combined Charging System)" },
+            ],
+            HeatPump: [
+              { value: "Standard", label: "Standard" },
+              { value: "Optional", label: "Optional" },
+            ],
+          };
+          return Object.entries(SPECS_CONFIG).map(([category, specs]) => (
+            <div key={category} className="mb-4">
+              <h6 className="text-primary mb-2">{category}</h6>
+              <div className="row g-2">
+                {Object.entries(specs).map(([specName, config]) => {
+                  const specValue = formData.specs[specName];
+                  const hasValue = specValue && specValue.value !== undefined && specValue.value !== "";
+                  const dropdownOptions = DROPDOWN_SPEC_OPTIONS[specName];
+                  return (
+                    <div key={specName} className="col-md-6">
+                      <div className="card">
+                        <div className="card-body p-2">
+                          <div className="d-flex justify-content-between align-items-center mb-1">
+                            <label className="form-label mb-0 small">{specName.replace(/([A-Z])/g, " $1").trim()}</label>
+                            {hasValue && modalMode !== "view" && (
+                              <button type="button" className="btn btn-sm btn-outline-danger" onClick={() => removeSpec(specName)} title="Remove">
+                                <i className="bx bx-x" />
+                              </button>
+                            )}
+                          </div>
+                          <div className="input-group input-group-sm">
+                            {dropdownOptions ? (
+                              <select
+                                className="form-select"
+                                value={specValue?.value || ""}
+                                onChange={(e) => handleSpecChange(category, specName, "value", e.target.value)}
+                                disabled={modalMode === "view"}
+                              >
+                                <option value="">Select...</option>
+                                {dropdownOptions.map((opt) => (
+                                  <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                  </option>
+                                ))}
+                              </select>
+                            ) : (
+                              <input
+                                type={config.type}
+                                className="form-control"
+                                value={specValue?.value || ""}
+                                onChange={(e) => handleSpecChange(category, specName, "value", e.target.value)}
+                                disabled={modalMode === "view"}
+                                placeholder={config.unit ? `Value` : "Enter value"}
+                              />
+                            )}
+                            {config.unit && <span className="input-group-text">{config.unit}</span>}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          ));
+        })()}
       </div>
     );
   };
@@ -667,7 +739,6 @@ const VehicleVariantManagement = () => {
       if (!hasFeatures) {
         return (
           <div className="step-content">
-            <h6 className="mb-3">Features</h6>
             <div className="alert alert-info">
               <i className="bx bx-info-circle me-2" />
               No features available for this variant.
@@ -678,8 +749,6 @@ const VehicleVariantManagement = () => {
 
       return (
         <div className="step-content">
-          <h6 className="mb-3">Features</h6>
-
           {Object.entries(FEATURES_CONFIG).map(([category]) => {
             const selectedFeatures = formData.features[category] || [];
 
@@ -698,7 +767,7 @@ const VehicleVariantManagement = () => {
                     <div key={feature} className="col-md-6">
                       <div className="card bg-light">
                         <div className="card-body p-2 d-flex align-items-center">
-                          <i className="bx bx-check-circle text-success me-2 fs-5" />
+                          {/* Removed checkmark icon */}
                           <span className="fw-semibold">{feature.replace(/([A-Z])/g, " $1").trim()}</span>
                         </div>
                       </div>
