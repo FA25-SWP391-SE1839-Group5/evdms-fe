@@ -15,6 +15,7 @@ const DealerSidebar = ({ currentPage, onNavigate }) => {
         { id: 'sales-orders', label: 'Sales Orders', icon: 'bx-shopping-bag', page: 'sales-orders' },
         { id: 'test-drives', label: 'Test Drives', icon: 'bx-car', page: 'test-drives' },
         { id: 'feedbacks', label: 'Feedbacks', icon: 'bx-message-square-dots', page: 'feedbacks' },
+        { id: 'quotations', label: 'Quotations', icon: 'bx-package', page: 'quotations' },
         // Staff can manage sales orders, test drives, and feedbacks
       ];
     }
