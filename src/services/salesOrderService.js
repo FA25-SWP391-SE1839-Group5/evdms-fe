@@ -115,3 +115,46 @@ export const deleteSalesOrder = async (id) => {
         throw error;
     }
 };
+
+/**
+ * Get summary information for a sales order by ID
+ * @param {string} id - Sales order ID (GUID)
+ */
+export const getSalesOrdersSummary = async (id) => {
+    try {
+        const response = await api.get(`/sales-orders/${id}/summary`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching sales order summary:', error);
+        throw error;
+    }
+};
+
+/**
+ * Create a payment record
+ * @param {Object} paymentData - { salesOrderId, amount, method }
+ */
+export const createPayment = async (paymentData) => {
+    try {
+        const response = await api.post('/payments', paymentData);
+        return response.data;
+    } catch (error) {
+        console.error('Error creating payment:', error);
+        throw error;
+    }
+};
+
+/**
+ * Deliver a sales order by ID
+ * @param {string} id - Sales order ID (GUID)
+ * @param {Object} [payload] - Optional delivery payload data
+ */
+export const deliverSalesOrders = async (id, payload = {}) => {
+    try {
+        const response = await api.post(`/sales-orders/${id}/deliver`, payload);
+        return response.data;
+    } catch (error) {
+        console.error('Error delivering sales order:', error);
+        throw error;
+    }
+};

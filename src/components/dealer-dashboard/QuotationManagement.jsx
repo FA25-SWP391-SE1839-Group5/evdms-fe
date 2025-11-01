@@ -304,6 +304,7 @@ const QuotationManagement = () => {
           `;
           document.body.appendChild(failAlert);
           setTimeout(() => failAlert.remove(), 5000);
+          return;
         }
       }
 

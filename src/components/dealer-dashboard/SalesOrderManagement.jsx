@@ -5,6 +5,9 @@ import {
   createSalesOrder,
   updateSalesOrder,
   deleteSalesOrder,
+  createPayment,
+  getSalesOrdersSummary,
+  deliverSalesOrders,
 } from "../../services/salesOrderService";
 
 const SalesOrderManagement = () => {
@@ -17,6 +20,12 @@ const SalesOrderManagement = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState(null);
+  const [showPayModal, setShowPayModal] = useState(false);
+  const [payMethod, setPayMethod] = useState("Upfront");
+  const [installmentAmount, setInstallmentAmount] = useState(0);
+  const [processingPayment, setProcessingPayment] = useState(false);
+  const [showSummaryModal, setShowSummaryModal] = useState(false);
+  const [paymentSummary, setPaymentSummary] = useState(null);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -68,6 +77,29 @@ const SalesOrderManagement = () => {
       setError("Failed to load sales orders. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // helper to normalize different response shapes for summary
+  const extractSummaryData = (resp) => {
+    if (!resp) return null;
+    // If axios response.data has inner data: { success, message, data: { ... } }
+    if (resp.data && resp.data.data) return resp.data.data;
+    // If axios response.data is already the summary object
+    if (resp.data && typeof resp.data === 'object' && ('totalAmount' in resp.data || 'paidAmount' in resp.data)) return resp.data;
+    // If the resp itself is the summary object
+    if (typeof resp === 'object' && ('totalAmount' in resp || 'paidAmount' in resp)) return resp;
+    return null;
+  };
+
+  const handleDeliverClick = async (order) => {
+    try {
+      await deliverSalesOrders(order.id, {});
+      showSuccessAlert('Sales order delivered.');
+      loadSalesOrders();
+    } catch (err) {
+      console.error('Error delivering sales order:', err);
+      setError('Failed to deliver sales order.');
     }
   };
 
@@ -174,6 +206,63 @@ const SalesOrderManagement = () => {
     } catch (err) {
       console.error("Error deleting sales order:", err);
       setError("Failed to delete sales order.");
+    }
+  };
+
+  const handlePayClick = async (order) => {
+    // set selected order (we show modal using selectedOrder)
+    setSelectedOrder(order);
+    setPayMethod("Upfront");
+    setInstallmentAmount(0);
+    setShowPayModal(true);
+  };
+
+  const handlePaySubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedOrder) return;
+    setProcessingPayment(true);
+    setError(null);
+    try {
+      let amountToPay = 0;
+
+      if (payMethod === "Upfront") {
+        // get current total from summary (quotation total)
+        const summaryResp = await getSalesOrdersSummary(selectedOrder.id);
+        // summaryResp may be { data: { totalAmount, ... } } or raw
+        const totalAmount = summaryResp?.data?.totalAmount ?? summaryResp?.totalAmount ?? 0;
+        amountToPay = totalAmount;
+      } else {
+        amountToPay = Number(installmentAmount) || 0;
+      }
+
+      const paymentDto = {
+        salesOrderId: selectedOrder.id,
+        amount: amountToPay,
+        method: payMethod === "Upfront" ? "Upfront" : "Installment",
+      };
+
+      // call create payment
+      await createPayment(paymentDto);
+
+      // fetch updated summary
+      const updatedSummaryResp = await getSalesOrdersSummary(selectedOrder.id);
+      const summaryData = extractSummaryData(updatedSummaryResp);
+
+      if (summaryData) {
+        setPaymentSummary(summaryData);
+        setShowSummaryModal(true);
+      } else {
+        showSuccessAlert("Payment recorded.");
+      }
+
+      // Close pay modal but keep summary modal open
+      setShowPayModal(false);
+      loadSalesOrders();
+    } catch (err) {
+      console.error("Error processing payment:", err);
+      setError("Failed to process payment. Please try again.");
+    } finally {
+      setProcessingPayment(false);
     }
   };
 
@@ -295,6 +384,99 @@ const SalesOrderManagement = () => {
         </div>
       )}
 
+      {/* Payment Summary Modal */}
+      {showSummaryModal && paymentSummary && (
+        <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  <i className="bx bx-info-circle me-2"></i>
+                  Payment Summary
+                </h5>
+                <button type="button" className="btn-close" onClick={() => setShowSummaryModal(false)}></button>
+              </div>
+              <div className="modal-body">
+                <div className="row g-3">
+                  <div className="col-12">
+                    <p><strong>Sales Order ID:</strong> {paymentSummary.salesOrderId ?? paymentSummary.salesOrderId}</p>
+                    <p><strong>Total Amount:</strong> {paymentSummary.totalAmount ?? paymentSummary.data?.totalAmount ?? 'N/A'}</p>
+                    <p><strong>Paid Amount:</strong> {paymentSummary.paidAmount ?? paymentSummary.data?.paidAmount ?? 'N/A'}</p>
+                    <p><strong>Outstanding Balance:</strong> {paymentSummary.outstandingBalance ?? paymentSummary.data?.outstandingBalance ?? 'N/A'}</p>
+                    <p><strong>Fully Paid:</strong> {String(paymentSummary.isFullyPaid ?? paymentSummary.data?.isFullyPaid ?? false)}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowSummaryModal(false)}>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pay Modal */}
+      {showPayModal && selectedOrder && (
+        <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <form onSubmit={handlePaySubmit}>
+                <div className="modal-header">
+                  <h5 className="modal-title">
+                    <i className="bx bx-credit-card me-2"></i>
+                    Pay Sales Order
+                  </h5>
+                  <button type="button" className="btn-close" onClick={() => setShowPayModal(false)}></button>
+                </div>
+                <div className="modal-body">
+                  <p className="text-muted">Sales Order ID: {selectedOrder.id}</p>
+                  <div className="mb-3">
+                    <label className="form-label">Payment Method</label>
+                    <select className="form-select" value={payMethod} onChange={(e) => setPayMethod(e.target.value)}>
+                      <option value="Upfront">Upfront</option>
+                      <option value="Installment">Installment</option>
+                    </select>
+                  </div>
+                  {payMethod === "Installment" && (
+                    <div className="mb-3">
+                      <label className="form-label">Amount to Pay</label>
+                      <input
+                        type="number"
+                        className="form-control"
+                        value={installmentAmount}
+                        min={0}
+                        onChange={(e) => setInstallmentAmount(e.target.value)}
+                        required
+                      />
+                    </div>
+                  )}
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowPayModal(false)}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary" disabled={processingPayment}>
+                    {processingPayment ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <i className="bx bx-check me-1"></i>
+                        Pay
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Sales Orders Table */}
       <div className="card">
         <div className="card-header d-flex justify-content-between align-items-center">
@@ -356,10 +538,20 @@ const SalesOrderManagement = () => {
                             <i className="bx bx-show me-2"></i>
                             View Details
                           </button>
+                          <button className="dropdown-item" onClick={() => handlePayClick(order)}>
+                            <i className="bx bx-credit-card me-2"></i>
+                            Pay
+                          </button>
                           <button className="dropdown-item" onClick={() => handleEditClick(order)}>
                             <i className="bx bx-edit me-2"></i>
                             Edit
                           </button>
+                          {order.status === 'Confirmed' && (
+                            <button className="dropdown-item" onClick={() => handleDeliverClick(order)}>
+                              <i className="bx bx-car me-2"></i>
+                              Deliver
+                            </button>
+                          )}
                           <button className="dropdown-item text-danger" onClick={() => handleDeleteClick(order)}>
                             <i className="bx bx-trash me-2"></i>
                             Delete
