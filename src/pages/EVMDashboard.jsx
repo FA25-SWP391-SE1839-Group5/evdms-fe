@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import DealerContractManagement from "../components/evm-dashboard/DealerContractManagement";
 import DealerManagement from "../components/evm-dashboard/DealerManagement";
 import DealerOrderManagement from "../components/evm-dashboard/DealerOrderManagement";
+import DealerPaymentsManagement from "../components/evm-dashboard/DealerPaymentsManagement";
 import InventoryManagement from "../components/evm-dashboard/InventoryManagement";
 import DealerTotalSales from "../components/evm-dashboard/reports/DealerTotalSales";
 import RegionTotalSales from "../components/evm-dashboard/reports/RegionTotalSales";
@@ -272,6 +273,12 @@ const EVMDashboard = ({ currentPage }) => {
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
             <DealerOrderManagement />
+          </div>
+        );
+      case "dealer-payments":
+        return (
+          <div className="container-xxl flex-grow-1 container-p-y">
+            <DealerPaymentsManagement />
           </div>
         );
       case "dealer-total-sales":
