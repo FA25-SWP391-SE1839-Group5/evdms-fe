@@ -1,13 +1,13 @@
-import React, { useReducer, useState, useEffect } from 'react';
-import LoginPage from './pages/LoginPage';
-import AdminDashboard from './pages/AdminDashboard';
-import EVMDashboard from './pages/EVMDashboard';
-import DealerManagerDashboard from './pages/DealerManagerDashboard';
-import Layout from './components/admin-dashboard/layout/Layout';
-import EVMLayout from './components/evm-dashboard/layout/EVMLayout';
-import DealerLayout from './components/dealer-mananger-dashboard/layout/DealerLayout';
-import { routeReducer, initialState, ROUTES } from './routes';
-import { logout, getStoredToken } from './services/authService';
+import { useEffect, useReducer, useState } from "react";
+import Layout from "./components/admin-dashboard/layout/Layout";
+import DealerLayout from "./components/dealer-mananger-dashboard/layout/DealerLayout";
+import EVMLayout from "./components/evm-dashboard/layout/EVMLayout";
+import AdminDashboard from "./pages/AdminDashboard";
+import DealerManagerDashboard from "./pages/DealerManagerDashboard";
+import EVMDashboard from "./pages/EVMDashboard";
+import LoginPage from "./pages/LoginPage";
+import { initialState, routeReducer, ROUTES } from "./routes";
+import { getStoredToken, logout } from "./services/authService";
 
 const App = () => {
   const [routeState, dispatch] = useReducer(routeReducer, initialState);
@@ -26,7 +26,7 @@ const App = () => {
       "/assets/js/dashboards-analytics.js",
     ];
 
-    scripts.forEach(src => {
+    scripts.forEach((src) => {
       const script = document.createElement("script");
       script.src = src;
       script.async = false; // đảm bảo load theo thứ tự
@@ -36,51 +36,51 @@ const App = () => {
 
   useEffect(() => {
     const checkAuthAndRoute = () => {
-      console.log('--- Running Initial Auth Check ---');
+      console.log("--- Running Initial Auth Check ---");
       try {
         const stored = getStoredToken();
 
         // ƯU TIÊN 1: Có token hợp lệ?
         if (stored?.user?.role) {
-          console.log('Token found. Dispatching LOGIN_SUCCESS:', stored.user);
-          dispatch({ type: 'LOGIN_SUCCESS', payload: stored.user });
+          console.log("Token found. Dispatching LOGIN_SUCCESS:", stored.user);
+          dispatch({ type: "LOGIN_SUCCESS", payload: stored.user });
           // Không set isCheckingAuth = false ở đây vội
           return; // Kết thúc sớm nếu đã đăng nhập
         }
 
         // ƯU TIÊN 2: Không có token, kiểm tra URL đặc biệt
-        console.log('No token found. Checking URL:', window.location.pathname, window.location.search);
+        console.log("No token found. Checking URL:", window.location.pathname, window.location.search);
         const urlParams = new URLSearchParams(window.location.search);
-        const resetToken = urlParams.get('token');
-        const path = window.location.pathname.replace('/', '');
+        const resetToken = urlParams.get("token");
+        const path = window.location.pathname.replace("/", "");
 
-        if (resetToken /* && path === 'reset-password' */) { // Có thể thêm check path nếu muốn
-          console.log('Reset token detected.');
-          dispatch({ type: 'NAVIGATE_TO_RESET_PASSWORD' });
-        } else if (path === 'login') {
-          console.log('No token, on /login path.');
-          dispatch({ type: 'NAVIGATE_TO_LOGIN' });
-        } else if (path === 'catalog') {
-          console.log('No token, on /catalog path.');
-          dispatch({ type: 'NAVIGATE_TO_CATALOG' });
-        } else if (path === '' || path === 'home') {
-           console.log('No token, on root or /home path.');
-           dispatch({ type: 'NAVIGATE_TO_HOME' });
+        if (resetToken /* && path === 'reset-password' */) {
+          // Có thể thêm check path nếu muốn
+          console.log("Reset token detected.");
+          dispatch({ type: "NAVIGATE_TO_RESET_PASSWORD" });
+        } else if (path === "login") {
+          console.log("No token, on /login path.");
+          dispatch({ type: "NAVIGATE_TO_LOGIN" });
+        } else if (path === "catalog") {
+          console.log("No token, on /catalog path.");
+          dispatch({ type: "NAVIGATE_TO_CATALOG" });
+        } else if (path === "" || path === "home") {
+          console.log("No token, on root or /home path.");
+          dispatch({ type: "NAVIGATE_TO_HOME" });
         } else {
-           // Các URL khác mà không có token -> Chuyển về Home (hoặc Login tùy ý)
-           console.log(`No token, on protected path /${path}. Redirecting to HOME.`);
-           dispatch({ type: 'NAVIGATE_TO_HOME' });
+          // Các URL khác mà không có token -> Chuyển về Home (hoặc Login tùy ý)
+          console.log(`No token, on protected path /${path}. Redirecting to HOME.`);
+          dispatch({ type: "NAVIGATE_TO_HOME" });
         }
-
       } catch (error) {
-        console.error('Initial Auth check failed:', error);
-        dispatch({ type: 'NAVIGATE_TO_HOME' }); // Lỗi thì về home
+        console.error("Initial Auth check failed:", error);
+        dispatch({ type: "NAVIGATE_TO_HOME" }); // Lỗi thì về home
       } finally {
         // Luôn tắt loading sau khi kiểm tra xong
         // Dùng setTimeout để đảm bảo dispatch kịp xử lý trước khi tắt loading
         setTimeout(() => {
-            console.log('--- Finished Initial Auth Check ---');
-            setIsCheckingAuth(false);
+          console.log("--- Finished Initial Auth Check ---");
+          setIsCheckingAuth(false);
         }, 0);
       }
     };
@@ -89,25 +89,25 @@ const App = () => {
   }, []); // Hook này chỉ chạy 1 lần khi mount
 
   const getInitialAdminPage = () => {
-    const path = globalThis.location.pathname.replace('/', '');
-    if (!path || path === 'admin-dashboard') return 'dashboard';
+    const path = globalThis.location.pathname.replace("/", "");
+    if (!path || path === "admin-dashboard") return "dashboard";
     return path;
   };
 
   const getInitialEVMPage = () => {
-    const path = globalThis.location.pathname.replace('/', '');
-    if (!path || path === 'evm-dashboard') return 'evm-dashboard';
+    const path = globalThis.location.pathname.replace("/", "");
+    if (!path || path === "evm-dashboard") return "evm-dashboard";
     return path;
   };
 
   const getInitialDealerPage = () => {
-    const path = globalThis.location.pathname.replace('/', '');
+    const path = globalThis.location.pathname.replace("/", "");
     // Các trang hợp lệ này được định nghĩa trong DealerLayout và DealerSidebar
-    const validPages = ['dealer-dashboard', 'dealer-staff', 'dealer-performance', 'dealer-orders'];
+    const validPages = ["dealer-dashboard", "dealer-staff", "dealer-performance", "dealer-orders"];
     if (validPages.includes(path)) {
       return path;
     }
-    return 'dealer-dashboard'; // Trang mặc định
+    return "dealer-dashboard"; // Trang mặc định
   };
 
   // Sync logout across tabs
@@ -131,18 +131,18 @@ const App = () => {
   //   const evmSubPages = ['vehicle-models', 'dealers', 'dealer-contracts', 'oem-inventories', 'vehicle-variants', 'specifications'];
   //   const adminSubPages = ['users', 'dealers', 'customers', 'dashboard'];
   //   const currentPath = globalThis.location.pathname.replace('/', '');
-    
+
   //   // Don't sync if we're on a sub-page
   //   if (evmSubPages.includes(currentPath) || adminSubPages.includes(currentPath)) {
   //     console.log('Sync URL - Skipping sync for sub-page:', currentPath);
   //     return;
   //   }
-    
+
   //   const path = `/${routeState.currentPage}`;
   //   console.log('Sync URL - currentPage:', routeState.currentPage);
   //   console.log('Sync URL - target path:', path);
   //   console.log('Sync URL - current location:', globalThis.location.pathname);
-    
+
   //   if (globalThis.location.pathname !== path) {
   //     console.log('Sync URL - Pushing state to:', path);
   //     globalThis.history.pushState({}, '', path);
@@ -153,7 +153,7 @@ const App = () => {
   // useEffect(() => {
   //   const handlePopState = () => {
   //     const path = globalThis.location.pathname.replace('/', '');
-      
+
   //     if (path === 'home' || path === '') {
   //       dispatch({ type: 'NAVIGATE_TO_HOME' });
   //     } else if (path === 'login') {
@@ -175,20 +175,22 @@ const App = () => {
   // AUTHENTICATION HANDLERS
   // ============================================
   const handleLoginSuccess = (userData) => {
-    console.log('handleLoginSuccess called with:', userData);
-     // Đảm bảo userData có role
-     if (userData && userData.role) {
-         dispatch({ type: 'LOGIN_SUCCESS', payload: userData });
-     } else {
-         console.error("handleLoginSuccess: Invalid userData received", userData);
-         // Có thể dispatch về login hoặc hiển thị lỗi
-         dispatch({ type: 'NAVIGATE_TO_LOGIN' });
-     }
+    console.log("handleLoginSuccess called with:", userData);
+    // Đảm bảo userData có role
+    if (userData && userData.role) {
+      dispatch({ type: "LOGIN_SUCCESS", payload: userData });
+      // Redirect to root after login success
+      window.location.href = "/";
+    } else {
+      console.error("handleLoginSuccess: Invalid userData received", userData);
+      // Có thể dispatch về login hoặc hiển thị lỗi
+      dispatch({ type: "NAVIGATE_TO_LOGIN" });
+    }
   };
 
   const handleLogout = async () => {
     await logout();
-    dispatch({ type: 'LOGOUT' });
+    dispatch({ type: "LOGOUT" });
   };
 
   // ============================================
@@ -196,7 +198,7 @@ const App = () => {
   // ============================================
   const navigateToLogin = () => {
     dispatch({
-      type: 'NAVIGATE_TO_LOGIN'
+      type: "NAVIGATE_TO_LOGIN",
     });
   };
 
@@ -218,9 +220,7 @@ const App = () => {
   return (
     <div className="font-sans">
       {/* LOGIN PAGE */}
-      {routeState.currentPage === ROUTES.LOGIN && (
-        <LoginPage onLoginSuccess={handleLoginSuccess} />
-      )}
+      {routeState.currentPage === ROUTES.LOGIN && <LoginPage onLoginSuccess={handleLoginSuccess} />}
 
       {/* ADMIN DASHBOARD */}
       {routeState.currentPage === ROUTES.ADMIN_DASHBOARD && (
@@ -245,9 +245,7 @@ const App = () => {
       )}
 
       {/* RESET PASSWORD PAGE */}
-      {routeState.currentPage === ROUTES.RESET_PASSWORD && (
-        <ResetPasswordPage />
-      )}
+      {routeState.currentPage === ROUTES.RESET_PASSWORD && <ResetPasswordPage />}
     </div>
   );
 };
