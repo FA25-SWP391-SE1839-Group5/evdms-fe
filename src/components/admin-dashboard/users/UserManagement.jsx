@@ -115,9 +115,11 @@ const UserManagement = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setSubmitting(true);
 
     if (!validateForm()) {
       setError("Please fix the validation errors");
+      setSubmitting(false);
       return;
     }
 
@@ -158,6 +160,8 @@ const UserManagement = () => {
       if (errorMsg.toLowerCase().includes("email") && errorMsg.toLowerCase().includes("exists")) {
         setValidationErrors({ email: "This email is already registered" });
       }
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -229,6 +233,7 @@ const UserManagement = () => {
       dealerId: user.dealerId || "",
       isActive: user.isActive !== undefined ? user.isActive : true,
     });
+    setSubmitting(false);
     setShowModal(true);
     setError("");
     setValidationErrors({});
@@ -244,6 +249,7 @@ const UserManagement = () => {
       dealerId: "",
       isActive: true,
     });
+    setSubmitting(false);
     setError("");
     setValidationErrors({});
   };
@@ -470,7 +476,14 @@ const UserManagement = () => {
                   <i className="bx bx-export me-1"></i> Export
                 </button>
 
-                <button type="button" className="btn btn-primary rounded-pill d-flex align-items-center px-3 py-2" onClick={() => setShowModal(true)}>
+                <button
+                  type="button"
+                  className="btn btn-primary rounded-pill d-flex align-items-center px-3 py-2"
+                  onClick={() => {
+                    setShowModal(true);
+                    setSubmitting(false);
+                  }}
+                >
                   <Plus size={18} className="me-2" />
                   <span className="fw-semibold">Add User</span>
                 </button>

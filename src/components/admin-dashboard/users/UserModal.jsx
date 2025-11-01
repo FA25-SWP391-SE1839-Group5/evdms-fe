@@ -1,4 +1,4 @@
-export default function UserModal({ show, onClose, onSubmit, user, formData, onFormChange, errors, dealers }) {
+export default function UserModal({ show, onClose, onSubmit, user, formData, onFormChange, errors, dealers, submitting }) {
   if (!show) {
     return null;
   }
@@ -118,11 +118,18 @@ export default function UserModal({ show, onClose, onSubmit, user, formData, onF
               </div>
 
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={onClose}>
+                <button type="button" className="btn btn-secondary" onClick={onClose} disabled={submitting}>
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary">
-                  {isEditMode ? "Update User" : "Create User"}
+                <button type="submit" className="btn btn-primary" disabled={submitting}>
+                  {submitting ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" />
+                      {isEditMode ? "Updating..." : "Creating..."}
+                    </>
+                  ) : (
+                    <>{isEditMode ? "Update User" : "Create User"}</>
+                  )}
                 </button>
               </div>
             </div>
