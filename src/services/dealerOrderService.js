@@ -1,10 +1,10 @@
-import api from './api';
+import api from "./api";
 
 // Helper function (if not already in a shared utils file)
 const sanitizeParams = (params = {}) => {
   const cleaned = {};
   Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== '') {
+    if (value !== undefined && value !== null && value !== "") {
       cleaned[key] = value;
     }
   });
@@ -21,15 +21,15 @@ const sanitizeParams = (params = {}) => {
  */
 export const getAllDealerOrders = async (params = {}) => {
   try {
-    console.log('API Call: GET /api/dealer-orders with params:', params);
-    const response = await api.get('/dealer-orders', {
-      params: sanitizeParams(params)
+    console.log("API Call: GET /api/dealer-orders with params:", params);
+    const response = await api.get("/dealer-orders", {
+      params: sanitizeParams(params),
     });
-    console.log('API Response:', response.data);
+    console.log("API Response:", response.data);
     // Adjust based on actual API response structure
     return response.data;
   } catch (error) {
-    console.error('Error fetching dealer orders:', error.response?.data || error.message);
+    console.error("Error fetching dealer orders:", error.response?.data || error.message);
     throw error;
   }
 };
@@ -42,7 +42,7 @@ export const getDealerOrderById = async (id) => {
   try {
     console.log(`API Call: GET /api/dealer-orders/${id}`);
     const response = await api.get(`/dealer-orders/${id}`);
-    console.log('API Response:', response.data);
+    console.log("API Response:", response.data);
     return response.data;
   } catch (error) {
     console.error(`Error fetching dealer order ${id}:`, error.response?.data || error.message);
@@ -56,17 +56,17 @@ export const getDealerOrderById = async (id) => {
  */
 export const createDealerOrder = async (orderData) => {
   try {
-    console.log('API Call: POST /api/dealer-orders with data:', orderData);
+    console.log("API Call: POST /api/dealer-orders with data:", orderData);
     // Ensure quantity is a number
     const payload = {
       ...orderData,
-      quantity: Number(orderData.quantity) || 1 // Default to 1 if invalid
+      quantity: Number(orderData.quantity) || 1, // Default to 1 if invalid
     };
-    const response = await api.post('/dealer-orders', payload);
-    console.log('API Response:', response.data);
+    const response = await api.post("/dealer-orders", payload);
+    console.log("API Response:", response.data);
     return response.data;
   } catch (error) {
-    console.error('Error creating dealer order:', error.response?.data || error.message);
+    console.error("Error creating dealer order:", error.response?.data || error.message);
     throw error;
   }
 };
@@ -81,7 +81,7 @@ export const patchDealerOrder = async (id, updateData) => {
   try {
     console.log(`API Call: PATCH /api/dealer-orders/${id} with data:`, updateData);
     const response = await api.patch(`/dealer-orders/${id}`, updateData);
-    console.log('API Response:', response.data);
+    console.log("API Response:", response.data);
     return response.data;
   } catch (error) {
     console.error(`Error patching dealer order ${id}:`, error.response?.data || error.message);
@@ -98,14 +98,13 @@ export const markDealerOrderDelivered = async (id) => {
   try {
     console.log(`API Call: POST /api/dealer-orders/${id}/deliver`);
     const response = await api.post(`/dealer-orders/${id}/deliver`);
-    console.log('API Response:', response.data);
+    console.log("API Response:", response.data);
     return response.data;
   } catch (error) {
     console.error(`Error marking dealer order ${id} delivered:`, error.response?.data || error.message);
     throw error;
   }
 };
-
 
 // ============================================
 // DEALER PAYMENTS API SERVICE (/api/dealer-payments)
@@ -117,17 +116,17 @@ export const markDealerOrderDelivered = async (id) => {
  */
 export const getAllDealerPayments = async (params = {}) => {
   try {
-    console.log('API Call: GET /api/dealer-payments with params:', params);
+    console.log("API Call: GET /api/dealer-payments with params:", params);
     // Assuming the endpoint exists, adjust if needed
-    const response = await api.get('/dealer-payments', {
-        params: sanitizeParams(params)
+    const response = await api.get("/dealer-payments", {
+      params: sanitizeParams(params),
     });
-    console.log('API Response:', response.data);
+    console.log("API Response:", response.data);
     return response.data;
   } catch (error) {
-    console.error('Error fetching dealer payments:', error.response?.data || error.message);
+    console.error("Error fetching dealer payments:", error.response?.data || error.message);
     // It's possible this endpoint doesn't exist yet for GET all
-    console.warn('Endpoint GET /api/dealer-payments might not exist.');
+    console.warn("Endpoint GET /api/dealer-payments might not exist.");
     throw error;
   }
 };
@@ -138,15 +137,15 @@ export const getAllDealerPayments = async (params = {}) => {
  * @param {object} paymentData - Data for creating payment (likely includes dealerOrderId)
  */
 export const createDealerPayment = async (paymentData) => {
-    try {
-      console.log('API Call: POST /api/dealer-payments with data:', paymentData);
-      const response = await api.post('/dealer-payments', paymentData);
-      console.log('API Response:', response.data);
-      return response.data;
-    } catch (error) {
-      console.error('Error creating dealer payment:', error.response?.data || error.message);
-      throw error;
-    }
+  try {
+    console.log("API Call: POST /api/dealer-payments with data:", paymentData);
+    const response = await api.post("/dealer-payments", paymentData);
+    console.log("API Response:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating dealer payment:", error.response?.data || error.message);
+    throw error;
+  }
 };
 
 /**
@@ -158,14 +157,14 @@ export const uploadDealerPaymentDocument = async (paymentId, file) => {
   try {
     console.log(`API Call: POST /api/dealer-payments/${paymentId}/upload-document`);
     const formData = new FormData();
-    formData.append('file', file); // API likely expects the file under the key 'file'
+    formData.append("Document", file); // API likely expects the file under the key 'file'
 
     const response = await api.post(`/dealer-payments/${paymentId}/upload-document`, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data', // Important for file uploads
+        "Content-Type": "multipart/form-data", // Important for file uploads
       },
     });
-    console.log('API Response:', response.data);
+    console.log("API Response:", response.data);
     return response.data;
   } catch (error) {
     console.error(`Error uploading document for payment ${paymentId}:`, error.response?.data || error.message);
@@ -179,15 +178,15 @@ export const uploadDealerPaymentDocument = async (paymentId, file) => {
  * @param {string} paymentId - The ID of the dealer payment record
  */
 export const markDealerPaymentPaid = async (paymentId) => {
-    try {
-      console.log(`API Call: POST /api/dealer-payments/${paymentId}/mark-paid`);
-      const response = await api.post(`/dealer-payments/${paymentId}/mark-paid`);
-      console.log('API Response:', response.data);
-      return response.data;
-    } catch (error) {
-      console.error(`Error marking payment ${paymentId} as paid:`, error.response?.data || error.message);
-      throw error;
-    }
+  try {
+    console.log(`API Call: POST /api/dealer-payments/${paymentId}/mark-paid`);
+    const response = await api.post(`/dealer-payments/${paymentId}/mark-paid`);
+    console.log("API Response:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error(`Error marking payment ${paymentId} as paid:`, error.response?.data || error.message);
+    throw error;
+  }
 };
 
 /**
@@ -196,15 +195,15 @@ export const markDealerPaymentPaid = async (paymentId) => {
  * @param {string} paymentId - The ID of the dealer payment record
  */
 export const markDealerPaymentFailed = async (paymentId) => {
-    try {
-      console.log(`API Call: POST /api/dealer-payments/${paymentId}/mark-failed`);
-      const response = await api.post(`/dealer-payments/${paymentId}/mark-failed`);
-      console.log('API Response:', response.data);
-      return response.data;
-    } catch (error) {
-      console.error(`Error marking payment ${paymentId} as failed:`, error.response?.data || error.message);
-      throw error;
-    }
+  try {
+    console.log(`API Call: POST /api/dealer-payments/${paymentId}/mark-failed`);
+    const response = await api.post(`/dealer-payments/${paymentId}/mark-failed`);
+    console.log("API Response:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error(`Error marking payment ${paymentId} as failed:`, error.response?.data || error.message);
+    throw error;
+  }
 };
 
 /**
