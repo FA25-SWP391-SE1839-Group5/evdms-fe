@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import DealerContractManagement from "../components/evm-dashboard/DealerContractManagement";
 import DealerManagement from "../components/evm-dashboard/DealerManagement";
 import InventoryManagement from "../components/evm-dashboard/InventoryManagement";
@@ -6,8 +7,75 @@ import RegionTotalSales from "../components/evm-dashboard/reports/RegionTotalSal
 import VariantOrderRates from "../components/evm-dashboard/reports/VariantOrderRates";
 import VehicleModelManagement from "../components/evm-dashboard/VehicleModelManagement";
 import VehicleVariantManagement from "../components/evm-dashboard/VehicleVariantManagement";
+import { getAllDealerContracts } from "../services/dealerService";
+import { getAllInventories } from "../services/inventoryService";
+import { getAllVehicleModels } from "../services/vehicleModelService";
+import { getAllVehicleVariants } from "../services/vehicleVariantService";
 
 const EVMDashboard = ({ currentPage }) => {
+  // Dashboard stats state
+  const [stats, setStats] = useState({
+    vehicleModels: null,
+    variants: null,
+    activeDealers: null,
+    pendingReview: null,
+    loading: true,
+    error: null,
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      setStats((s) => ({ ...s, loading: true, error: null }));
+      try {
+        const vehicleModelsRes = await getAllVehicleModels({ page: 0, pageSize: 0 });
+        const vehicleVariantsRes = await getAllVehicleVariants({ page: 0, pageSize: 0 });
+        // Fetch all dealer contracts and count active ones
+        let activeDealers = null;
+        try {
+          const dealerContractsRes = await getAllDealerContracts({ page: 1, pageSize: 10000 });
+          const now = new Date();
+          activeDealers = (dealerContractsRes.items || []).filter((contract) => {
+            const start = contract.startDate ? new Date(contract.startDate) : null;
+            const end = contract.endDate ? new Date(contract.endDate) : null;
+            return start && start <= now && (!end || end >= now);
+          }).length;
+        } catch {
+          activeDealers = null;
+        }
+        // Low Stock: get all inventories, count those with quantity <= 5
+        let lowStock = null;
+        try {
+          const inventoriesRes = await getAllInventories({ page: 1, pageSize: 10000 });
+          lowStock = (inventoriesRes.items || []).filter((inv) => typeof inv.quantity === "number" && inv.quantity <= 5).length;
+        } catch {
+          lowStock = null;
+        }
+        setStats({
+          vehicleModels: vehicleModelsRes.totalResults,
+          variants: vehicleVariantsRes.totalResults,
+          activeDealers,
+          lowStock,
+          loading: false,
+          error: null,
+        });
+      } catch (err) {
+        setStats((s) => ({ ...s, loading: false, error: err?.message || "Failed to load stats" }));
+      }
+    };
+    fetchStats();
+  }, []);
+
+  const renderStatValue = (value) => {
+    if (stats.loading)
+      return (
+        <span className="placeholder-glow">
+          <span className="placeholder col-6"></span>
+        </span>
+      );
+    if (stats.error) return <span className="text-danger">!</span>;
+    return value !== null && value !== undefined ? value : <span className="text-muted">-</span>;
+  };
+
   const renderContent = () => {
     switch (currentPage) {
       case "evm-dashboard":
@@ -19,7 +87,7 @@ const EVMDashboard = ({ currentPage }) => {
                   <div className="card-body">
                     <div className="mb-4">
                       <h4 className="mb-1">Welcome to EVM Dashboard</h4>
-                      <p className="mb-0 text-muted">Manage vehicle models and variants</p>
+                      <p className="mb-0 text-muted">Manage vehicles and dealers</p>
                     </div>
 
                     {/* Quick Stats */}
@@ -27,61 +95,58 @@ const EVMDashboard = ({ currentPage }) => {
                       <div className="col-md-3">
                         <div className="card bg-primary text-white">
                           <div className="card-body">
-                            <div className="d-flex justify-content-between">
+                            <div className="d-flex justify-content-between align-items-center">
                               <div>
-                                <h5 className="text-white mb-1">45</h5>
+                                <h5 className="text-white mb-1">{renderStatValue(stats.vehicleModels)}</h5>
                                 <p className="mb-0 small">Vehicle Models</p>
                               </div>
                               <div className="avatar d-flex align-items-center justify-content-center" style={{ width: 40, height: 40 }}>
-                                <i className="bx bx-car text-white bx-lg d-flex align-items-center justify-content-center w-100 h-100" />
+                                <i className="bx bx-car text-white bx-lg" />
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
-
                       <div className="col-md-3">
                         <div className="card bg-success text-white">
                           <div className="card-body">
-                            <div className="d-flex justify-content-between">
+                            <div className="d-flex justify-content-between align-items-center">
                               <div>
-                                <h5 className="text-white mb-1">128</h5>
+                                <h5 className="text-white mb-1">{renderStatValue(stats.variants)}</h5>
                                 <p className="mb-0 small">Variants</p>
                               </div>
                               <div className="avatar d-flex align-items-center justify-content-center" style={{ width: 40, height: 40 }}>
-                                <i className="bx bx-customize text-white bx-lg d-flex align-items-center justify-content-center w-100 h-100" />
+                                <i className="bx bx-customize text-white bx-lg" />
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
-
                       <div className="col-md-3">
                         <div className="card bg-info text-white">
                           <div className="card-body">
-                            <div className="d-flex justify-content-between">
+                            <div className="d-flex justify-content-between align-items-center">
                               <div>
-                                <h5 className="text-white mb-1">12</h5>
-                                <p className="mb-0 small">Active Models</p>
+                                <h5 className="text-white mb-1">{renderStatValue(stats.activeDealers)}</h5>
+                                <p className="mb-0 small">Active Dealers</p>
                               </div>
                               <div className="avatar d-flex align-items-center justify-content-center" style={{ width: 40, height: 40 }}>
-                                <i className="bx bx-check-circle text-white bx-lg d-flex align-items-center justify-content-center w-100 h-100" />
+                                <i className="bx bx-user-check text-white bx-lg" />
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
-
                       <div className="col-md-3">
                         <div className="card bg-warning text-white">
                           <div className="card-body">
-                            <div className="d-flex justify-content-between">
+                            <div className="d-flex justify-content-between align-items-center">
                               <div>
-                                <h5 className="text-white mb-1">8</h5>
-                                <p className="mb-0 small">Pending Review</p>
+                                <h5 className="text-white mb-1">{renderStatValue(stats.lowStock)}</h5>
+                                <p className="mb-0 small">Low Stock</p>
                               </div>
                               <div className="avatar d-flex align-items-center justify-content-center" style={{ width: 40, height: 40 }}>
-                                <i className="bx bx-time text-white bx-lg d-flex align-items-center justify-content-center w-100 h-100" />
+                                <i className="bx bx-error text-white bx-lg" />
                               </div>
                             </div>
                           </div>
