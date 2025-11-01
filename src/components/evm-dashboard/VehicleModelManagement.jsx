@@ -30,6 +30,7 @@ const VehicleModelManagement = () => {
   const [totalResults, setTotalResults] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
 
   // Modal state
   const [showModal, setShowModal] = useState(false);
@@ -61,7 +62,7 @@ const VehicleModelManagement = () => {
           pageSize,
           search: searchTerm,
           sortBy,
-          sortOrder: "asc",
+          sortOrder,
         });
         setModels(data.items);
         setTotalResults(data.totalResults);
@@ -73,7 +74,7 @@ const VehicleModelManagement = () => {
       }
     };
     fetchData();
-  }, [page, pageSize, searchTerm, sortBy]);
+  }, [page, pageSize, searchTerm, sortBy, sortOrder]);
 
   // Fetch models with pagination
   const fetchModels = async () => {
@@ -85,7 +86,7 @@ const VehicleModelManagement = () => {
         pageSize,
         search: searchTerm,
         sortBy,
-        sortOrder: "asc",
+        sortOrder,
       });
       setModels(data.items);
       setTotalResults(data.totalResults);
@@ -331,14 +332,7 @@ const VehicleModelManagement = () => {
                 <option value="50">50 per page</option>
               </select>
             </div>
-            <div className="col-md-3">
-              <select className="form-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-                <option value="">Sort by...</option>
-                <option value="name">Name</option>
-                <option value="createdAt">Created Date</option>
-                <option value="updatedAt">Updated Date</option>
-              </select>
-            </div>
+            {/* Removed Sort by dropdown */}
           </div>
         </div>
       </div>
@@ -359,8 +353,34 @@ const VehicleModelManagement = () => {
                   <thead>
                     <tr>
                       <th style={{ width: "80px" }}>Image</th>
-                      <th>Name</th>
-                      <th>Description</th>
+                      <th
+                        style={{ cursor: "pointer", userSelect: "none" }}
+                        onClick={() => {
+                          if (sortBy === "name") {
+                            setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+                          } else {
+                            setSortBy("name");
+                            setSortOrder("asc");
+                          }
+                        }}
+                      >
+                        Name
+                        {sortBy === "name" && <span style={{ marginLeft: 4 }}>{sortOrder === "asc" ? "▲" : "▼"}</span>}
+                      </th>
+                      <th
+                        style={{ cursor: "pointer", userSelect: "none" }}
+                        onClick={() => {
+                          if (sortBy === "description") {
+                            setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+                          } else {
+                            setSortBy("description");
+                            setSortOrder("asc");
+                          }
+                        }}
+                      >
+                        Description
+                        {sortBy === "description" && <span style={{ marginLeft: 4 }}>{sortOrder === "asc" ? "▲" : "▼"}</span>}
+                      </th>
                       <th>Created At</th>
                       <th>Updated At</th>
                       <th style={{ width: "150px" }}>Actions</th>
@@ -379,16 +399,19 @@ const VehicleModelManagement = () => {
                         <tr key={model.id}>
                           <td>
                             {model.imageUrl ? (
-                              <img
-                                src={model.imageUrl}
-                                alt={model.name}
-                                className="rounded"
-                                style={{
-                                  width: "60px",
-                                  height: "60px",
-                                  objectFit: "cover",
-                                }}
-                              />
+                              <div style={{ width: "60px", height: "60px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                <img
+                                  src={model.imageUrl}
+                                  alt={model.name}
+                                  className="rounded"
+                                  style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
+                                    aspectRatio: "1 / 1",
+                                  }}
+                                />
+                              </div>
                             ) : (
                               <div className="bg-light rounded d-flex align-items-center justify-content-center" style={{ width: "60px", height: "60px" }}>
                                 <i className="bx bx-image text-muted" />
