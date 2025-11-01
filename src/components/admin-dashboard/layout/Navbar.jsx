@@ -66,6 +66,14 @@ const Navbar = () => {
           <i className="bx bx-menu bx-sm" />
         </a>
       </div>
+
+      {/* Page Title */}
+      <div className="navbar-nav align-items-center">
+        <div className="nav-item d-flex align-items-center">
+          <h4 className="mb-0 text-primary fw-bold">Admin Dashboard</h4>
+        </div>
+      </div>
+
       <ul className="navbar-nav flex-row align-items-center ms-auto">
         {/* User Dropdown */}
         <li className="nav-item navbar-dropdown dropdown-user dropdown">
