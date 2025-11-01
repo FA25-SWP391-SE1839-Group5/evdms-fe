@@ -1,4 +1,4 @@
-const VehicleVariantSearchFilter = ({ searchTerm, onSearchChange, pageSize, onPageSizeChange, sortBy, onSortByChange }) => (
+const VehicleVariantSearchFilter = ({ searchTerm, onSearchChange, pageSize, onPageSizeChange }) => (
   <div className="card mb-4">
     <div className="card-body">
       <div className="row g-3">
@@ -18,14 +18,7 @@ const VehicleVariantSearchFilter = ({ searchTerm, onSearchChange, pageSize, onPa
             <option value="50">50 per page</option>
           </select>
         </div>
-        <div className="col-md-3">
-          <select className="form-select" value={sortBy} onChange={onSortByChange}>
-            <option value="">Sort by...</option>
-            <option value="name">Name</option>
-            <option value="basePrice">Base Price</option>
-            <option value="createdAt">Created Date</option>
-          </select>
-        </div>
+        {/* Sort dropdown removed. Sorting is now handled by table headers. */}
       </div>
     </div>
   </div>

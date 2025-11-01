@@ -100,7 +100,16 @@ const VehicleVariantManagement = () => {
   const [pageSize, setPageSize] = useState(10);
   const [totalResults, setTotalResults] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+
+  // Debounce search term
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 400); // 400ms debounce
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+  // Removed sortBy state. Sorting is now handled locally in the table.
 
   // Modal state
   const [showModal, setShowModal] = useState(false);
@@ -126,7 +135,7 @@ const VehicleVariantManagement = () => {
     fetchModels();
   }, []);
 
-  // Fetch variants when filters change
+  // Fetch variants when filters change (debounced search)
   useEffect(() => {
     const loadVariants = async () => {
       setLoading(true);
@@ -135,9 +144,7 @@ const VehicleVariantManagement = () => {
         const data = await getAllVehicleVariants({
           page,
           pageSize,
-          search: searchTerm,
-          sortBy,
-          sortOrder: "asc",
+          search: debouncedSearchTerm,
         });
         setVariants(data.items);
         setTotalResults(data.totalResults);
@@ -148,7 +155,7 @@ const VehicleVariantManagement = () => {
       }
     };
     loadVariants();
-  }, [page, pageSize, searchTerm, sortBy]);
+  }, [page, pageSize, debouncedSearchTerm]);
 
   const fetchModels = async () => {
     try {
@@ -167,8 +174,6 @@ const VehicleVariantManagement = () => {
         page,
         pageSize,
         search: searchTerm,
-        sortBy,
-        sortOrder: "asc",
       });
       setVariants(data.items);
       setTotalResults(data.totalResults);
@@ -914,8 +919,6 @@ const VehicleVariantManagement = () => {
           setPageSize(Number(e.target.value));
           setPage(1);
         }}
-        sortBy={sortBy}
-        onSortByChange={(e) => setSortBy(e.target.value)}
       />
 
       {/* Table */}
