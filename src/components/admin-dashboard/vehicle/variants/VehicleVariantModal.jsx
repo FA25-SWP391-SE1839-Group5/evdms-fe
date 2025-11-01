@@ -203,13 +203,29 @@ export default function VehicleVariantModal({ show, onClose, onSaveSuccess, vari
     setLoading(true);
     setError("");
 
+    // Always send all spec and feature categories, with empty arrays if not selected
+    const allSpecs = {};
+    Object.keys(specCategories).forEach((category) => {
+      specCategories[category].forEach((spec) => {
+        const valueObj = specs[spec.key];
+        if (valueObj && valueObj.value !== undefined && valueObj.value !== "" && valueObj.value !== null) {
+          allSpecs[spec.key] = valueObj;
+        }
+      });
+    });
+
+    const allFeatures = {};
+    Object.keys(featureCategories).forEach((category) => {
+      const selected = features[category] || [];
+      allFeatures[category] = selected;
+    });
+
     const dataToSend = {
       modelId: basicInfo.modelId,
       name: basicInfo.name,
       basePrice: Number(basicInfo.basePrice) || 0,
-      // Chỉ gửi specs/features nếu object không rỗng
-      ...(Object.keys(specs).length > 0 && { specs: specs }),
-      ...(Object.keys(features).length > 0 && { features: features }),
+      specs: allSpecs,
+      features: allFeatures,
     };
 
     try {

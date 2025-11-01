@@ -331,31 +331,29 @@ const VehicleVariantManagement = () => {
       basePrice: formData.basePrice,
     };
 
-    // Add specs (convert keys to camelCase for API)
+    // Always send all spec keys, with empty arrays if not selected
     const specs = {};
-    Object.entries(formData.specs).forEach(([key, spec]) => {
-      if (spec.value !== undefined && spec.value !== "" && spec.value !== null) {
-        const camelKey = key.charAt(0).toLowerCase() + key.slice(1);
-        specs[camelKey] = {
-          value: String(spec.value),
-          ...(spec.unit && { unit: spec.unit }),
-        };
-      }
+    Object.keys(SPECS_CONFIG).forEach((category) => {
+      Object.keys(SPECS_CONFIG[category]).forEach((specName) => {
+        const spec = formData.specs[specName];
+        if (spec && spec.value !== undefined && spec.value !== "" && spec.value !== null) {
+          const camelKey = specName.charAt(0).toLowerCase() + specName.slice(1);
+          specs[camelKey] = {
+            value: String(spec.value),
+            ...(spec.unit && { unit: spec.unit }),
+          };
+        }
+      });
     });
-    if (Object.keys(specs).length > 0) {
-      payload.specs = specs;
-    }
+    payload.specs = specs;
 
-    // Add features (convert keys to lowercase for API)
+    // Always send all feature categories, with empty arrays if not selected
     const features = {};
-    Object.entries(formData.features).forEach(([category, featureList]) => {
-      if (featureList && featureList.length > 0) {
-        features[category.toLowerCase()] = featureList;
-      }
+    Object.keys(FEATURES_CONFIG).forEach((category) => {
+      const selected = formData.features[category] || [];
+      features[category.toLowerCase()] = selected;
     });
-    if (Object.keys(features).length > 0) {
-      payload.features = features;
-    }
+    payload.features = features;
 
     return payload;
   };
