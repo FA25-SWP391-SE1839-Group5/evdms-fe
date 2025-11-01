@@ -1,4 +1,4 @@
-export default function UserModal({ show, onClose, onSubmit, user, formData, onFormChange, errors, dealers }) {
+export default function UserModal({ show, onClose, onSubmit, user, formData, onFormChange, errors, dealers, submitting }) {
   if (!show) {
     return null;
   }
@@ -46,23 +46,6 @@ export default function UserModal({ show, onClose, onSubmit, user, formData, onF
                 {errors.email && <div className="invalid-feedback">{errors.email}</div>}
               </div>
 
-              {/* Password field removed for user creation. Only show for edit if needed. */}
-              {isEditMode && (
-                <div className="mb-3">
-                  <label className="form-label">Password (leave blank to keep current)</label>
-                  <input
-                    type="password"
-                    className={`form-control ${errors.password ? "is-invalid" : ""}`}
-                    name="password"
-                    value={formData.password || ""}
-                    onChange={onFormChange}
-                    placeholder="Enter new password"
-                    required={false}
-                  />
-                  {errors.password && <div className="invalid-feedback">{errors.password}</div>}
-                </div>
-              )}
-
               {/* Role */}
               <div className="mb-3">
                 <label className="form-label">Role *</label>
@@ -84,14 +67,12 @@ export default function UserModal({ show, onClose, onSubmit, user, formData, onF
                     id="dealerId"
                     name="dealerId"
                     className={`form-select ${errors?.dealerId ? "is-invalid" : ""}`}
-                    value={formData?.dealerId || ""} // Đảm bảo giá trị là ''
+                    value={formData?.dealerId || ""}
                     onChange={onFormChange}
-                    // Bắt buộc chọn khi tạo mới và role yêu cầu
                     required={!isEditMode && shouldShowDealerSelect}
-                    disabled={isEditMode} // Không cho sửa dealer khi edit
+                    // Always enabled
                   >
                     <option value="">-- Select Dealer --</option>
-                    {/* Kiểm tra dealers trước khi map */}
                     {dealers &&
                       dealers.map((dealer) => (
                         <option key={dealer.id} value={dealer.id}>
@@ -118,11 +99,18 @@ export default function UserModal({ show, onClose, onSubmit, user, formData, onF
               </div>
 
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={onClose}>
+                <button type="button" className="btn btn-secondary" onClick={onClose} disabled={submitting}>
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary">
-                  {isEditMode ? "Update User" : "Create User"}
+                <button type="submit" className="btn btn-primary" disabled={submitting}>
+                  {submitting ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" />
+                      {isEditMode ? "Updating..." : "Creating..."}
+                    </>
+                  ) : (
+                    <>{isEditMode ? "Update User" : "Create User"}</>
+                  )}
                 </button>
               </div>
             </div>

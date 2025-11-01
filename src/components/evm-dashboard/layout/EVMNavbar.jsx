@@ -98,8 +98,18 @@ const EVMNavbar = () => {
           {/* User Dropdown */}
           <li className="nav-item navbar-dropdown dropdown-user dropdown">
             <a className="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-              <div className="avatar avatar-online">
-                <img src="../assets/img/avatars/1.png" alt="User Avatar" className="w-px-40 h-auto rounded-circle" />
+              <div
+                className="avatar avatar-online bg-primary text-white d-flex align-items-center justify-content-center"
+                style={{ width: 40, height: 40, borderRadius: "50%", fontWeight: 600, fontSize: 18 }}
+              >
+                {user && user.name
+                  ? user.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .toUpperCase()
+                      .slice(0, 2)
+                  : "GU"}
               </div>
             </a>
             <ul className="dropdown-menu dropdown-menu-end">
@@ -108,8 +118,18 @@ const EVMNavbar = () => {
                 <a className="dropdown-item" href="#">
                   <div className="d-flex">
                     <div className="flex-shrink-0 me-3">
-                      <div className="avatar avatar-online">
-                        <img src="../assets/img/avatars/1.png" alt="User Avatar" className="w-px-40 h-auto rounded-circle" />
+                      <div
+                        className="avatar avatar-online bg-primary text-white d-flex align-items-center justify-content-center"
+                        style={{ width: 40, height: 40, borderRadius: "50%", fontWeight: 600, fontSize: 18 }}
+                      >
+                        {user && user.name
+                          ? user.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")
+                              .toUpperCase()
+                              .slice(0, 2)
+                          : "GU"}
                       </div>
                     </div>
                     <div className="flex-grow-1">
