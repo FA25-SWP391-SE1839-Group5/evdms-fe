@@ -67,7 +67,7 @@ const FEATURES_CONFIG = {
   ],
 };
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const VehicleVariantManagement = () => {
   // Open create modal if ?create=1 is in the URL
@@ -335,9 +335,28 @@ const VehicleVariantManagement = () => {
     });
   };
 
-  // Navigate steps
-  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 3));
-  const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
+  // Per-step scroll memory
+  const modalBodyRef = useRef(null);
+  const scrollPositions = useRef({ 1: 0, 2: 0, 3: 0 });
+
+  // Save scroll position before changing step, restore after
+  const setStepWithScroll = (getNextStep) => {
+    if (modalBodyRef.current) {
+      scrollPositions.current[currentStep] = modalBodyRef.current.scrollTop;
+    }
+    setCurrentStep((prev) => {
+      const next = getNextStep(prev);
+      setTimeout(() => {
+        if (modalBodyRef.current) {
+          modalBodyRef.current.scrollTop = scrollPositions.current[next] || 0;
+        }
+      }, 0);
+      return next;
+    });
+  };
+
+  const nextStep = () => setStepWithScroll((prev) => Math.min(prev + 1, 3));
+  const prevStep = () => setStepWithScroll((prev) => Math.max(prev - 1, 1));
 
   const preparePayload = () => {
     const payload = {
@@ -1098,7 +1117,7 @@ const VehicleVariantManagement = () => {
                     <div
                       className={`flex-fill text-center ${currentStep === 1 ? "text-primary" : "text-muted"}`}
                       style={{ cursor: "pointer", transition: "all 0.3s" }}
-                      onClick={() => setCurrentStep(1)}
+                      onClick={() => setStepWithScroll(() => 1)}
                       onMouseEnter={(e) => {
                         if (currentStep !== 1) e.currentTarget.style.opacity = "0.7";
                       }}
@@ -1112,7 +1131,7 @@ const VehicleVariantManagement = () => {
                     <div
                       className={`flex-fill text-center ${currentStep === 2 ? "text-primary" : "text-muted"}`}
                       style={{ cursor: "pointer", transition: "all 0.3s" }}
-                      onClick={() => setCurrentStep(2)}
+                      onClick={() => setStepWithScroll(() => 2)}
                       onMouseEnter={(e) => {
                         if (currentStep !== 2) e.currentTarget.style.opacity = "0.7";
                       }}
@@ -1126,7 +1145,7 @@ const VehicleVariantManagement = () => {
                     <div
                       className={`flex-fill text-center ${currentStep === 3 ? "text-primary" : "text-muted"}`}
                       style={{ cursor: "pointer", transition: "all 0.3s" }}
-                      onClick={() => setCurrentStep(3)}
+                      onClick={() => setStepWithScroll(() => 3)}
                       onMouseEnter={(e) => {
                         if (currentStep !== 3) e.currentTarget.style.opacity = "0.7";
                       }}
@@ -1144,7 +1163,15 @@ const VehicleVariantManagement = () => {
                 </div>
 
                 {/* Step Content */}
-                <div style={{ minHeight: "400px", maxHeight: "60vh", overflowY: "auto" }}>
+                <div
+                  ref={modalBodyRef}
+                  style={{ minHeight: "400px", maxHeight: "60vh", overflowY: "auto" }}
+                  onScroll={() => {
+                    if (modalBodyRef.current) {
+                      scrollPositions.current[currentStep] = modalBodyRef.current.scrollTop;
+                    }
+                  }}
+                >
                   {currentStep === 1 && renderStep1()}
                   {currentStep === 2 && renderStep2()}
                   {currentStep === 3 && renderStep3()}
