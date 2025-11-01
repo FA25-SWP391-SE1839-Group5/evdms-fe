@@ -77,10 +77,19 @@ const EVMNavbar = () => {
       </div>
 
       <div className="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-        {/* Page Title - No Search Bar */}
+        {/* Page Title - Welcome Message */}
         <div className="navbar-nav align-items-center">
           <div className="nav-item d-flex align-items-center">
-            <h4 className="mb-0 text-primary fw-bold">OEM</h4>
+            {loading ? (
+              <h4 className="mb-0 text-muted">Loading...</h4>
+            ) : user ? (
+              <h4 className="mb-0 text-primary fw-bold">
+                <i className="bx bx-user-circle me-2"></i>
+                Welcome, {getRoleDisplay(user.role)}
+              </h4>
+            ) : (
+              <h4 className="mb-0 text-muted">Welcome</h4>
+            )}
           </div>
         </div>
 

@@ -3,6 +3,7 @@ import LoginPage from './pages/LoginPage';
 import AdminDashboard from './pages/AdminDashboard';
 import EVMDashboard from './pages/EVMDashboard';
 import DealerManagerDashboard from './pages/DealerManagerDashboard';
+import DealerStaffDashboard from './pages/DealerStaffDashboard';
 import Layout from './components/admin-dashboard/layout/Layout';
 import EVMLayout from './components/evm-dashboard/layout/EVMLayout';
 import DealerLayout from './components/dealer-mananger-dashboard/layout/DealerLayout';
@@ -96,8 +97,23 @@ const App = () => {
 
   const getInitialEVMPage = () => {
     const path = globalThis.location.pathname.replace('/', '');
-    if (!path || path === 'evm-dashboard') return 'evm-dashboard';
-    return path;
+    // Valid EVM pages
+    const validPages = [
+      'evm-dashboard',
+      'vehicle-models',
+      'vehicle-variants',
+      'dealers',
+      'dealer-contracts',
+      'oem-inventories',
+      'variant-order-rates',
+      'dealer-total-sales',
+      'region-total-sales'
+    ];
+    if (validPages.includes(path)) {
+      return path;
+    }
+    // Default to evm-dashboard for invalid/empty paths
+    return 'evm-dashboard';
   };
 
   const getInitialDealerPage = () => {
@@ -109,6 +125,20 @@ const App = () => {
     }
     return 'dealer-dashboard'; // Trang mặc định
   };
+
+  // Sync URL when route changes
+  useEffect(() => {
+    // Don't sync URL for login page
+    if (routeState.currentPage === ROUTES.LOGIN) {
+      return;
+    }
+    
+    const path = `/${routeState.currentPage}`;
+    if (globalThis.location.pathname !== path) {
+      console.log('Sync URL - Pushing state to:', path);
+      globalThis.history.pushState({}, '', path);
+    }
+  }, [routeState.currentPage]);
 
   // Sync logout across tabs
   // useEffect(() => {
@@ -241,6 +271,13 @@ const App = () => {
         <DealerLayout initialPage={getInitialDealerPage()}>
           {/* DealerManagerDashboard là component children */}
           <DealerManagerDashboard />
+        </DealerLayout>
+      )}
+
+      {/* DEALER STAFF DASHBOARD */}
+      {routeState.currentPage === ROUTES.DEALER_STAFF_DASHBOARD && (
+        <DealerLayout initialPage="staff-dashboard">
+          <DealerStaffDashboard />
         </DealerLayout>
       )}
 

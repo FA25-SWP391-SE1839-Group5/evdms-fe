@@ -6,8 +6,9 @@ import api from './api';
 export const roleRoutes = {
   admin: '/admin/dashboard',
   dealer_manager: '/manager/dashboard',
-  dealer_staff: '/staff/dashboard',
-  evm_staff: '/vehicle-models'
+  dealer_staff: '/staff-dashboard',
+  staff: '/staff-dashboard',
+  evm_staff: '/evm-dashboard'
 };
 
 // Decode JWT token to get payload
@@ -28,6 +29,9 @@ const decodeJWT = (token) => {
 // Normalize role from API to internal format
 const normalizeRole = (role) => {
   if (!role) return 'admin';
+  
+  // Handle "Staff" role specifically
+  if (role === 'Staff') return 'staff';
   
   // Convert PascalCase to snake_case
   const normalized = role
