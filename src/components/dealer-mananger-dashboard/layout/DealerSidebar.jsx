@@ -1,15 +1,13 @@
-import React from 'react';
-
 const DealerSidebar = ({ currentPage, onNavigate }) => {
   // Get user role from localStorage
-  const userStr = localStorage.getItem('evdms_user');
+  const userStr = localStorage.getItem("evdms_user");
   const user = userStr ? JSON.parse(userStr) : null;
   const userRole = user?.role?.toLowerCase();
 
   // Define menu items based on role
   const getMenuItems = () => {
     // For Dealer Staff (role: "staff" or "dealer_staff")
-    if (userRole === 'staff' || userRole === 'dealer_staff') {
+    if (userRole === "staff" || userRole === "dealer_staff") {
       return [
         { id: 'staff-dashboard', label: 'Dashboard', icon: 'bx-home-circle', page: 'staff-dashboard' },
         { id: 'sales-orders', label: 'Sales Orders', icon: 'bx-shopping-bag', page: 'sales-orders' },
@@ -19,13 +17,14 @@ const DealerSidebar = ({ currentPage, onNavigate }) => {
         // Staff can manage sales orders, test drives, and feedbacks
       ];
     }
-    
+
     // For Dealer Manager (role: "dealer_manager")
     return [
-      { id: 'dashboard', label: 'Dashboard', icon: 'bx-home-circle', page: 'dealer-dashboard' },
-      { id: 'staff', label: 'Staff Management', icon: 'bx-user-plus', page: 'dealer-staff' },
-      { id: 'performance', label: 'Staff Performance', icon: 'bx-line-chart', page: 'dealer-performance' },
-      { id: 'orders', label: 'Dealer Orders', icon: 'bx-package', page: 'dealer-orders' },
+      { id: "dashboard", label: "Dashboard", icon: "bx-home-circle", page: "dealer-dashboard" },
+      { id: "staff", label: "Staff Management", icon: "bx-user-plus", page: "dealer-staff" },
+      { id: "performance", label: "Staff Performance", icon: "bx-line-chart", page: "dealer-performance" },
+      { id: "orders", label: "Dealer Orders", icon: "bx-package", page: "dealer-orders" },
+      { id: "payments", label: "Dealer Payments", icon: "bx-credit-card", page: "dealer-payments" },
     ];
   };
 
@@ -41,7 +40,7 @@ const DealerSidebar = ({ currentPage, onNavigate }) => {
   const renderMenuItem = (item) => {
     const isActive = currentPage === item.page;
     return (
-      <li key={item.id} className={`menu-item ${isActive ? 'active' : ''}`}>
+      <li key={item.id} className={`menu-item ${isActive ? "active" : ""}`}>
         <a
           href={`/${item.page}`} // Keep href for potential direct navigation/refresh
           className="menu-link"
@@ -58,14 +57,10 @@ const DealerSidebar = ({ currentPage, onNavigate }) => {
     <aside id="layout-menu" className="layout-menu menu-vertical menu bg-menu-theme">
       {/* Logo */}
       <div className="app-brand demo">
-        <a 
-          href="#" 
-          className="app-brand-link" 
-          onClick={(e) => handleMenuClick(e, userRole === 'staff' || userRole === 'dealer_staff' ? 'staff-dashboard' : 'dealer-dashboard')}
-        >
+        <a href="#" className="app-brand-link" onClick={(e) => handleMenuClick(e, userRole === "staff" || userRole === "dealer_staff" ? "staff-dashboard" : "dealer-dashboard")}>
           <span className="app-brand-logo demo">
-             {/* You might want a different logo or color */}
-            <img src="/assets/images/elecar_logo.svg" alt="EVDMS Logo" className="img-fluid" style={{ maxHeight: '56px' }} />
+            {/* You might want a different logo or color */}
+            <img src="/assets/images/elecar_logo.svg" alt="EVDMS Logo" className="img-fluid" style={{ maxHeight: "56px" }} />
           </span>
           <span className="app-brand-text demo menu-text fw-bolder ms-2">EVDMS</span>
         </a>
@@ -76,9 +71,7 @@ const DealerSidebar = ({ currentPage, onNavigate }) => {
       </div>
       <div className="menu-inner-shadow" />
       {/* Menu */}
-      <ul className="menu-inner py-1">
-        {menuItems.map(renderMenuItem)}
-      </ul>
+      <ul className="menu-inner py-1">{menuItems.map(renderMenuItem)}</ul>
     </aside>
   );
 };

@@ -1,9 +1,9 @@
 import api from "./api";
 
-export const getAllUsers = async (page = 1, pageSize = 10) => {
+export const getAllUsers = async (params = {}) => {
   try {
     const response = await api.get(`/users`, {
-      params: { page, pageSize },
+      params,
     });
     return response.data;
   } catch (error) {

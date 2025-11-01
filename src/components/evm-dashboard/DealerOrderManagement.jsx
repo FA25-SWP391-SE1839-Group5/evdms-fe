@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createDealerPayment, getAllDealerOrders, patchDealerOrder } from "../../services/dealerOrderService";
+import { createDealerPayment, getAllDealerOrders, markDealerOrderDelivered, patchDealerOrder } from "../../services/dealerOrderService";
 import DealerOrderReviewModal from "./dealer-orders/DealerOrderReviewModal";
 
 const ORDER_STATUSES = ["Pending", "Confirmed", "Delivered", "Canceled"];
@@ -84,6 +84,19 @@ const DealerOrderManagement = () => {
       fetchOrders();
     } catch (err) {
       setError("Failed to decline order: " + (err.message || "Unknown error"));
+      setModalLoading(false);
+    }
+  };
+
+  const handleDeliver = async () => {
+    if (!selectedOrder) return;
+    setModalLoading(true);
+    try {
+      await markDealerOrderDelivered(selectedOrder.id);
+      handleModalClose();
+      fetchOrders();
+    } catch (err) {
+      setError("Failed to deliver order: " + (err.message || "Unknown error"));
       setModalLoading(false);
     }
   };
@@ -312,7 +325,7 @@ const DealerOrderManagement = () => {
         </div>
       </div>
       {/* Review Modal */}
-      <DealerOrderReviewModal open={modalOpen} order={selectedOrder} onClose={handleModalClose} onAccept={handleAccept} onDecline={handleDecline} loading={modalLoading} />
+      <DealerOrderReviewModal open={modalOpen} order={selectedOrder} onClose={handleModalClose} onAccept={handleAccept} onDecline={handleDecline} onDeliver={handleDeliver} loading={modalLoading} />
     </div>
   );
 };
