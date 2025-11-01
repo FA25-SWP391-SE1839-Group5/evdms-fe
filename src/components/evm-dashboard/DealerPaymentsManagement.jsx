@@ -215,7 +215,7 @@ const DealerPaymentsManagement = () => {
                       payments.map((payment) => (
                         <tr key={payment.id}>
                           <td>{payment.dealerOrderId}</td>
-                          <td>{formatCurrency(payment.amount)}</td>
+                          <td className="text-primary fw-semibold">{formatCurrency(payment.amount)}</td>
                           <td>{getStatusBadge(payment.status)}</td>
                           <td>{formatDate(payment.createdAt)}</td>
                           <td>{formatDate(payment.updatedAt)}</td>
