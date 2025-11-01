@@ -860,8 +860,8 @@ const VehicleVariantManagement = () => {
         </button>
       </div>
 
-      {/* Alerts */}
-      {error && (
+      {/* Alerts (only show in background if modal is not open) */}
+      {!showModal && error && (
         <div className="alert alert-danger alert-dismissible fade show" role="alert">
           <i className="bx bx-error me-2" />
           {error}
@@ -1057,10 +1057,26 @@ const VehicleVariantManagement = () => {
                     </>
                   )}
                 </h5>
-                <button type="button" className="btn-close" onClick={() => setShowModal(false)} disabled={loading} />
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => {
+                    setShowModal(false);
+                    setError(null);
+                  }}
+                  disabled={loading}
+                />
               </div>
 
               <div className="modal-body">
+                {/* Error alert inside modal */}
+                {error && (
+                  <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i className="bx bx-error me-2" />
+                    {error}
+                    <button type="button" className="btn-close" onClick={() => setError(null)} />
+                  </div>
+                )}
                 {/* Step Indicator - Clickable */}
                 <div className="mb-4">
                   <div className="d-flex justify-content-between">
