@@ -14,6 +14,12 @@ const EVMSidebar = ({ currentPage, onNavigate }) => {
       page: "vehicle-models",
     },
     {
+      id: "vehicle-variants",
+      label: "Vehicle Variants",
+      icon: "bx-customize",
+      page: "vehicle-variants",
+    },
+    {
       id: "dealers",
       label: "Dealers",
       icon: "bx-store",
@@ -26,16 +32,22 @@ const EVMSidebar = ({ currentPage, onNavigate }) => {
       page: "dealer-contracts",
     },
     {
+      id: "dealer-orders",
+      label: "Dealer Orders",
+      icon: "bx-cart",
+      page: "dealer-orders",
+    },
+    {
+      id: "dealer-payments",
+      label: "Dealer Payments",
+      icon: "bx-credit-card",
+      page: "dealer-payments",
+    },
+    {
       id: "oem-inventories",
       label: "OEM Inventories",
       icon: "bx-package",
       page: "oem-inventories",
-    },
-    {
-      id: "vehicle-variants",
-      label: "Vehicle Variants",
-      icon: "bx-customize",
-      page: "vehicle-variants",
     },
     {
       id: "variant-order-rates",
@@ -104,28 +116,30 @@ const EVMSidebar = ({ currentPage, onNavigate }) => {
           <span className="menu-header-text">Vehicle Management</span>
         </li>
         {renderMenuItem(menuItems[1])}
-        {renderMenuItem(menuItems[5])}
+        {renderMenuItem(menuItems[2])}
 
         {/* Dealer Management Section */}
         <li className="menu-header small text-uppercase">
           <span className="menu-header-text">Dealer Management</span>
         </li>
-        {renderMenuItem(menuItems[2])}
         {renderMenuItem(menuItems[3])}
+        {renderMenuItem(menuItems[4])}
 
         {/* Inventory Management Section */}
         <li className="menu-header small text-uppercase">
           <span className="menu-header-text">Inventory</span>
         </li>
-        {renderMenuItem(menuItems[4])}
+        {renderMenuItem(menuItems[5])}
+        {renderMenuItem(menuItems[6])}
+        {renderMenuItem(menuItems[7])}
 
         {/* Reports Section */}
         <li className="menu-header small text-uppercase">
           <span className="menu-header-text">Reports</span>
         </li>
-        {renderMenuItem(menuItems[6])}
-        {renderMenuItem(menuItems[7])}
         {renderMenuItem(menuItems[8])}
+        {renderMenuItem(menuItems[9])}
+        {renderMenuItem(menuItems[10])}
       </ul>
     </aside>
   );

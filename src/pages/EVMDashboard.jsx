@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import DealerContractManagement from "../components/evm-dashboard/DealerContractManagement";
 import DealerManagement from "../components/evm-dashboard/DealerManagement";
+import DealerOrderManagement from "../components/evm-dashboard/DealerOrderManagement";
 import InventoryManagement from "../components/evm-dashboard/InventoryManagement";
 import DealerTotalSales from "../components/evm-dashboard/reports/DealerTotalSales";
 import RegionTotalSales from "../components/evm-dashboard/reports/RegionTotalSales";
@@ -233,6 +234,13 @@ const EVMDashboard = ({ currentPage }) => {
           </div>
         );
 
+      case "vehicle-variants":
+        return (
+          <div className="container-xxl flex-grow-1 container-p-y">
+            <VehicleVariantManagement />
+          </div>
+        );
+
       case "dealers":
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
@@ -254,17 +262,16 @@ const EVMDashboard = ({ currentPage }) => {
           </div>
         );
 
-      case "vehicle-variants":
-        return (
-          <div className="container-xxl flex-grow-1 container-p-y">
-            <VehicleVariantManagement />
-          </div>
-        );
-
       case "variant-order-rates":
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
             <VariantOrderRates />
+          </div>
+        );
+      case "dealer-orders":
+        return (
+          <div className="container-xxl flex-grow-1 container-p-y">
+            <DealerOrderManagement />
           </div>
         );
       case "dealer-total-sales":
