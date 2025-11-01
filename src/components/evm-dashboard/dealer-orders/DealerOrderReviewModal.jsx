@@ -1,4 +1,4 @@
-const DealerOrderReviewModal = ({ open, order, onClose, onAccept, onDecline, loading }) => {
+const DealerOrderReviewModal = ({ open, order, onClose, onAccept, onDecline, onDeliver, loading }) => {
   if (!open || !order) return null;
 
   // Helper for pretty field names
@@ -68,6 +68,9 @@ const DealerOrderReviewModal = ({ open, order, onClose, onAccept, onDecline, loa
             </button>
             <button type="button" className="btn btn-success" onClick={onAccept} disabled={loading || order.status !== "Pending"}>
               {loading ? "Accepting..." : "Accept"}
+            </button>
+            <button type="button" className="btn btn-primary" onClick={onDeliver} disabled={loading || order.status !== "Confirmed"}>
+              {loading ? "Delivering..." : "Deliver"}
             </button>
           </div>
         </div>
