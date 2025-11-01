@@ -1,8 +1,16 @@
 import { useEffect, useState } from "react";
 import { exportDealerTotalSales, getDealerTotalSales } from "../../../services/reportService";
 
+const formatCurrency = (amount) =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 0,
+  }).format(amount);
+
 const DealerTotalSales = () => {
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [totalResults, setTotalResults] = useState(0);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -10,6 +18,7 @@ const DealerTotalSales = () => {
   const [sortOrder, setSortOrder] = useState("desc");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [search, setSearch] = useState("");
 
   const fetchData = async () => {
     setLoading(true);
@@ -30,6 +39,14 @@ const DealerTotalSales = () => {
     // eslint-disable-next-line
   }, [page, pageSize, sortBy, sortOrder]);
 
+  useEffect(() => {
+    let filtered = data;
+    if (search.trim()) {
+      filtered = data.filter((item) => item.dealerName.toLowerCase().includes(search.trim().toLowerCase()));
+    }
+    setFilteredData(filtered);
+  }, [data, search]);
+
   const handleSort = (column) => {
     if (sortBy === column) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -49,17 +66,50 @@ const DealerTotalSales = () => {
   };
 
   const totalPages = Math.ceil(totalResults / pageSize);
+  const paginatedData = filteredData;
 
   return (
     <div className="container-xxl flex-grow-1 container-p-y">
-      <div className="d-flex justify-content-between align-items-center mb-4">
+      <div className="mb-4">
         <div>
           <h4 className="fw-bold mb-1">Dealer Total Sales</h4>
           <p className="text-muted mb-0">Shows total orders and sales amount for each dealer</p>
         </div>
-        <button className="btn btn-outline-primary" onClick={handleExport}>
-          <i className="bx bx-download me-1" /> Export CSV
-        </button>
+        <div className="card mt-3 mb-2">
+          <div className="card-body">
+            <div className="row g-3 align-items-center">
+              <div className="col-md-6">
+                <div className="input-group">
+                  <span className="input-group-text">
+                    <i className="bx bx-search" />
+                  </span>
+                  <input type="text" className="form-control" placeholder="Search dealer name..." value={search} onChange={(e) => setSearch(e.target.value)} />
+                </div>
+              </div>
+              <div className="col-md-3">
+                <select
+                  className="form-select"
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setPage(1);
+                  }}
+                >
+                  {[5, 10, 20, 50].map((size) => (
+                    <option key={size} value={size}>
+                      {size} per page
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-md-3 text-end">
+                <button className="btn btn-outline-primary" onClick={handleExport}>
+                  <i className="bx bx-download me-1" /> Export CSV
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}
@@ -93,20 +143,20 @@ const DealerTotalSales = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.length === 0 ? (
+                  {paginatedData.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="text-center text-muted">
                         No data found
                       </td>
                     </tr>
                   ) : (
-                    data.map((item, idx) => (
+                    paginatedData.map((item, idx) => (
                       <tr key={item.dealerId}>
                         <td>{(page - 1) * pageSize + idx + 1}</td>
-                        <td>{item.dealerName}</td>
-                        <td>{item.region}</td>
-                        <td>{item.totalOrders}</td>
-                        <td>${item.totalAmount.toLocaleString()}</td>
+                        <td className="fw-semibold">{item.dealerName}</td>
+                        <td className="fw-semibold">{item.region}</td>
+                        <td className="fw-semibold">{item.totalOrders}</td>
+                        <td className="fw-semibold text-primary">{formatCurrency(item.totalAmount)}</td>
                       </tr>
                     ))
                   )}
@@ -158,25 +208,6 @@ const DealerTotalSales = () => {
           </nav>
         </div>
       )}
-
-      {/* Page size selector */}
-      <div className="mt-3">
-        <label className="me-2">Rows per page:</label>
-        <select
-          value={pageSize}
-          onChange={(e) => {
-            setPageSize(Number(e.target.value));
-            setPage(1);
-          }}
-          style={{ width: 80, display: "inline-block" }}
-        >
-          {[5, 10, 20, 50].map((size) => (
-            <option key={size} value={size}>
-              {size}
-            </option>
-          ))}
-        </select>
-      </div>
     </div>
   );
 };

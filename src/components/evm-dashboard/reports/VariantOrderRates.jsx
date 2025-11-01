@@ -3,6 +3,7 @@ import { exportVariantOrderRates, getVariantOrderRates } from "../../../services
 
 const VariantOrderRates = () => {
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [totalResults, setTotalResults] = useState(0);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -10,14 +11,15 @@ const VariantOrderRates = () => {
   const [sortOrder, setSortOrder] = useState("desc");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [search, setSearch] = useState("");
 
   const fetchData = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await getVariantOrderRates({ page, pageSize, sortBy, sortOrder });
+      // Fetch all data for local search
+      const res = await getVariantOrderRates({ page: 1, pageSize: 10000, sortBy, sortOrder });
       setData(res.data.items || []);
-      setTotalResults(res.data.totalResults || 0);
     } catch {
       setError("Failed to fetch data");
     } finally {
@@ -28,7 +30,17 @@ const VariantOrderRates = () => {
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line
-  }, [page, pageSize, sortBy, sortOrder]);
+  }, [sortBy, sortOrder]);
+
+  useEffect(() => {
+    let filtered = data;
+    if (search.trim()) {
+      filtered = data.filter((item) => item.variantName.toLowerCase().includes(search.trim().toLowerCase()));
+    }
+    setFilteredData(filtered);
+    setTotalResults(filtered.length);
+    setPage(1);
+  }, [data, search]);
 
   const handleSort = (column) => {
     if (sortBy === column) {
@@ -49,17 +61,50 @@ const VariantOrderRates = () => {
   };
 
   const totalPages = Math.ceil(totalResults / pageSize);
+  const paginatedData = filteredData.slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <div className="container-xxl flex-grow-1 container-p-y">
-      <div className="d-flex justify-content-between align-items-center mb-4">
+      <div className="mb-4">
         <div>
           <h4 className="fw-bold mb-1">Variant Order Rates</h4>
           <p className="text-muted mb-0">Shows order counts and share for each vehicle variant</p>
         </div>
-        <button className="btn btn-outline-primary" onClick={handleExport}>
-          <i className="bx bx-download me-1" /> Export CSV
-        </button>
+        <div className="card mt-3 mb-2">
+          <div className="card-body">
+            <div className="row g-3 align-items-center">
+              <div className="col-md-6">
+                <div className="input-group">
+                  <span className="input-group-text">
+                    <i className="bx bx-search" />
+                  </span>
+                  <input type="text" className="form-control" placeholder="Search variant name..." value={search} onChange={(e) => setSearch(e.target.value)} />
+                </div>
+              </div>
+              <div className="col-md-3">
+                <select
+                  className="form-select"
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setPage(1);
+                  }}
+                >
+                  {[5, 10, 20, 50].map((size) => (
+                    <option key={size} value={size}>
+                      {size} per page
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-md-3 text-end">
+                <button className="btn btn-outline-primary" onClick={handleExport}>
+                  <i className="bx bx-download me-1" /> Export CSV
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}
@@ -90,19 +135,19 @@ const VariantOrderRates = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.length === 0 ? (
+                  {paginatedData.length === 0 ? (
                     <tr>
                       <td colSpan={4} className="text-center text-muted">
                         No data found
                       </td>
                     </tr>
                   ) : (
-                    data.map((item, idx) => (
+                    paginatedData.map((item, idx) => (
                       <tr key={item.variantId}>
                         <td>{(page - 1) * pageSize + idx + 1}</td>
-                        <td>{item.variantName}</td>
-                        <td>{item.orderCount}</td>
-                        <td>{item.percentage}%</td>
+                        <td className="fw-semibold">{item.variantName}</td>
+                        <td className="fw-semibold">{item.orderCount}</td>
+                        <td className="fw-semibold text-primary">{item.percentage}%</td>
                       </tr>
                     ))
                   )}
@@ -154,25 +199,6 @@ const VariantOrderRates = () => {
           </nav>
         </div>
       )}
-
-      {/* Page size selector */}
-      <div className="mt-3">
-        <label className="me-2">Rows per page:</label>
-        <select
-          value={pageSize}
-          onChange={(e) => {
-            setPageSize(Number(e.target.value));
-            setPage(1);
-          }}
-          style={{ width: 80, display: "inline-block" }}
-        >
-          {[5, 10, 20, 50].map((size) => (
-            <option key={size} value={size}>
-              {size}
-            </option>
-          ))}
-        </select>
-      </div>
     </div>
   );
 };
