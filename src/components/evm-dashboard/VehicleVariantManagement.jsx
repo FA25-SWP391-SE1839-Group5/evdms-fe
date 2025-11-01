@@ -711,6 +711,34 @@ const VehicleVariantManagement = () => {
                                 onChange={(e) => handleSpecChange(category, specName, "value", e.target.value)}
                                 disabled={modalMode === "view"}
                                 placeholder={config.unit ? `Value` : "Enter value"}
+                                inputMode={config.type === "number" ? "decimal" : undefined}
+                                pattern={config.type === "number" ? "[0-9]*[.,]?[0-9]*" : undefined}
+                                step={config.type === "number" ? "any" : undefined}
+                                onKeyDown={
+                                  config.type === "number"
+                                    ? (e) => {
+                                        // Allow: backspace, delete, tab, escape, enter, arrows, home, end
+                                        if (["Backspace", "Delete", "Tab", "Escape", "Enter", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)) {
+                                          return;
+                                        }
+                                        // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+                                        if ((e.ctrlKey || e.metaKey) && ["a", "c", "v", "x"].includes(e.key.toLowerCase())) {
+                                          return;
+                                        }
+                                        // Allow one dot for decimals
+                                        if (e.key === ".") {
+                                          if (e.target.value.includes(".")) {
+                                            e.preventDefault();
+                                          }
+                                          return;
+                                        }
+                                        // Allow digits only
+                                        if (!/^[0-9]$/.test(e.key)) {
+                                          e.preventDefault();
+                                        }
+                                      }
+                                    : undefined
+                                }
                               />
                             )}
                             {config.unit && <span className="input-group-text">{config.unit}</span>}
