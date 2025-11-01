@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { getAllDealerPayments } from "../../services/dealerOrderService";
+import { getAllDealerPayments, markDealerPaymentFailed, markDealerPaymentPaid } from "../../services/dealerOrderService";
+import DealerPaymentReviewModal from "./dealer-payment/DealerPaymentReviewModal";
 
 const DealerPaymentsManagement = () => {
   const [payments, setPayments] = useState([]);
@@ -11,6 +12,47 @@ const DealerPaymentsManagement = () => {
   const [statusFilter, setStatusFilter] = useState("Pending"); // default status Pending
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState("desc");
+  // Modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState(null);
+  const [modalLoading, setModalLoading] = useState(false);
+  // Modal handlers
+  const handleReview = (payment) => {
+    setSelectedPayment(payment);
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setSelectedPayment(null);
+    setModalLoading(false);
+  };
+
+  const handlePaid = async () => {
+    if (!selectedPayment) return;
+    setModalLoading(true);
+    try {
+      await markDealerPaymentPaid(selectedPayment.id);
+      handleModalClose();
+      fetchPayments();
+    } catch (err) {
+      setError("Failed to mark as paid: " + (err.message || "Unknown error"));
+      setModalLoading(false);
+    }
+  };
+
+  const handleFailed = async () => {
+    if (!selectedPayment) return;
+    setModalLoading(true);
+    try {
+      await markDealerPaymentFailed(selectedPayment.id);
+      handleModalClose();
+      fetchPayments();
+    } catch (err) {
+      setError("Failed to mark as failed: " + (err.message || "Unknown error"));
+      setModalLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchPayments();
@@ -178,7 +220,7 @@ const DealerPaymentsManagement = () => {
                           <td>{formatDate(payment.createdAt)}</td>
                           <td>{formatDate(payment.updatedAt)}</td>
                           <td>
-                            <button className="btn btn-sm btn-primary" onClick={() => alert("Review modal coming soon")}>
+                            <button className="btn btn-sm btn-primary" onClick={() => handleReview(payment)}>
                               Review
                             </button>
                           </td>
@@ -188,6 +230,8 @@ const DealerPaymentsManagement = () => {
                   </tbody>
                 </table>
               </div>
+              {/* Review Modal */}
+              <DealerPaymentReviewModal open={modalOpen} payment={selectedPayment} onClose={handleModalClose} onPaid={handlePaid} onFailed={handleFailed} loading={modalLoading} />
               {totalPages > 1 && (
                 <div className="d-flex justify-content-between align-items-center mt-4">
                   <div className="text-muted">
