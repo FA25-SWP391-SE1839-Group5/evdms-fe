@@ -2,6 +2,18 @@ import { useEffect, useState } from "react";
 import { createDealerContract, deleteDealerContract, getAllDealerContracts, getAllDealers, getDealerContractById, updateDealerContract } from "../../services/dealerService";
 
 const DealerContractManagement = () => {
+  // Open create modal if ?create=1 is in the URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("create") === "1") {
+      setModalMode && setModalMode("create");
+      setShowModal && setShowModal(true);
+      // Remove the query param from the URL (optional, for cleaner UX)
+      params.delete("create");
+      const newUrl = window.location.pathname + (params.toString() ? `?${params}` : "");
+      window.history.replaceState({}, "", newUrl);
+    }
+  }, []);
   // State management
   const [contracts, setContracts] = useState([]);
   const [dealers, setDealers] = useState([]);

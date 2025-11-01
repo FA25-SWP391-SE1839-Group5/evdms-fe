@@ -9,6 +9,18 @@ import useInventory from "./inventory/useInventory";
 import useVariants from "./inventory/useVariants";
 
 const InventoryManagement = () => {
+  // Open create modal if ?create=1 is in the URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("create") === "1") {
+      setModalMode && setModalMode("create");
+      setShowModal && setShowModal(true);
+      // Remove the query param from the URL (optional, for cleaner UX)
+      params.delete("create");
+      const newUrl = window.location.pathname + (params.toString() ? `?${params}` : "");
+      window.history.replaceState({}, "", newUrl);
+    }
+  }, []);
   // Pagination & filtering
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);

@@ -8,6 +8,18 @@ import DealerTable from "./dealer/DealerTable";
 const REGIONS = ["Ho Chi Minh City", "Hanoi", "Da Nang", "Nha Trang"];
 
 const DealerManagement = () => {
+  // Open create modal if ?create=1 is in the URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("create") === "1") {
+      setModalMode && setModalMode("create");
+      setShowModal && setShowModal(true);
+      // Remove the query param from the URL (optional, for cleaner UX)
+      params.delete("create");
+      const newUrl = window.location.pathname + (params.toString() ? `?${params}` : "");
+      window.history.replaceState({}, "", newUrl);
+    }
+  }, []);
   // State management
   const [dealers, setDealers] = useState([]);
   const [loading, setLoading] = useState(false);

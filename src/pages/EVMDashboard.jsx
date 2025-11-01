@@ -156,7 +156,6 @@ const EVMDashboard = ({ currentPage }) => {
                           </div>
                         </div>
                       </div>
-                      {/* ...existing code... */}
                     </div>
 
                     {/* Quick Actions */}
@@ -169,12 +168,54 @@ const EVMDashboard = ({ currentPage }) => {
                             window.location.href = "/vehicle-models?create=1";
                           }}
                         >
-                          <i className="bx bx-plus me-2" />
-                          Add New Model
+                          <span className="d-inline-flex align-items-center">
+                            <i className="bx bx-car" style={{ marginRight: 8 }} />
+                            Add New Model
+                          </span>
                         </button>
-                        <button className="btn btn-outline-primary" onClick={() => (window.location.href = "/vehicle-variants")}>
-                          <i className="bx bx-customize me-2" />
-                          Manage Variants
+                        <button
+                          className="btn btn-success"
+                          onClick={() => {
+                            window.location.href = "/vehicle-variants?create=1";
+                          }}
+                        >
+                          <span className="d-inline-flex align-items-center">
+                            <i className="bx bx-customize" style={{ marginRight: 8 }} />
+                            Add New Variant
+                          </span>
+                        </button>
+                        <button
+                          className="btn btn-info"
+                          onClick={() => {
+                            window.location.href = "/dealers?create=1";
+                          }}
+                        >
+                          <span className="d-inline-flex align-items-center">
+                            <i className="bx bx-store" style={{ marginRight: 8 }} />
+                            Add New Dealer
+                          </span>
+                        </button>
+                        <button
+                          className="btn btn-warning"
+                          onClick={() => {
+                            window.location.href = "/dealer-contracts?create=1";
+                          }}
+                        >
+                          <span className="d-inline-flex align-items-center">
+                            <i className="bx bx-file" style={{ marginRight: 8 }} />
+                            Add New Contract
+                          </span>
+                        </button>
+                        <button
+                          className="btn btn-danger"
+                          onClick={() => {
+                            window.location.href = "/oem-inventories?create=1";
+                          }}
+                        >
+                          <span className="d-inline-flex align-items-center">
+                            <i className="bx bx-package" style={{ marginRight: 8 }} />
+                            Add New Inventory
+                          </span>
                         </button>
                       </div>
                     </div>

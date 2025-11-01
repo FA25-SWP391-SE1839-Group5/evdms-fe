@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { getAllVehicleModels } from "../../services/vehicleModelService";
 import { createVehicleVariant, deleteVehicleVariant, getAllVehicleVariants, getVehicleVariantById, updateVehicleVariant } from "../../services/vehicleVariantService";
 
@@ -68,7 +67,23 @@ const FEATURES_CONFIG = {
   ],
 };
 
+import { useEffect, useState } from "react";
+
 const VehicleVariantManagement = () => {
+  // Open create modal if ?create=1 is in the URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("create") === "1") {
+      setModalMode("create");
+      setCurrentVariant(null);
+      setCurrentStep(1);
+      setShowModal(true);
+      // Remove the query param from the URL (optional, for cleaner UX)
+      params.delete("create");
+      const newUrl = window.location.pathname + (params.toString() ? `?${params}` : "");
+      window.history.replaceState({}, "", newUrl);
+    }
+  }, []);
   // State management
   const [variants, setVariants] = useState([]);
   const [models, setModels] = useState([]);
