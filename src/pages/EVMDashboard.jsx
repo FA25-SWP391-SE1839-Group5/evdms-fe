@@ -92,6 +92,7 @@ const EVMDashboard = ({ currentPage }) => {
 
                     {/* Quick Stats */}
                     <div className="row g-3">
+                      {/* ...existing code... */}
                       <div className="col-md-3">
                         <div className="card bg-primary text-white">
                           <div className="card-body">
@@ -107,6 +108,7 @@ const EVMDashboard = ({ currentPage }) => {
                           </div>
                         </div>
                       </div>
+                      {/* ...existing code... */}
                       <div className="col-md-3">
                         <div className="card bg-success text-white">
                           <div className="card-body">
@@ -122,6 +124,7 @@ const EVMDashboard = ({ currentPage }) => {
                           </div>
                         </div>
                       </div>
+                      {/* ...existing code... */}
                       <div className="col-md-3">
                         <div className="card bg-info text-white">
                           <div className="card-body">
@@ -137,6 +140,7 @@ const EVMDashboard = ({ currentPage }) => {
                           </div>
                         </div>
                       </div>
+                      {/* ...existing code... */}
                       <div className="col-md-3">
                         <div className="card bg-warning text-white">
                           <div className="card-body">
@@ -152,13 +156,19 @@ const EVMDashboard = ({ currentPage }) => {
                           </div>
                         </div>
                       </div>
+                      {/* ...existing code... */}
                     </div>
 
                     {/* Quick Actions */}
                     <div className="mt-4">
                       <h5 className="mb-3">Quick Actions</h5>
                       <div className="d-flex flex-wrap gap-2">
-                        <button className="btn btn-primary" onClick={() => (window.location.href = "/vehicle-models")}>
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => {
+                            window.location.href = "/vehicle-models?create=1";
+                          }}
+                        >
                           <i className="bx bx-plus me-2" />
                           Add New Model
                         </button>

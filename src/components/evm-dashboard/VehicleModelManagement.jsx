@@ -2,6 +2,22 @@ import { useEffect, useState } from "react";
 import { createVehicleModel, deleteVehicleModel, getAllVehicleModels, getVehicleModelById, updateVehicleModel, uploadVehicleImage, validateImageFile } from "../../services/vehicleModelService";
 
 const VehicleModelManagement = () => {
+  // Open create modal if ?create=1 is in the URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("create") === "1") {
+      setModalMode("create");
+      setFormData({ name: "", description: "", imageUrl: "" });
+      setSelectedFile(null);
+      setImagePreview(null);
+      setCurrentModel(null);
+      setShowModal(true);
+      // Remove the query param from the URL (optional, for cleaner UX)
+      params.delete("create");
+      const newUrl = window.location.pathname + (params.toString() ? `?${params}` : "");
+      window.history.replaceState({}, "", newUrl);
+    }
+  }, []);
   // State management
   const [models, setModels] = useState([]);
   const [loading, setLoading] = useState(false);
