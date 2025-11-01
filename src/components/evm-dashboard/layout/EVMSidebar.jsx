@@ -37,6 +37,24 @@ const EVMSidebar = ({ currentPage, onNavigate }) => {
       icon: "bx-customize",
       page: "vehicle-variants",
     },
+    {
+      id: "variant-order-rates",
+      label: "Variant Order Rates",
+      icon: "bx-bar-chart",
+      page: "variant-order-rates",
+    },
+    {
+      id: "dealer-total-sales",
+      label: "Dealer Total Sales",
+      icon: "bx-bar-chart-alt-2",
+      page: "dealer-total-sales",
+    },
+    {
+      id: "region-total-sales",
+      label: "Region Total Sales",
+      icon: "bx-pie-chart-alt",
+      page: "region-total-sales",
+    },
   ];
 
   const handleMenuClick = (e, page) => {
@@ -100,6 +118,14 @@ const EVMSidebar = ({ currentPage, onNavigate }) => {
           <span className="menu-header-text">Inventory</span>
         </li>
         {renderMenuItem(menuItems[4])}
+
+        {/* Reports Section */}
+        <li className="menu-header small text-uppercase">
+          <span className="menu-header-text">Reports</span>
+        </li>
+        {renderMenuItem(menuItems[6])}
+        {renderMenuItem(menuItems[7])}
+        {renderMenuItem(menuItems[8])}
       </ul>
     </aside>
   );

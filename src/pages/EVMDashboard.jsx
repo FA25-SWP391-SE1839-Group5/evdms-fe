@@ -1,6 +1,9 @@
 import DealerContractManagement from "../components/evm-dashboard/DealerContractManagement";
 import DealerManagement from "../components/evm-dashboard/DealerManagement";
 import InventoryManagement from "../components/evm-dashboard/InventoryManagement";
+import DealerTotalSales from "../components/evm-dashboard/reports/DealerTotalSales";
+import RegionTotalSales from "../components/evm-dashboard/reports/RegionTotalSales";
+import VariantOrderRates from "../components/evm-dashboard/reports/VariantOrderRates";
 import VehicleModelManagement from "../components/evm-dashboard/VehicleModelManagement";
 import VehicleVariantManagement from "../components/evm-dashboard/VehicleVariantManagement";
 
@@ -144,6 +147,25 @@ const EVMDashboard = ({ currentPage }) => {
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
             <VehicleVariantManagement />
+          </div>
+        );
+
+      case "variant-order-rates":
+        return (
+          <div className="container-xxl flex-grow-1 container-p-y">
+            <VariantOrderRates />
+          </div>
+        );
+      case "dealer-total-sales":
+        return (
+          <div className="container-xxl flex-grow-1 container-p-y">
+            <DealerTotalSales />
+          </div>
+        );
+      case "region-total-sales":
+        return (
+          <div className="container-xxl flex-grow-1 container-p-y">
+            <RegionTotalSales />
           </div>
         );
 
