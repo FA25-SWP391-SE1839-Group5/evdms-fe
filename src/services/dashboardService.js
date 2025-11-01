@@ -1,4 +1,5 @@
 import api from './api';
+import { getAllVehicleModels } from './vehicleModelService';
 
 // ============================================
 // DEALERS
@@ -243,6 +244,120 @@ export const deleteInventory = async (id) => {
     return response.data;
   } catch (error) {
     console.error('Error deleting inventory:', error);
+    throw error;
+  }
+};
+
+// ============================================
+// EVM DASHBOARD STATISTICS
+// ============================================
+
+export const getEVMDashboardStats = async () => {
+  try {
+    // Fetch all necessary data in parallel
+    const [vehicleModels, vehicleVariants, dealers, dealerContracts, inventories] = await Promise.all([
+      getAllVehicleModels({ page: 1, pageSize: 1000 }),
+      api.get('/vehicle-variants', { params: { page: 1, pageSize: 1000 } }),
+      getAllDealers({ page: 1, pageSize: 1000 }),
+      getAllDealerContracts({ page: 1, pageSize: 1000 }),
+      getAllInventories(),
+    ]);
+
+    // Extract data
+    const modelsData = vehicleModels?.items || [];
+    const variantsData = vehicleVariants?.data?.data?.items || [];
+    const dealersData = dealers?.items || [];
+    const contractsData = dealerContracts?.items || [];
+    const inventoriesData = inventories?.data?.items || [];
+
+    // Calculate statistics
+    const stats = {
+      totalVehicleModels: modelsData.length,
+      totalVariants: variantsData.length,
+      totalDealers: dealersData.length,
+      totalContracts: contractsData.length,
+      totalInventory: inventoriesData.reduce((sum, item) => sum + (item.quantity || 0), 0),
+      activeContracts: contractsData.filter(c => c.status === 'Active' || c.status === 'active').length,
+      pendingContracts: contractsData.filter(c => c.status === 'Pending' || c.status === 'pending').length,
+      
+      // Inventory by status
+      availableInventory: inventoriesData.filter(i => i.status === 'Available' || i.status === 'available').reduce((sum, item) => sum + (item.quantity || 0), 0),
+      allocatedInventory: inventoriesData.filter(i => i.status === 'Allocated' || i.status === 'allocated').reduce((sum, item) => sum + (item.quantity || 0), 0),
+      
+      // Dealers by region
+      dealersByRegion: dealersData.reduce((acc, dealer) => {
+        const region = dealer.region || 'Unknown';
+        acc[region] = (acc[region] || 0) + 1;
+        return acc;
+      }, {}),
+      
+      // Models and variants data for charts
+      modelsData,
+      variantsData,
+      dealersData,
+      contractsData,
+      inventoriesData,
+    };
+
+    return stats;
+  } catch (error) {
+    console.error('Error fetching EVM dashboard stats:', error);
+    throw error;
+  }
+};
+
+export const getInventoryDistribution = async () => {
+  try {
+    const response = await getAllInventories();
+    const inventories = response?.data?.items || [];
+    
+    // Group by vehicle variant
+    const distribution = inventories.reduce((acc, item) => {
+      const variantName = item.vehicleVariant?.name || item.variantName || 'Unknown';
+      if (!acc[variantName]) {
+        acc[variantName] = { name: variantName, quantity: 0, available: 0, allocated: 0 };
+      }
+      acc[variantName].quantity += item.quantity || 0;
+      if (item.status === 'Available' || item.status === 'available') {
+        acc[variantName].available += item.quantity || 0;
+      } else if (item.status === 'Allocated' || item.status === 'allocated') {
+        acc[variantName].allocated += item.quantity || 0;
+      }
+      return acc;
+    }, {});
+
+    return Object.values(distribution);
+  } catch (error) {
+    console.error('Error fetching inventory distribution:', error);
+    throw error;
+  }
+};
+
+export const getContractTrends = async () => {
+  try {
+    const response = await getAllDealerContracts({ page: 1, pageSize: 1000 });
+    const contracts = response?.items || [];
+    
+    // Group by month
+    const trends = contracts.reduce((acc, contract) => {
+      const date = new Date(contract.startDate || contract.createdAt);
+      const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      
+      if (!acc[monthYear]) {
+        acc[monthYear] = { month: monthYear, count: 0, active: 0, pending: 0 };
+      }
+      acc[monthYear].count++;
+      if (contract.status === 'Active' || contract.status === 'active') {
+        acc[monthYear].active++;
+      } else if (contract.status === 'Pending' || contract.status === 'pending') {
+        acc[monthYear].pending++;
+      }
+      return acc;
+    }, {});
+
+    return Object.values(trends).sort((a, b) => a.month.localeCompare(b.month));
+  } catch (error) {
+    console.error('Error fetching contract trends:', error);
     throw error;
   }
 };

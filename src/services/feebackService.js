@@ -57,6 +57,20 @@ export const patchFeedback = async (id, feedbackData) => {
     }
 };
 
+/**
+ * PUT feedback (Full update)
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const updateFeedback = async (id, feedbackData) => {
+    try {
+        const response = await api.put(`/feedbacks/${id}`, feedbackData);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating feedback:', error);
+        throw error;
+    }
+};
+
 export const deleteFeedback = async (id) => {
     try {
         const response = await api.delete(`/feedbacks/${id}`);

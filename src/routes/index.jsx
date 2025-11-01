@@ -3,6 +3,7 @@ export const ROUTES = {
     ADMIN_DASHBOARD: 'admin-dashboard',
     EVM_DASHBOARD: 'evm-dashboard',
     DEALER_MANAGER_DASHBOARD: 'dealer-dashboard',
+    DEALER_STAFF_DASHBOARD: 'staff-dashboard',
     RESET_PASSWORD: 'reset-password',
 };
 
@@ -65,8 +66,8 @@ export const routeReducer = (state, action) => {
                 targetPage = ROUTES.ADMIN_DASHBOARD;
             } else if (user.role === 'dealer_manager') {
                 targetPage = ROUTES.DEALER_MANAGER_DASHBOARD;
-            } else if (user.role === 'dealer_staff') {
-                targetPage = ROUTES.ADMIN_DASHBOARD;
+            } else if (user.role === 'dealer_staff' || user.role === 'staff') {
+                targetPage = ROUTES.DEALER_STAFF_DASHBOARD;
             } else if (user.role === 'evm_staff') {
                 targetPage = ROUTES.EVM_DASHBOARD;
             }

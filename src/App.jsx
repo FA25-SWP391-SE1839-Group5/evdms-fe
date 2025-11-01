@@ -1,13 +1,14 @@
-import { useEffect, useReducer, useState } from "react";
-import Layout from "./components/admin-dashboard/layout/Layout";
-import DealerLayout from "./components/dealer-mananger-dashboard/layout/DealerLayout";
-import EVMLayout from "./components/evm-dashboard/layout/EVMLayout";
-import AdminDashboard from "./pages/AdminDashboard";
-import DealerManagerDashboard from "./pages/DealerManagerDashboard";
-import EVMDashboard from "./pages/EVMDashboard";
-import LoginPage from "./pages/LoginPage";
-import { initialState, routeReducer, ROUTES } from "./routes";
-import { getStoredToken, logout } from "./services/authService";
+import React, { useReducer, useState, useEffect } from 'react';
+import LoginPage from './pages/LoginPage';
+import AdminDashboard from './pages/AdminDashboard';
+import EVMDashboard from './pages/EVMDashboard';
+import DealerManagerDashboard from './pages/DealerManagerDashboard';
+import DealerStaffDashboard from './pages/DealerStaffDashboard';
+import Layout from './components/admin-dashboard/layout/Layout';
+import EVMLayout from './components/evm-dashboard/layout/EVMLayout';
+import DealerLayout from './components/dealer-mananger-dashboard/layout/DealerLayout';
+import { routeReducer, initialState, ROUTES } from './routes';
+import { logout, getStoredToken } from './services/authService';
 
 const App = () => {
   const [routeState, dispatch] = useReducer(routeReducer, initialState);
@@ -95,9 +96,24 @@ const App = () => {
   };
 
   const getInitialEVMPage = () => {
-    const path = globalThis.location.pathname.replace("/", "");
-    if (!path || path === "evm-dashboard") return "evm-dashboard";
-    return path;
+    const path = globalThis.location.pathname.replace('/', '');
+    // Valid EVM pages
+    const validPages = [
+      'evm-dashboard',
+      'vehicle-models',
+      'vehicle-variants',
+      'dealers',
+      'dealer-contracts',
+      'oem-inventories',
+      'variant-order-rates',
+      'dealer-total-sales',
+      'region-total-sales'
+    ];
+    if (validPages.includes(path)) {
+      return path;
+    }
+    // Default to evm-dashboard for invalid/empty paths
+    return 'evm-dashboard';
   };
 
   const getInitialDealerPage = () => {
@@ -109,6 +125,20 @@ const App = () => {
     }
     return "dealer-dashboard"; // Trang mặc định
   };
+
+  // Sync URL when route changes
+  useEffect(() => {
+    // Don't sync URL for login page
+    if (routeState.currentPage === ROUTES.LOGIN) {
+      return;
+    }
+    
+    const path = `/${routeState.currentPage}`;
+    if (globalThis.location.pathname !== path) {
+      console.log('Sync URL - Pushing state to:', path);
+      globalThis.history.pushState({}, '', path);
+    }
+  }, [routeState.currentPage]);
 
   // Sync logout across tabs
   // useEffect(() => {
@@ -241,6 +271,13 @@ const App = () => {
         <DealerLayout initialPage={getInitialDealerPage()}>
           {/* DealerManagerDashboard là component children */}
           <DealerManagerDashboard />
+        </DealerLayout>
+      )}
+
+      {/* DEALER STAFF DASHBOARD */}
+      {routeState.currentPage === ROUTES.DEALER_STAFF_DASHBOARD && (
+        <DealerLayout initialPage="staff-dashboard">
+          <DealerStaffDashboard />
         </DealerLayout>
       )}
 

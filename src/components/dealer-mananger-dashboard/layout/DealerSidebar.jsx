@@ -1,14 +1,34 @@
 import React from 'react';
 
 const DealerSidebar = ({ currentPage, onNavigate }) => {
-  // Define menu items for Dealer Manager
-  const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: 'bx-home-circle', page: 'dealer-dashboard' },
-    { id: 'staff', label: 'Staff Management', icon: 'bx-user-plus', page: 'dealer-staff' },
-    { id: 'performance', label: 'Staff Performance', icon: 'bx-line-chart', page: 'dealer-performance' },
-    { id: 'orders', label: 'Dealer Orders', icon: 'bx-package', page: 'dealer-orders' },
-    // Add other relevant sections like Inventory (if managed by dealer), Customer CRM, etc.
-  ];
+  // Get user role from localStorage
+  const userStr = localStorage.getItem('evdms_user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  const userRole = user?.role?.toLowerCase();
+
+  // Define menu items based on role
+  const getMenuItems = () => {
+    // For Dealer Staff (role: "staff" or "dealer_staff")
+    if (userRole === 'staff' || userRole === 'dealer_staff') {
+      return [
+        { id: 'staff-dashboard', label: 'Dashboard', icon: 'bx-home-circle', page: 'staff-dashboard' },
+        { id: 'sales-orders', label: 'Sales Orders', icon: 'bx-shopping-bag', page: 'sales-orders' },
+        { id: 'test-drives', label: 'Test Drives', icon: 'bx-car', page: 'test-drives' },
+        { id: 'feedbacks', label: 'Feedbacks', icon: 'bx-message-square-dots', page: 'feedbacks' },
+        // Staff can manage sales orders, test drives, and feedbacks
+      ];
+    }
+    
+    // For Dealer Manager (role: "dealer_manager")
+    return [
+      { id: 'dashboard', label: 'Dashboard', icon: 'bx-home-circle', page: 'dealer-dashboard' },
+      { id: 'staff', label: 'Staff Management', icon: 'bx-user-plus', page: 'dealer-staff' },
+      { id: 'performance', label: 'Staff Performance', icon: 'bx-line-chart', page: 'dealer-performance' },
+      { id: 'orders', label: 'Dealer Orders', icon: 'bx-package', page: 'dealer-orders' },
+    ];
+  };
+
+  const menuItems = getMenuItems();
 
   const handleMenuClick = (e, page) => {
     e.preventDefault();
@@ -37,7 +57,11 @@ const DealerSidebar = ({ currentPage, onNavigate }) => {
     <aside id="layout-menu" className="layout-menu menu-vertical menu bg-menu-theme">
       {/* Logo */}
       <div className="app-brand demo">
-        <a href="#" className="app-brand-link" onClick={(e) => handleMenuClick(e, 'dealer-dashboard')}>
+        <a 
+          href="#" 
+          className="app-brand-link" 
+          onClick={(e) => handleMenuClick(e, userRole === 'staff' || userRole === 'dealer_staff' ? 'staff-dashboard' : 'dealer-dashboard')}
+        >
           <span className="app-brand-logo demo">
              {/* You might want a different logo or color */}
             <img src="/assets/images/elecar_logo.svg" alt="EVDMS Logo" className="img-fluid" style={{ maxHeight: '56px' }} />

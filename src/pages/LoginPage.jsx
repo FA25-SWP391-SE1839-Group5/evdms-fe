@@ -32,13 +32,28 @@ const LoginPage = ({ onLoginSuccess }) => {
 
       // Decode JWT to get role and other info
       const jwtPayload = decodeJwt(userData.accessToken);
+      console.log('LoginPage - JWT Payload:', jwtPayload);
+      
+      // Normalize role from JWT (could be "EvmStaff", "evm_staff", etc.)
+      const rawRole = jwtPayload.role || jwtPayload.Role || jwtPayload.ROLE;
+      console.log('LoginPage - Raw role from JWT:', rawRole);
+      
+      // Normalize: "EvmStaff" -> "evm_staff"
+      const normalizedRole = rawRole 
+        ? rawRole.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '')
+        : undefined;
+      
+      console.log('LoginPage - Normalized role:', normalizedRole);
+      
       const user = {
         id: userData.id,
         name: userData.fullName,
         email: userData.email,
-        role: jwtPayload.role || jwtPayload.Role || jwtPayload.ROLE || undefined,
+        role: normalizedRole,
         dealerId: jwtPayload.dealerId || jwtPayload.dealerID || undefined,
       };
+
+      console.log('LoginPage - User object to send:', user);
 
       if (!user.role) {
         setLoginError("No user role found in token. Cannot redirect.");
