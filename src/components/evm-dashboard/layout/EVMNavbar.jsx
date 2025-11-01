@@ -80,7 +80,7 @@ const EVMNavbar = () => {
         {/* Page Title - No Search Bar */}
         <div className="navbar-nav align-items-center">
           <div className="nav-item d-flex align-items-center">
-            <h4 className="mb-0 text-primary fw-bold">OEM</h4>
+            <h4 className="mb-0 text-primary fw-bold">EVM Staff Dashboard</h4>
           </div>
         </div>
 
