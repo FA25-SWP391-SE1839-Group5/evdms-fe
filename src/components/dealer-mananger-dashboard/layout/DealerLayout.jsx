@@ -31,6 +31,7 @@ const DealerLayout = ({ children, initialPage = 'dealer-dashboard' }) => {
         'dealer-staff',
         'dealer-performance',
         'dealer-orders',
+        'vehicle',
       ];
       if (validPages.includes(path)) {
         console.log("DealerLayout: PopState detected, setting page to", path);
@@ -56,7 +57,7 @@ const DealerLayout = ({ children, initialPage = 'dealer-dashboard' }) => {
   // Render appropriate content based on currentPage
   const renderContent = () => {
     // Pages handled by DealerStaffDashboard
-  const staffPages = ['staff-dashboard', 'sales-orders', 'test-drives', 'feedbacks', 'quotations', 'customers'];
+  const staffPages = ['staff-dashboard', 'sales-orders', 'test-drives', 'feedbacks', 'quotations', 'customers', 'vehicle-list', 'vehicle'];
     if (staffPages.includes(currentPage)) {
       return <DealerStaffDashboard currentPage={currentPage} onNavigate={handleNavigate} />;
     }

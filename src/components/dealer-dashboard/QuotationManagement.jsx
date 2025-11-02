@@ -31,17 +31,19 @@ const QuotationManagement = () => {
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
 
   // Filters
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [filterBy, setFilterBy] = useState("");
+  const [filterValue, setFilterValue] = useState("");
+
 
   useEffect(() => {
     loadQuotations();
-  }, [currentPage, searchTerm, statusFilter]);
+  }, [currentPage, searchTerm, filterBy, filterValue, pageSize]);
 
   // Load customers and variants for dropdowns
   useEffect(() => {
@@ -69,19 +71,65 @@ const QuotationManagement = () => {
     try {
       setLoading(true);
       setError(null);
+      // Build params similar to CustomerManagement/VehicleManagement
       const params = {
         page: currentPage,
         pageSize,
-        search: searchTerm,
-        filters: statusFilter ? `status:${statusFilter}` : "",
+        search: searchTerm || undefined,
       };
 
-      const response = await getAllQuotations(params);
-      if (response?.data) {
-        setQuotations(response.data.items || []);
-        setTotalResults(response.data.totalResults || 0);
-        setTotalPages(Math.ceil((response.data.totalResults || 0) / pageSize));
+      // attach filter as JSON string if provided
+      if (filterBy && filterValue) {
+        try {
+          params.filters = JSON.stringify({ [filterBy]: filterValue });
+        } catch (e) {
+          params.filters = `${filterBy}:${filterValue}`;
+        }
       }
+
+      const response = await getAllQuotations(params);
+
+      // Normalize a variety of possible backend shapes
+      let items = [];
+      let total = 0;
+
+      if (!response) {
+        items = [];
+      } else if (Array.isArray(response)) {
+        items = response;
+      } else if (Array.isArray(response.data)) {
+        items = response.data;
+      } else if (response.data && Array.isArray(response.data.items)) {
+        items = response.data.items;
+        total = response.data.totalResults || response.data.total || 0;
+      } else if (response.items && Array.isArray(response.items)) {
+        items = response.items;
+        total = response.totalResults || response.total || 0;
+      } else if (response.data && typeof response.data === 'object') {
+        // maybe single object or nested
+        const d = response.data;
+        if (d.items && Array.isArray(d.items)) {
+          items = d.items;
+          total = d.totalResults || d.total || 0;
+        } else if (Array.isArray(d)) {
+          items = d;
+        } else {
+          // single object response -> wrap
+          items = [d];
+        }
+      } else if (response.data?.data && Array.isArray(response.data.data)) {
+        items = response.data.data;
+      } else if (response.data?.data && typeof response.data.data === 'object') {
+        items = [response.data.data];
+      } else {
+        // unknown shape - try to be tolerant
+        items = response?.data || response?.items || [];
+        if (!Array.isArray(items)) items = [items];
+      }
+
+      setQuotations(items);
+      setTotalResults(Number(total) || items.length || 0);
+      setTotalPages(Math.max(1, Math.ceil((Number(total) || items.length) / pageSize)));
     } catch (err) {
       console.error("Error loading quotations:", err);
       setError("Failed to load quotations. Please try again.");
@@ -100,6 +148,37 @@ const QuotationManagement = () => {
     if (!id) return "-";
     const v = variants.find((x) => x.id === id || x._id === id || x.variantId === id);
     return v ? (v.name || v.variantName || v.title || id) : id;
+  };
+
+  const getStatusBadgeClass = (status) => {
+    if (!status) return "bg-label-secondary";
+    switch (String(status).toLowerCase()) {
+      case "draft":
+        return "bg-label-secondary";
+      case "sent":
+        return "bg-label-info";
+      case "approved":
+      case "approve":
+        return "bg-label-success";
+      case "rejected":
+      case "cancelled":
+        return "bg-label-danger";
+      default:
+        return "bg-label-secondary";
+    }
+  };
+
+  const getColorBadgeClass = (color) => {
+    if (!color) return "bg-label-secondary text-dark";
+    const c = String(color).toLowerCase();
+    if (c.includes("red")) return "bg-label-danger";
+    if (c.includes("blue")) return "bg-label-primary";
+    if (c.includes("green")) return "bg-label-success";
+    if (c.includes("yellow")) return "bg-label-warning text-dark";
+    if (c.includes("silver") || c.includes("gray") || c.includes("grey")) return "bg-label-secondary";
+    if (c.includes("black")) return "bg-label-secondary";
+    if (c.includes("white")) return "bg-label-light text-dark";
+    return "bg-label-secondary";
   };
 
   const handleViewDetail = async (q) => {
@@ -248,8 +327,7 @@ const QuotationManagement = () => {
     }
   };
 
-  // status field is not present in the provided sample; if your API supports status updates,
-  // adapt this function to include only supported fields. For now we'll update color/customer/variant only via edit.
+
   const handleUpdateStatus = async (newStatus) => {
     try {
       if (!selectedQuotation) return;
@@ -362,7 +440,7 @@ const QuotationManagement = () => {
       <div className="card mb-4">
         <div className="card-body">
           <div className="row g-3">
-            <div className="col-md-6">
+            <div className="col-md-4">
               <label className="form-label">Search</label>
               <input
                 type="text"
@@ -375,19 +453,33 @@ const QuotationManagement = () => {
                 }}
               />
             </div>
-                <div className="col-md-6">
-                  <label className="form-label">Filter by Variant</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Filter by variant id..."
-                    value={statusFilter}
-                    onChange={(e) => {
-                      setStatusFilter(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                  />
-                </div>
+            <div className="col-md-3">
+              <label className="form-label">Filter by</label>
+              <select className="form-select" value={filterBy} onChange={(e) => { setFilterBy(e.target.value); setCurrentPage(1); }}>
+                <option value="">None</option>
+                <option value="variantId">Variant ID</option>
+                <option value="status">Status</option>
+                <option value="color">Color</option>
+                <option value="customerId">Customer ID</option>
+              </select>
+            </div>
+            <div className="col-md-3">
+              <label className="form-label">Filter value</label>
+              <input type="text" className="form-control" placeholder="Value" value={filterValue} onChange={(e) => { setFilterValue(e.target.value); setCurrentPage(1); }} />
+            </div>
+            <div className="col-md-2">
+              <label className="form-label">Page size</label>
+              <select className="form-select" value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}>
+                {[5,10,20,50,100].map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+            <div className="col-12 mt-2 d-flex justify-content-end">
+              <button className="btn btn-outline-secondary me-2" onClick={() => { setSearchTerm(''); setFilterBy(''); setFilterValue(''); setPageSize(10); setCurrentPage(1); }}>
+                Reset
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -491,27 +583,37 @@ const QuotationManagement = () => {
                     </tr>
               </thead>
               <tbody className="table-border-bottom-0">
-                    {quotations.map((q) => (
-                  <tr key={q.id}>
-                    <td>
-                      <small className="text-muted">{q.id?.substring(0, 8)}...</small>
-                    </td>
-                    <td>
-                          <small className="text-muted">{getCustomerName(q.customerId)}</small>
-                    </td>
-                        <td>
-                          <small className="text-muted">{getVariantName(q.variantId)}</small>
-                        </td>
-                        <td>
-                          <small className="text-muted">{q.color || '-'}</small>
-                        </td>
-                        <td>
-                          <small className="text-muted">{q.status || '-'}</small>
-                        </td>
-                    <td>
-                      <small className="text-muted">{formatDate(q.createdAt)}</small>
-                    </td>
-                    <td>
+                      {quotations.map((q) => {
+                        const id = q.id || q._id || q.quotationId || q.quoteId;
+                        return (
+                    <tr key={id}>
+                      <td>
+                        <small className="text-muted">{String(id)?.substring(0, 8)}...</small>
+                      </td>
+                      <td>
+                            <small className="text-muted">{getCustomerName(q.customerId)}</small>
+                      </td>
+                          <td>
+                            <small className="text-muted">{getVariantName(q.variantId)}</small>
+                          </td>
+                          <td>
+                            {q.color ? (
+                              <span className={`badge ${getColorBadgeClass(q.color)}`}>{q.color}</span>
+                            ) : (
+                              <small className="text-muted">-</small>
+                            )}
+                          </td>
+                          <td>
+                            {q.status ? (
+                              <span className={`badge ${getStatusBadgeClass(q.status)}`}>{q.status}</span>
+                            ) : (
+                              <small className="text-muted">-</small>
+                            )}
+                          </td>
+                      <td>
+                        <small className="text-muted">{formatDate(q.createdAt)}</small>
+                      </td>
+                      <td>
                       <div className="dropdown">
                         <button
                           type="button"
@@ -533,7 +635,8 @@ const QuotationManagement = () => {
                       </div>
                     </td>
                   </tr>
-                ))}
+                      );
+                    })}
               </tbody>
             </table>
           )}
@@ -635,7 +738,11 @@ const QuotationManagement = () => {
                           ))}
                         </select>
                       ) : (
-                        <span className="text-muted">{selectedQuotation.color || '-'}</span>
+                        (selectedQuotation.color) ? (
+                          <span className={`badge ${getColorBadgeClass(selectedQuotation.color)}`}>{selectedQuotation.color}</span>
+                        ) : (
+                          <span className="text-muted">-</span>
+                        )
                       )}
                     </p>
                   </div>
@@ -652,7 +759,11 @@ const QuotationManagement = () => {
                         ))}
                       </select>
                     ) : (
-                      <p className="text-muted">{selectedQuotation.status || '-'}</p>
+                      (selectedQuotation.status) ? (
+                        <span className={`badge ${getStatusBadgeClass(selectedQuotation.status)}`}>{selectedQuotation.status}</span>
+                      ) : (
+                        <p className="text-muted">-</p>
+                      )
                     )}
                   </div>
                   <div className="col-md-6">
