@@ -22,6 +22,7 @@ const DealerLayout = ({ children, initialPage = 'dealer-dashboard' }) => {
       // Check if path is a valid dealer page
       const validPages = [
         'dealer-dashboard',
+        'customers',
         'staff-dashboard',
         'sales-orders',
         'test-drives',
@@ -55,7 +56,7 @@ const DealerLayout = ({ children, initialPage = 'dealer-dashboard' }) => {
   // Render appropriate content based on currentPage
   const renderContent = () => {
     // Pages handled by DealerStaffDashboard
-    const staffPages = ['staff-dashboard', 'sales-orders', 'test-drives', 'feedbacks', 'quotations'];
+  const staffPages = ['staff-dashboard', 'sales-orders', 'test-drives', 'feedbacks', 'quotations', 'customers'];
     if (staffPages.includes(currentPage)) {
       return <DealerStaffDashboard currentPage={currentPage} onNavigate={handleNavigate} />;
     }

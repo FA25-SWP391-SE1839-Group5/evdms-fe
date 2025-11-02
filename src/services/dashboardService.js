@@ -145,9 +145,11 @@ export const deleteDealerContract = async (id) => {
 // ============================================
 // CUSTOMERS
 // ============================================
-export const getAllCustomers = async () => {
+export const getAllCustomers = async (params = {}) => {
   try {
-    const response = await api.get('/customers');
+    const response = await api.get('/customers', {
+      params: sanitizeParams(params)
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching customers:', error);

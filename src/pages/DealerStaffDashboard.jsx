@@ -6,6 +6,7 @@ import FeedbackManagement from "../components/dealer-dashboard/FeedbackManagemen
 import TestDriveManagement from "../components/dealer-dashboard/TestDriveManagement";
 import SalesOrderManagement from "../components/dealer-dashboard/SalesOrderManagement";
 import QuotationManagement from "../components/dealer-dashboard/QuotationManagement";
+import CustomerManagement from "../components/dealer-dashboard/CustomerManagement";
 
 const DealerStaffDashboard = ({ currentPage, onNavigate }) => {
   const handleNavigate = (page) => {
@@ -604,6 +605,9 @@ const DealerStaffDashboard = ({ currentPage, onNavigate }) => {
 
       case "sales-orders":
         return <SalesOrderManagement />;
+
+      case "customers":
+        return <CustomerManagement />;
 
       case "quotations":
         return <QuotationManagement />;

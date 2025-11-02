@@ -11,6 +11,7 @@ const DealerSidebar = ({ currentPage, onNavigate }) => {
       return [
         { id: 'staff-dashboard', label: 'Dashboard', icon: 'bx-home-circle', page: 'staff-dashboard' },
         { id: 'sales-orders', label: 'Sales Orders', icon: 'bx-shopping-bag', page: 'sales-orders' },
+        { id: 'customers', label: 'Customer', icon: 'bx-group', page: 'customers' },
         { id: 'test-drives', label: 'Test Drives', icon: 'bx-car', page: 'test-drives' },
         { id: 'feedbacks', label: 'Feedbacks', icon: 'bx-message-square-dots', page: 'feedbacks' },
         { id: 'quotations', label: 'Quotations', icon: 'bx-package', page: 'quotations' },
