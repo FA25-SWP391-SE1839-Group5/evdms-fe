@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import DealerContractManagement from "../components/evm-dashboard/DealerContractManagement";
+import OemPromotionManagement from "../components/evm-dashboard/OemPromotionManagement";
 import DealerManagement from "../components/evm-dashboard/DealerManagement";
 import DealerOrderManagement from "../components/evm-dashboard/DealerOrderManagement";
 import DealerPaymentsManagement from "../components/evm-dashboard/DealerPaymentsManagement";
@@ -294,6 +295,12 @@ const EVMDashboard = ({ currentPage }) => {
           </div>
         );
 
+      case "oem-promotions":
+        return (
+          <div className="container-xxl flex-grow-1 container-p-y">
+            <OemPromotionManagement />
+          </div>
+        );
       default:
         return (
           <div className="container-xxl flex-grow-1 container-p-y">

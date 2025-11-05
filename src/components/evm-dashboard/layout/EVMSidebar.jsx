@@ -50,6 +50,12 @@ const EVMSidebar = ({ currentPage, onNavigate }) => {
       page: "oem-inventories",
     },
     {
+      id: "oem-promotions",
+      label: "Promotions",
+      icon: "bx-gift",
+      page: "oem-promotions",
+    },
+    {
       id: "variant-order-rates",
       label: "Variant Order Rates",
       icon: "bx-bar-chart",
@@ -129,17 +135,18 @@ const EVMSidebar = ({ currentPage, onNavigate }) => {
         <li className="menu-header small text-uppercase">
           <span className="menu-header-text">Inventory</span>
         </li>
-        {renderMenuItem(menuItems[5])}
-        {renderMenuItem(menuItems[6])}
-        {renderMenuItem(menuItems[7])}
+  {renderMenuItem(menuItems[5])}
+  {renderMenuItem(menuItems[6])}
+  {renderMenuItem(menuItems[7])}
+  {renderMenuItem(menuItems[8])}
 
         {/* Reports Section */}
         <li className="menu-header small text-uppercase">
           <span className="menu-header-text">Reports</span>
         </li>
-        {renderMenuItem(menuItems[8])}
-        {renderMenuItem(menuItems[9])}
-        {renderMenuItem(menuItems[10])}
+  {renderMenuItem(menuItems[9])}
+  {renderMenuItem(menuItems[10])}
+  {renderMenuItem(menuItems[11])}
       </ul>
     </aside>
   );

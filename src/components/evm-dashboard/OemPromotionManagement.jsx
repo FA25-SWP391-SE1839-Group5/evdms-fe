@@ -6,9 +6,8 @@ import {
   updatePromotion,
   deletePromotion,
 } from "../../services/dashboardService";
-import { decodeJwt } from "../../utils/jwt";
 
-const PromotionManagement = () => {
+const OemPromotionManagement = () => {
   const [promotions, setPromotions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -26,46 +25,36 @@ const PromotionManagement = () => {
     endDate: ""
   });
 
-  // Pagination, search, filter
+  // Pagination, search
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
-  // Remove filterBy/filterValue state, use dealerId from JWT
 
   useEffect(() => {
-    // Get dealerId from JWT
-    const token = localStorage.getItem('evdms_auth_token');
-    const decoded = decodeJwt(token);
-    const dealerId = decoded?.dealerId || decoded?.dealer || "";
-    // Update URL with query params for navigation/history
+    // Always filter by type OEM
     const params = new URLSearchParams();
     if (searchTerm) params.set('search', searchTerm);
     if (pageSize !== 10) params.set('pageSize', pageSize);
     if (currentPage !== 1) params.set('page', currentPage);
-    // Always filter by dealerId
-    params.set('filters', JSON.stringify({ dealerId }));
-    const url = `/dealer-promotions${params.toString() ? '?' + params.toString() : ''}`;
+    params.set('filters', JSON.stringify({ type: "OEM" }));
+    const url = `/evm-promotions${params.toString() ? '?' + params.toString() : ''}`;
     if (window.location.pathname + window.location.search !== url) {
       window.history.pushState({}, '', url);
     }
-    loadPromotions(dealerId);
+    loadPromotions();
   }, [currentPage, pageSize, searchTerm]);
 
-  const loadPromotions = async (dealerIdOverride) => {
+  const loadPromotions = async () => {
     try {
       setLoading(true);
       setError(null);
-      // Always filter by dealerId from JWT
-      const token = localStorage.getItem('evdms_auth_token');
-      const decoded = decodeJwt(token);
-      const dealerId = dealerIdOverride || decoded?.dealerId || decoded?.dealer || "";
       const params = {
         page: currentPage,
         pageSize,
         search: searchTerm || undefined,
-        filters: JSON.stringify({ dealerId })
+        filters: JSON.stringify({ type: "OEM" })
       };
       const response = await getAllPromotions(params);
       let items = [];
@@ -80,9 +69,9 @@ const PromotionManagement = () => {
         items = response;
         total = items.length;
       }
-  setPromotions(items);
-  setTotalResults(total);
-  setTotalPages(Math.max(1, Math.ceil(total / pageSize)));
+      setPromotions(items);
+      setTotalResults(total);
+      setTotalPages(Math.max(1, Math.ceil(total / pageSize)));
     } catch (err) {
       setError("Failed to load promotions. Please try again.");
     } finally {
@@ -124,6 +113,7 @@ const PromotionManagement = () => {
     try {
       setLoading(true);
       await createPromotion({
+        type: "OEM",
         description: createForm.description,
         discountPercent: Number(createForm.discountPercent) || 0,
         startDate: createForm.startDate,
@@ -158,13 +148,9 @@ const PromotionManagement = () => {
   const handleSaveEdit = async () => {
     try {
       setLoading(true);
-      // Get dealerId from token
-      const token = localStorage.getItem('evdms_auth_token');
-      const decoded = decodeJwt(token);
-      const dealerId = decoded?.dealerId || decoded?.dealer || "";
       await updatePromotion(editForm.id, {
-        dealerId,
         ...editForm,
+        type: "OEM",
         discountPercent: Number(editForm.discountPercent) || 0,
       });
       setIsEditing(false);
@@ -187,12 +173,7 @@ const PromotionManagement = () => {
 
   const handleDeleteConfirm = async () => {
     try {
-      // Get dealerId from token
-      const token = localStorage.getItem('evdms_auth_token');
-      const decoded = decodeJwt(token);
-      const dealerId = decoded?.dealerId || decoded?.dealer || "";
-      // If your API requires dealerId for delete, pass as second arg; otherwise just call deletePromotion(id)
-      await deletePromotion(promotionToDelete.id, dealerId);
+      await deletePromotion(promotionToDelete.id);
       setShowDeleteModal(false);
       setPromotionToDelete(null);
       loadPromotions();
@@ -222,14 +203,14 @@ const PromotionManagement = () => {
         <div>
           <h4 className="fw-bold mb-1">
             <i className="bx bx-gift me-2 text-primary"></i>
-            Promotion Management
+            OEM Promotion Management
           </h4>
-          <p className="text-muted mb-0">View and manage promotions</p>
+          <p className="text-muted mb-0">View and manage OEM promotions</p>
         </div>
         <div className="d-flex align-items-center">
           <button className="btn btn-outline-primary me-2" onClick={handleOpenCreate}>
             <i className="bx bx-plus me-1"></i>
-            New Promotion
+            New OEM Promotion
           </button>
           <button className="btn btn-primary" onClick={loadPromotions} disabled={loading}>
             <i className="bx bx-refresh me-1"></i>
@@ -251,7 +232,7 @@ const PromotionManagement = () => {
           <div className="modal-dialog">
             <form className="modal-content" onSubmit={handleCreateSubmit}>
               <div className="modal-header">
-                <h5 className="modal-title"><i className="bx bx-plus me-2"></i>Create Promotion</h5>
+                <h5 className="modal-title"><i className="bx bx-plus me-2"></i>Create OEM Promotion</h5>
                 <button type="button" className="btn-close" onClick={() => setShowCreateModal(false)}></button>
               </div>
               <div className="modal-body">
@@ -282,7 +263,7 @@ const PromotionManagement = () => {
         </div>
       )}
 
-      {/* Filters/Search/PageSize */}
+      {/* Search/PageSize */}
       <div className="card mb-4">
         <div className="card-body">
           <div className="row g-3">
@@ -291,7 +272,7 @@ const PromotionManagement = () => {
               <input
                 type="text"
                 className="form-control"
-                placeholder="Search by description or type..."
+                placeholder="Search by description..."
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -318,7 +299,7 @@ const PromotionManagement = () => {
 
       <div className="card">
         <div className="card-header d-flex justify-content-between align-items-center">
-          <h5 className="mb-0">Promotions List</h5>
+          <h5 className="mb-0">OEM Promotions List</h5>
           <span className="badge bg-label-primary">{totalResults} Total</span>
         </div>
         <div className="table-responsive text-nowrap">
@@ -339,7 +320,6 @@ const PromotionManagement = () => {
               <thead>
                 <tr>
                   <th>Promotion ID</th>
-                  <th>Dealer ID</th>
                   <th>Type</th>
                   <th>Description</th>
                   <th>Discount (%)</th>
@@ -352,7 +332,6 @@ const PromotionManagement = () => {
                 {promotions.map((p) => (
                   <tr key={p.id || p._id || p.promotionId}>
                     <td><small className="text-muted">{String(p.id || p._id || p.promotionId).substring(0, 8)}...</small></td>
-                    <td><small className="text-muted">{p.dealerId}</small></td>
                     <td><small className="text-muted">{p.type}</small></td>
                     <td><small className="text-muted">{p.description}</small></td>
                     <td><small className="text-muted">{p.discountPercent}</small></td>
@@ -414,7 +393,7 @@ const PromotionManagement = () => {
               <div className="modal-header">
                 <h5 className="modal-title">
                   <i className="bx bx-gift me-2"></i>
-                  Promotion Details
+                  OEM Promotion Details
                 </h5>
                 <div className="d-flex align-items-center">
                   <button type="button" className="btn btn-outline-secondary me-2" onClick={handleEditToggle}>
@@ -430,18 +409,9 @@ const PromotionManagement = () => {
                     <p className="text-muted">{selectedPromotion.id || '-'}</p>
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label fw-semibold">Dealer ID</label>
-                    {isEditing ? (
-                      <input className="form-control" value={editForm?.dealerId || selectedPromotion.dealerId} onChange={e => setEditForm({ ...editForm, dealerId: e.target.value })} />
-                    ) : (
-                      <p className="text-muted">{selectedPromotion.dealerId}</p>
-                    )}
-                  </div>
-                  <div className="col-md-6">
                     <label className="form-label fw-semibold">Type</label>
                     {isEditing ? (
-                      <select className="form-select" value={editForm?.type || selectedPromotion.type} onChange={e => setEditForm({ ...editForm, type: e.target.value })}>
-                        <option value="Dealer">Dealer</option>
+                      <select className="form-select" value={editForm?.type || selectedPromotion.type} disabled>
                         <option value="OEM">OEM</option>
                       </select>
                     ) : (
@@ -547,4 +517,4 @@ const PromotionManagement = () => {
   );
 };
 
-export default PromotionManagement;
+export default OemPromotionManagement;
