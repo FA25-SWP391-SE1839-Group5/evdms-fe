@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   getAllPromotions,
   getPromotionById,
@@ -204,12 +204,7 @@ const PromotionManagement = () => {
 
   const handleDeleteConfirm = async () => {
     try {
-      // Get dealerId from token
-      const token = localStorage.getItem('evdms_auth_token');
-      const decoded = decodeJwt(token);
-      const dealerId = decoded?.dealerId || decoded?.dealer || "";
-      // If your API requires dealerId for delete, pass as second arg; otherwise just call deletePromotion(id)
-      await deletePromotion(promotionToDelete.id, dealerId);
+      await deletePromotion(promotionToDelete.id);
       setShowDeleteModal(false);
       setPromotionToDelete(null);
       loadPromotions();
