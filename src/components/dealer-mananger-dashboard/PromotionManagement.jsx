@@ -327,7 +327,13 @@ const PromotionManagement = () => {
       <div className="card">
         <div className="card-header d-flex justify-content-between align-items-center">
           <h5 className="mb-0">Promotions List</h5>
-          <span className="badge bg-label-primary">{totalResults} Total</span>
+          <div>
+            <span className="badge bg-label-primary me-3">{totalResults} Total</span>
+            <button className="btn btn-primary" onClick={() => loadPromotions()} disabled={loading}>
+              <i className="bx bx-refresh me-1"></i>
+              Refresh
+            </button>
+          </div>
         </div>
         <div className="table-responsive text-nowrap">
           {loading ? (
@@ -348,38 +354,45 @@ const PromotionManagement = () => {
                 <tr>
                   <th>Description</th>
                   <th>Discount</th>
+                  <th>Status</th>
                   <th>Start Date</th>
                   <th>End Date</th>
-                  <th>Actions</th>
+                  <th style={{ width: "200px" }}>Actions</th>
                 </tr>
               </thead>
               <tbody className="table-border-bottom-0">
-                {promotions.map((p) => (
-                  <tr key={p.id || p._id || p.promotionId}>
-                    <td><small className="text-muted">{String(p.id || p._id || p.promotionId).substring(0, 8)}...</small></td>
-                    <td><small className="text-muted">{p.dealerId}</small></td>
-                    <td><small className="text-muted">{p.type}</small></td>
-                    <td><small className="text-muted">{p.description}</small></td>
-                    <td><small className="text-muted">{p.discountPercent}%</small></td>
-                    <td><small className="text-muted">{formatDate(p.startDate)}</small></td>
-                    <td><small className="text-muted">{formatDate(p.endDate)}</small></td>
-                    <td>
-                      <div className="dropdown">
-                        <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                          <i className="bx bx-dots-vertical-rounded"></i>
-                        </button>
-                        <div className="dropdown-menu">
-                          <button className="dropdown-item" onClick={() => handleViewDetail(p)}>
-                            <i className="bx bx-show me-2"></i> View Details
-                          </button>
-                          <button className="dropdown-item text-danger" onClick={() => handleDeleteClick(p)}>
-                            <i className="bx bx-trash me-2"></i> Delete
-                          </button>
+                {promotions.map((p) => {
+                  const now = new Date();
+                  const start = p.startDate ? new Date(p.startDate) : null;
+                  const end = p.endDate ? new Date(p.endDate) : null;
+                  let status = "Inactive";
+                  if (start && end && now >= start && now <= end) status = "Active";
+                  const statusClass = status === "Active" ? "badge bg-label-success" : "badge bg-label-secondary";
+                  return (
+                    <tr key={p.id || p._id || p.promotionId}>
+                      <td><span className="fw-bold">{p.description}</span></td>
+                      <td><span className="text-primary fw-semibold">{p.discountPercent}%</span></td>
+                      <td><span className={statusClass}>{status}</span></td>
+                      <td><span>{formatDate(p.startDate)}</span></td>
+                      <td><span>{formatDate(p.endDate)}</span></td>
+                      <td>
+                        <div>
+                          <div className="btn-group" role="group">
+                            <button className="btn btn-sm btn-success" onClick={() => { setSelectedPromotion(p); setIsEditing(true); setEditForm({ ...p }); setShowDetailModal(true); }} title="Edit">
+                              <i className="bx bx-edit" />
+                            </button>
+                            <button className="btn btn-sm btn-outline-info" onClick={() => handleViewDetail(p)} title="View Details">
+                              <i className="bx bx-show" />
+                            </button>
+                            <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteClick(p)} title="Delete">
+                              <i className="bx bx-trash" />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}
