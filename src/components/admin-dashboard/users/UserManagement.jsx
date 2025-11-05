@@ -59,7 +59,7 @@ const UserManagement = () => {
       setSubmitting(true);
       setLoading(true);
       setError("");
-      const [userResponse, dealerResponse] = await Promise.all([getAllUsers(currentPage, pageSize), getAllDealers()]);
+      const [userResponse, dealerResponse] = await Promise.all([getAllUsers({ page: currentPage, pageSize }), getAllDealers()]);
       setUsers(userResponse?.data?.items || []);
       setDealers(dealerResponse.items || []);
     } catch (err) {

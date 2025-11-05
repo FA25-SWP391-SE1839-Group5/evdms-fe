@@ -70,7 +70,7 @@ const Navbar = () => {
       {/* Page Title */}
       <div className="navbar-nav align-items-center">
         <div className="nav-item d-flex align-items-center">
-          <h4 className="mb-0 text-primary fw-bold">Admin Dashboard</h4>
+          <h4 className="mb-0 text-primary fw-bold">{user && user.name ? `Welcome, ${user.name}!` : "Welcome!"}</h4>
         </div>
       </div>
 

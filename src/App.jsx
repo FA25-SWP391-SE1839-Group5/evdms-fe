@@ -1,14 +1,14 @@
-import React, { useReducer, useState, useEffect } from 'react';
-import LoginPage from './pages/LoginPage';
-import AdminDashboard from './pages/AdminDashboard';
-import EVMDashboard from './pages/EVMDashboard';
-import DealerManagerDashboard from './pages/DealerManagerDashboard';
-import DealerStaffDashboard from './pages/DealerStaffDashboard';
-import Layout from './components/admin-dashboard/layout/Layout';
-import EVMLayout from './components/evm-dashboard/layout/EVMLayout';
-import DealerLayout from './components/dealer-mananger-dashboard/layout/DealerLayout';
-import { routeReducer, initialState, ROUTES } from './routes';
-import { logout, getStoredToken } from './services/authService';
+import { useEffect, useReducer, useState } from "react";
+import Layout from "./components/admin-dashboard/layout/Layout";
+import DealerLayout from "./components/dealer-mananger-dashboard/layout/DealerLayout";
+import EVMLayout from "./components/evm-dashboard/layout/EVMLayout";
+import AdminDashboard from "./pages/AdminDashboard";
+import DealerManagerDashboard from "./pages/DealerManagerDashboard";
+import DealerStaffDashboard from "./pages/DealerStaffDashboard";
+import EVMDashboard from "./pages/EVMDashboard";
+import LoginPage from "./pages/LoginPage";
+import { initialState, routeReducer, ROUTES } from "./routes";
+import { getStoredToken } from "./services/authService";
 
 const App = () => {
   const [routeState, dispatch] = useReducer(routeReducer, initialState);
@@ -96,24 +96,14 @@ const App = () => {
   };
 
   const getInitialEVMPage = () => {
-    const path = globalThis.location.pathname.replace('/', '');
+    const path = globalThis.location.pathname.replace("/", "");
     // Valid EVM pages
-    const validPages = [
-      'evm-dashboard',
-      'vehicle-models',
-      'vehicle-variants',
-      'dealers',
-      'dealer-contracts',
-      'oem-inventories',
-      'variant-order-rates',
-      'dealer-total-sales',
-      'region-total-sales'
-    ];
+    const validPages = ["evm-dashboard", "vehicle-models", "vehicle-variants", "dealers", "dealer-contracts", "oem-inventories", "variant-order-rates", "dealer-total-sales", "region-total-sales"];
     if (validPages.includes(path)) {
       return path;
     }
     // Default to evm-dashboard for invalid/empty paths
-    return 'evm-dashboard';
+    return "evm-dashboard";
   };
 
   const getInitialDealerPage = () => {
@@ -132,74 +122,13 @@ const App = () => {
     if (routeState.currentPage === ROUTES.LOGIN) {
       return;
     }
-    
+
     const path = `/${routeState.currentPage}`;
     if (globalThis.location.pathname !== path) {
-      console.log('Sync URL - Pushing state to:', path);
-      globalThis.history.pushState({}, '', path);
+      console.log("Sync URL - Pushing state to:", path);
+      globalThis.history.pushState({}, "", path);
     }
   }, [routeState.currentPage]);
-
-  // Sync logout across tabs
-  // useEffect(() => {
-  //   const handleStorageChange = (e) => {
-  //     if (e.key === 'evdms_auth_token' && !e.newValue) {
-  //       // Token was cleared in another tab
-  //       dispatch({ type: 'LOGOUT' });
-  //       setFavorites(new Set());
-  //       setCompareList([]);
-  //     }
-  //   };
-
-  //   globalThis.addEventListener('storage', handleStorageChange);
-  //   return () => globalThis.removeEventListener('storage', handleStorageChange);
-  // }, []);
-
-  // // Sync URL with routing state
-  // useEffect(() => {
-  //   // Sub-pages that don't need URL syncing (managed by layout components)
-  //   const evmSubPages = ['vehicle-models', 'dealers', 'dealer-contracts', 'oem-inventories', 'vehicle-variants', 'specifications'];
-  //   const adminSubPages = ['users', 'dealers', 'customers', 'dashboard'];
-  //   const currentPath = globalThis.location.pathname.replace('/', '');
-
-  //   // Don't sync if we're on a sub-page
-  //   if (evmSubPages.includes(currentPath) || adminSubPages.includes(currentPath)) {
-  //     console.log('Sync URL - Skipping sync for sub-page:', currentPath);
-  //     return;
-  //   }
-
-  //   const path = `/${routeState.currentPage}`;
-  //   console.log('Sync URL - currentPage:', routeState.currentPage);
-  //   console.log('Sync URL - target path:', path);
-  //   console.log('Sync URL - current location:', globalThis.location.pathname);
-
-  //   if (globalThis.location.pathname !== path) {
-  //     console.log('Sync URL - Pushing state to:', path);
-  //     globalThis.history.pushState({}, '', path);
-  //   }
-  // }, [routeState.currentPage]);
-
-  // // Handle browser back/forward buttons
-  // useEffect(() => {
-  //   const handlePopState = () => {
-  //     const path = globalThis.location.pathname.replace('/', '');
-
-  //     if (path === 'home' || path === '') {
-  //       dispatch({ type: 'NAVIGATE_TO_HOME' });
-  //     } else if (path === 'login') {
-  //       dispatch({ type: 'NAVIGATE_TO_LOGIN' });
-  //     } else if (path === 'catalog') {
-  //       dispatch({ type: 'NAVIGATE_TO_CATALOG' });
-  //     } else if (path === 'admin-dashboard' || path === 'dashboard') {
-  //       dispatch({ type: 'NAVIGATE_TO_ADMIN_DASHBOARD' });
-  //     } else if (path === 'evm-dashboard') {
-  //       dispatch({ type: 'NAVIGATE_TO_EVM_DASHBOARD' });
-  //     }
-  //   };
-
-  //   globalThis.addEventListener('popstate', handlePopState);
-  //   return () => globalThis.removeEventListener('popstate', handlePopState);
-  // }, []);
 
   // ============================================
   // AUTHENTICATION HANDLERS
@@ -209,27 +138,11 @@ const App = () => {
     // Đảm bảo userData có role
     if (userData && userData.role) {
       dispatch({ type: "LOGIN_SUCCESS", payload: userData });
-      // Redirect to root after login success
-      window.location.href = "/";
     } else {
       console.error("handleLoginSuccess: Invalid userData received", userData);
       // Có thể dispatch về login hoặc hiển thị lỗi
       dispatch({ type: "NAVIGATE_TO_LOGIN" });
     }
-  };
-
-  const handleLogout = async () => {
-    await logout();
-    dispatch({ type: "LOGOUT" });
-  };
-
-  // ============================================
-  // NAVIGATION HANDLERS
-  // ============================================
-  const navigateToLogin = () => {
-    dispatch({
-      type: "NAVIGATE_TO_LOGIN",
-    });
   };
 
   // Show loading screen while checking authentication
