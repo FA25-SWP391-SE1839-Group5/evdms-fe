@@ -73,9 +73,18 @@ const RegionTotalSales = () => {
   return (
     <div className="container-xxl flex-grow-1 container-p-y">
       <div className="mb-4">
-        <div>
-          <h4 className="fw-bold mb-1">Region Total Sales</h4>
-          <p className="text-muted mb-0">Shows total orders and sales amount for each region</p>
+        <div className="d-flex justify-content-between align-items-start">
+          <div>
+            <h4 className="fw-bold mb-1">Region Total Sales</h4>
+            <p className="text-muted mb-0">Shows total orders and sales amount for each region</p>
+          </div>
+          <div className="d-flex align-items-center">
+            {typeof totalResults === 'number' && <span className="badge bg-label-primary me-3">{totalResults} Total</span>}
+            <button className="btn btn-primary me-3" onClick={fetchData} disabled={loading}>
+              <i className="bx bx-refresh me-1" />
+              Refresh
+            </button>
+          </div>
         </div>
         <div className="card mt-3 mb-2">
           <div className="card-body">

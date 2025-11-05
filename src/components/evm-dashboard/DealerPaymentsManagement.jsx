@@ -126,6 +126,13 @@ const DealerPaymentsManagement = () => {
           <h4 className="fw-bold mb-1">Dealer Payments</h4>
           <p className="text-muted mb-0">View and manage dealer payments</p>
         </div>
+        <div>
+          {typeof totalResults === "number" && <span className="badge bg-label-primary me-3">{totalResults} Total</span>}
+          <button className="btn btn-primary" onClick={fetchPayments}>
+            <i className="bx bx-refresh me-1" />
+            Refresh
+          </button>
+        </div>
       </div>
       {error && (
         <div className="alert alert-danger alert-dismissible fade show" role="alert">

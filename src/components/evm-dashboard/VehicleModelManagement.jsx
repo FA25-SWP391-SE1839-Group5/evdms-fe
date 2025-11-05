@@ -293,8 +293,8 @@ const VehicleModelManagement = () => {
 
   return (
     <div className="container-xxl flex-grow-1 container-p-y">
-      {/* Header */}
-      <VehicleModelHeader onCreate={handleCreate} />
+  {/* Header */}
+  <VehicleModelHeader onCreate={handleCreate} onRefresh={fetchModels} totalResults={totalResults} />
 
       {/* Alerts */}
       {error && (

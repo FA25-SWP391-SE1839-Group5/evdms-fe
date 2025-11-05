@@ -891,8 +891,8 @@ const VehicleVariantManagement = () => {
 
   return (
     <div className="container-xxl flex-grow-1 container-p-y">
-      {/* Header */}
-      <VehicleVariantHeader onCreate={handleCreate} />
+  {/* Header */}
+  <VehicleVariantHeader onCreate={handleCreate} onRefresh={fetchVariants} totalResults={totalResults} />
 
       {/* Alerts (only show in background if modal is not open) */}
       {!showModal && error && (

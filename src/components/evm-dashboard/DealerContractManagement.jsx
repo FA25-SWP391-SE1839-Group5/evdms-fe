@@ -333,10 +333,17 @@ const DealerContractManagement = () => {
           <h4 className="fw-bold mb-1">Dealer Contract Management</h4>
           <p className="text-muted mb-0">Manage dealer contracts, sales targets, and outstanding debts</p>
         </div>
-        <button className="btn btn-primary" onClick={handleCreate}>
-          <i className="bx bx-plus me-1" />
-          Add New Contract
-        </button>
+        <div>
+          {typeof totalResults === "number" && <span className="badge bg-label-primary me-3">{totalResults} Total</span>}
+          <button className="btn btn-outline-primary me-2" onClick={handleCreate}>
+            <i className="bx bx-plus me-1" />
+            Add New Contract
+          </button>
+          <button className="btn btn-primary" onClick={fetchContracts}>
+            <i className="bx bx-refresh me-1" />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Alerts */}

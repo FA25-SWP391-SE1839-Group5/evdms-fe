@@ -151,6 +151,13 @@ const DealerOrderManagement = () => {
           <h4 className="fw-bold mb-1">Dealer Order Management</h4>
           <p className="text-muted mb-0">View and manage dealer vehicle orders</p>
         </div>
+        <div>
+          {typeof totalResults === "number" && <span className="badge bg-label-primary me-3">{totalResults} Total</span>}
+          <button className="btn btn-primary" onClick={fetchOrders}>
+            <i className="bx bx-refresh me-1" />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Alerts */}
