@@ -16,6 +16,7 @@ const SalesOrderManagement = () => {
   const [payMethod, setPayMethod] = useState("Upfront");
   const [installmentAmount, setInstallmentAmount] = useState(0);
   const [processingPayment, setProcessingPayment] = useState(false);
+  const [paySummary, setPaySummary] = useState(null); // summary for Pay modal
   const [showSummaryModal, setShowSummaryModal] = useState(false);
   const [paymentSummary, setPaymentSummary] = useState(null);
 
@@ -225,10 +226,18 @@ const SalesOrderManagement = () => {
   };
 
   const handlePayClick = async (order) => {
-    // set selected order (we show modal using selectedOrder)
     setSelectedOrder(order);
     setPayMethod("Upfront");
     setInstallmentAmount(0);
+    setPaySummary(null);
+    // Fetch payment summary for this order
+    try {
+      const resp = await getSalesOrdersSummary(order.id);
+      const summaryData = extractSummaryData(resp);
+      setPaySummary(summaryData);
+    } catch (e) {
+      setPaySummary(null);
+    }
     setShowPayModal(true);
   };
 
@@ -457,17 +466,67 @@ const SalesOrderManagement = () => {
                 </div>
                 <div className="modal-body">
                   <p className="text-muted">Sales Order ID: {selectedOrder.id}</p>
+                  {/* Payment summary section */}
+                  {paySummary && (
+                    <div className="mb-3 border rounded p-2 bg-light">
+                      <div className="fw-semibold mb-2">Payment Summary</div>
+                      <div className="row g-2">
+                        <div className="col-6">
+                          <small className="text-muted">Total Amount:</small>
+                          <div>{paySummary.totalAmount ?? paySummary.data?.totalAmount ?? "N/A"}</div>
+                        </div>
+                        <div className="col-6">
+                          <small className="text-muted">Paid Amount:</small>
+                          <div>{paySummary.paidAmount ?? paySummary.data?.paidAmount ?? "N/A"}</div>
+                        </div>
+                        <div className="col-6">
+                          <small className="text-muted">Outstanding Balance:</small>
+                          <div>{paySummary.outstandingBalance ?? paySummary.data?.outstandingBalance ?? "N/A"}</div>
+                        </div>
+                        <div className="col-6">
+                          <small className="text-muted">Fully Paid:</small>
+                          <div>{String(paySummary.isFullyPaid ?? paySummary.data?.isFullyPaid ?? false)}</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   <div className="mb-3">
                     <label className="form-label">Payment Method</label>
-                    <select className="form-select" value={payMethod} onChange={(e) => setPayMethod(e.target.value)}>
-                      <option value="Upfront">Upfront</option>
-                      <option value="Installment">Installment</option>
-                    </select>
+                    {paySummary && (paySummary.paidAmount ?? paySummary.data?.paidAmount ?? 0) > 0 ? (
+                      <>
+                        <select className="form-select" value="Installment" disabled>
+                          <option value="Installment">Installment</option>
+                        </select>
+                        <div className="form-text text-warning">Installment is the only available method after partial payment.</div>
+                      </>
+                    ) : (
+                      <select className="form-select" value={payMethod} onChange={(e) => setPayMethod(e.target.value)}>
+                        <option value="Upfront">Upfront</option>
+                        <option value="Installment">Installment</option>
+                      </select>
+                    )}
                   </div>
-                  {payMethod === "Installment" && (
+                  {(payMethod === "Installment" || (paySummary && (paySummary.paidAmount ?? paySummary.data?.paidAmount ?? 0) > 0)) && (
                     <div className="mb-3">
                       <label className="form-label">Amount to Pay</label>
-                      <input type="number" className="form-control" value={installmentAmount} min={0} onChange={(e) => setInstallmentAmount(e.target.value)} required />
+                      <input
+                        type="number"
+                        className="form-control"
+                        value={installmentAmount}
+                        min={0}
+                        max={
+                          paySummary
+                            ? (paySummary.totalAmount ?? paySummary.data?.totalAmount ?? 0) - (paySummary.paidAmount ?? paySummary.data?.paidAmount ?? 0)
+                            : undefined
+                        }
+                        onChange={(e) => setInstallmentAmount(e.target.value)}
+                        required
+                      />
+                      {paySummary && (
+                        <div className="form-text">
+                          Max: {((paySummary.totalAmount ?? paySummary.data?.totalAmount ?? 0) - (paySummary.paidAmount ?? paySummary.data?.paidAmount ?? 0))}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

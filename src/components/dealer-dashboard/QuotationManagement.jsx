@@ -423,7 +423,8 @@ const QuotationManagement = () => {
           setTimeout(() => orderAlert.remove(), 3000);
         } catch (orderErr) {
           console.error("Error creating order from quotation:", orderErr);
-          // Non-fatal: inform the user
+          // If error message matches, revert status to Sent
+          const msg = orderErr?.response?.data?.message || orderErr?.message || "";
           const failAlert = document.createElement("div");
           failAlert.className = "alert alert-warning alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3";
           failAlert.style.zIndex = "9999";
@@ -434,6 +435,13 @@ const QuotationManagement = () => {
           `;
           document.body.appendChild(failAlert);
           setTimeout(() => failAlert.remove(), 5000);
+          // Revert status to Sent in backend
+          try {
+            await updateQuotation(selectedQuotation.id, { ...payload, status: "Sent" });
+            loadQuotations();
+          } catch (revertErr) {
+            console.error("Error reverting status to Sent:", revertErr);
+          }
           return;
         }
       }
@@ -619,16 +627,6 @@ const QuotationManagement = () => {
                     {["Red", "Blue", "Black", "White", "Silver", "Gray", "Green", "Yellow"].map((c) => (
                       <option key={c} value={c}>
                         {c}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Status</label>
-                  <select className="form-select" value={createForm.status} onChange={(e) => setCreateForm({ ...createForm, status: e.target.value })}>
-                    {["Draft", "Sent", "Approved", "Rejected"].map((s) => (
-                      <option key={s} value={s}>
-                        {s}
                       </option>
                     ))}
                   </select>

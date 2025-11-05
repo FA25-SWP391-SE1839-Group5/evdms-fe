@@ -85,7 +85,7 @@ const DealerOrderReviewModal = ({ open, order, onClose, onAccept, onDecline, onD
             <button type="button" className="btn btn-success" onClick={onAccept} disabled={loading || order.status !== "Pending"}>
               {loading ? "Accepting..." : "Accept"}
             </button>
-            <button type="button" className="btn btn-primary" onClick={onDeliver} disabled={loading || order.status !== "Confirmed"}>
+            <button type="button" className="btn btn-primary" onClick={onDeliver} disabled={loading || (order.status !== "Confirmed" && order.status !== "Paid")}> 
               {loading ? "Delivering..." : "Deliver"}
             </button>
           </div>
