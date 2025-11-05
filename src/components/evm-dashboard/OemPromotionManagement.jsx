@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   getAllPromotions,
   getPromotionById,
@@ -31,11 +31,22 @@ const OemPromotionManagement = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const searchTimeout = useRef();
+
+  useEffect(() => {
+    // Debounce search input
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    searchTimeout.current = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 350);
+    return () => clearTimeout(searchTimeout.current);
+  }, [searchTerm]);
 
   useEffect(() => {
     // Always filter by type OEM
     const params = new URLSearchParams();
-    if (searchTerm) params.set('search', searchTerm);
+    if (debouncedSearch) params.set('search', debouncedSearch);
     if (pageSize !== 10) params.set('pageSize', pageSize);
     if (currentPage !== 1) params.set('page', currentPage);
     params.set('filters', JSON.stringify({ type: "OEM" }));
@@ -44,7 +55,7 @@ const OemPromotionManagement = () => {
       window.history.pushState({}, '', url);
     }
     loadPromotions();
-  }, [currentPage, pageSize, searchTerm]);
+  }, [currentPage, pageSize, debouncedSearch]);
 
   const loadPromotions = async () => {
     try {
@@ -53,7 +64,7 @@ const OemPromotionManagement = () => {
       const params = {
         page: currentPage,
         pageSize,
-        search: searchTerm || undefined,
+        search: debouncedSearch || undefined,
         filters: JSON.stringify({ type: "OEM" })
       };
       const response = await getAllPromotions(params);
@@ -73,7 +84,7 @@ const OemPromotionManagement = () => {
       setTotalResults(total);
       setTotalPages(Math.max(1, Math.ceil(total / pageSize)));
     } catch (err) {
-      setError("Failed to load promotions. Please try again.");
+      setError(err?.response?.data?.message || err?.message || "Failed to load promotions. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -128,7 +139,13 @@ const OemPromotionManagement = () => {
       document.body.appendChild(alert);
       setTimeout(() => alert.remove(), 3000);
     } catch (err) {
-      setError("Failed to create promotion.");
+      let apiMsg = "Failed to create promotion.";
+      if (err?.response?.data?.message) {
+        apiMsg = err.response.data.message;
+      } else if (err?.message) {
+        apiMsg = err.message;
+      }
+      setError(apiMsg);
     } finally {
       setLoading(false);
     }
@@ -198,7 +215,7 @@ const OemPromotionManagement = () => {
   };
 
   return (
-    <div className="container-xxl flex-grow-1 container-p-y">
+  <div className="container-xxl flex-grow-1 container-p-y">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h4 className="fw-bold mb-1">
@@ -208,23 +225,14 @@ const OemPromotionManagement = () => {
           <p className="text-muted mb-0">View and manage OEM promotions</p>
         </div>
         <div className="d-flex align-items-center">
-          <button className="btn btn-outline-primary me-2" onClick={handleOpenCreate}>
+          <button className="btn btn-outline-primary" onClick={handleOpenCreate}>
             <i className="bx bx-plus me-1"></i>
             New OEM Promotion
-          </button>
-          <button className="btn btn-primary" onClick={loadPromotions} disabled={loading}>
-            <i className="bx bx-refresh me-1"></i>
-            Refresh
           </button>
         </div>
       </div>
 
-      {error && (
-        <div className="alert alert-danger alert-dismissible fade show" role="alert">
-          {error}
-          <button type="button" className="btn-close" onClick={() => setError(null)}></button>
-        </div>
-      )}
+      {/* Error message in modal only */}
 
       {/* Create Modal */}
       {showCreateModal && (
@@ -253,6 +261,11 @@ const OemPromotionManagement = () => {
                   <label className="form-label">End Date</label>
                   <input type="date" className="form-control" value={createForm.endDate} onChange={e => setCreateForm({ ...createForm, endDate: e.target.value })} required />
                 </div>
+                {error && (
+                  <div className="alert alert-danger mt-2" role="alert">
+                    {error}
+                  </div>
+                )}
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>Cancel</button>
@@ -289,7 +302,7 @@ const OemPromotionManagement = () => {
               </select>
             </div>
             <div className="col-12 mt-2 d-flex justify-content-end">
-              <button className="btn btn-outline-secondary me-2" onClick={() => { setSearchTerm(''); setPageSize(10); setCurrentPage(1); }}>
+              <button className="btn btn-outline-secondary" onClick={() => { setSearchTerm(''); setPageSize(10); setCurrentPage(1); }}>
                 Reset
               </button>
             </div>
@@ -319,10 +332,8 @@ const OemPromotionManagement = () => {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Promotion ID</th>
-                  <th>Type</th>
                   <th>Description</th>
-                  <th>Discount (%)</th>
+                  <th>Discount</th>
                   <th>Start Date</th>
                   <th>End Date</th>
                   <th>Actions</th>
@@ -331,10 +342,8 @@ const OemPromotionManagement = () => {
               <tbody className="table-border-bottom-0">
                 {promotions.map((p) => (
                   <tr key={p.id || p._id || p.promotionId}>
-                    <td><small className="text-muted">{String(p.id || p._id || p.promotionId).substring(0, 8)}...</small></td>
-                    <td><small className="text-muted">{p.type}</small></td>
                     <td><small className="text-muted">{p.description}</small></td>
-                    <td><small className="text-muted">{p.discountPercent}</small></td>
+                    <td><small className="text-muted">{p.discountPercent}%</small></td>
                     <td><small className="text-muted">{formatDate(p.startDate)}</small></td>
                     <td><small className="text-muted">{formatDate(p.endDate)}</small></td>
                     <td>
@@ -492,20 +501,12 @@ const OemPromotionManagement = () => {
               </div>
               <div className="modal-body">
                 <p>Are you sure you want to delete this promotion?</p>
-                <div className="alert alert-warning">
-                  <strong>Promotion ID:</strong> {promotionToDelete.id}
-                </div>
-                <p className="text-danger mb-0">
-                  <i className="bx bx-error-circle me-1"></i>
-                  This action cannot be undone.
-                </p>
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowDeleteModal(false)}>
                   Cancel
                 </button>
-                <button type="button" className="btn btn-danger" onClick={handleDeleteConfirm}>
-                  <i className="bx bx-trash me-1"></i>
+                <button type="button" className="btn btn-danger" onClick={handleDeletePromotion}>
                   Delete
                 </button>
               </div>
@@ -513,8 +514,9 @@ const OemPromotionManagement = () => {
           </div>
         </div>
       )}
-    </div>
-  );
-};
+      {/* End main container */}
+  </div>
+        
 
+  )}
 export default OemPromotionManagement;

@@ -31,8 +31,19 @@ const PromotionManagement = () => {
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
-  const [searchTerm, setSearchTerm] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");  
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+    const searchTimeout = useRef();
   // Remove filterBy/filterValue state, use dealerId from JWT
+
+  useEffect(() => {
+    // Debounce search input
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    searchTimeout.current = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 350);
+    return () => clearTimeout(searchTimeout.current);
+  }, [searchTerm]);
 
   useEffect(() => {
     // Get dealerId from JWT
@@ -41,7 +52,7 @@ const PromotionManagement = () => {
     const dealerId = decoded?.dealerId || decoded?.dealer || "";
     // Update URL with query params for navigation/history
     const params = new URLSearchParams();
-    if (searchTerm) params.set('search', searchTerm);
+    if (debouncedSearch) params.set('search', debouncedSearch);
     if (pageSize !== 10) params.set('pageSize', pageSize);
     if (currentPage !== 1) params.set('page', currentPage);
     // Always filter by dealerId
@@ -51,7 +62,7 @@ const PromotionManagement = () => {
       window.history.pushState({}, '', url);
     }
     loadPromotions(dealerId);
-  }, [currentPage, pageSize, searchTerm]);
+  }, [currentPage, pageSize, debouncedSearch]);
 
   const loadPromotions = async (dealerIdOverride) => {
     try {
@@ -138,7 +149,13 @@ const PromotionManagement = () => {
       document.body.appendChild(alert);
       setTimeout(() => alert.remove(), 3000);
     } catch (err) {
-      setError("Failed to create promotion.");
+      let apiMsg = "Failed to create promotion.";
+      if (err?.response?.data?.message) {
+        apiMsg = err.response.data.message;
+      } else if (err?.message) {
+        apiMsg = err.message;
+      }
+      setError(apiMsg);
     } finally {
       setLoading(false);
     }
@@ -227,23 +244,14 @@ const PromotionManagement = () => {
           <p className="text-muted mb-0">View and manage promotions</p>
         </div>
         <div className="d-flex align-items-center">
-          <button className="btn btn-outline-primary me-2" onClick={handleOpenCreate}>
+          <button className="btn btn-outline-primary" onClick={handleOpenCreate}>
             <i className="bx bx-plus me-1"></i>
             New Promotion
-          </button>
-          <button className="btn btn-primary" onClick={loadPromotions} disabled={loading}>
-            <i className="bx bx-refresh me-1"></i>
-            Refresh
           </button>
         </div>
       </div>
 
-      {error && (
-        <div className="alert alert-danger alert-dismissible fade show" role="alert">
-          {error}
-          <button type="button" className="btn-close" onClick={() => setError(null)}></button>
-        </div>
-      )}
+      {/* Error only in modal, not background */}
 
       {/* Create Modal */}
       {showCreateModal && (
@@ -272,6 +280,11 @@ const PromotionManagement = () => {
                   <label className="form-label">End Date</label>
                   <input type="date" className="form-control" value={createForm.endDate} onChange={e => setCreateForm({ ...createForm, endDate: e.target.value })} required />
                 </div>
+                {error && (
+                  <div className="alert alert-danger mt-2" role="alert">
+                    {error}
+                  </div>
+                )}
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>Cancel</button>
@@ -308,7 +321,7 @@ const PromotionManagement = () => {
               </select>
             </div>
             <div className="col-12 mt-2 d-flex justify-content-end">
-              <button className="btn btn-outline-secondary me-2" onClick={() => { setSearchTerm(''); setPageSize(10); setCurrentPage(1); }}>
+              <button className="btn btn-outline-secondary" onClick={() => { setSearchTerm(''); setPageSize(10); setCurrentPage(1); }}>
                 Reset
               </button>
             </div>
@@ -338,11 +351,8 @@ const PromotionManagement = () => {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Promotion ID</th>
-                  <th>Dealer ID</th>
-                  <th>Type</th>
                   <th>Description</th>
-                  <th>Discount (%)</th>
+                  <th>Discount</th>
                   <th>Start Date</th>
                   <th>End Date</th>
                   <th>Actions</th>
@@ -355,7 +365,7 @@ const PromotionManagement = () => {
                     <td><small className="text-muted">{p.dealerId}</small></td>
                     <td><small className="text-muted">{p.type}</small></td>
                     <td><small className="text-muted">{p.description}</small></td>
-                    <td><small className="text-muted">{p.discountPercent}</small></td>
+                    <td><small className="text-muted">{p.discountPercent}%</small></td>
                     <td><small className="text-muted">{formatDate(p.startDate)}</small></td>
                     <td><small className="text-muted">{formatDate(p.endDate)}</small></td>
                     <td>
