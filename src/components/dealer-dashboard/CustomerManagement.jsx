@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAllCustomers, createCustomer, updateCustomer, deleteCustomer } from "../../services/dashboardService";
+import { createCustomer, deleteCustomer, getAllCustomers, updateCustomer } from "../../services/dashboardService";
 
 const CustomerManagement = () => {
   const [customers, setCustomers] = useState([]);
@@ -46,9 +46,9 @@ const CustomerManagement = () => {
         params[`filters[${filterBy}]`] = filterValue;
       }
 
-  // Debug: log params so you can inspect the exact outgoing query in browser console/network
-  // Remove or lower verbosity in production
-  console.debug("Customer list params:", params);
+      // Debug: log params so you can inspect the exact outgoing query in browser console/network
+      // Remove or lower verbosity in production
+      console.debug("Customer list params:", params);
 
       const resp = await getAllCustomers(params);
       const items = resp?.data?.items || resp?.items || resp?.data || [];
@@ -147,6 +147,15 @@ const CustomerManagement = () => {
 
   const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
 
+  // Helper for copying to clipboard
+  const handleCopyId = (id) => {
+    if (!id) return;
+    navigator.clipboard.writeText(id.toString());
+    showSuccessAlert("ID copied to clipboard!");
+  };
+
+  // No need for hoveredId state when using native tooltip
+
   return (
     <div className="container-xxl flex-grow-1 container-p-y">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -169,7 +178,16 @@ const CustomerManagement = () => {
         <div className="card-body">
           <div className="row g-2 align-items-center">
             <div className="col-md-4">
-              <input type="text" className="form-control" placeholder="Search name/email/address..." value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }} />
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search name/email/address..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
+              />
             </div>
             <div className="col-md-2">
               <select className="form-select" value={filterBy} onChange={(e) => setFilterBy(e.target.value)}>
@@ -181,10 +199,25 @@ const CustomerManagement = () => {
               </select>
             </div>
             <div className="col-md-3">
-              <input className="form-control" placeholder="Filter value" value={filterValue} onChange={(e) => { setFilterValue(e.target.value); setCurrentPage(1); }} />
+              <input
+                className="form-control"
+                placeholder="Filter value"
+                value={filterValue}
+                onChange={(e) => {
+                  setFilterValue(e.target.value);
+                  setCurrentPage(1);
+                }}
+              />
             </div>
             <div className="col-md-1">
-              <select className="form-select" value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}>
+              <select
+                className="form-select"
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+              >
                 <option value={5}>5</option>
                 <option value={10}>10</option>
                 <option value={25}>25</option>
@@ -192,7 +225,19 @@ const CustomerManagement = () => {
               </select>
             </div>
             <div className="col-md-2 text-end">
-              <button className="btn btn-outline-secondary" onClick={() => { setSearchTerm(""); setFilterBy(""); setFilterValue(""); setSortBy(""); setSortOrder("asc"); setCurrentPage(1); }}>Reset</button>
+              <button
+                className="btn btn-outline-secondary"
+                onClick={() => {
+                  setSearchTerm("");
+                  setFilterBy("");
+                  setFilterValue("");
+                  setSortBy("");
+                  setSortOrder("asc");
+                  setCurrentPage(1);
+                }}
+              >
+                Reset
+              </button>
             </div>
           </div>
         </div>
@@ -224,22 +269,36 @@ const CustomerManagement = () => {
             <table className="table">
               <thead>
                 <tr>
-                  <th onClick={() => toggleSort('id')} style={{ cursor: 'pointer' }}>ID {sortBy === 'id' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}</th>
-                  <th onClick={() => toggleSort('fullName')} style={{ cursor: 'pointer' }}>Name {sortBy === 'fullName' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}</th>
-                  <th onClick={() => toggleSort('email')} style={{ cursor: 'pointer' }}>Email {sortBy === 'email' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}</th>
-                  <th onClick={() => toggleSort('address')} style={{ cursor: 'pointer' }}>Address {sortBy === 'address' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}</th>
-                  <th onClick={() => toggleSort('phone')} style={{ cursor: 'pointer' }}>Phone {sortBy === 'phone' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}</th>
+                  <th onClick={() => toggleSort("id")} style={{ cursor: "pointer" }}>
+                    ID {sortBy === "id" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
+                  <th onClick={() => toggleSort("fullName")} style={{ cursor: "pointer" }}>
+                    Name {sortBy === "fullName" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
+                  <th onClick={() => toggleSort("email")} style={{ cursor: "pointer" }}>
+                    Email {sortBy === "email" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
+                  <th onClick={() => toggleSort("address")} style={{ cursor: "pointer" }}>
+                    Address {sortBy === "address" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
+                  <th onClick={() => toggleSort("phone")} style={{ cursor: "pointer" }}>
+                    Phone {sortBy === "phone" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody className="table-border-bottom-0">
                 {customers.map((c) => (
                   <tr key={c.id || c._id}>
-                    <td><small className="text-muted">{(c.id || c._id)?.toString().substring(0, 8)}...</small></td>
-                    <td>{c.fullName || c.name || '-'}</td>
-                    <td>{c.email || '-'}</td>
-                    <td>{c.address || '-'}</td>
-                    <td>{c.phone || '-'}</td>
+                    <td>
+                      <small className="text-muted" style={{ cursor: "pointer" }} title={c.id || c._id} onClick={() => handleCopyId(c.id || c._id)}>
+                        {(c.id || c._id)?.toString().substring(0, 8)}...
+                      </small>
+                    </td>
+                    <td>{c.fullName || c.name || "-"}</td>
+                    <td>{c.email || "-"}</td>
+                    <td>{c.address || "-"}</td>
+                    <td>{c.phone || "-"}</td>
                     <td>
                       <div className="btn-group">
                         <button className="btn btn-sm btn-outline-primary" onClick={() => handleEditClick(c)}>
@@ -313,8 +372,12 @@ const CustomerManagement = () => {
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Create</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  Create
+                </button>
               </div>
             </form>
           </div>
@@ -349,8 +412,12 @@ const CustomerManagement = () => {
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowEditModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Save</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowEditModal(false)}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  Save
+                </button>
               </div>
             </form>
           </div>
@@ -361,4 +428,3 @@ const CustomerManagement = () => {
 };
 
 export default CustomerManagement;
-
