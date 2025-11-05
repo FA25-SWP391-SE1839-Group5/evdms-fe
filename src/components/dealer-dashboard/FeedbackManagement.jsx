@@ -286,7 +286,7 @@ const FeedbackManagement = () => {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Customer ID</th>
+                  <th>Customer</th>
                   <th>Content</th>
                   <th>Status</th>
                   <th>Created At</th>
@@ -297,7 +297,7 @@ const FeedbackManagement = () => {
                 {feedbacks.map((feedback) => (
                   <tr key={feedback.id}>
                     <td>
-                      <small className="text-muted">{feedback.customerId.substring(0, 8)}...</small>
+                      <small className="text-muted">{feedback.customerFullName || feedback.customerId?.substring(0, 8) + "..."}</small>
                     </td>
                     <td>
                       <div style={{ maxWidth: "300px" }}>{feedback.content.length > 50 ? `${feedback.content.substring(0, 50)}...` : feedback.content}</div>
@@ -379,8 +379,8 @@ const FeedbackManagement = () => {
                     <p className="text-muted">{selectedFeedback.id}</p>
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label fw-semibold">Customer ID</label>
-                    <p className="text-muted">{selectedFeedback.customerId}</p>
+                    <label className="form-label fw-semibold">Customer Name</label>
+                    <p className="text-muted">{selectedFeedback.customerName || selectedFeedback.customerId}</p>
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Dealer ID</label>

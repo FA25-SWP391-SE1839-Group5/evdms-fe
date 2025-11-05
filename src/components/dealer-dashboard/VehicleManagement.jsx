@@ -514,7 +514,6 @@ const VehicleManagement = () => {
                   <th style={{ width: 40 }}></th>
                   <th>VIN</th>
                   <th>Variant</th>
-                  <th>Dealer</th>
                   <th>Color</th>
                   <th>Type</th>
                   <th>Status</th>
@@ -548,9 +547,6 @@ const VehicleManagement = () => {
                     </td>
                     <td>
                       <small className="text-muted">{variantNameMap[vehicle.variantId] || vehicle.variantId}</small>
-                    </td>
-                    <td>
-                      <small className="text-muted">{dealerNameMap[vehicle.dealerId] || vehicle.dealerId}</small>
                     </td>
                     <td>{vehicle.color ? <span className={`badge ${getColorBadgeClass(vehicle.color)}`}>{vehicle.color}</span> : <small className="text-muted">-</small>}</td>
                     <td>{vehicle.type ? <span className={`badge ${getTypeBadgeClass(vehicle.type)}`}>{vehicle.type}</span> : <small className="text-muted">-</small>}</td>

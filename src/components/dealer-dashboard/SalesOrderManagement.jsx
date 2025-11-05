@@ -518,8 +518,8 @@ const SalesOrderManagement = () => {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Customer ID</th>
-                  <th>Vehicle ID</th>
+                  <th>Customer</th>
+                  <th>VIN</th>
                   <th>Date</th>
                   <th>Status</th>
                   <th>Actions</th>
@@ -529,10 +529,10 @@ const SalesOrderManagement = () => {
                 {salesOrders.map((order) => (
                   <tr key={order.id}>
                     <td>
-                      <small className="text-muted">{order.customerId.substring(0, 8)}...</small>
+                      <small className="text-muted">{order.customerFullName || order.customerId}</small>
                     </td>
                     <td>
-                      <small className="text-muted">{order.vehicleId.substring(0, 8)}...</small>
+                      <small className="text-muted">{order.vehicleVin || order.vehicleId}</small>
                     </td>
                     <td>
                       <small>{formatDate(order.date)}</small>

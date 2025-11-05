@@ -178,9 +178,10 @@ const DealerStaffDashboard = ({ currentPage }) => {
       let feedbackParams = { ...baseParams };
 
       if (dealerId) {
-        salesOrderParams.dealerId = dealerId;
-        testDriveParams.dealerId = dealerId;
-        feedbackParams.dealerId = dealerId;
+        const filters = JSON.stringify({ dealerId });
+        salesOrderParams.filters = filters;
+        testDriveParams.filters = filters;
+        feedbackParams.filters = filters;
       }
 
       const [salesOrdersResponse, testDrivesResponse, feedbacksResponse] = await Promise.all([getAllSalesOrders(salesOrderParams), getAllTestDrives(testDriveParams), getAllFeedbacks(feedbackParams)]);
