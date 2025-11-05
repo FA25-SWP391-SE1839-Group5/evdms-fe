@@ -236,6 +236,12 @@ const DealerOrdersPage = () => {
         break;
 
       // Logic cũ của tui (bổ sung cho các trạng thái khác)
+      case "confirmed":
+        variant = "primary"; // Xanh đậm
+        break;
+      case "delivered":
+        variant = "info"; // Xanh dương
+        break;
       case "awaitingpayment":
         variant = "info"; // Xanh dương
         break;
@@ -274,7 +280,7 @@ const DealerOrdersPage = () => {
           </Button>
         );
       case "Pending":
-        return <em>Awaiting EVM Review</em>;
+        return <em>Awaiting OEM Review</em>;
       case "AwaitingPaymentConfirmation":
         return <em>Payment Under Review</em>;
       default:
@@ -296,8 +302,8 @@ const DealerOrdersPage = () => {
       setSortOrder("asc");
     }
   };
-  const handleStatusFilter = (e) => {
-    setStatusFilter(e.target.value);
+  const handleStatusFilter = (selectedStatus) => {
+    setStatusFilter(selectedStatus);
     setPage(1);
   };
   const handleColorFilter = (selectedColor) => {
@@ -323,13 +329,19 @@ const DealerOrdersPage = () => {
           </Row>
           <Row className="mt-3">
             <Col md={3} sm={6} xs={12}>
-              <Form.Select value={statusFilter} onChange={handleStatusFilter}>
-                <option value="">All Statuses</option>
-                <option value="Pending">Pending</option>
-                <option value="Confirmed">Confirmed</option>
-                <option value="Delivered">Delivered</option>
-                <option value="Canceled">Canceled</option>
-              </Form.Select>
+              <Dropdown onSelect={handleStatusFilter} className="w-100">
+                <Dropdown.Toggle variant="outline-secondary" className="w-100 text-start">
+                  {statusFilter ? renderStatusBadge(statusFilter) : "All Statuses"}
+                </Dropdown.Toggle>
+                <Dropdown.Menu className="w-100">
+                  <Dropdown.Item eventKey="">All Statuses</Dropdown.Item>
+                  {["Pending", "Confirmed", "Paid", "Delivered", "Canceled"].map((status) => (
+                    <Dropdown.Item eventKey={status} key={status}>
+                      {renderStatusBadge(status)}
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Menu>
+              </Dropdown>
             </Col>
             <Col md={3} sm={6} xs={12}>
               <Dropdown onSelect={handleColorFilter} className="w-100">
