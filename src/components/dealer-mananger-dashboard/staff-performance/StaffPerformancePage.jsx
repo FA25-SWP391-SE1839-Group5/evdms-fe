@@ -1,21 +1,12 @@
-import React, { useState, useEffect } from "react";
-import {
-  Card,
-  Table,
-  Spinner,
-  Alert,
-  Form,
-  Button,
-  Row,
-  Col,
-} from "react-bootstrap";
+import { useCallback, useEffect, useState } from "react";
+import { Alert, Button, Card, Col, Form, Row, Spinner, Table } from "react-bootstrap";
 import { getDealerStaffSales } from "../../../services/reportService";
 
 const StaffPerformancePage = () => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   // State cho bộ lọc ngày
   const [filters, setFilters] = useState({
     startDate: "",
@@ -23,7 +14,7 @@ const StaffPerformancePage = () => {
   });
 
   // Hàm gọi API
-  const fetchReport = async () => {
+  const fetchReport = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -33,20 +24,20 @@ const StaffPerformancePage = () => {
       if (filters.endDate) queryParams.endDate = filters.endDate;
 
       const response = await getDealerStaffSales(queryParams);
-      
+
       // Giả sử API trả về một mảng
-      setData(response.data.items || []); 
+      setData(response.data.items || []);
     } catch (err) {
       setError(err.message);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [filters]);
 
   // Tải dữ liệu lần đầu khi component được mount
   useEffect(() => {
     fetchReport();
-  }, []); // Chỉ chạy 1 lần
+  }, [fetchReport]);
 
   // Xử lý thay đổi filter
   const handleFilterChange = (e) => {
@@ -76,11 +67,7 @@ const StaffPerformancePage = () => {
     }
 
     if (data.length === 0) {
-      return (
-        <p className="text-center text-muted">
-          Không có dữ liệu hiệu suất để hiển thị.
-        </p>
-      );
+      return <p className="text-center text-muted">Không có dữ liệu hiệu suất để hiển thị.</p>;
     }
 
     // Render bảng dữ liệu
@@ -90,18 +77,17 @@ const StaffPerformancePage = () => {
           <tr>
             <th>#</th>
             <th>Staff name</th>
-            <th>Quantity</th>
-            <th>Amount (VND)</th>
-            {/* Cậu có thể thêm các cột khác mà API trả về */}
+            <th>Total Orders</th>
+            <th>Amount</th>
           </tr>
         </thead>
         <tbody>
           {data.map((staff, index) => (
-            <tr key={staff.id || index}>
+            <tr key={staff.staffId || index}>
               <td>{index + 1}</td>
               <td>{staff.staffName}</td>
-              <td>{staff.salesCount}</td>
-              <td>{(staff.totalRevenue || 0).toLocaleString("vi-VN")}</td>
+              <td>{staff.totalOrders}</td>
+              <td>{`$${(staff.totalAmount || 0).toLocaleString("en-US")}`}</td>
             </tr>
           ))}
         </tbody>
@@ -121,23 +107,13 @@ const StaffPerformancePage = () => {
             <Col md={4}>
               <Form.Group controlId="startDate">
                 <Form.Label>Start Date</Form.Label>
-                <Form.Control
-                  type="date"
-                  name="startDate"
-                  value={filters.startDate}
-                  onChange={handleFilterChange}
-                />
+                <Form.Control type="date" name="startDate" value={filters.startDate} onChange={handleFilterChange} />
               </Form.Group>
             </Col>
             <Col md={4}>
               <Form.Group controlId="endDate">
                 <Form.Label>End Date</Form.Label>
-                <Form.Control
-                  type="date"
-                  name="endDate"
-                  value={filters.endDate}
-                  onChange={handleFilterChange}
-                />
+                <Form.Control type="date" name="endDate" value={filters.endDate} onChange={handleFilterChange} />
               </Form.Group>
             </Col>
             <Col md={4} className="d-grid">
@@ -150,9 +126,7 @@ const StaffPerformancePage = () => {
         </Form>
 
         {/* === KẾT QUẢ === */}
-        <div className="mt-4">
-          {renderContent()}
-        </div>
+        <div className="mt-4">{renderContent()}</div>
       </Card.Body>
     </Card>
   );
