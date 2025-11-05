@@ -9,13 +9,13 @@ const DealerSidebar = ({ currentPage, onNavigate }) => {
     // For Dealer Staff (role: "staff" or "dealer_staff")
     if (userRole === "staff" || userRole === "dealer_staff") {
       return [
-        { id: 'staff-dashboard', label: 'Dashboard', icon: 'bx-home-circle', page: 'staff-dashboard' },
-        { id: 'sales-orders', label: 'Sales Orders', icon: 'bx-shopping-bag', page: 'sales-orders' },
-        { id: 'customers', label: 'Customer', icon: 'bx-group', page: 'customers' },
-        { id: 'vehicle', label: 'Vehicle', icon: 'bx-car', page: 'vehicle' },
-        { id: 'test-drives', label: 'Test Drives', icon: 'bx-car', page: 'test-drives' },
-        { id: 'feedbacks', label: 'Feedbacks', icon: 'bx-message-square-dots', page: 'feedbacks' },
-        { id: 'quotations', label: 'Quotations', icon: 'bx-package', page: 'quotations' },
+        { id: "staff-dashboard", label: "Dashboard", icon: "bx-home-circle", page: "staff-dashboard" },
+        { id: "vehicle", label: "Vehicle", icon: "bx-car", page: "vehicle" },
+        { id: "customers", label: "Customers", icon: "bx-group", page: "customers" },
+        { id: "test-drives", label: "Test Drives", icon: "bx-car", page: "test-drives" },
+        { id: "quotations", label: "Quotations", icon: "bx-package", page: "quotations" },
+        { id: "sales-orders", label: "Sales Orders", icon: "bx-shopping-bag", page: "sales-orders" },
+        { id: "feedbacks", label: "Feedbacks", icon: "bx-message-square-dots", page: "feedbacks" },
       ];
     }
 

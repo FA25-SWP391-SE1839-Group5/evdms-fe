@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { deleteFeedback, getAllFeedbacks, getFeedbackById, updateFeedback } from "../../services/feebackService";
+import { deleteFeedback, getAllFeedbacks, getFeedbackById, updateFeedback } from "../../services/feedbackService";
 import { decodeJwt } from "../../utils/jwt";
 
 const FeedbackManagement = () => {

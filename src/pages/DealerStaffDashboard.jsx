@@ -1,34 +1,16 @@
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+import CustomerManagement from "../components/dealer-dashboard/CustomerManagement";
+import FeedbackManagement from "../components/dealer-dashboard/FeedbackManagement";
+import QuotationManagement from "../components/dealer-dashboard/QuotationManagement";
+import SalesOrderManagement from "../components/dealer-dashboard/SalesOrderManagement";
+import TestDriveManagement from "../components/dealer-dashboard/TestDriveManagement";
+import VehicleManagement from "../components/dealer-dashboard/VehicleManagement";
+import { getAllFeedbacks } from "../services/feedbackService";
 import { getAllSalesOrders } from "../services/salesOrderService";
 import { getAllTestDrives } from "../services/testDriveService";
-import { getAllFeedbacks } from "../services/feebackService";
-import FeedbackManagement from "../components/dealer-dashboard/FeedbackManagement";
-import TestDriveManagement from "../components/dealer-dashboard/TestDriveManagement";
-import SalesOrderManagement from "../components/dealer-dashboard/SalesOrderManagement";
-import QuotationManagement from "../components/dealer-dashboard/QuotationManagement";
-import CustomerManagement from "../components/dealer-dashboard/CustomerManagement";
-import VehicleManagement from "../components/dealer-dashboard/VehicleManagement";
+import { decodeJwt } from "../utils/jwt";
 
-const DealerStaffDashboard = ({ currentPage, onNavigate }) => {
-  const handleNavigate = (page) => {
-    // prefer parent handler
-    if (typeof onNavigate === "function") {
-      onNavigate(page);
-      return;
-    }
-
-    // fallback: update hash and dispatch a custom event
-    try {
-      window.location.hash = `#${page}`;
-    } catch (e) {
-      // ignore
-    }
-    try {
-      window.dispatchEvent(new CustomEvent("evdms-navigate", { detail: { page } }));
-    } catch (e) {
-      // ignore
-    }
-  };
+const DealerStaffDashboard = ({ currentPage }) => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -45,7 +27,7 @@ const DealerStaffDashboard = ({ currentPage, onNavigate }) => {
     const salesOrdersChartEl = document.querySelector("#salesOrdersStatusChart");
     if (salesOrdersChartEl && salesOrdersData.length > 0) {
       salesOrdersChartEl.innerHTML = "";
-      
+
       const statusCounts = salesOrdersData.reduce((acc, order) => {
         const status = order.status || "Pending";
         acc[status] = (acc[status] || 0) + 1;
@@ -84,7 +66,7 @@ const DealerStaffDashboard = ({ currentPage, onNavigate }) => {
     const testDrivesChartEl = document.querySelector("#testDrivesStatusChart");
     if (testDrivesChartEl && testDrivesData.length > 0) {
       testDrivesChartEl.innerHTML = "";
-      
+
       const statusCounts = testDrivesData.reduce((acc, td) => {
         const status = td.status || "Scheduled";
         acc[status] = (acc[status] || 0) + 1;
@@ -95,7 +77,7 @@ const DealerStaffDashboard = ({ currentPage, onNavigate }) => {
       const series = Object.values(statusCounts);
 
       // Define colors for each status
-      const statusColors = categories.map(status => {
+      const statusColors = categories.map((status) => {
         switch (status) {
           case "Scheduled":
             return "#696cff"; // Primary blue
@@ -138,10 +120,10 @@ const DealerStaffDashboard = ({ currentPage, onNavigate }) => {
     const feedbacksChartEl = document.querySelector("#feedbacksStatusChart");
     if (feedbacksChartEl && feedbacksData.length > 0) {
       feedbacksChartEl.innerHTML = "";
-      
-      const newCount = feedbacksData.filter(f => f.status === "New").length;
-      const reviewedCount = feedbacksData.filter(f => f.status === "Reviewed").length;
-      const resolvedCount = feedbacksData.filter(f => f.status === "Resolved").length;
+
+      const newCount = feedbacksData.filter((f) => f.status === "New").length;
+      const reviewedCount = feedbacksData.filter((f) => f.status === "Reviewed").length;
+      const resolvedCount = feedbacksData.filter((f) => f.status === "Resolved").length;
       const total = feedbacksData.length;
 
       const newPercent = total > 0 ? Math.round((newCount / total) * 100) : 0;
@@ -176,30 +158,50 @@ const DealerStaffDashboard = ({ currentPage, onNavigate }) => {
     try {
       setLoading(true);
       setError(null);
-      
-      const [salesOrdersResponse, testDrivesResponse, feedbacksResponse] = await Promise.all([
-        getAllSalesOrders({ page: 1, pageSize: 100 }),
-        getAllTestDrives({ page: 1, pageSize: 100 }),
-        getAllFeedbacks({ page: 1, pageSize: 100 }),
-      ]);
+
+      // Get dealerId from JWT (same logic as SalesOrderManagement)
+      let dealerId = null;
+      try {
+        const token = localStorage.getItem("evdms_auth_token");
+        if (token) {
+          const decoded = decodeJwt(token);
+          dealerId = decoded?.dealerId;
+        }
+      } catch (e) {
+        console.debug("Error decoding JWT for dealerId:", e);
+      }
+
+      // Always filter by dealerId if present
+      const baseParams = { page: 1, pageSize: 100 };
+      let salesOrderParams = { ...baseParams };
+      let testDriveParams = { ...baseParams };
+      let feedbackParams = { ...baseParams };
+
+      if (dealerId) {
+        salesOrderParams.dealerId = dealerId;
+        testDriveParams.dealerId = dealerId;
+        feedbackParams.dealerId = dealerId;
+      }
+
+      const [salesOrdersResponse, testDrivesResponse, feedbacksResponse] = await Promise.all([getAllSalesOrders(salesOrderParams), getAllTestDrives(testDriveParams), getAllFeedbacks(feedbackParams)]);
 
       const salesOrders = salesOrdersResponse?.data?.items || [];
       const testDrives = testDrivesResponse?.data?.items || [];
       const feedbacks = feedbacksResponse?.data?.items || [];
 
       // Calculate stats from Sales Orders
-      const pendingSalesOrders = salesOrders.filter(o => o.status === "Pending").length;
-      const confirmedSalesOrders = salesOrders.filter(o => o.status === "Confirmed").length;
-      const completedSalesOrders = salesOrders.filter(o => o.status === "Completed").length;
+      const pendingSalesOrders = salesOrders.filter((o) => o.status === "Pending").length;
+      const confirmedSalesOrders = salesOrders.filter((o) => o.status === "Confirmed").length;
+      const completedSalesOrders = salesOrders.filter((o) => o.status === "Completed").length;
 
       // Calculate stats from Test Drives
-      const scheduledTestDrives = testDrives.filter(td => td.status === "Scheduled").length;
-      const completedTestDrives = testDrives.filter(td => td.status === "Completed").length;
+      const scheduledTestDrives = testDrives.filter((td) => td.status === "Scheduled").length;
+      const completedTestDrives = testDrives.filter((td) => td.status === "Completed").length;
 
       // Calculate stats from Feedbacks
-      const newFeedbacks = feedbacks.filter(f => f.status === "New").length;
-      const reviewedFeedbacks = feedbacks.filter(f => f.status === "Reviewed").length;
-      const resolvedFeedbacks = feedbacks.filter(f => f.status === "Resolved").length;
+      const newFeedbacks = feedbacks.filter((f) => f.status === "New").length;
+      const reviewedFeedbacks = feedbacks.filter((f) => f.status === "Reviewed").length;
+      const resolvedFeedbacks = feedbacks.filter((f) => f.status === "Resolved").length;
 
       // Aggregate stats
       const statsData = {
@@ -208,12 +210,12 @@ const DealerStaffDashboard = ({ currentPage, onNavigate }) => {
         pendingSalesOrders,
         confirmedSalesOrders,
         completedSalesOrders,
-        
+
         // Test Drives
         totalTestDrives: testDrives.length,
         scheduledTestDrives,
         completedTestDrives,
-        
+
         // Feedbacks
         totalFeedbacks: feedbacks.length,
         newFeedbacks,
@@ -229,7 +231,7 @@ const DealerStaffDashboard = ({ currentPage, onNavigate }) => {
       setStats(statsData);
       setRecentOrders(salesOrders.slice(0, 5));
       setRecentTestDrives(testDrives.slice(0, 5));
-      
+
       setTimeout(() => {
         initializeCharts(salesOrders, testDrives, feedbacks);
       }, 100);
@@ -299,11 +301,7 @@ const DealerStaffDashboard = ({ currentPage, onNavigate }) => {
                     </h4>
                     <p className="text-muted mb-0">Manage sales orders, test drives, and feedbacks</p>
                   </div>
-                  <button 
-                    className="btn btn-primary" 
-                    onClick={loadDashboardData} 
-                    disabled={loading}
-                  >
+                  <button className="btn btn-primary" onClick={loadDashboardData} disabled={loading}>
                     <i className="bx bx-refresh me-1" />
                     Refresh
                   </button>
@@ -448,8 +446,6 @@ const DealerStaffDashboard = ({ currentPage, onNavigate }) => {
                   </div>
                 </div>
 
-                
-
                 {/* Charts Row */}
                 <div className="row g-4 mb-4">
                   {/* Sales Orders Status */}
@@ -513,16 +509,26 @@ const DealerStaffDashboard = ({ currentPage, onNavigate }) => {
                               <tbody>
                                 {recentOrders.map((order) => (
                                   <tr key={order.id}>
-                                    <td><span className="badge bg-label-secondary">{order.id?.substring(0, 8) || "N/A"}</span></td>
-                                    <td><small className="text-muted">{order.customerId?.substring(0, 8) || "N/A"}...</small></td>
                                     <td>
-                                      <span className={`badge ${
-                                        order.status === "Completed" ? "bg-success" :
-                                        order.status === "Confirmed" ? "bg-info" :
-                                        order.status === "Pending" ? "bg-warning" :
-                                        order.status === "Cancelled" ? "bg-danger" :
-                                        "bg-secondary"
-                                      }`}>
+                                      <span className="badge bg-label-secondary">{order.id?.substring(0, 8) || "N/A"}</span>
+                                    </td>
+                                    <td>
+                                      <small className="text-muted">{order.customerId?.substring(0, 8) || "N/A"}...</small>
+                                    </td>
+                                    <td>
+                                      <span
+                                        className={`badge ${
+                                          order.status === "Completed"
+                                            ? "bg-success"
+                                            : order.status === "Confirmed"
+                                            ? "bg-info"
+                                            : order.status === "Pending"
+                                            ? "bg-warning"
+                                            : order.status === "Cancelled"
+                                            ? "bg-danger"
+                                            : "bg-secondary"
+                                        }`}
+                                      >
                                         {order.status || "N/A"}
                                       </span>
                                     </td>
@@ -564,17 +570,27 @@ const DealerStaffDashboard = ({ currentPage, onNavigate }) => {
                               <tbody>
                                 {recentTestDrives.map((td) => (
                                   <tr key={td.id}>
-                                    <td><small className="text-muted">{td.customerId?.substring(0, 8) || "N/A"}...</small></td>
-                                    <td><small className="text-muted">{td.vehicleId?.substring(0, 8) || "N/A"}...</small></td>
+                                    <td>
+                                      <small className="text-muted">{td.customerId?.substring(0, 8) || "N/A"}...</small>
+                                    </td>
+                                    <td>
+                                      <small className="text-muted">{td.vehicleId?.substring(0, 8) || "N/A"}...</small>
+                                    </td>
                                     <td className="text-muted small">{formatDateTime(td.scheduledAt)}</td>
                                     <td>
-                                      <span className={`badge ${
-                                        td.status === "Completed" ? "bg-success" :
-                                        td.status === "Scheduled" ? "bg-primary" :
-                                        td.status === "InProgress" ? "bg-info" :
-                                        td.status === "Cancelled" ? "bg-danger" :
-                                        "bg-secondary"
-                                      }`}>
+                                      <span
+                                        className={`badge ${
+                                          td.status === "Completed"
+                                            ? "bg-success"
+                                            : td.status === "Scheduled"
+                                            ? "bg-primary"
+                                            : td.status === "InProgress"
+                                            ? "bg-info"
+                                            : td.status === "Cancelled"
+                                            ? "bg-danger"
+                                            : "bg-secondary"
+                                        }`}
+                                      >
                                         {td.status || "N/A"}
                                       </span>
                                     </td>
