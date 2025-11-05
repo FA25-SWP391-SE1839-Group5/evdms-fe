@@ -1,11 +1,59 @@
 // src/components/DealerOrders/DealerOrdersPage.jsx
 import { useEffect, useState } from "react";
-import { Alert, Badge, Button, Card, Col, Form, Modal, Row, Spinner, Table } from "react-bootstrap";
+import { Alert, Badge, Button, Card, Col, Dropdown, Form, Modal, Row, Spinner, Table } from "react-bootstrap";
 // Đảm bảo các đường dẫn service này là chính xác
 import { createDealerOrder, getAllDealerOrders } from "../../../services/dealerOrderService";
 import { uploadDealerPaymentDocument } from "../../../services/dealerService";
 import { getAllVehicleVariants } from "../../../services/vehicleVariantService";
 import { decodeJwt } from "../../../utils/jwt";
+
+// Helper function to map color names to badge classes
+function getColorBadgeClass(color) {
+  if (!color) return "secondary";
+  const colorMap = {
+    Red: "danger",
+    Blue: "primary",
+    Green: "success",
+    Yellow: "warning",
+    Black: "dark",
+    White: "white-badge",
+    Silver: "secondary",
+    Gray: "secondary",
+  };
+  // Try to match case-insensitive
+  const key = Object.keys(colorMap).find((k) => k.toLowerCase() === color.toLowerCase());
+  return key ? colorMap[key] : "secondary";
+}
+
+function renderColorBadge(color) {
+  const badgeClass = getColorBadgeClass(color);
+  if (badgeClass === "white-badge") {
+    return (
+      <span className="badge bg-white text-dark border border-secondary" style={{ minWidth: 60 }}>
+        {color}
+      </span>
+    );
+  }
+  if (badgeClass === "purple-badge") {
+    return (
+      <span className="badge" style={{ backgroundColor: "#6f42c1", color: "#fff", minWidth: 60 }}>
+        {color}
+      </span>
+    );
+  }
+  if (badgeClass === "dark" && color === "Black") {
+    return (
+      <span className="badge" style={{ backgroundColor: "#000", color: "#fff", minWidth: 60 }}>
+        {color}
+      </span>
+    );
+  }
+  return (
+    <span className={`badge bg-label-${badgeClass}`} style={{ minWidth: 60 }}>
+      {color}
+    </span>
+  );
+}
 
 const DealerOrdersPage = () => {
   // State chính
@@ -19,6 +67,7 @@ const DealerOrdersPage = () => {
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState("desc");
   const [statusFilter, setStatusFilter] = useState("");
+  const [colorFilter, setColorFilter] = useState("");
 
   // State cho Modal Tạo Order (giữ nguyên từ lần trước)
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -54,6 +103,7 @@ const DealerOrdersPage = () => {
       const filterObj = {};
       if (dealerId) filterObj.dealerId = dealerId;
       if (statusFilter) filterObj.status = statusFilter;
+      if (colorFilter) filterObj.color = colorFilter;
       const filters = Object.keys(filterObj).length > 0 ? JSON.stringify(filterObj) : undefined;
       const response = await getAllDealerOrders({
         page,
@@ -81,7 +131,7 @@ const DealerOrdersPage = () => {
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, pageSize, sortBy, sortOrder, statusFilter]);
+  }, [page, pageSize, sortBy, sortOrder, statusFilter, colorFilter]);
 
   // --- 2. Xử lý Modal Tạo Order ---
   // (Giữ nguyên logic từ lần trước, đã bao gồm quantity và color)
@@ -250,6 +300,10 @@ const DealerOrdersPage = () => {
     setStatusFilter(e.target.value);
     setPage(1);
   };
+  const handleColorFilter = (selectedColor) => {
+    setColorFilter(selectedColor);
+    setPage(1);
+  };
   // Sort indicator
   const renderSort = (column) => (sortBy === column ? (sortOrder === "asc" ? " ▲" : " ▼") : "");
 
@@ -276,6 +330,21 @@ const DealerOrdersPage = () => {
                 <option value="Delivered">Delivered</option>
                 <option value="Canceled">Canceled</option>
               </Form.Select>
+            </Col>
+            <Col md={3} sm={6} xs={12}>
+              <Dropdown onSelect={handleColorFilter} className="w-100">
+                <Dropdown.Toggle variant="outline-secondary" className="w-100 text-start">
+                  {colorFilter ? renderColorBadge(colorFilter) : "All Colors"}
+                </Dropdown.Toggle>
+                <Dropdown.Menu className="w-100">
+                  <Dropdown.Item eventKey="">All Colors</Dropdown.Item>
+                  {["Red", "Blue", "Green", "Yellow", "Black", "White", "Silver", "Gray"].map((color) => (
+                    <Dropdown.Item eventKey={color} key={color}>
+                      {renderColorBadge(color)}
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Menu>
+              </Dropdown>
             </Col>
             <Col md={3} sm={6} xs={12} className="mt-2 mt-md-0">
               <Form.Label className="me-2">Page Size</Form.Label>
@@ -336,7 +405,8 @@ const DealerOrdersPage = () => {
                     <td>{order.id ? order.id.substring(0, 8) : "N/A"}...</td>
                     <td>{order.variantName || "N/A"}</td>
                     <td>{order.quantity || 1}</td>
-                    <td>{order.color || "N/A"}</td>
+                    <td>{renderColorBadge(order.color || "N/A")}</td>
+
                     <td>{order.createdAt ? new Date(order.createdAt).toLocaleString() : "N/A"}</td>
                     <td>{renderStatusBadge(order.status)}</td>
                     <td>{renderActionButton(order)}</td>
@@ -412,17 +482,19 @@ const DealerOrdersPage = () => {
 
             <Form.Group className="mb-3" controlId="orderColor">
               <Form.Label>Color</Form.Label>
-              <Form.Select value={orderColor} onChange={(e) => setOrderColor(e.target.value)} required>
-                <option value="">Select a color</option>
-                <option value="Red">Red</option>
-                <option value="Blue">Blue</option>
-                <option value="Black">Black</option>
-                <option value="White">White</option>
-                <option value="Silver">Silver</option>
-                <option value="Gray">Gray</option>
-                <option value="Green">Green</option>
-                <option value="Yellow">Yellow</option>
-              </Form.Select>
+              <Dropdown onSelect={(selected) => setOrderColor(selected)} className="w-100">
+                <Dropdown.Toggle variant="outline-secondary" className="w-100 text-start" id="orderColorDropdown">
+                  {orderColor ? renderColorBadge(orderColor) : "Select a color"}
+                </Dropdown.Toggle>
+                <Dropdown.Menu className="w-100">
+                  <Dropdown.Item eventKey="">Select a color</Dropdown.Item>
+                  {["Red", "Blue", "Black", "White", "Silver", "Gray", "Green", "Yellow"].map((color) => (
+                    <Dropdown.Item eventKey={color} key={color}>
+                      {renderColorBadge(color)}
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Menu>
+              </Dropdown>
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>
