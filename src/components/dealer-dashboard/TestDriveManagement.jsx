@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createTestDrive, deleteTestDrive, getAllTestDrives, getTestDriveById, updateTestDrive } from "../../services/testDriveService";
+import { createTestDrive, deleteTestDrive, getAllTestDrives, getTestDriveById, patchTestDrive } from "../../services/testDriveService";
 import { decodeJwt } from "../../utils/jwt";
 
 const TestDriveManagement = () => {
@@ -26,11 +26,64 @@ const TestDriveManagement = () => {
   // Form state
   const [formData, setFormData] = useState({
     customerId: "",
-    dealerId: "",
     vehicleId: "",
     scheduledAt: "",
-    status: "Scheduled",
   });
+
+  // Dropdown options
+  const [customerOptions, setCustomerOptions] = useState([]);
+  const [vehicleOptions, setVehicleOptions] = useState([]);
+  // Fetch customers and vehicles for dropdowns when modal opens
+  const fetchDropdownOptions = async () => {
+    try {
+      const token = localStorage.getItem("evdms_auth_token");
+      let dealerId;
+      if (token) {
+        const payload = decodeJwt(token);
+        dealerId = payload?.dealerId;
+      }
+      // Fetch customers of the dealer
+      let customers = [];
+      if (dealerId) {
+        const customerRes = await import("../../services/dashboardService").then((m) => m.getAllCustomers());
+        customers = customerRes?.data?.items || [];
+      }
+      setCustomerOptions(customers);
+
+      // Fetch vehicles of the dealer that are status=available and type=demo
+      let vehicles = [];
+      if (dealerId) {
+        const vehicleRes = await import("../../services/vehicleService").then((m) => m.getAllVehicles({ filters: JSON.stringify({ dealerId, status: "available", type: "demo" }) }));
+        console.log("Full vehicle API response:", vehicleRes);
+        vehicles = vehicleRes?.data?.data?.items || [];
+      }
+      setVehicleOptions(vehicles);
+      console.log("Vehicle options for dropdown:", vehicles);
+
+      // Fetch variant names for vehicles
+      if (vehicles.length > 0) {
+        const variantIds = Array.from(new Set(vehicles.map((v) => v.variantId).filter(Boolean)));
+        const variantMap = {};
+        if (variantIds.length > 0) {
+          const { getVehicleVariantById } = await import("../../services/vehicleVariantService");
+          await Promise.all(
+            variantIds.map(async (id) => {
+              try {
+                const res = await getVehicleVariantById(id);
+                const variant = res?.data ?? res;
+                variantMap[id] = variant.name || variant.variantName || variant.title || id;
+              } catch {
+                variantMap[id] = id;
+              }
+            })
+          );
+        }
+      }
+    } catch {
+      setCustomerOptions([]);
+      setVehicleOptions([]);
+    }
+  };
 
   useEffect(() => {
     loadTestDrives();
@@ -89,14 +142,13 @@ const TestDriveManagement = () => {
     }
   };
 
-  const handleCreateClick = () => {
+  const handleCreateClick = async () => {
     setFormData({
       customerId: "",
-      dealerId: "",
       vehicleId: "",
       scheduledAt: "",
-      status: "Scheduled",
     });
+    await fetchDropdownOptions();
     setShowCreateModal(true);
   };
 
@@ -105,11 +157,21 @@ const TestDriveManagement = () => {
       const response = await getTestDriveById(testDrive.id);
       if (response?.data) {
         setSelectedTestDrive(response.data);
+        // Convert UTC to local time for input value
+        let localDateTime = "";
+        if (response.data.scheduledAt) {
+          const utcDate = new Date(response.data.scheduledAt);
+          // Get local ISO string without seconds/milliseconds
+          const pad = (n) => n.toString().padStart(2, "0");
+          const year = utcDate.getFullYear();
+          const month = pad(utcDate.getMonth() + 1);
+          const day = pad(utcDate.getDate());
+          const hour = pad(utcDate.getHours());
+          const minute = pad(utcDate.getMinutes());
+          localDateTime = `${year}-${month}-${day}T${hour}:${minute}`;
+        }
         setFormData({
-          customerId: response.data.customerId,
-          dealerId: response.data.dealerId,
-          vehicleId: response.data.vehicleId,
-          scheduledAt: response.data.scheduledAt ? response.data.scheduledAt.substring(0, 16) : "",
+          scheduledAt: localDateTime,
           status: response.data.status,
         });
         setShowEditModal(true);
@@ -123,9 +185,18 @@ const TestDriveManagement = () => {
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Get dealerId from JWT
+      const token = localStorage.getItem("evdms_auth_token");
+      let dealerId;
+      if (token) {
+        const payload = decodeJwt(token);
+        dealerId = payload?.dealerId;
+      }
       const dataToSend = {
         ...formData,
+        dealerId,
         scheduledAt: new Date(formData.scheduledAt).toISOString(),
+        status: "Scheduled",
       };
       await createTestDrive(dataToSend);
       setShowCreateModal(false);
@@ -147,7 +218,7 @@ const TestDriveManagement = () => {
         scheduledAt: new Date(formData.scheduledAt).toISOString(),
         status: formData.status,
       };
-      await updateTestDrive(selectedTestDrive.id, dataToSend);
+      await patchTestDrive(selectedTestDrive.id, dataToSend);
       setShowEditModal(false);
       setSelectedTestDrive(null);
       loadTestDrives();
@@ -206,12 +277,16 @@ const TestDriveManagement = () => {
 
   const formatDateTime = (dateString) => {
     if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleString("en-US", {
+    // Convert UTC string to local time
+    const utcDate = new Date(dateString);
+    // toLocaleString will show in user's local time zone
+    return utcDate.toLocaleString(undefined, {
       year: "numeric",
       month: "short",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
+      hour12: false,
     });
   };
 
@@ -461,50 +536,30 @@ const TestDriveManagement = () => {
                 </div>
                 <div className="modal-body">
                   <div className="mb-3">
-                    <label className="form-label">Customer ID *</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={formData.customerId}
-                      onChange={(e) => setFormData({ ...formData, customerId: e.target.value })}
-                      required
-                      placeholder="Enter customer ID (GUID)"
-                    />
+                    <label className="form-label">Customer Name *</label>
+                    <select className="form-select" value={formData.customerId} onChange={(e) => setFormData({ ...formData, customerId: e.target.value })} required>
+                      <option value="">Select customer...</option>
+                      {customerOptions.map((customer) => (
+                        <option key={customer.id} value={customer.id}>
+                          {customer.fullName || customer.name || customer.id}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Dealer ID *</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={formData.dealerId}
-                      onChange={(e) => setFormData({ ...formData, dealerId: e.target.value })}
-                      required
-                      placeholder="Enter dealer ID (GUID)"
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">Vehicle ID *</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={formData.vehicleId}
-                      onChange={(e) => setFormData({ ...formData, vehicleId: e.target.value })}
-                      required
-                      placeholder="Enter vehicle ID (GUID)"
-                    />
+                    <label className="form-label">Vehicle *</label>
+                    <select className="form-select" value={formData.vehicleId} onChange={(e) => setFormData({ ...formData, vehicleId: e.target.value })} required>
+                      <option value="">Select vehicle...</option>
+                      {vehicleOptions.map((vehicle) => (
+                        <option key={vehicle.id} value={vehicle.id}>
+                          {`${vehicle.variantName || vehicle.variantId} - ${vehicle.vin}`}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div className="mb-3">
                     <label className="form-label">Scheduled At *</label>
                     <input type="datetime-local" className="form-control" value={formData.scheduledAt} onChange={(e) => setFormData({ ...formData, scheduledAt: e.target.value })} required />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">Status *</label>
-                    <select className="form-select" value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} required>
-                      <option value="Scheduled">Scheduled</option>
-                      <option value="InProgress">In Progress</option>
-                      <option value="Completed">Completed</option>
-                      <option value="Cancelled">Cancelled</option>
-                    </select>
                   </div>
                 </div>
                 <div className="modal-footer">
@@ -537,18 +592,6 @@ const TestDriveManagement = () => {
                 </div>
                 <div className="modal-body">
                   <div className="mb-3">
-                    <label className="form-label">Customer ID *</label>
-                    <input type="text" className="form-control" value={formData.customerId} onChange={(e) => setFormData({ ...formData, customerId: e.target.value })} required />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">Dealer ID *</label>
-                    <input type="text" className="form-control" value={formData.dealerId} onChange={(e) => setFormData({ ...formData, dealerId: e.target.value })} required />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">Vehicle ID *</label>
-                    <input type="text" className="form-control" value={formData.vehicleId} onChange={(e) => setFormData({ ...formData, vehicleId: e.target.value })} required />
-                  </div>
-                  <div className="mb-3">
                     <label className="form-label">Scheduled At *</label>
                     <input type="datetime-local" className="form-control" value={formData.scheduledAt} onChange={(e) => setFormData({ ...formData, scheduledAt: e.target.value })} required />
                   </div>
@@ -556,9 +599,9 @@ const TestDriveManagement = () => {
                     <label className="form-label">Status *</label>
                     <select className="form-select" value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} required>
                       <option value="Scheduled">Scheduled</option>
-                      <option value="InProgress">In Progress</option>
                       <option value="Completed">Completed</option>
-                      <option value="Cancelled">Cancelled</option>
+                      <option value="Canceled">Canceled</option>
+                      <option value="NoShow">NoShow</option>
                     </select>
                   </div>
                 </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getDealerById } from "../../services/dealerService";
-import { deleteVehicle, getAllVehicles, getVehicleById, updateVehicle } from "../../services/vehicleService";
+import { deleteVehicle, getAllVehicles, getVehicleById, patchVehicle } from "../../services/vehicleService";
 import { getVehicleVariantById } from "../../services/vehicleVariantService";
 import { decodeJwt } from "../../utils/jwt";
 
@@ -65,13 +65,8 @@ const VehicleManagement = () => {
       // Always filter by dealerId if present
       if (dealerId) {
         params.filters = JSON.stringify({ ...(filterBy && filterValue ? { [filterBy]: filterValue } : {}), dealerId });
-        params["filters[dealerId]"] = dealerId;
-        if (filterBy && filterValue) {
-          params[`filters[${filterBy}]`] = filterValue;
-        }
       } else if (filterBy && filterValue) {
         params.filters = JSON.stringify({ [filterBy]: filterValue });
-        params[`filters[${filterBy}]`] = filterValue;
       }
 
       console.debug("Vehicle list params:", params);
@@ -257,19 +252,20 @@ const VehicleManagement = () => {
     }
   };
 
-  const handleUpdateStatus = async (newStatus) => {
-    try {
-      // PUT requires full vehicle object
-      const updatedVehicle = {
-        model: selectedVehicle.model,
-        variant: selectedVehicle.variant,
-        status: newStatus,
-        // Add other fields as needed
-      };
+  const [editType, setEditType] = useState("");
 
-      await updateVehicle(selectedVehicle.id, updatedVehicle);
+  useEffect(() => {
+    if (showDetailModal && selectedVehicle) {
+      setEditType(selectedVehicle.type || "");
+    }
+  }, [showDetailModal, selectedVehicle]);
+
+  const handleUpdateVehicle = async (fields) => {
+    try {
+      await patchVehicle(selectedVehicle.id, fields);
       setShowDetailModal(false);
       setSelectedVehicle(null);
+      setEditType("");
       loadVehicles();
 
       // Show success message
@@ -278,14 +274,14 @@ const VehicleManagement = () => {
       alert.style.zIndex = "9999";
       alert.innerHTML = `
         <i class="bx bx-check-circle me-2"></i>
-        Vehicle status updated successfully!
+        Vehicle updated successfully!
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
       `;
       document.body.appendChild(alert);
       setTimeout(() => alert.remove(), 3000);
     } catch (err) {
       console.error("Error updating vehicle:", err);
-      setError("Failed to update vehicle status.");
+      setError("Failed to update vehicle.");
     }
   };
 
@@ -786,7 +782,17 @@ const VehicleManagement = () => {
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Type</label>
-                    <p>{selectedVehicle.type ? <span className={`badge ${getTypeBadgeClass(selectedVehicle.type)}`}>{selectedVehicle.type}</span> : <span className="text-muted">-</span>}</p>
+                    <div className="input-group">
+                      <select className="form-select" value={editType || selectedVehicle.type || ""} onChange={(e) => setEditType(e.target.value)}>
+                        <option value="">Select type...</option>
+                        <option value="Sale">Sale</option>
+                        <option value="Demo">Demo</option>
+                        <option value="Display">Display</option>
+                      </select>
+                      <button type="button" className="btn btn-outline-primary" disabled={!editType || editType === selectedVehicle.type} onClick={() => handleUpdateVehicle({ type: editType })}>
+                        Update Type
+                      </button>
+                    </div>
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Current Status</label>
@@ -856,7 +862,7 @@ const VehicleManagement = () => {
                       <button
                         type="button"
                         className={`btn ${selectedVehicle.status === "Available" ? "btn-success" : "btn-outline-success"}`}
-                        onClick={() => handleUpdateStatus("Available")}
+                        onClick={() => handleUpdateVehicle({ status: "Available" })}
                         disabled={selectedVehicle.status === "Available"}
                       >
                         Available
@@ -864,7 +870,7 @@ const VehicleManagement = () => {
                       <button
                         type="button"
                         className={`btn ${selectedVehicle.status === "Sold" ? "btn-danger" : "btn-outline-danger"}`}
-                        onClick={() => handleUpdateStatus("Sold")}
+                        onClick={() => handleUpdateVehicle({ status: "Sold" })}
                         disabled={selectedVehicle.status === "Sold"}
                       >
                         Sold
@@ -872,7 +878,7 @@ const VehicleManagement = () => {
                       <button
                         type="button"
                         className={`btn ${selectedVehicle.status === "Reserved" ? "btn-warning" : "btn-outline-warning"}`}
-                        onClick={() => handleUpdateStatus("Reserved")}
+                        onClick={() => handleUpdateVehicle({ status: "Reserved" })}
                         disabled={selectedVehicle.status === "Reserved"}
                       >
                         Reserved

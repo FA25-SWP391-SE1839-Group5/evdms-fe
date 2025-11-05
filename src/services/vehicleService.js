@@ -1,4 +1,9 @@
-import api from './api'; 
+import api from "./api";
+export const patchVehicle = (id, vehicleData) => {
+  console.log(`📡 API Call: PATCH /api/vehicles/${id}`);
+  console.log("📤 Sending patch data:", vehicleData);
+  return api.patch(`/vehicles/${id}`, vehicleData);
+};
 
 // ============================================
 // VEHICLE MODELS
@@ -9,8 +14,8 @@ import api from './api';
  * @param {object} params - Optional query parameters (sorting, filtering, pagination)
  */
 export const getAllVehicleModels = (params = {}) => {
-    console.log("📡 API Call: GET /api/vehicle-models");
-    return api.get('/vehicle-models', { params });
+  console.log("📡 API Call: GET /api/vehicle-models");
+  return api.get("/vehicle-models", { params });
 };
 
 /**
@@ -18,18 +23,18 @@ export const getAllVehicleModels = (params = {}) => {
  * @param {string} id - Model ID
  */
 export const getVehicleModelById = (id) => {
-    console.log(`📡 API Call: GET /api/vehicle-models/${id}`);
-    return api.get(`/vehicle-models/${id}`);
+  console.log(`📡 API Call: GET /api/vehicle-models/${id}`);
+  return api.get(`/vehicle-models/${id}`);
 };
 
 /**
- * CREATE Vehicle Model 
+ * CREATE Vehicle Model
  * @param {object} modelData - { name: string, description: string, imageUrl?: string, imagePublicId?: string }
  */
 export const createVehicleModel = (modelData) => {
-    console.log("📡 API Call: POST /api/vehicle-models");
-    console.log("📤 Sending data:", modelData);
-    return api.post('/vehicle-models', modelData);
+  console.log("📡 API Call: POST /api/vehicle-models");
+  console.log("📤 Sending data:", modelData);
+  return api.post("/vehicle-models", modelData);
 };
 
 /**
@@ -38,9 +43,9 @@ export const createVehicleModel = (modelData) => {
  * @param {object} modelData - Dữ liệu cập nhật
  */
 export const updateVehicleModel = (id, modelData) => {
-    console.log(`📡 API Call: PUT /api/vehicle-models/${id}`);
-    console.log("📤 Sending update data:", modelData);
-    return api.put(`/vehicle-models/${id}`, modelData);
+  console.log(`📡 API Call: PUT /api/vehicle-models/${id}`);
+  console.log("📤 Sending update data:", modelData);
+  return api.put(`/vehicle-models/${id}`, modelData);
 };
 
 /**
@@ -48,8 +53,8 @@ export const updateVehicleModel = (id, modelData) => {
  * @param {string} id - Model ID
  */
 export const deleteVehicleModel = (id) => {
-    console.log(`📡 API Call: DELETE /api/vehicle-models/${id}`);
-    return api.delete(`/vehicle-models/${id}`);
+  console.log(`📡 API Call: DELETE /api/vehicle-models/${id}`);
+  return api.delete(`/vehicle-models/${id}`);
 };
 
 /**
@@ -58,15 +63,15 @@ export const deleteVehicleModel = (id) => {
  * @param {File} imageFile - File ảnh cần upload
  */
 export const uploadVehicleModelImage = (modelId, imageFile) => {
-    console.log(`📡 API Call: POST /api/vehicle-models/${modelId}/upload-image`); 
-    const formData = new FormData();
-    formData.append('imageFile', imageFile); 
+  console.log(`📡 API Call: POST /api/vehicle-models/${modelId}/upload-image`);
+  const formData = new FormData();
+  formData.append("imageFile", imageFile);
 
-    return api.post(`/vehicle-models/${modelId}/upload-image`, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    });
+  return api.post(`/vehicle-models/${modelId}/upload-image`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 
 /**
@@ -74,9 +79,9 @@ export const uploadVehicleModelImage = (modelId, imageFile) => {
  * @param {string} modelId - Model ID (Theo lưu ý mới của bạn)
  */
 export const deleteVehicleModelImage = (modelId) => {
-    console.log(`📡 API Call: DELETE /api/vehicle-models/${modelId}/delete-image`); // Endpoint có thể khác
-    // API này có thể cần gửi imagePublicId trong body hoặc không, tùy backend
-    return api.delete(`/vehicle-models/${modelId}/delete-image`);
+  console.log(`📡 API Call: DELETE /api/vehicle-models/${modelId}/delete-image`); // Endpoint có thể khác
+  // API này có thể cần gửi imagePublicId trong body hoặc không, tùy backend
+  return api.delete(`/vehicle-models/${modelId}/delete-image`);
 };
 
 // ============================================
@@ -88,8 +93,8 @@ export const deleteVehicleModelImage = (modelId) => {
  * @param {object} params - Optional query parameters
  */
 export const getAllVehicleVariants = (params = {}) => {
-    console.log("📡 API Call: GET /api/vehicle-variants");
-    return api.get('/vehicle-variants', { params });
+  console.log("📡 API Call: GET /api/vehicle-variants");
+  return api.get("/vehicle-variants", { params });
 };
 
 /**
@@ -97,18 +102,18 @@ export const getAllVehicleVariants = (params = {}) => {
  * @param {string} id - Variant ID
  */
 export const getVehicleVariantById = (id) => {
-    console.log(`📡 API Call: GET /api/vehicle-variants/${id}`);
-    return api.get(`/vehicle-variants/${id}`);
+  console.log(`📡 API Call: GET /api/vehicle-variants/${id}`);
+  return api.get(`/vehicle-variants/${id}`);
 };
 
 /**
- * CREATE Vehicle Variant 
+ * CREATE Vehicle Variant
  * @param {object} variantData - Dữ liệu variant (modelId, name, basePrice, specs, features)
  */
 export const createVehicleVariant = (variantData) => {
-    console.log("📡 API Call: POST /api/vehicle-variants");
-    console.log("📤 Sending data:", variantData);
-    return api.post('/vehicle-variants', variantData);
+  console.log("📡 API Call: POST /api/vehicle-variants");
+  console.log("📤 Sending data:", variantData);
+  return api.post("/vehicle-variants", variantData);
 };
 
 /**
@@ -117,9 +122,9 @@ export const createVehicleVariant = (variantData) => {
  * @param {object} variantData - Dữ liệu cập nhật
  */
 export const updateVehicleVariant = (id, variantData) => {
-    console.log(`📡 API Call: PUT /api/vehicle-variants/${id}`);
-    console.log("📤 Sending update data:", variantData);
-    return api.put(`/vehicle-variants/${id}`, variantData);
+  console.log(`📡 API Call: PUT /api/vehicle-variants/${id}`);
+  console.log("📤 Sending update data:", variantData);
+  return api.put(`/vehicle-variants/${id}`, variantData);
 };
 
 /**
@@ -127,8 +132,8 @@ export const updateVehicleVariant = (id, variantData) => {
  * @param {string} id - Variant ID
  */
 export const deleteVehicleVariant = (id) => {
-    console.log(`📡 API Call: DELETE /api/vehicle-variants/${id}`);
-    return api.delete(`/vehicle-variants/${id}`);
+  console.log(`📡 API Call: DELETE /api/vehicle-variants/${id}`);
+  return api.delete(`/vehicle-variants/${id}`);
 };
 
 // ============================================
@@ -140,8 +145,8 @@ export const deleteVehicleVariant = (id) => {
  * @param {object} params - Optional query parameters
  */
 export const getAllVehicles = (params = {}) => {
-    console.log("📡 API Call: GET /api/vehicles");
-    return api.get('/vehicles', { params });
+  console.log("📡 API Call: GET /api/vehicles");
+  return api.get("/vehicles", { params });
 };
 
 /**
@@ -149,8 +154,8 @@ export const getAllVehicles = (params = {}) => {
  * @param {string} id - Vehicle ID
  */
 export const getVehicleById = (id) => {
-    console.log(`📡 API Call: GET /api/vehicles/${id}`);
-    return api.get(`/vehicles/${id}`);
+  console.log(`📡 API Call: GET /api/vehicles/${id}`);
+  return api.get(`/vehicles/${id}`);
 };
 
 /**
@@ -158,9 +163,9 @@ export const getVehicleById = (id) => {
  * @param {object} vehicleData - { variantId, dealerId, color, vin, type, status }
  */
 export const createVehicle = (vehicleData) => {
-    console.log("📡 API Call: POST /api/vehicles");
-    console.log("📤 Sending data:", vehicleData);
-    return api.post('/vehicles', vehicleData);
+  console.log("📡 API Call: POST /api/vehicles");
+  console.log("📤 Sending data:", vehicleData);
+  return api.post("/vehicles", vehicleData);
 };
 
 /**
@@ -169,9 +174,9 @@ export const createVehicle = (vehicleData) => {
  * @param {object} vehicleData - Dữ liệu cập nhật
  */
 export const updateVehicle = (id, vehicleData) => {
-    console.log(`📡 API Call: PUT /api/vehicles/${id}`);
-    console.log("📤 Sending update data:", vehicleData);
-    return api.put(`/vehicles/${id}`, vehicleData);
+  console.log(`📡 API Call: PUT /api/vehicles/${id}`);
+  console.log("📤 Sending update data:", vehicleData);
+  return api.put(`/vehicles/${id}`, vehicleData);
 };
 
 /**
@@ -179,6 +184,6 @@ export const updateVehicle = (id, vehicleData) => {
  * @param {string} id - Vehicle ID
  */
 export const deleteVehicle = (id) => {
-    console.log(`📡 API Call: DELETE /api/vehicles/${id}`);
-    return api.delete(`/vehicles/${id}`);
+  console.log(`📡 API Call: DELETE /api/vehicles/${id}`);
+  return api.delete(`/vehicles/${id}`);
 };
