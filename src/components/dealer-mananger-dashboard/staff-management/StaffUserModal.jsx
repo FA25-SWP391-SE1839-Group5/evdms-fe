@@ -6,7 +6,7 @@ const StaffUserModal = ({ show, onClose, onSubmit, user, formData, onFormChange,
     <Modal show={show} onHide={onClose} centered>
       <Form onSubmit={onSubmit} autoComplete="off">
         <Modal.Header closeButton>
-          <Modal.Title>{isEdit ? "Edit User" : "Add New User"}</Modal.Title>
+          <Modal.Title>{isEdit ? "Edit Staff" : "Add New Staff"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form.Group className="mb-3" controlId="fullName">

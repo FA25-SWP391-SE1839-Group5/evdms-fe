@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Alert, Button, Card, Col, Form, Row, Spinner, Table } from "react-bootstrap";
 import { getDealerStaffSales } from "../../../services/reportService";
+import { decodeJwt } from "../../../utils/jwt";
 
 const StaffPerformancePage = () => {
   const [data, setData] = useState([]);
@@ -18,14 +19,18 @@ const StaffPerformancePage = () => {
     setIsLoading(true);
     setError(null);
     try {
+      // Lấy dealerId từ JWT
+      const token = localStorage.getItem("evdms_auth_token");
+      const payload = decodeJwt(token);
+      const dealerId = payload?.dealerId;
+
       // Chỉ gửi các filter
       const queryParams = {};
       if (filters.startDate) queryParams.startDate = filters.startDate;
       if (filters.endDate) queryParams.endDate = filters.endDate;
+      if (dealerId) queryParams.dealerId = dealerId;
 
       const response = await getDealerStaffSales(queryParams);
-
-      // Giả sử API trả về một mảng
       setData(response.data.items || []);
     } catch (err) {
       setError(err.message);
@@ -67,7 +72,7 @@ const StaffPerformancePage = () => {
     }
 
     if (data.length === 0) {
-      return <p className="text-center text-muted">Không có dữ liệu hiệu suất để hiển thị.</p>;
+      return <p className="text-center text-muted">No data.</p>;
     }
 
     // Render bảng dữ liệu

@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
-import {
-  getAllTestDrives,
-  getTestDriveById,
-  createTestDrive,
-  updateTestDrive,
-  deleteTestDrive,
-} from "../../services/testDriveService";
+import { createTestDrive, deleteTestDrive, getAllTestDrives, getTestDriveById, updateTestDrive } from "../../services/testDriveService";
+import { decodeJwt } from "../../utils/jwt";
 
 const TestDriveManagement = () => {
   const [testDrives, setTestDrives] = useState([]);
@@ -43,19 +38,31 @@ const TestDriveManagement = () => {
   }, [currentPage, searchTerm, statusFilter]);
 
   const loadTestDrives = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      setError(null);
-
+      // Get dealerId from JWT
+      const token = localStorage.getItem("evdms_auth_token");
+      let dealerId;
+      if (token) {
+        const payload = decodeJwt(token);
+        dealerId = payload?.dealerId;
+      }
       const params = {
         page: currentPage,
         pageSize: pageSize,
         search: searchTerm,
-        filters: statusFilter ? `status:${statusFilter}` : "",
       };
-
+      // Always filter by dealerId
+      if (dealerId) {
+        params.filters = JSON.stringify({ dealerId });
+      }
+      // Attach status filter if provided
+      if (statusFilter) {
+        const extraFilter = { status: statusFilter };
+        params.filters = params.filters ? JSON.stringify({ ...JSON.parse(params.filters), ...extraFilter }) : JSON.stringify(extraFilter);
+      }
       const response = await getAllTestDrives(params);
-
       if (response?.data) {
         setTestDrives(response.data.items || []);
         setTotalResults(response.data.totalResults || 0);
@@ -321,17 +328,11 @@ const TestDriveManagement = () => {
                       <small>{formatDateTime(testDrive.scheduledAt)}</small>
                     </td>
                     <td>
-                      <span className={`badge ${getStatusBadgeClass(testDrive.status)}`}>
-                        {testDrive.status}
-                      </span>
+                      <span className={`badge ${getStatusBadgeClass(testDrive.status)}`}>{testDrive.status}</span>
                     </td>
                     <td>
                       <div className="dropdown">
-                        <button
-                          type="button"
-                          className="btn p-0 dropdown-toggle hide-arrow"
-                          data-bs-toggle="dropdown"
-                        >
+                        <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                           <i className="bx bx-dots-vertical-rounded"></i>
                         </button>
                         <div className="dropdown-menu">
@@ -406,9 +407,7 @@ const TestDriveManagement = () => {
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Status</label>
                     <p>
-                      <span className={`badge ${getStatusBadgeClass(selectedTestDrive.status)}`}>
-                        {selectedTestDrive.status}
-                      </span>
+                      <span className={`badge ${getStatusBadgeClass(selectedTestDrive.status)}`}>{selectedTestDrive.status}</span>
                     </p>
                   </div>
                   <div className="col-md-6">
@@ -496,22 +495,11 @@ const TestDriveManagement = () => {
                   </div>
                   <div className="mb-3">
                     <label className="form-label">Scheduled At *</label>
-                    <input
-                      type="datetime-local"
-                      className="form-control"
-                      value={formData.scheduledAt}
-                      onChange={(e) => setFormData({ ...formData, scheduledAt: e.target.value })}
-                      required
-                    />
+                    <input type="datetime-local" className="form-control" value={formData.scheduledAt} onChange={(e) => setFormData({ ...formData, scheduledAt: e.target.value })} required />
                   </div>
                   <div className="mb-3">
                     <label className="form-label">Status *</label>
-                    <select
-                      className="form-select"
-                      value={formData.status}
-                      onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                      required
-                    >
+                    <select className="form-select" value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} required>
                       <option value="Scheduled">Scheduled</option>
                       <option value="InProgress">In Progress</option>
                       <option value="Completed">Completed</option>
@@ -550,52 +538,23 @@ const TestDriveManagement = () => {
                 <div className="modal-body">
                   <div className="mb-3">
                     <label className="form-label">Customer ID *</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={formData.customerId}
-                      onChange={(e) => setFormData({ ...formData, customerId: e.target.value })}
-                      required
-                    />
+                    <input type="text" className="form-control" value={formData.customerId} onChange={(e) => setFormData({ ...formData, customerId: e.target.value })} required />
                   </div>
                   <div className="mb-3">
                     <label className="form-label">Dealer ID *</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={formData.dealerId}
-                      onChange={(e) => setFormData({ ...formData, dealerId: e.target.value })}
-                      required
-                    />
+                    <input type="text" className="form-control" value={formData.dealerId} onChange={(e) => setFormData({ ...formData, dealerId: e.target.value })} required />
                   </div>
                   <div className="mb-3">
                     <label className="form-label">Vehicle ID *</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={formData.vehicleId}
-                      onChange={(e) => setFormData({ ...formData, vehicleId: e.target.value })}
-                      required
-                    />
+                    <input type="text" className="form-control" value={formData.vehicleId} onChange={(e) => setFormData({ ...formData, vehicleId: e.target.value })} required />
                   </div>
                   <div className="mb-3">
                     <label className="form-label">Scheduled At *</label>
-                    <input
-                      type="datetime-local"
-                      className="form-control"
-                      value={formData.scheduledAt}
-                      onChange={(e) => setFormData({ ...formData, scheduledAt: e.target.value })}
-                      required
-                    />
+                    <input type="datetime-local" className="form-control" value={formData.scheduledAt} onChange={(e) => setFormData({ ...formData, scheduledAt: e.target.value })} required />
                   </div>
                   <div className="mb-3">
                     <label className="form-label">Status *</label>
-                    <select
-                      className="form-select"
-                      value={formData.status}
-                      onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                      required
-                    >
+                    <select className="form-select" value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} required>
                       <option value="Scheduled">Scheduled</option>
                       <option value="InProgress">In Progress</option>
                       <option value="Completed">Completed</option>

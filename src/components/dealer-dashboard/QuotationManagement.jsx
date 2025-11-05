@@ -1,16 +1,8 @@
-
-
 import { useEffect, useState } from "react";
-import {
-  getAllQuotations,
-  getQuotationById,
-  createQuotation,
-  deleteQuotation,
-  updateQuotation,
-} from "../../services/quotationService";
-import { getAllCustomers, createOrder } from "../../services/dashboardService";
-import { getAllVehicleVariants } from "../../services/vehicleVariantService";
 import { getCurrentUser } from "../../services/authService";
+import { createOrder, getAllCustomers } from "../../services/dashboardService";
+import { createQuotation, deleteQuotation, getAllQuotations, getQuotationById, updateQuotation } from "../../services/quotationService";
+import { getAllVehicleVariants } from "../../services/vehicleVariantService";
 import { decodeJwt } from "../../utils/jwt";
 
 const QuotationManagement = () => {
@@ -40,19 +32,82 @@ const QuotationManagement = () => {
   const [filterBy, setFilterBy] = useState("");
   const [filterValue, setFilterValue] = useState("");
 
-
   useEffect(() => {
-    loadQuotations();
+    const fetchQuotations = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Get dealerId from JWT
+        const token = localStorage.getItem("evdms_auth_token");
+        let dealerId;
+        if (token) {
+          const payload = decodeJwt(token);
+          dealerId = payload?.dealerId;
+        }
+        const params = {
+          page: currentPage,
+          pageSize,
+          search: searchTerm || undefined,
+        };
+        // Always filter by dealerId
+        if (dealerId) {
+          params.filters = JSON.stringify({ dealerId });
+        }
+        // Attach additional filter if provided
+        if (filterBy && filterValue) {
+          const extraFilter = { [filterBy]: filterValue };
+          params.filters = params.filters ? JSON.stringify({ ...JSON.parse(params.filters), ...extraFilter }) : JSON.stringify(extraFilter);
+        }
+        const response = await getAllQuotations(params);
+        let items = [];
+        let total = 0;
+        if (!response) {
+          items = [];
+        } else if (Array.isArray(response)) {
+          items = response;
+        } else if (Array.isArray(response.data)) {
+          items = response.data;
+        } else if (response.data && Array.isArray(response.data.items)) {
+          items = response.data.items;
+          total = response.data.totalResults || response.data.total || 0;
+        } else if (response.items && Array.isArray(response.items)) {
+          items = response.items;
+          total = response.totalResults || response.total || 0;
+        } else if (response.data && typeof response.data === "object") {
+          const d = response.data;
+          if (d.items && Array.isArray(d.items)) {
+            items = d.items;
+            total = d.totalResults || d.total || 0;
+          } else if (Array.isArray(d)) {
+            items = d;
+          } else {
+            items = [d];
+          }
+        } else if (response.data?.data && Array.isArray(response.data.data)) {
+          items = response.data.data;
+        } else if (response.data?.data && typeof response.data.data === "object") {
+          items = [response.data.data];
+        } else {
+          items = response?.data || response?.items || [];
+          if (!Array.isArray(items)) items = [items];
+        }
+        setQuotations(items);
+        setTotalResults(Number(total) || items.length || 0);
+        setTotalPages(Math.max(1, Math.ceil((Number(total) || items.length) / pageSize)));
+      } catch {
+        setError("Failed to load quotations. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchQuotations();
   }, [currentPage, searchTerm, filterBy, filterValue, pageSize]);
 
   // Load customers and variants for dropdowns
   useEffect(() => {
     const loadOptions = async () => {
       try {
-        const [custRes, varRes] = await Promise.all([
-          getAllCustomers(),
-          getAllVehicleVariants({ page: 1, pageSize: 1000 }),
-        ]);
+        const [custRes, varRes] = await Promise.all([getAllCustomers(), getAllVehicleVariants({ page: 1, pageSize: 1000 })]);
 
         // dashboardService returns { success, data } in some callers; handle different shapes
         const custItems = custRes?.data?.items || custRes?.data || custRes?.items || [];
@@ -68,31 +123,33 @@ const QuotationManagement = () => {
   }, []);
 
   const loadQuotations = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      setError(null);
-      // Build params similar to CustomerManagement/VehicleManagement
+      // Get dealerId from JWT
+      const token = localStorage.getItem("evdms_auth_token");
+      let dealerId;
+      if (token) {
+        const payload = decodeJwt(token);
+        dealerId = payload?.dealerId;
+      }
       const params = {
         page: currentPage,
         pageSize,
         search: searchTerm || undefined,
       };
-
-      // attach filter as JSON string if provided
-      if (filterBy && filterValue) {
-        try {
-          params.filters = JSON.stringify({ [filterBy]: filterValue });
-        } catch (e) {
-          params.filters = `${filterBy}:${filterValue}`;
-        }
+      // Always filter by dealerId
+      if (dealerId) {
+        params.filters = JSON.stringify({ dealerId });
       }
-
+      // Attach additional filter if provided
+      if (filterBy && filterValue) {
+        const extraFilter = { [filterBy]: filterValue };
+        params.filters = params.filters ? JSON.stringify({ ...JSON.parse(params.filters), ...extraFilter }) : JSON.stringify(extraFilter);
+      }
       const response = await getAllQuotations(params);
-
-      // Normalize a variety of possible backend shapes
       let items = [];
       let total = 0;
-
       if (!response) {
         items = [];
       } else if (Array.isArray(response)) {
@@ -105,8 +162,7 @@ const QuotationManagement = () => {
       } else if (response.items && Array.isArray(response.items)) {
         items = response.items;
         total = response.totalResults || response.total || 0;
-      } else if (response.data && typeof response.data === 'object') {
-        // maybe single object or nested
+      } else if (response.data && typeof response.data === "object") {
         const d = response.data;
         if (d.items && Array.isArray(d.items)) {
           items = d.items;
@@ -114,19 +170,16 @@ const QuotationManagement = () => {
         } else if (Array.isArray(d)) {
           items = d;
         } else {
-          // single object response -> wrap
           items = [d];
         }
       } else if (response.data?.data && Array.isArray(response.data.data)) {
         items = response.data.data;
-      } else if (response.data?.data && typeof response.data.data === 'object') {
+      } else if (response.data?.data && typeof response.data.data === "object") {
         items = [response.data.data];
       } else {
-        // unknown shape - try to be tolerant
         items = response?.data || response?.items || [];
         if (!Array.isArray(items)) items = [items];
       }
-
       setQuotations(items);
       setTotalResults(Number(total) || items.length || 0);
       setTotalPages(Math.max(1, Math.ceil((Number(total) || items.length) / pageSize)));
@@ -141,13 +194,13 @@ const QuotationManagement = () => {
   const getCustomerName = (id) => {
     if (!id) return "-";
     const c = customers.find((x) => x.id === id || x._id === id || x.customerId === id);
-    return c ? (c.fullName || c.name || c.email || id) : id;
+    return c ? c.fullName || c.name || c.email || id : id;
   };
 
   const getVariantName = (id) => {
     if (!id) return "-";
     const v = variants.find((x) => x.id === id || x._id === id || x.variantId === id);
-    return v ? (v.name || v.variantName || v.title || id) : id;
+    return v ? v.name || v.variantName || v.title || id : id;
   };
 
   const getStatusBadgeClass = (status) => {
@@ -212,7 +265,7 @@ const QuotationManagement = () => {
       setLoading(true);
       // Build DTO: dealerId, userId, customerId, variantId, color, totalAmount, status
       const currentUser = getCurrentUser();
-      const token = localStorage.getItem('evdms_auth_token');
+      const token = localStorage.getItem("evdms_auth_token");
       const decoded = decodeJwt(token);
       const dealerId = decoded?.dealerId || decoded?.dealer || "";
       const userId = currentUser?.id || decoded?.sub || "";
@@ -229,7 +282,7 @@ const QuotationManagement = () => {
 
       await createQuotation(dto);
       setShowCreateModal(false);
-  setCreateForm({ customerId: "", variantId: "", color: "", totalAmount: "", status: "Draft" });
+      setCreateForm({ customerId: "", variantId: "", color: "", totalAmount: "", status: "Draft" });
       loadQuotations();
       const alert = document.createElement("div");
       alert.className = "alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3";
@@ -265,7 +318,7 @@ const QuotationManagement = () => {
       setLoading(true);
       // Send the updated fields expected by the API per UpdateQuotationDto
       const currentUser = getCurrentUser();
-      const token = localStorage.getItem('evdms_auth_token');
+      const token = localStorage.getItem("evdms_auth_token");
       const decoded = decodeJwt(token);
       const dealerId = decoded?.dealerId || decoded?.dealer || "";
       const userId = currentUser?.id || decoded?.sub || "";
@@ -327,12 +380,11 @@ const QuotationManagement = () => {
     }
   };
 
-
   const handleUpdateStatus = async (newStatus) => {
     try {
       if (!selectedQuotation) return;
       const currentUser = getCurrentUser();
-      const token = localStorage.getItem('evdms_auth_token');
+      const token = localStorage.getItem("evdms_auth_token");
       const decoded = decodeJwt(token);
       const dealerId = decoded?.dealerId || decoded?.dealer || "";
       const userId = currentUser?.id || decoded?.sub || "";
@@ -455,7 +507,14 @@ const QuotationManagement = () => {
             </div>
             <div className="col-md-3">
               <label className="form-label">Filter by</label>
-              <select className="form-select" value={filterBy} onChange={(e) => { setFilterBy(e.target.value); setCurrentPage(1); }}>
+              <select
+                className="form-select"
+                value={filterBy}
+                onChange={(e) => {
+                  setFilterBy(e.target.value);
+                  setCurrentPage(1);
+                }}
+              >
                 <option value="">None</option>
                 <option value="variantId">Variant ID</option>
                 <option value="status">Status</option>
@@ -465,18 +524,45 @@ const QuotationManagement = () => {
             </div>
             <div className="col-md-3">
               <label className="form-label">Filter value</label>
-              <input type="text" className="form-control" placeholder="Value" value={filterValue} onChange={(e) => { setFilterValue(e.target.value); setCurrentPage(1); }} />
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Value"
+                value={filterValue}
+                onChange={(e) => {
+                  setFilterValue(e.target.value);
+                  setCurrentPage(1);
+                }}
+              />
             </div>
             <div className="col-md-2">
               <label className="form-label">Page size</label>
-              <select className="form-select" value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}>
-                {[5,10,20,50,100].map((s) => (
-                  <option key={s} value={s}>{s}</option>
+              <select
+                className="form-select"
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+              >
+                {[5, 10, 20, 50, 100].map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
                 ))}
               </select>
             </div>
             <div className="col-12 mt-2 d-flex justify-content-end">
-              <button className="btn btn-outline-secondary me-2" onClick={() => { setSearchTerm(''); setFilterBy(''); setFilterValue(''); setPageSize(10); setCurrentPage(1); }}>
+              <button
+                className="btn btn-outline-secondary me-2"
+                onClick={() => {
+                  setSearchTerm("");
+                  setFilterBy("");
+                  setFilterValue("");
+                  setPageSize(10);
+                  setCurrentPage(1);
+                }}
+              >
                 Reset
               </button>
             </div>
@@ -498,7 +584,9 @@ const QuotationManagement = () => {
           <div className="modal-dialog">
             <form className="modal-content" onSubmit={handleCreateSubmit}>
               <div className="modal-header">
-                <h5 className="modal-title"><i className="bx bx-plus me-2"></i>Create Quotation</h5>
+                <h5 className="modal-title">
+                  <i className="bx bx-plus me-2"></i>Create Quotation
+                </h5>
                 <button type="button" className="btn-close" onClick={() => setShowCreateModal(false)}></button>
               </div>
               <div className="modal-body">
@@ -508,7 +596,7 @@ const QuotationManagement = () => {
                     <option value="">Select customer</option>
                     {customers.map((c) => (
                       <option key={c.id || c._id || c.customerId} value={c.id || c._id || c.customerId}>
-                        {c.fullName || c.name || c.email || (c.id || c._id || c.customerId)}
+                        {c.fullName || c.name || c.email || c.id || c._id || c.customerId}
                       </option>
                     ))}
                   </select>
@@ -519,7 +607,7 @@ const QuotationManagement = () => {
                     <option value="">Select variant</option>
                     {variants.map((v) => (
                       <option key={v.id || v._id || v.variantId} value={v.id || v._id || v.variantId}>
-                        {v.name || v.variantName || v.title || (v.id || v._id || v.variantId)}
+                        {v.name || v.variantName || v.title || v.id || v._id || v.variantId}
                       </option>
                     ))}
                   </select>
@@ -528,8 +616,10 @@ const QuotationManagement = () => {
                   <label className="form-label">Color</label>
                   <select className="form-select" value={createForm.color} onChange={(e) => setCreateForm({ ...createForm, color: e.target.value })}>
                     <option value="">Select color</option>
-                    {["Red","Blue","Black","White","Silver","Gray","Green","Yellow"].map((c) => (
-                      <option key={c} value={c}>{c}</option>
+                    {["Red", "Blue", "Black", "White", "Silver", "Gray", "Green", "Yellow"].map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -537,14 +627,20 @@ const QuotationManagement = () => {
                   <label className="form-label">Status</label>
                   <select className="form-select" value={createForm.status} onChange={(e) => setCreateForm({ ...createForm, status: e.target.value })}>
                     {["Draft", "Sent", "Approved", "Rejected"].map((s) => (
-                      <option key={s} value={s}>{s}</option>
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
                     ))}
                   </select>
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Create</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  Create
+                </button>
               </div>
             </form>
           </div>
@@ -572,71 +668,55 @@ const QuotationManagement = () => {
           ) : (
             <table className="table">
               <thead>
-                    <tr>
-                      <th>Quotation ID</th>
-                      <th>Customer</th>
-                      <th>Variant</th>
-                      <th>Color</th>
-                      <th>Status</th>
-                      <th>Created At</th>
-                      <th>Actions</th>
-                    </tr>
+                <tr>
+                  <th>Quotation ID</th>
+                  <th>Customer</th>
+                  <th>Variant</th>
+                  <th>Color</th>
+                  <th>Status</th>
+                  <th>Created At</th>
+                  <th>Actions</th>
+                </tr>
               </thead>
               <tbody className="table-border-bottom-0">
-                      {quotations.map((q) => {
-                        const id = q.id || q._id || q.quotationId || q.quoteId;
-                        return (
+                {quotations.map((q) => {
+                  const id = q.id || q._id || q.quotationId || q.quoteId;
+                  return (
                     <tr key={id}>
                       <td>
                         <small className="text-muted">{String(id)?.substring(0, 8)}...</small>
                       </td>
                       <td>
-                            <small className="text-muted">{getCustomerName(q.customerId)}</small>
+                        <small className="text-muted">{getCustomerName(q.customerId)}</small>
                       </td>
-                          <td>
-                            <small className="text-muted">{getVariantName(q.variantId)}</small>
-                          </td>
-                          <td>
-                            {q.color ? (
-                              <span className={`badge ${getColorBadgeClass(q.color)}`}>{q.color}</span>
-                            ) : (
-                              <small className="text-muted">-</small>
-                            )}
-                          </td>
-                          <td>
-                            {q.status ? (
-                              <span className={`badge ${getStatusBadgeClass(q.status)}`}>{q.status}</span>
-                            ) : (
-                              <small className="text-muted">-</small>
-                            )}
-                          </td>
+                      <td>
+                        <small className="text-muted">{getVariantName(q.variantId)}</small>
+                      </td>
+                      <td>{q.color ? <span className={`badge ${getColorBadgeClass(q.color)}`}>{q.color}</span> : <small className="text-muted">-</small>}</td>
+                      <td>{q.status ? <span className={`badge ${getStatusBadgeClass(q.status)}`}>{q.status}</span> : <small className="text-muted">-</small>}</td>
                       <td>
                         <small className="text-muted">{formatDate(q.createdAt)}</small>
                       </td>
                       <td>
-                      <div className="dropdown">
-                        <button
-                          type="button"
-                          className="btn p-0 dropdown-toggle hide-arrow"
-                          data-bs-toggle="dropdown"
-                        >
-                          <i className="bx bx-dots-vertical-rounded"></i>
-                        </button>
-                        <div className="dropdown-menu">
-                          <button className="dropdown-item" onClick={() => handleViewDetail(q)}>
-                            <i className="bx bx-show me-2"></i>
-                            View Details
+                        <div className="dropdown">
+                          <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                            <i className="bx bx-dots-vertical-rounded"></i>
                           </button>
-                          <button className="dropdown-item text-danger" onClick={() => handleDeleteClick(q)}>
-                            <i className="bx bx-trash me-2"></i>
-                            Delete
-                          </button>
+                          <div className="dropdown-menu">
+                            <button className="dropdown-item" onClick={() => handleViewDetail(q)}>
+                              <i className="bx bx-show me-2"></i>
+                              View Details
+                            </button>
+                            <button className="dropdown-item text-danger" onClick={() => handleDeleteClick(q)}>
+                              <i className="bx bx-trash me-2"></i>
+                              Delete
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                  </tr>
-                      );
-                    })}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}
@@ -682,20 +762,32 @@ const QuotationManagement = () => {
                 </h5>
                 <div className="d-flex align-items-center">
                   <button type="button" className="btn btn-outline-secondary me-2" onClick={handleEditToggle}>
-                    {isEditing ? (<><i className="bx bx-x me-1"></i> Cancel</>) : (<><i className="bx bx-edit me-1"></i> Edit</>)}
+                    {isEditing ? (
+                      <>
+                        <i className="bx bx-x me-1"></i> Cancel
+                      </>
+                    ) : (
+                      <>
+                        <i className="bx bx-edit me-1"></i> Edit
+                      </>
+                    )}
                   </button>
-                  <button type="button" className="btn-close" onClick={() => { setShowDetailModal(false); setIsEditing(false); setEditForm(null); }}></button>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={() => {
+                      setShowDetailModal(false);
+                      setIsEditing(false);
+                      setEditForm(null);
+                    }}
+                  ></button>
                 </div>
               </div>
               <div className="modal-body">
                 <div className="row g-3">
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Quotation ID</label>
-                    {isEditing ? (
-                      <input className="form-control" value={editForm?.id || selectedQuotation.id} disabled />
-                    ) : (
-                      <p className="text-muted">{selectedQuotation.id || '-'}</p>
-                    )}
+                    {isEditing ? <input className="form-control" value={editForm?.id || selectedQuotation.id} disabled /> : <p className="text-muted">{selectedQuotation.id || "-"}</p>}
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Customer</label>
@@ -704,7 +796,7 @@ const QuotationManagement = () => {
                         <option value="">Select customer</option>
                         {customers.map((c) => (
                           <option key={c.id || c._id || c.customerId} value={c.id || c._id || c.customerId}>
-                            {c.fullName || c.name || c.email || (c.id || c._id || c.customerId)}
+                            {c.fullName || c.name || c.email || c.id || c._id || c.customerId}
                           </option>
                         ))}
                       </select>
@@ -719,7 +811,7 @@ const QuotationManagement = () => {
                         <option value="">Select variant</option>
                         {variants.map((v) => (
                           <option key={v.id || v._id || v.variantId} value={v.id || v._id || v.variantId}>
-                            {v.name || v.variantName || v.title || (v.id || v._id || v.variantId)}
+                            {v.name || v.variantName || v.title || v.id || v._id || v.variantId}
                           </option>
                         ))}
                       </select>
@@ -731,39 +823,39 @@ const QuotationManagement = () => {
                     <label className="form-label fw-semibold">Color</label>
                     <p>
                       {isEditing ? (
-                        <select className="form-select" value={editForm?.color || selectedQuotation.color || ''} onChange={(e) => setEditForm({ ...editForm, color: e.target.value })}>
+                        <select className="form-select" value={editForm?.color || selectedQuotation.color || ""} onChange={(e) => setEditForm({ ...editForm, color: e.target.value })}>
                           <option value="">Select color</option>
-                          {["Red","Blue","Black","White","Silver","Gray","Green","Yellow"].map((c) => (
-                            <option key={c} value={c}>{c}</option>
+                          {["Red", "Blue", "Black", "White", "Silver", "Gray", "Green", "Yellow"].map((c) => (
+                            <option key={c} value={c}>
+                              {c}
+                            </option>
                           ))}
                         </select>
+                      ) : selectedQuotation.color ? (
+                        <span className={`badge ${getColorBadgeClass(selectedQuotation.color)}`}>{selectedQuotation.color}</span>
                       ) : (
-                        (selectedQuotation.color) ? (
-                          <span className={`badge ${getColorBadgeClass(selectedQuotation.color)}`}>{selectedQuotation.color}</span>
-                        ) : (
-                          <span className="text-muted">-</span>
-                        )
+                        <span className="text-muted">-</span>
                       )}
                     </p>
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Total Amount</label>
-                    <p className="text-muted">{selectedQuotation.totalAmount != null ? selectedQuotation.totalAmount : '-'}</p>                    
+                    <p className="text-muted">{selectedQuotation.totalAmount != null ? selectedQuotation.totalAmount : "-"}</p>
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Status</label>
                     {isEditing ? (
-                      <select className="form-select" value={editForm?.status || selectedQuotation.status || 'Draft'} onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}>
-                        {["Draft","Sent","Approved","Rejected"].map((s) => (
-                          <option key={s} value={s}>{s}</option>
+                      <select className="form-select" value={editForm?.status || selectedQuotation.status || "Draft"} onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}>
+                        {["Draft", "Sent", "Approved", "Rejected"].map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
                         ))}
                       </select>
+                    ) : selectedQuotation.status ? (
+                      <span className={`badge ${getStatusBadgeClass(selectedQuotation.status)}`}>{selectedQuotation.status}</span>
                     ) : (
-                      (selectedQuotation.status) ? (
-                        <span className={`badge ${getStatusBadgeClass(selectedQuotation.status)}`}>{selectedQuotation.status}</span>
-                      ) : (
-                        <p className="text-muted">-</p>
-                      )
+                      <p className="text-muted">-</p>
                     )}
                   </div>
                   <div className="col-md-6">
@@ -778,8 +870,12 @@ const QuotationManagement = () => {
                   <div className="col-12">
                     {isEditing ? (
                       <div className="d-flex justify-content-end">
-                        <button type="button" className="btn btn-outline-secondary me-2" onClick={handleEditToggle}>Cancel</button>
-                        <button type="button" className="btn btn-primary" onClick={handleSaveEdit}>Save</button>
+                        <button type="button" className="btn btn-outline-secondary me-2" onClick={handleEditToggle}>
+                          Cancel
+                        </button>
+                        <button type="button" className="btn btn-primary" onClick={handleSaveEdit}>
+                          Save
+                        </button>
                       </div>
                     ) : (
                       <div className="btn-group w-100" role="group">

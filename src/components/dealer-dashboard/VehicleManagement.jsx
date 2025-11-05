@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { getAllVehicles, getVehicleById, updateVehicle, deleteVehicle } from "../../services/vehicleService";
-import { getVehicleVariantById } from "../../services/vehicleVariantService";
 import { getDealerById } from "../../services/dealerService";
+import { deleteVehicle, getAllVehicles, getVehicleById, updateVehicle } from "../../services/vehicleService";
+import { getVehicleVariantById } from "../../services/vehicleVariantService";
+import { decodeJwt } from "../../utils/jwt";
 
 const VehicleManagement = () => {
   const [vehicles, setVehicles] = useState([]);
@@ -43,19 +44,37 @@ const VehicleManagement = () => {
       setLoading(true);
       setError(null);
 
+      // Get dealerId from JWT (correct key)
+      let dealerId = null;
+      try {
+        const token = localStorage.getItem("evdms_auth_token");
+        if (token) {
+          const decoded = decodeJwt(token);
+          dealerId = decoded?.dealerId;
+        }
+      } catch (e) {
+        console.debug("Error decoding JWT for dealerId:", e);
+      }
+
       const params = {
         page: currentPage,
         pageSize,
         search: searchTerm || undefined,
       };
 
-      // add filters similar to CustomerManagement so backend can accept either style
-      if (filterBy && filterValue) {
+      // Always filter by dealerId if present
+      if (dealerId) {
+        params.filters = JSON.stringify({ ...(filterBy && filterValue ? { [filterBy]: filterValue } : {}), dealerId });
+        params["filters[dealerId]"] = dealerId;
+        if (filterBy && filterValue) {
+          params[`filters[${filterBy}]`] = filterValue;
+        }
+      } else if (filterBy && filterValue) {
         params.filters = JSON.stringify({ [filterBy]: filterValue });
         params[`filters[${filterBy}]`] = filterValue;
       }
 
-      console.debug('Vehicle list params:', params);
+      console.debug("Vehicle list params:", params);
       const resp = await getAllVehicles(params);
 
       // Normalize response to an items array + totalResults
@@ -76,7 +95,7 @@ const VehicleManagement = () => {
         total = raw.totalResults ?? raw.items.length;
       } else {
         // fallback: if maybeData is a single object representing one vehicle, wrap it
-        if (maybeData && typeof maybeData === 'object' && Object.keys(maybeData).length > 0) {
+        if (maybeData && typeof maybeData === "object" && Object.keys(maybeData).length > 0) {
           // if it looks like a single vehicle (has id or vin), wrap it
           if (maybeData.id || maybeData.vin || maybeData.variantId) {
             items = [maybeData];
@@ -96,7 +115,7 @@ const VehicleManagement = () => {
       try {
         await fetchNamesForItems(items);
       } catch (e) {
-        console.debug('Error fetching related names:', e);
+        console.debug("Error fetching related names:", e);
       }
       setTotalResults(total);
       setTotalPages(Math.max(1, Math.ceil(total / pageSize)));
@@ -119,15 +138,15 @@ const VehicleManagement = () => {
       setCompareVehicles(vData);
 
       // fetch variants for both
-      const variantPromises = vData.map((v) => v?.variantId ? getVehicleVariantById(v.variantId) : null);
+      const variantPromises = vData.map((v) => (v?.variantId ? getVehicleVariantById(v.variantId) : null));
       const variantResponses = await Promise.all(variantPromises);
-      const vVariants = variantResponses.map((r) => (r ? (r?.data ?? r) : null));
+      const vVariants = variantResponses.map((r) => (r ? r?.data ?? r : null));
       setCompareVariants(vVariants);
 
       setShowCompareModal(true);
     } catch (err) {
-      console.error('Error preparing comparison:', err);
-      setError('Failed to prepare comparison.');
+      console.error("Error preparing comparison:", err);
+      setError("Failed to prepare comparison.");
     } finally {
       setLoading(false);
     }
@@ -146,15 +165,19 @@ const VehicleManagement = () => {
     const missingVariantIds = variantIds.filter((id) => !vMap[id]);
     if (missingVariantIds.length > 0) {
       try {
-        const vPromises = missingVariantIds.map((id) => getVehicleVariantById(id).then((r) => r?.data ?? r).catch(() => null));
+        const vPromises = missingVariantIds.map((id) =>
+          getVehicleVariantById(id)
+            .then((r) => r?.data ?? r)
+            .catch(() => null)
+        );
         const vResults = await Promise.all(vPromises);
         vResults.forEach((vr, idx) => {
           const id = missingVariantIds[idx];
-          if (vr) vMap[id] = vr.name || vr.variantName || vr.title || (vr.id || id);
+          if (vr) vMap[id] = vr.name || vr.variantName || vr.title || vr.id || id;
           else vMap[id] = id;
         });
       } catch (e) {
-        console.debug('Error fetching variant names', e);
+        console.debug("Error fetching variant names", e);
       }
     }
 
@@ -162,7 +185,11 @@ const VehicleManagement = () => {
     const missingDealerIds = dealerIds.filter((id) => !dMap[id]);
     if (missingDealerIds.length > 0) {
       try {
-        const dPromises = missingDealerIds.map((id) => getDealerById(id).then((r) => r?.name || r?.data?.name || r).catch(() => null));
+        const dPromises = missingDealerIds.map((id) =>
+          getDealerById(id)
+            .then((r) => r?.name || r?.data?.name || r)
+            .catch(() => null)
+        );
         const dResults = await Promise.all(dPromises);
         dResults.forEach((dr, idx) => {
           const id = missingDealerIds[idx];
@@ -170,7 +197,7 @@ const VehicleManagement = () => {
           else dMap[id] = id;
         });
       } catch (e) {
-        console.debug('Error fetching dealer names', e);
+        console.debug("Error fetching dealer names", e);
       }
     }
 
@@ -190,7 +217,7 @@ const VehicleManagement = () => {
       const response = await getVehicleById(vehicle.id);
       // normalize different service return shapes (axios response vs raw data)
       const data = response?.data?.data ?? response?.data ?? response;
-      console.debug('getVehicleById result:', data);
+      console.debug("getVehicleById result:", data);
       if (data) {
         setSelectedVehicle(data);
         // fetch dealer name for detail view
@@ -200,7 +227,7 @@ const VehicleManagement = () => {
             setSelectedDealer(d?.name || d || null);
             setDealerNameMap((m) => ({ ...m, [data.dealerId]: d?.name || d || data.dealerId }));
           } catch (e) {
-            console.debug('Error fetching dealer for detail view', e);
+            console.debug("Error fetching dealer for detail view", e);
           }
         } else {
           setSelectedDealer(null);
@@ -209,12 +236,12 @@ const VehicleManagement = () => {
         if (data.variantId) {
           try {
             const variantDetail = await getVehicleVariantById(data.variantId);
-            console.debug('getVehicleVariantById result:', variantDetail);
+            console.debug("getVehicleVariantById result:", variantDetail);
             // normalize variant shape (service may return axios response or raw data)
             const variant = variantDetail?.data ?? variantDetail;
             setSelectedVariant(variant);
           } catch (variantErr) {
-            console.error('Error fetching variant detail:', variantErr);
+            console.error("Error fetching variant detail:", variantErr);
             setSelectedVariant(null);
           }
         } else {
@@ -222,7 +249,7 @@ const VehicleManagement = () => {
         }
         setShowDetailModal(true);
       } else {
-        setError('Vehicle details not found');
+        setError("Vehicle details not found");
       }
     } catch (err) {
       console.error("Error loading vehicle detail:", err);
@@ -239,12 +266,12 @@ const VehicleManagement = () => {
         status: newStatus,
         // Add other fields as needed
       };
-      
+
       await updateVehicle(selectedVehicle.id, updatedVehicle);
       setShowDetailModal(false);
       setSelectedVehicle(null);
       loadVehicles();
-      
+
       // Show success message
       const alert = document.createElement("div");
       alert.className = "alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3";
@@ -273,7 +300,7 @@ const VehicleManagement = () => {
       setShowDeleteModal(false);
       setVehicleToDelete(null);
       loadVehicles();
-      
+
       // Show success message
       const alert = document.createElement("div");
       alert.className = "alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3";
@@ -353,16 +380,31 @@ const VehicleManagement = () => {
           <p className="text-muted mb-0">View and manage vehicles</p>
         </div>
         <div className="d-flex gap-2">
-          <button className="btn btn-outline-secondary" onClick={() => { setSelectedForCompare([]); setCompareVehicles([]); setCompareVariants([]); setShowCompareModal(false); }} disabled={selectedForCompare.length === 0}>
+          <button
+            className="btn btn-outline-secondary"
+            onClick={() => {
+              setSelectedForCompare([]);
+              setCompareVehicles([]);
+              setCompareVariants([]);
+              setShowCompareModal(false);
+            }}
+            disabled={selectedForCompare.length === 0}
+          >
             Clear Selection
           </button>
-          <button className="btn btn-success" onClick={async () => { await handleCompare(); }} disabled={selectedForCompare.length !== 2}>
+          <button
+            className="btn btn-success"
+            onClick={async () => {
+              await handleCompare();
+            }}
+            disabled={selectedForCompare.length !== 2}
+          >
             <i className="bx bx-compare me-1"></i>
             Compare Selected ({selectedForCompare.length})
           </button>
           <button className="btn btn-primary" onClick={loadVehicles} disabled={loading}>
-          <i className="bx bx-refresh me-1"></i>
-          Refresh
+            <i className="bx bx-refresh me-1"></i>
+            Refresh
           </button>
         </div>
       </div>
@@ -372,7 +414,16 @@ const VehicleManagement = () => {
         <div className="card-body">
           <div className="row g-2 align-items-center">
             <div className="col-md-4">
-              <input type="text" className="form-control" placeholder="Search VIN/color/type..." value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }} />
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search VIN/color/type..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
+              />
             </div>
             <div className="col-md-2">
               <select className="form-select" value={filterBy} onChange={(e) => setFilterBy(e.target.value)}>
@@ -386,10 +437,25 @@ const VehicleManagement = () => {
               </select>
             </div>
             <div className="col-md-3">
-              <input className="form-control" placeholder="Filter value" value={filterValue} onChange={(e) => { setFilterValue(e.target.value); setCurrentPage(1); }} />
+              <input
+                className="form-control"
+                placeholder="Filter value"
+                value={filterValue}
+                onChange={(e) => {
+                  setFilterValue(e.target.value);
+                  setCurrentPage(1);
+                }}
+              />
             </div>
             <div className="col-md-1">
-              <select className="form-select" value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}>
+              <select
+                className="form-select"
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+              >
                 <option value={5}>5</option>
                 <option value={10}>10</option>
                 <option value={25}>25</option>
@@ -397,7 +463,17 @@ const VehicleManagement = () => {
               </select>
             </div>
             <div className="col-md-2 text-end">
-              <button className="btn btn-outline-secondary" onClick={() => { setSearchTerm(""); setFilterBy(""); setFilterValue(""); setCurrentPage(1); }}>Reset</button>
+              <button
+                className="btn btn-outline-secondary"
+                onClick={() => {
+                  setSearchTerm("");
+                  setFilterBy("");
+                  setFilterValue("");
+                  setCurrentPage(1);
+                }}
+              >
+                Reset
+              </button>
             </div>
           </div>
         </div>
@@ -434,16 +510,16 @@ const VehicleManagement = () => {
           ) : (
             <table className="table">
               <thead>
-                    <tr>
-                      <th style={{ width: 40 }}></th>
-                      <th>VIN</th>
-                      <th>Variant</th>
-                      <th>Dealer</th>
-                      <th>Color</th>
-                      <th>Type</th>
-                      <th>Status</th>
-                      <th>Actions</th>
-                    </tr>
+                <tr>
+                  <th style={{ width: 40 }}></th>
+                  <th>VIN</th>
+                  <th>Variant</th>
+                  <th>Dealer</th>
+                  <th>Color</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
               </thead>
               <tbody className="table-border-bottom-0">
                 {vehicles.map((vehicle) => (
@@ -467,24 +543,20 @@ const VehicleManagement = () => {
                         />
                       </div>
                     </td>
-                    <td><small className="text-muted">{vehicle.vin}</small></td>
-                                    <td><small className="text-muted">{variantNameMap[vehicle.variantId] || vehicle.variantId}</small></td>
-                                    <td><small className="text-muted">{dealerNameMap[vehicle.dealerId] || vehicle.dealerId}</small></td>
                     <td>
-                      {vehicle.color ? (
-                        <span className={`badge ${getColorBadgeClass(vehicle.color)}`}>{vehicle.color}</span>
-                      ) : (
-                        <small className="text-muted">-</small>
-                      )}
+                      <small className="text-muted">{vehicle.vin}</small>
                     </td>
                     <td>
-                      {vehicle.type ? (
-                        <span className={`badge ${getTypeBadgeClass(vehicle.type)}`}>{vehicle.type}</span>
-                      ) : (
-                        <small className="text-muted">-</small>
-                      )}
+                      <small className="text-muted">{variantNameMap[vehicle.variantId] || vehicle.variantId}</small>
                     </td>
-                    <td><span className={`badge ${getStatusBadgeClass(vehicle.status)}`}>{vehicle.status}</span></td>
+                    <td>
+                      <small className="text-muted">{dealerNameMap[vehicle.dealerId] || vehicle.dealerId}</small>
+                    </td>
+                    <td>{vehicle.color ? <span className={`badge ${getColorBadgeClass(vehicle.color)}`}>{vehicle.color}</span> : <small className="text-muted">-</small>}</td>
+                    <td>{vehicle.type ? <span className={`badge ${getTypeBadgeClass(vehicle.type)}`}>{vehicle.type}</span> : <small className="text-muted">-</small>}</td>
+                    <td>
+                      <span className={`badge ${getStatusBadgeClass(vehicle.status)}`}>{vehicle.status}</span>
+                    </td>
                     <td>
                       <div className="dropdown">
                         <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
@@ -509,88 +581,132 @@ const VehicleManagement = () => {
           )}
         </div>
 
-          {/* Compare Modal */}
-          {showCompareModal && compareVehicles.length === 2 && (
-            <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
-              <div className="modal-dialog modal-xl">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h5 className="modal-title"><i className="bx bx-compare me-2"></i>Compare Vehicles</h5>
-                    <button type="button" className="btn-close" onClick={handleCloseCompare}></button>
-                  </div>
-                  <div className="modal-body">
-                    <div className="row">
-                      <div className="col-6">
-                        <h6 className="mb-2">Vehicle A</h6>
-                        <div className="mb-2"><strong>VIN:</strong> {compareVehicles[0].vin}</div>
-                        <div className="mb-2"><strong>Variant:</strong> {variantNameMap[compareVehicles[0].variantId] || compareVehicles[0].variantId}</div>
-                        <div className="mb-2"><strong>Dealer:</strong> {dealerNameMap[compareVehicles[0].dealerId] || compareVehicles[0].dealerId}</div>
-                        <div className="mb-2"><strong>Color:</strong> {compareVehicles[0].color ? <span className={`badge ${getColorBadgeClass(compareVehicles[0].color)}`}>{compareVehicles[0].color}</span> : <span className="text-muted">-</span>}</div>
-                        <div className="mb-2"><strong>Type:</strong> {compareVehicles[0].type ? <span className={`badge ${getTypeBadgeClass(compareVehicles[0].type)}`}>{compareVehicles[0].type}</span> : <span className="text-muted">-</span>}</div>
-                        <div className="mb-2"><strong>Status:</strong> {compareVehicles[0].status}</div>
+        {/* Compare Modal */}
+        {showCompareModal && compareVehicles.length === 2 && (
+          <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+            <div className="modal-dialog modal-xl">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">
+                    <i className="bx bx-compare me-2"></i>Compare Vehicles
+                  </h5>
+                  <button type="button" className="btn-close" onClick={handleCloseCompare}></button>
+                </div>
+                <div className="modal-body">
+                  <div className="row">
+                    <div className="col-6">
+                      <h6 className="mb-2">Vehicle A</h6>
+                      <div className="mb-2">
+                        <strong>VIN:</strong> {compareVehicles[0].vin}
                       </div>
-                      <div className="col-6">
-                        <h6 className="mb-2">Vehicle B</h6>
-                        <div className="mb-2"><strong>VIN:</strong> {compareVehicles[1].vin}</div>
-                        <div className="mb-2"><strong>Variant:</strong> {variantNameMap[compareVehicles[1].variantId] || compareVehicles[1].variantId}</div>
-                        <div className="mb-2"><strong>Dealer:</strong> {dealerNameMap[compareVehicles[1].dealerId] || compareVehicles[1].dealerId}</div>
-                        <div className="mb-2"><strong>Color:</strong> {compareVehicles[1].color ? <span className={`badge ${getColorBadgeClass(compareVehicles[1].color)}`}>{compareVehicles[1].color}</span> : <span className="text-muted">-</span>}</div>
-                        <div className="mb-2"><strong>Type:</strong> {compareVehicles[1].type ? <span className={`badge ${getTypeBadgeClass(compareVehicles[1].type)}`}>{compareVehicles[1].type}</span> : <span className="text-muted">-</span>}</div>
-                        <div className="mb-2"><strong>Status:</strong> {compareVehicles[1].status}</div>
+                      <div className="mb-2">
+                        <strong>Variant:</strong> {variantNameMap[compareVehicles[0].variantId] || compareVehicles[0].variantId}
+                      </div>
+                      <div className="mb-2">
+                        <strong>Dealer:</strong> {dealerNameMap[compareVehicles[0].dealerId] || compareVehicles[0].dealerId}
+                      </div>
+                      <div className="mb-2">
+                        <strong>Color:</strong>{" "}
+                        {compareVehicles[0].color ? <span className={`badge ${getColorBadgeClass(compareVehicles[0].color)}`}>{compareVehicles[0].color}</span> : <span className="text-muted">-</span>}
+                      </div>
+                      <div className="mb-2">
+                        <strong>Type:</strong>{" "}
+                        {compareVehicles[0].type ? <span className={`badge ${getTypeBadgeClass(compareVehicles[0].type)}`}>{compareVehicles[0].type}</span> : <span className="text-muted">-</span>}
+                      </div>
+                      <div className="mb-2">
+                        <strong>Status:</strong> {compareVehicles[0].status}
                       </div>
                     </div>
-
-                    <hr />
-
-                    <h6>Variant Specs Comparison</h6>
-                    <div className="table-responsive">
-                      <table className="table table-sm">
-                        <thead>
-                          <tr>
-                            <th>Spec</th>
-                            <th>Vehicle A</th>
-                            <th>Vehicle B</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {(() => {
-                            // build union of spec keys
-                            const aSpecs = compareVariants[0]?.specs || {};
-                            const bSpecs = compareVariants[1]?.specs || {};
-                            const keys = Array.from(new Set([...Object.keys(aSpecs), ...Object.keys(bSpecs)]));
-                            return keys.map((k) => (
-                              <tr key={k}>
-                                <td>{k.replace(/([A-Z])/g, ' $1').trim()}</td>
-                                <td>{aSpecs[k] ? `${aSpecs[k].value}${aSpecs[k].unit ? ` ${aSpecs[k].unit}` : ''}` : '-'}</td>
-                                <td>{bSpecs[k] ? `${bSpecs[k].value}${bSpecs[k].unit ? ` ${bSpecs[k].unit}` : ''}` : '-'}</td>
-                              </tr>
-                            ));
-                          })()}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <h6 className="mt-3">Variant Features Comparison</h6>
-                    <div className="row">
-                      <div className="col-6">
-                        {compareVariants[0] ? Object.entries(compareVariants[0].features || {}).map(([cat, list]) => (
-                          <div key={cat} className="mb-2"><strong>{cat}:</strong> {Array.isArray(list) ? list.join(', ') : String(list)}</div>
-                        )) : <div>No variant A features</div>}
+                    <div className="col-6">
+                      <h6 className="mb-2">Vehicle B</h6>
+                      <div className="mb-2">
+                        <strong>VIN:</strong> {compareVehicles[1].vin}
                       </div>
-                      <div className="col-6">
-                        {compareVariants[1] ? Object.entries(compareVariants[1].features || {}).map(([cat, list]) => (
-                          <div key={cat} className="mb-2"><strong>{cat}:</strong> {Array.isArray(list) ? list.join(', ') : String(list)}</div>
-                        )) : <div>No variant B features</div>}
+                      <div className="mb-2">
+                        <strong>Variant:</strong> {variantNameMap[compareVehicles[1].variantId] || compareVehicles[1].variantId}
+                      </div>
+                      <div className="mb-2">
+                        <strong>Dealer:</strong> {dealerNameMap[compareVehicles[1].dealerId] || compareVehicles[1].dealerId}
+                      </div>
+                      <div className="mb-2">
+                        <strong>Color:</strong>{" "}
+                        {compareVehicles[1].color ? <span className={`badge ${getColorBadgeClass(compareVehicles[1].color)}`}>{compareVehicles[1].color}</span> : <span className="text-muted">-</span>}
+                      </div>
+                      <div className="mb-2">
+                        <strong>Type:</strong>{" "}
+                        {compareVehicles[1].type ? <span className={`badge ${getTypeBadgeClass(compareVehicles[1].type)}`}>{compareVehicles[1].type}</span> : <span className="text-muted">-</span>}
+                      </div>
+                      <div className="mb-2">
+                        <strong>Status:</strong> {compareVehicles[1].status}
                       </div>
                     </div>
                   </div>
-                  <div className="modal-footer">
-                    <button type="button" className="btn btn-secondary" onClick={handleCloseCompare}>Close</button>
+
+                  <hr />
+
+                  <h6>Variant Specs Comparison</h6>
+                  <div className="table-responsive">
+                    <table className="table table-sm">
+                      <thead>
+                        <tr>
+                          <th>Spec</th>
+                          <th>Vehicle A</th>
+                          <th>Vehicle B</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(() => {
+                          // build union of spec keys
+                          const aSpecs = compareVariants[0]?.specs || {};
+                          const bSpecs = compareVariants[1]?.specs || {};
+                          const keys = Array.from(new Set([...Object.keys(aSpecs), ...Object.keys(bSpecs)]));
+                          return keys.map((k) => (
+                            <tr key={k}>
+                              <td>{k.replace(/([A-Z])/g, " $1").trim()}</td>
+                              <td>{aSpecs[k] ? `${aSpecs[k].value}${aSpecs[k].unit ? ` ${aSpecs[k].unit}` : ""}` : "-"}</td>
+                              <td>{bSpecs[k] ? `${bSpecs[k].value}${bSpecs[k].unit ? ` ${bSpecs[k].unit}` : ""}` : "-"}</td>
+                            </tr>
+                          ));
+                        })()}
+                      </tbody>
+                    </table>
                   </div>
+
+                  <h6 className="mt-3">Variant Features Comparison</h6>
+                  <div className="row">
+                    <div className="col-6">
+                      {compareVariants[0] ? (
+                        Object.entries(compareVariants[0].features || {}).map(([cat, list]) => (
+                          <div key={cat} className="mb-2">
+                            <strong>{cat}:</strong> {Array.isArray(list) ? list.join(", ") : String(list)}
+                          </div>
+                        ))
+                      ) : (
+                        <div>No variant A features</div>
+                      )}
+                    </div>
+                    <div className="col-6">
+                      {compareVariants[1] ? (
+                        Object.entries(compareVariants[1].features || {}).map(([cat, list]) => (
+                          <div key={cat} className="mb-2">
+                            <strong>{cat}:</strong> {Array.isArray(list) ? list.join(", ") : String(list)}
+                          </div>
+                        ))
+                      ) : (
+                        <div>No variant B features</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={handleCloseCompare}>
+                    Close
+                  </button>
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
         {/* Pagination */}
         {totalPages > 1 && (
@@ -632,9 +748,18 @@ const VehicleManagement = () => {
                 </h5>
                 <div>
                   <button type="button" className="btn btn-sm btn-outline-secondary me-2" onClick={() => setShowRawJson((s) => !s)}>
-                    {showRawJson ? 'Hide JSON' : 'Show JSON'}
+                    {showRawJson ? "Hide JSON" : "Show JSON"}
                   </button>
-                  <button type="button" className="btn-close" onClick={() => { setShowDetailModal(false); setSelectedVehicle(null); setSelectedVariant(null); setShowRawJson(false); }}></button>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={() => {
+                      setShowDetailModal(false);
+                      setSelectedVehicle(null);
+                      setSelectedVariant(null);
+                      setShowRawJson(false);
+                    }}
+                  ></button>
                 </div>
               </div>
               <div className="modal-body">
@@ -646,7 +771,9 @@ const VehicleManagement = () => {
                   {showRawJson && (
                     <div className="col-12 mt-2">
                       <label className="form-label fw-semibold">Raw JSON (vehicle / variant)</label>
-                      <pre style={{ maxHeight: 240, overflow: 'auto' }} className="bg-light p-2 border">{JSON.stringify({ vehicle: selectedVehicle, variant: selectedVariant }, null, 2)}</pre>
+                      <pre style={{ maxHeight: 240, overflow: "auto" }} className="bg-light p-2 border">
+                        {JSON.stringify({ vehicle: selectedVehicle, variant: selectedVariant }, null, 2)}
+                      </pre>
                     </div>
                   )}
                   <div className="col-md-6">
@@ -659,23 +786,11 @@ const VehicleManagement = () => {
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Color</label>
-                    <p>
-                      {selectedVehicle.color ? (
-                        <span className={`badge ${getColorBadgeClass(selectedVehicle.color)}`}>{selectedVehicle.color}</span>
-                      ) : (
-                        <span className="text-muted">-</span>
-                      )}
-                    </p>
+                    <p>{selectedVehicle.color ? <span className={`badge ${getColorBadgeClass(selectedVehicle.color)}`}>{selectedVehicle.color}</span> : <span className="text-muted">-</span>}</p>
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Type</label>
-                    <p>
-                      {selectedVehicle.type ? (
-                        <span className={`badge ${getTypeBadgeClass(selectedVehicle.type)}`}>{selectedVehicle.type}</span>
-                      ) : (
-                        <span className="text-muted">-</span>
-                      )}
-                    </p>
+                    <p>{selectedVehicle.type ? <span className={`badge ${getTypeBadgeClass(selectedVehicle.type)}`}>{selectedVehicle.type}</span> : <span className="text-muted">-</span>}</p>
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Current Status</label>
@@ -692,29 +807,36 @@ const VehicleManagement = () => {
                     {selectedVariant ? (
                       <div className="alert alert-info mb-0">
                         {selectedVariant.basePrice != null && (
-                          <p className="mb-1"><strong>Base Price:</strong> {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(selectedVariant.basePrice)}</p>
+                          <p className="mb-1">
+                            <strong>Base Price:</strong> {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(selectedVariant.basePrice)}
+                          </p>
                         )}
 
-                        {selectedVariant.specs && typeof selectedVariant.specs === 'object' && (
+                        {selectedVariant.specs && typeof selectedVariant.specs === "object" && (
                           <div className="mb-2">
                             <strong>Specs:</strong>
                             <div className="row mt-1">
                               {Object.entries(selectedVariant.specs).map(([key, spec]) => (
                                 <div key={key} className="col-md-6 mb-1">
-                                  <small className="text-muted">{key.replace(/([A-Z])/g, ' $1').trim()}:</small>
-                                  <div>{spec?.value}{spec?.unit ? ` ${spec.unit}` : ''}</div>
+                                  <small className="text-muted">{key.replace(/([A-Z])/g, " $1").trim()}:</small>
+                                  <div>
+                                    {spec?.value}
+                                    {spec?.unit ? ` ${spec.unit}` : ""}
+                                  </div>
                                 </div>
                               ))}
                             </div>
                           </div>
                         )}
 
-                        {selectedVariant.features && typeof selectedVariant.features === 'object' && (
+                        {selectedVariant.features && typeof selectedVariant.features === "object" && (
                           <div>
                             <strong>Features:</strong>
                             <div className="mt-1">
                               {Object.entries(selectedVariant.features).map(([cat, list]) => (
-                                <p key={cat} className="mb-1"><strong>{cat}:</strong> {Array.isArray(list) ? list.join(', ') : String(list)}</p>
+                                <p key={cat} className="mb-1">
+                                  <strong>{cat}:</strong> {Array.isArray(list) ? list.join(", ") : String(list)}
+                                </p>
                               ))}
                             </div>
                           </div>
@@ -735,15 +857,44 @@ const VehicleManagement = () => {
                   <div className="col-12">
                     <label className="form-label fw-semibold">Update Status</label>
                     <div className="btn-group w-100" role="group">
-                      <button type="button" className={`btn ${selectedVehicle.status === "Available" ? "btn-success" : "btn-outline-success"}`} onClick={() => handleUpdateStatus("Available")} disabled={selectedVehicle.status === "Available"}>Available</button>
-                      <button type="button" className={`btn ${selectedVehicle.status === "Sold" ? "btn-danger" : "btn-outline-danger"}`} onClick={() => handleUpdateStatus("Sold")} disabled={selectedVehicle.status === "Sold"}>Sold</button>
-                      <button type="button" className={`btn ${selectedVehicle.status === "Reserved" ? "btn-warning" : "btn-outline-warning"}`} onClick={() => handleUpdateStatus("Reserved")} disabled={selectedVehicle.status === "Reserved"}>Reserved</button>
+                      <button
+                        type="button"
+                        className={`btn ${selectedVehicle.status === "Available" ? "btn-success" : "btn-outline-success"}`}
+                        onClick={() => handleUpdateStatus("Available")}
+                        disabled={selectedVehicle.status === "Available"}
+                      >
+                        Available
+                      </button>
+                      <button
+                        type="button"
+                        className={`btn ${selectedVehicle.status === "Sold" ? "btn-danger" : "btn-outline-danger"}`}
+                        onClick={() => handleUpdateStatus("Sold")}
+                        disabled={selectedVehicle.status === "Sold"}
+                      >
+                        Sold
+                      </button>
+                      <button
+                        type="button"
+                        className={`btn ${selectedVehicle.status === "Reserved" ? "btn-warning" : "btn-outline-warning"}`}
+                        onClick={() => handleUpdateStatus("Reserved")}
+                        disabled={selectedVehicle.status === "Reserved"}
+                      >
+                        Reserved
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => { setShowDetailModal(false); setSelectedVehicle(null); setSelectedVariant(null); }}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    setShowDetailModal(false);
+                    setSelectedVehicle(null);
+                    setSelectedVariant(null);
+                  }}
+                >
                   Close
                 </button>
               </div>
@@ -767,7 +918,8 @@ const VehicleManagement = () => {
               <div className="modal-body">
                 <p>Are you sure you want to delete this vehicle?</p>
                 <div className="alert alert-warning">
-                  <strong>Model:</strong> {vehicleToDelete.model}<br />
+                  <strong>Model:</strong> {vehicleToDelete.model}
+                  <br />
                   <strong>Variant:</strong> {vehicleToDelete.variant}
                 </div>
                 <p className="text-danger mb-0">

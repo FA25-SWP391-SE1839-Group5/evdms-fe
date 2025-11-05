@@ -1,14 +1,6 @@
 import { useEffect, useState } from "react";
-import {
-  getAllSalesOrders,
-  getSalesOrderById,
-  createSalesOrder,
-  updateSalesOrder,
-  deleteSalesOrder,
-  createPayment,
-  getSalesOrdersSummary,
-  deliverSalesOrders,
-} from "../../services/salesOrderService";
+import { createPayment, createSalesOrder, deleteSalesOrder, deliverSalesOrders, getAllSalesOrders, getSalesOrderById, getSalesOrdersSummary, updateSalesOrder } from "../../services/salesOrderService";
+import { decodeJwt } from "../../utils/jwt";
 
 const SalesOrderManagement = () => {
   const [salesOrders, setSalesOrders] = useState([]);
@@ -58,12 +50,35 @@ const SalesOrderManagement = () => {
       setLoading(true);
       setError(null);
 
+      // Get dealerId from JWT
+      let dealerId = null;
+      try {
+        const token = localStorage.getItem("evdms_auth_token");
+        if (token) {
+          const decoded = decodeJwt(token);
+          dealerId = decoded?.dealerId;
+        }
+      } catch (e) {
+        console.debug("Error decoding JWT for dealerId:", e);
+      }
+
       const params = {
         page: currentPage,
         pageSize: pageSize,
         search: searchTerm,
-        filters: statusFilter ? `status:${statusFilter}` : "",
       };
+
+      // Always filter by dealerId if present
+      if (dealerId) {
+        params.filters = JSON.stringify({ ...(statusFilter ? { status: statusFilter } : {}), dealerId });
+        params["filters[dealerId]"] = dealerId;
+        if (statusFilter) {
+          params["filters[status]"] = statusFilter;
+        }
+      } else if (statusFilter) {
+        params.filters = JSON.stringify({ status: statusFilter });
+        params["filters[status]"] = statusFilter;
+      }
 
       const response = await getAllSalesOrders(params);
 
@@ -86,20 +101,20 @@ const SalesOrderManagement = () => {
     // If axios response.data has inner data: { success, message, data: { ... } }
     if (resp.data && resp.data.data) return resp.data.data;
     // If axios response.data is already the summary object
-    if (resp.data && typeof resp.data === 'object' && ('totalAmount' in resp.data || 'paidAmount' in resp.data)) return resp.data;
+    if (resp.data && typeof resp.data === "object" && ("totalAmount" in resp.data || "paidAmount" in resp.data)) return resp.data;
     // If the resp itself is the summary object
-    if (typeof resp === 'object' && ('totalAmount' in resp || 'paidAmount' in resp)) return resp;
+    if (typeof resp === "object" && ("totalAmount" in resp || "paidAmount" in resp)) return resp;
     return null;
   };
 
   const handleDeliverClick = async (order) => {
     try {
       await deliverSalesOrders(order.id, {});
-      showSuccessAlert('Sales order delivered.');
+      showSuccessAlert("Sales order delivered.");
       loadSalesOrders();
     } catch (err) {
-      console.error('Error delivering sales order:', err);
-      setError('Failed to deliver sales order.');
+      console.error("Error delivering sales order:", err);
+      setError("Failed to deliver sales order.");
     }
   };
 
@@ -399,11 +414,21 @@ const SalesOrderManagement = () => {
               <div className="modal-body">
                 <div className="row g-3">
                   <div className="col-12">
-                    <p><strong>Sales Order ID:</strong> {paymentSummary.salesOrderId ?? paymentSummary.salesOrderId}</p>
-                    <p><strong>Total Amount:</strong> {paymentSummary.totalAmount ?? paymentSummary.data?.totalAmount ?? 'N/A'}</p>
-                    <p><strong>Paid Amount:</strong> {paymentSummary.paidAmount ?? paymentSummary.data?.paidAmount ?? 'N/A'}</p>
-                    <p><strong>Outstanding Balance:</strong> {paymentSummary.outstandingBalance ?? paymentSummary.data?.outstandingBalance ?? 'N/A'}</p>
-                    <p><strong>Fully Paid:</strong> {String(paymentSummary.isFullyPaid ?? paymentSummary.data?.isFullyPaid ?? false)}</p>
+                    <p>
+                      <strong>Sales Order ID:</strong> {paymentSummary.salesOrderId ?? paymentSummary.salesOrderId}
+                    </p>
+                    <p>
+                      <strong>Total Amount:</strong> {paymentSummary.totalAmount ?? paymentSummary.data?.totalAmount ?? "N/A"}
+                    </p>
+                    <p>
+                      <strong>Paid Amount:</strong> {paymentSummary.paidAmount ?? paymentSummary.data?.paidAmount ?? "N/A"}
+                    </p>
+                    <p>
+                      <strong>Outstanding Balance:</strong> {paymentSummary.outstandingBalance ?? paymentSummary.data?.outstandingBalance ?? "N/A"}
+                    </p>
+                    <p>
+                      <strong>Fully Paid:</strong> {String(paymentSummary.isFullyPaid ?? paymentSummary.data?.isFullyPaid ?? false)}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -442,14 +467,7 @@ const SalesOrderManagement = () => {
                   {payMethod === "Installment" && (
                     <div className="mb-3">
                       <label className="form-label">Amount to Pay</label>
-                      <input
-                        type="number"
-                        className="form-control"
-                        value={installmentAmount}
-                        min={0}
-                        onChange={(e) => setInstallmentAmount(e.target.value)}
-                        required
-                      />
+                      <input type="number" className="form-control" value={installmentAmount} min={0} onChange={(e) => setInstallmentAmount(e.target.value)} required />
                     </div>
                   )}
                 </div>
@@ -520,17 +538,11 @@ const SalesOrderManagement = () => {
                       <small>{formatDate(order.date)}</small>
                     </td>
                     <td>
-                      <span className={`badge ${getStatusBadgeClass(order.status)}`}>
-                        {order.status}
-                      </span>
+                      <span className={`badge ${getStatusBadgeClass(order.status)}`}>{order.status}</span>
                     </td>
                     <td>
                       <div className="dropdown">
-                        <button
-                          type="button"
-                          className="btn p-0 dropdown-toggle hide-arrow"
-                          data-bs-toggle="dropdown"
-                        >
+                        <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                           <i className="bx bx-dots-vertical-rounded"></i>
                         </button>
                         <div className="dropdown-menu">
@@ -546,7 +558,7 @@ const SalesOrderManagement = () => {
                             <i className="bx bx-edit me-2"></i>
                             Edit
                           </button>
-                          {order.status === 'Confirmed' && (
+                          {order.status === "Confirmed" && (
                             <button className="dropdown-item" onClick={() => handleDeliverClick(order)}>
                               <i className="bx bx-car me-2"></i>
                               Deliver
@@ -615,9 +627,7 @@ const SalesOrderManagement = () => {
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Status</label>
                     <p>
-                      <span className={`badge ${getStatusBadgeClass(selectedOrder.status)}`}>
-                        {selectedOrder.status}
-                      </span>
+                      <span className={`badge ${getStatusBadgeClass(selectedOrder.status)}`}>{selectedOrder.status}</span>
                     </p>
                   </div>
                   <div className="col-md-6">
@@ -736,22 +746,11 @@ const SalesOrderManagement = () => {
                     </div>
                     <div className="col-md-6">
                       <label className="form-label">Order Date *</label>
-                      <input
-                        type="datetime-local"
-                        className="form-control"
-                        value={formData.date}
-                        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                        required
-                      />
+                      <input type="datetime-local" className="form-control" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} required />
                     </div>
                     <div className="col-md-12">
                       <label className="form-label">Status *</label>
-                      <select
-                        className="form-select"
-                        value={formData.status}
-                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                        required
-                      >
+                      <select className="form-select" value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} required>
                         <option value="Pending">Pending</option>
                         <option value="Confirmed">Confirmed</option>
                         <option value="Completed">Completed</option>
@@ -792,72 +791,31 @@ const SalesOrderManagement = () => {
                   <div className="row g-3">
                     <div className="col-md-6">
                       <label className="form-label">Quotation ID *</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={formData.quotationId}
-                        onChange={(e) => setFormData({ ...formData, quotationId: e.target.value })}
-                        required
-                      />
+                      <input type="text" className="form-control" value={formData.quotationId} onChange={(e) => setFormData({ ...formData, quotationId: e.target.value })} required />
                     </div>
                     <div className="col-md-6">
                       <label className="form-label">Dealer ID *</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={formData.dealerId}
-                        onChange={(e) => setFormData({ ...formData, dealerId: e.target.value })}
-                        required
-                      />
+                      <input type="text" className="form-control" value={formData.dealerId} onChange={(e) => setFormData({ ...formData, dealerId: e.target.value })} required />
                     </div>
                     <div className="col-md-6">
                       <label className="form-label">User ID *</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={formData.userId}
-                        onChange={(e) => setFormData({ ...formData, userId: e.target.value })}
-                        required
-                      />
+                      <input type="text" className="form-control" value={formData.userId} onChange={(e) => setFormData({ ...formData, userId: e.target.value })} required />
                     </div>
                     <div className="col-md-6">
                       <label className="form-label">Customer ID *</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={formData.customerId}
-                        onChange={(e) => setFormData({ ...formData, customerId: e.target.value })}
-                        required
-                      />
+                      <input type="text" className="form-control" value={formData.customerId} onChange={(e) => setFormData({ ...formData, customerId: e.target.value })} required />
                     </div>
                     <div className="col-md-6">
                       <label className="form-label">Vehicle ID *</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={formData.vehicleId}
-                        onChange={(e) => setFormData({ ...formData, vehicleId: e.target.value })}
-                        required
-                      />
+                      <input type="text" className="form-control" value={formData.vehicleId} onChange={(e) => setFormData({ ...formData, vehicleId: e.target.value })} required />
                     </div>
                     <div className="col-md-6">
                       <label className="form-label">Order Date *</label>
-                      <input
-                        type="datetime-local"
-                        className="form-control"
-                        value={formData.date}
-                        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                        required
-                      />
+                      <input type="datetime-local" className="form-control" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} required />
                     </div>
                     <div className="col-md-12">
                       <label className="form-label">Status *</label>
-                      <select
-                        className="form-select"
-                        value={formData.status}
-                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                        required
-                      >
+                      <select className="form-select" value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} required>
                         <option value="Pending">Pending</option>
                         <option value="Confirmed">Confirmed</option>
                         <option value="Completed">Completed</option>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { getAllFeedbacks, getFeedbackById, updateFeedback, deleteFeedback } from "../../services/feebackService";
+import { deleteFeedback, getAllFeedbacks, getFeedbackById, updateFeedback } from "../../services/feebackService";
+import { decodeJwt } from "../../utils/jwt";
 
 const FeedbackManagement = () => {
   const [feedbacks, setFeedbacks] = useState([]);
@@ -21,23 +22,73 @@ const FeedbackManagement = () => {
   const [statusFilter, setStatusFilter] = useState("");
 
   useEffect(() => {
-    loadFeedbacks();
-  }, [currentPage, searchTerm, statusFilter]);
-
-  const loadFeedbacks = async () => {
-    try {
+    const fetchFeedbacks = async () => {
       setLoading(true);
       setError(null);
+      try {
+        // Get dealerId from JWT
+        const token = localStorage.getItem("evdms_auth_token");
+        let dealerId;
+        if (token) {
+          const payload = decodeJwt(token);
+          dealerId = payload?.dealerId;
+        }
+        const params = {
+          page: currentPage,
+          pageSize: pageSize,
+          search: searchTerm,
+        };
+        // Always filter by dealerId
+        if (dealerId) {
+          params.filters = JSON.stringify({ dealerId });
+        }
+        // Attach status filter if provided
+        if (statusFilter) {
+          const extraFilter = { status: statusFilter };
+          params.filters = params.filters ? JSON.stringify({ ...JSON.parse(params.filters), ...extraFilter }) : JSON.stringify(extraFilter);
+        }
+        const response = await getAllFeedbacks(params);
+        if (response?.data) {
+          setFeedbacks(response.data.items || []);
+          setTotalResults(response.data.totalResults || 0);
+          setTotalPages(Math.ceil((response.data.totalResults || 0) / pageSize));
+        }
+      } catch (err) {
+        console.error("Error loading feedbacks:", err);
+        setError("Failed to load feedbacks. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFeedbacks();
+  }, [currentPage, searchTerm, statusFilter, pageSize]);
 
+  const loadFeedbacks = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Get dealerId from JWT
+      const token = localStorage.getItem("evdms_auth_token");
+      let dealerId;
+      if (token) {
+        const payload = decodeJwt(token);
+        dealerId = payload?.dealerId;
+      }
       const params = {
         page: currentPage,
         pageSize: pageSize,
         search: searchTerm,
-        filters: statusFilter ? `status:${statusFilter}` : "",
       };
-
+      // Always filter by dealerId
+      if (dealerId) {
+        params.filters = JSON.stringify({ dealerId });
+      }
+      // Attach status filter if provided
+      if (statusFilter) {
+        const extraFilter = { status: statusFilter };
+        params.filters = params.filters ? JSON.stringify({ ...JSON.parse(params.filters), ...extraFilter }) : JSON.stringify(extraFilter);
+      }
       const response = await getAllFeedbacks(params);
-      
       if (response?.data) {
         setFeedbacks(response.data.items || []);
         setTotalResults(response.data.totalResults || 0);
@@ -73,12 +124,12 @@ const FeedbackManagement = () => {
         content: selectedFeedback.content,
         status: newStatus,
       };
-      
+
       await updateFeedback(selectedFeedback.id, updatedFeedback);
       setShowDetailModal(false);
       setSelectedFeedback(null);
       loadFeedbacks();
-      
+
       // Show success message
       const alert = document.createElement("div");
       alert.className = "alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3";
@@ -107,7 +158,7 @@ const FeedbackManagement = () => {
       setShowDeleteModal(false);
       setFeedbackToDelete(null);
       loadFeedbacks();
-      
+
       // Show success message
       const alert = document.createElement("div");
       alert.className = "alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3";
@@ -249,27 +300,17 @@ const FeedbackManagement = () => {
                       <small className="text-muted">{feedback.customerId.substring(0, 8)}...</small>
                     </td>
                     <td>
-                      <div style={{ maxWidth: "300px" }}>
-                        {feedback.content.length > 50
-                          ? `${feedback.content.substring(0, 50)}...`
-                          : feedback.content}
-                      </div>
+                      <div style={{ maxWidth: "300px" }}>{feedback.content.length > 50 ? `${feedback.content.substring(0, 50)}...` : feedback.content}</div>
                     </td>
                     <td>
-                      <span className={`badge ${getStatusBadgeClass(feedback.status)}`}>
-                        {feedback.status}
-                      </span>
+                      <span className={`badge ${getStatusBadgeClass(feedback.status)}`}>{feedback.status}</span>
                     </td>
                     <td>
                       <small className="text-muted">{formatDate(feedback.createdAt)}</small>
                     </td>
                     <td>
                       <div className="dropdown">
-                        <button
-                          type="button"
-                          className="btn p-0 dropdown-toggle hide-arrow"
-                          data-bs-toggle="dropdown"
-                        >
+                        <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                           <i className="bx bx-dots-vertical-rounded"></i>
                         </button>
                         <div className="dropdown-menu">
@@ -348,16 +389,12 @@ const FeedbackManagement = () => {
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Current Status</label>
                     <p>
-                      <span className={`badge ${getStatusBadgeClass(selectedFeedback.status)}`}>
-                        {selectedFeedback.status}
-                      </span>
+                      <span className={`badge ${getStatusBadgeClass(selectedFeedback.status)}`}>{selectedFeedback.status}</span>
                     </p>
                   </div>
                   <div className="col-12">
                     <label className="form-label fw-semibold">Content</label>
-                    <div className="alert alert-secondary mb-0">
-                      {selectedFeedback.content}
-                    </div>
+                    <div className="alert alert-secondary mb-0">{selectedFeedback.content}</div>
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Created At</label>
