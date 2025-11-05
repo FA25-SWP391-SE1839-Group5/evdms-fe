@@ -26,6 +26,7 @@ const DealerSidebar = ({ currentPage, onNavigate }) => {
       { id: "performance", label: "Staff Performance", icon: "bx-line-chart", page: "dealer-performance" },
       { id: "orders", label: "Dealer Orders", icon: "bx-package", page: "dealer-orders" },
       { id: "payments", label: "Dealer Payments", icon: "bx-credit-card", page: "dealer-payments" },
+      { id: "promotions", label: "Promotions", icon: "bx-gift", page: "dealer-promotions" },
     ];
   };
 

@@ -2,6 +2,7 @@ import DealerOrdersPage from "../components/dealer-mananger-dashboard/dealer-ord
 import DealerPaymentsPage from "../components/dealer-mananger-dashboard/dealer-payments/DealerPaymentsPage";
 import StaffManagement from "../components/dealer-mananger-dashboard/staff-management/StaffManagement";
 import StaffPerformancePage from "../components/dealer-mananger-dashboard/staff-performance/StaffPerformancePage";
+import PromotionManagement from "../components/dealer-mananger-dashboard/PromotionManagement";
 
 const DealerManagerDashboard = ({ currentPage }) => {
   // Simple Dashboard Overview (Can be expanded later)
@@ -32,6 +33,8 @@ const DealerManagerDashboard = ({ currentPage }) => {
         return <DealerOrdersPage />;
       case "dealer-payments":
         return <DealerPaymentsPage />;
+      case "dealer-promotions":
+        return <PromotionManagement />;
       case "dealer-dashboard":
       default:
         return renderDashboardOverview(); // Default to overview

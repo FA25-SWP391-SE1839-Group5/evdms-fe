@@ -579,9 +579,11 @@ export const deletePayment = async (id) => {
 // ============================================
 // PROMOTIONS
 // ============================================
-export const getAllPromotions = async () => {
+export const getAllPromotions = async (params = {}) => {
   try {
-    const response = await api.get('/promotions');
+    const response = await api.get('/promotions', {
+      params: sanitizeParams(params)
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching promotions:', error);
