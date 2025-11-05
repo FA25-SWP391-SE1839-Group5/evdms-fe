@@ -17,7 +17,7 @@ const QuotationManagement = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState(null);
   // API sample: { customerId, variantId, color }
-  const [createForm, setCreateForm] = useState({ customerId: "", variantId: "", color: "", totalAmount: "", status: "Draft" });
+  const [createForm, setCreateForm] = useState({ customerId: "", variantId: "", color: "", totalAmount: "" });
   const [customers, setCustomers] = useState([]);
   const [variants, setVariants] = useState([]);
 
@@ -263,7 +263,7 @@ const QuotationManagement = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      // Build DTO: dealerId, userId, customerId, variantId, color, totalAmount, status
+      // Build DTO: dealerId, userId, customerId, variantId, color, totalAmount
       const currentUser = getCurrentUser();
       const token = localStorage.getItem("evdms_auth_token");
       const decoded = decodeJwt(token);
@@ -277,12 +277,11 @@ const QuotationManagement = () => {
         variantId: createForm.variantId,
         color: createForm.color,
         totalAmount: Number(createForm.totalAmount) || 0,
-        status: createForm.status || "Draft",
       };
 
       await createQuotation(dto);
       setShowCreateModal(false);
-      setCreateForm({ customerId: "", variantId: "", color: "", totalAmount: "", status: "Draft" });
+      setCreateForm({ customerId: "", variantId: "", color: "", totalAmount: "" });
       loadQuotations();
       const alert = document.createElement("div");
       alert.className = "alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3";
