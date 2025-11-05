@@ -669,7 +669,6 @@ const QuotationManagement = () => {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Quotation ID</th>
                   <th>Customer</th>
                   <th>Variant</th>
                   <th>Color</th>
@@ -683,9 +682,6 @@ const QuotationManagement = () => {
                   const id = q.id || q._id || q.quotationId || q.quoteId;
                   return (
                     <tr key={id}>
-                      <td>
-                        <small className="text-muted">{String(id)?.substring(0, 8)}...</small>
-                      </td>
                       <td>
                         <small className="text-muted">{getCustomerName(q.customerId)}</small>
                       </td>

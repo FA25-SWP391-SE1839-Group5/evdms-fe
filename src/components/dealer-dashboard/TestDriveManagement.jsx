@@ -308,8 +308,8 @@ const TestDriveManagement = () => {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Customer ID</th>
-                  <th>Vehicle ID</th>
+                  <th>Customer</th>
+                  <th>VIN</th>
                   <th>Scheduled At</th>
                   <th>Status</th>
                   <th>Actions</th>
@@ -319,10 +319,10 @@ const TestDriveManagement = () => {
                 {testDrives.map((testDrive) => (
                   <tr key={testDrive.id}>
                     <td>
-                      <small className="text-muted">{testDrive.customerId.substring(0, 8)}...</small>
+                      <small className="text-muted">{testDrive.customerFullName || testDrive.customerId}</small>
                     </td>
                     <td>
-                      <small className="text-muted">{testDrive.vehicleId.substring(0, 8)}...</small>
+                      <small className="text-muted">{testDrive.vehicleVin || testDrive.vehicleId}</small>
                     </td>
                     <td>
                       <small>{formatDateTime(testDrive.scheduledAt)}</small>
