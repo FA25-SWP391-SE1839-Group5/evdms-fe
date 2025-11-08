@@ -367,14 +367,16 @@ export const getContractTrends = async () => {
 // ============================================
 // SALES ORDERS
 // ============================================
-export const getAllOrders = async () => {
-  try {
-    const response = await api.get('/sales-orders');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching orders:', error);
-    throw error;
-  }
+export const getAllOrders = async (params = {}) => {
+    try {
+        const response = await api.get('/sales-orders', {
+            params: sanitizeParams(params)
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching sales orders:', error);
+        throw error;
+    }
 };
 
 export const getOrderById = async (id) => {
@@ -634,30 +636,14 @@ export const deletePromotion = async (id) => {
 // ============================================
 // USERS
 // ============================================
-export const getAllUsers = async () => {
-  console.log('📡 API Call: GET /api/users');
-  const response = await api.get('/users');
-  console.log('📥 Raw Response:', response.data);
-
-  const resData = response.data;
-  // 👉 Lấy mảng users từ data.items
-  const users = resData?.data?.items || [];
-
-  return {
-    success: resData.success ?? true,
-    data: users,
-    message: resData.message ?? null
-  };
-};
-
-export const getUserById = async (id) => {
-  try {
-    console.log(`📡 API Call: GET /api/users/${id}`);
-    const response = await api.get(`/users/${id}`);
-    console.log('📥 Response:', response.data);
-    return response.data;
+export const getAllUsers = async (params = {}) => {
+    try {
+        const response = await api.get('/users', {
+            params: sanitizeParams(params)
+        });
+        return response.data;   
   } catch (error) {
-    console.error(`❌ getUserById(${id}) error:`, error.response?.data || error.message);
+    console.error('Error fetching users:', error);
     throw error;
   }
 };
