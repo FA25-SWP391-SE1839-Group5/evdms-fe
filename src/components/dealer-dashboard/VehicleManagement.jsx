@@ -22,22 +22,37 @@ const VehicleManagement = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [vehicleToDelete, setVehicleToDelete] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editVehicle, setEditVehicle] = useState(null);
+  const [editType, setEditType] = useState("");
+  const [editStatus, setEditStatus] = useState("");
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [filterBy, setFilterBy] = useState("");
-  const [filterValue, setFilterValue] = useState("");
   const [totalResults, setTotalResults] = useState(0);
 
   // Filter states
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [colorFilter, setColorFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 350);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
 
   useEffect(() => {
     loadVehicles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, pageSize, searchTerm, filterBy, filterValue]);
+  }, [currentPage, pageSize, debouncedSearchTerm, sortBy, sortOrder, colorFilter, typeFilter, statusFilter]);
 
   const loadVehicles = async () => {
     try {
@@ -56,19 +71,18 @@ const VehicleManagement = () => {
         console.debug("Error decoding JWT for dealerId:", e);
       }
 
+      const filters = { dealerId };
+      if (colorFilter) filters.color = colorFilter;
+      if (typeFilter) filters.type = typeFilter;
+      if (statusFilter) filters.status = statusFilter;
       const params = {
         page: currentPage,
         pageSize,
-        search: searchTerm || undefined,
+        search: debouncedSearchTerm || undefined,
+        sortBy: sortBy || undefined,
+        sortOrder: sortOrder || undefined,
+        filters: JSON.stringify(filters),
       };
-
-      // Always filter by dealerId if present
-      if (dealerId) {
-        params.filters = JSON.stringify({ ...(filterBy && filterValue ? { [filterBy]: filterValue } : {}), dealerId });
-      } else if (filterBy && filterValue) {
-        params.filters = JSON.stringify({ [filterBy]: filterValue });
-      }
-
       console.debug("Vehicle list params:", params);
       const resp = await getAllVehicles(params);
 
@@ -252,22 +266,22 @@ const VehicleManagement = () => {
     }
   };
 
-  const [editType, setEditType] = useState("");
+  const handleEditClick = (vehicle) => {
+    setEditVehicle(vehicle);
+    setEditType(vehicle.type || "");
+    setEditStatus(vehicle.status || "");
+    setShowEditModal(true);
+  };
 
-  useEffect(() => {
-    if (showDetailModal && selectedVehicle) {
-      setEditType(selectedVehicle.type || "");
-    }
-  }, [showDetailModal, selectedVehicle]);
-
-  const handleUpdateVehicle = async (fields) => {
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
     try {
-      await patchVehicle(selectedVehicle.id, fields);
-      setShowDetailModal(false);
-      setSelectedVehicle(null);
+      await patchVehicle(editVehicle.id, { type: editType, status: editStatus });
+      setShowEditModal(false);
+      setEditVehicle(null);
       setEditType("");
+      setEditStatus("");
       loadVehicles();
-
       // Show success message
       const alert = document.createElement("div");
       alert.className = "alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3";
@@ -312,6 +326,16 @@ const VehicleManagement = () => {
       console.error("Error deleting vehicle:", err);
       setError("Failed to delete vehicle.");
     }
+  };
+
+  const toggleSort = (field) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+    setCurrentPage(1);
   };
 
   const getStatusBadgeClass = (status) => {
@@ -409,7 +433,7 @@ const VehicleManagement = () => {
       <div className="card mb-3">
         <div className="card-body">
           <div className="row g-2 align-items-center">
-            <div className="col-md-4">
+            <div className="col-md-6 mb-2">
               <input
                 type="text"
                 className="form-control"
@@ -421,29 +445,7 @@ const VehicleManagement = () => {
                 }}
               />
             </div>
-            <div className="col-md-2">
-              <select className="form-select" value={filterBy} onChange={(e) => setFilterBy(e.target.value)}>
-                <option value="">Filter by</option>
-                <option value="variantId">Variant ID</option>
-                <option value="dealerId">Dealer ID</option>
-                <option value="vin">VIN</option>
-                <option value="color">Color</option>
-                <option value="type">Type</option>
-                <option value="status">Status</option>
-              </select>
-            </div>
-            <div className="col-md-3">
-              <input
-                className="form-control"
-                placeholder="Filter value"
-                value={filterValue}
-                onChange={(e) => {
-                  setFilterValue(e.target.value);
-                  setCurrentPage(1);
-                }}
-              />
-            </div>
-            <div className="col-md-1">
+            <div className="col-md-2 mb-2">
               <select
                 className="form-select"
                 value={pageSize}
@@ -452,24 +454,69 @@ const VehicleManagement = () => {
                   setCurrentPage(1);
                 }}
               >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
+                <option value={5}>5 per page</option>
+                <option value={10}>10 per page</option>
+                <option value={25}>25 per page</option>
+                <option value={50}>50 per page</option>
               </select>
             </div>
-            <div className="col-md-2 text-end">
-              <button
-                className="btn btn-outline-secondary"
-                onClick={() => {
-                  setSearchTerm("");
-                  setFilterBy("");
-                  setFilterValue("");
+          </div>
+          <div className="row g-2 align-items-center mb-2">
+            <div className="col-md-2">
+              <select
+                className="form-select"
+                value={colorFilter}
+                onChange={(e) => {
+                  setColorFilter(e.target.value);
                   setCurrentPage(1);
                 }}
               >
-                Reset
-              </button>
+                <option value="">All Colors</option>
+                <option value="Black">Black</option>
+                <option value="Blue">Blue</option>
+                <option value="Gray">Gray</option>
+                <option value="Green">Green</option>
+                <option value="Red">Red</option>
+                <option value="Silver">Silver</option>
+                <option value="White">White</option>
+                <option value="Yellow">Yellow</option>
+              </select>
+            </div>
+            <div className="col-md-2">
+              <select
+                className="form-select"
+                value={typeFilter}
+                onChange={(e) => {
+                  setTypeFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+              >
+                <option value="">All Types</option>
+                <option value="Sale">Sale</option>
+                <option value="Demo">Demo</option>
+                <option value="Display">Display</option>
+              </select>
+            </div>
+            <div className="col-md-2">
+              <select
+                className="form-select"
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+              >
+                <option value="">All Statuses</option>
+                <option value="Available">Available</option>
+                <option
+                  value="Sold"
+                  disabled={typeFilter === "Demo" || typeFilter === "Display"}
+                  style={typeFilter === "Demo" || typeFilter === "Display" ? { color: "#aaa", backgroundColor: "#f8f9fa" } : {}}
+                >
+                  Sold
+                </option>
+                <option value="Reserved">Reserved</option>
+              </select>
             </div>
           </div>
         </div>
@@ -508,11 +555,21 @@ const VehicleManagement = () => {
               <thead>
                 <tr>
                   <th style={{ width: 40 }}></th>
-                  <th>VIN</th>
-                  <th>Variant</th>
-                  <th>Color</th>
-                  <th>Type</th>
-                  <th>Status</th>
+                  <th style={{ cursor: "pointer" }} onClick={() => toggleSort("vin")}>
+                    VIN {sortBy === "vin" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
+                  <th style={{ cursor: "pointer" }} onClick={() => toggleSort("variantId")}>
+                    Variant {sortBy === "variantId" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
+                  <th style={{ cursor: "pointer" }} onClick={() => toggleSort("color")}>
+                    Color {sortBy === "color" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
+                  <th style={{ cursor: "pointer" }} onClick={() => toggleSort("type")}>
+                    Type {sortBy === "type" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
+                  <th style={{ cursor: "pointer" }} onClick={() => toggleSort("status")}>
+                    Status {sortBy === "status" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -550,20 +607,16 @@ const VehicleManagement = () => {
                       <span className={`badge ${getStatusBadgeClass(vehicle.status)}`}>{vehicle.status}</span>
                     </td>
                     <td>
-                      <div className="dropdown">
-                        <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                          <i className="bx bx-dots-vertical-rounded"></i>
+                      <div className="d-flex gap-2">
+                        <button className="btn btn-outline-primary btn-sm" title="View Details" onClick={() => handleViewDetail(vehicle)}>
+                          <i className="bx bx-show me-1"></i> View
                         </button>
-                        <div className="dropdown-menu">
-                          <button className="dropdown-item" onClick={() => handleViewDetail(vehicle)}>
-                            <i className="bx bx-show me-2"></i>
-                            View Details
-                          </button>
-                          <button className="dropdown-item text-danger" onClick={() => handleDeleteClick(vehicle)}>
-                            <i className="bx bx-trash me-2"></i>
-                            Delete
-                          </button>
-                        </div>
+                        <button className="btn btn-outline-secondary btn-sm" title="Edit" onClick={() => handleEditClick(vehicle)}>
+                          <i className="bx bx-edit me-1"></i> Edit
+                        </button>
+                        <button className="btn btn-outline-danger btn-sm" title="Delete" onClick={() => handleDeleteClick(vehicle)}>
+                          <i className="bx bx-trash me-1"></i> Delete
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -782,17 +835,7 @@ const VehicleManagement = () => {
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Type</label>
-                    <div className="input-group">
-                      <select className="form-select" value={editType || selectedVehicle.type || ""} onChange={(e) => setEditType(e.target.value)}>
-                        <option value="">Select type...</option>
-                        <option value="Sale">Sale</option>
-                        <option value="Demo">Demo</option>
-                        <option value="Display">Display</option>
-                      </select>
-                      <button type="button" className="btn btn-outline-primary" disabled={!editType || editType === selectedVehicle.type} onClick={() => handleUpdateVehicle({ type: editType })}>
-                        Update Type
-                      </button>
-                    </div>
+                    <p>{selectedVehicle.type ? <span className={`badge ${getTypeBadgeClass(selectedVehicle.type)}`}>{selectedVehicle.type}</span> : <span className="text-muted">-</span>}</p>
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Current Status</label>
@@ -856,35 +899,6 @@ const VehicleManagement = () => {
                     <label className="form-label fw-semibold">Updated At</label>
                     <p className="text-muted">{formatDate(selectedVehicle.updatedAt)}</p>
                   </div>
-                  <div className="col-12">
-                    <label className="form-label fw-semibold">Update Status</label>
-                    <div className="btn-group w-100" role="group">
-                      <button
-                        type="button"
-                        className={`btn ${selectedVehicle.status === "Available" ? "btn-success" : "btn-outline-success"}`}
-                        onClick={() => handleUpdateVehicle({ status: "Available" })}
-                        disabled={selectedVehicle.status === "Available"}
-                      >
-                        Available
-                      </button>
-                      <button
-                        type="button"
-                        className={`btn ${selectedVehicle.status === "Sold" ? "btn-danger" : "btn-outline-danger"}`}
-                        onClick={() => handleUpdateVehicle({ status: "Sold" })}
-                        disabled={selectedVehicle.status === "Sold"}
-                      >
-                        Sold
-                      </button>
-                      <button
-                        type="button"
-                        className={`btn ${selectedVehicle.status === "Reserved" ? "btn-warning" : "btn-outline-warning"}`}
-                        onClick={() => handleUpdateVehicle({ status: "Reserved" })}
-                        disabled={selectedVehicle.status === "Reserved"}
-                      >
-                        Reserved
-                      </button>
-                    </div>
-                  </div>
                 </div>
               </div>
               <div className="modal-footer">
@@ -920,9 +934,9 @@ const VehicleManagement = () => {
               <div className="modal-body">
                 <p>Are you sure you want to delete this vehicle?</p>
                 <div className="alert alert-warning">
-                  <strong>Model:</strong> {vehicleToDelete.model}
+                  <strong>Variant:</strong> {variantNameMap[vehicleToDelete.variantId] || vehicleToDelete.variantId}
                   <br />
-                  <strong>Variant:</strong> {vehicleToDelete.variant}
+                  <strong>VIN:</strong> {vehicleToDelete.vin}
                 </div>
                 <p className="text-danger mb-0">
                   <i className="bx bx-error-circle me-1"></i>
@@ -938,6 +952,59 @@ const VehicleManagement = () => {
                   Delete
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Vehicle Modal */}
+      {showEditModal && editVehicle && (
+        <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <form onSubmit={handleEditSubmit}>
+                <div className="modal-header">
+                  <h5 className="modal-title">
+                    <i className="bx bx-edit me-2"></i>
+                    Edit Vehicle
+                  </h5>
+                  <button type="button" className="btn-close" onClick={() => setShowEditModal(false)}></button>
+                </div>
+                <div className="modal-body">
+                  <div className="mb-3">
+                    <label className="form-label">Type</label>
+                    <select className="form-select" value={editType} onChange={(e) => setEditType(e.target.value)} required>
+                      <option value="">Select type...</option>
+                      <option value="Sale">Sale</option>
+                      <option value="Demo">Demo</option>
+                      <option value="Display">Display</option>
+                    </select>
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">Status</label>
+                    <select className="form-select" value={editStatus} onChange={(e) => setEditStatus(e.target.value)} required>
+                      <option value="Available">Available</option>
+                      <option
+                        value="Sold"
+                        disabled={editType === "Demo" || editType === "Display"}
+                        style={editType === "Demo" || editType === "Display" ? { color: "#aaa", backgroundColor: "#f8f9fa" } : {}}
+                      >
+                        Sold
+                      </option>
+                      <option value="Reserved">Reserved</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowEditModal(false)}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary">
+                    <i className="bx bx-save me-1"></i>
+                    Save Changes
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
