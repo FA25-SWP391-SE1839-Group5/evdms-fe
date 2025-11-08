@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createTestDrive, deleteTestDrive, getAllTestDrives, getTestDriveById, patchTestDrive } from "../../services/testDriveService";
+import { getCustomerById, getDealerById } from "../../services/dashboardService";
 import { decodeJwt } from "../../utils/jwt";
 
 const TestDriveManagement = () => {
@@ -132,8 +133,34 @@ const TestDriveManagement = () => {
   const handleViewDetail = async (testDrive) => {
     try {
       const response = await getTestDriveById(testDrive.id);
-      if (response?.data) {
-        setSelectedTestDrive(response.data);
+      if (response) {
+        const data = response?.data ?? response;
+
+        // fetch customer and dealer names in parallel, but don't block modal if they fail
+        let customerName = null;
+        let dealerName = null;
+        try {
+          const [custResp, dealerResp] = await Promise.all([
+            getCustomerById(data.customerId),
+            getDealerById(data.dealerId),
+          ]);
+          // normalize possible shapes
+          const cust = custResp?.data ?? custResp;
+          const dealer = dealerResp?.data ?? dealerResp;
+          customerName = cust?.fullName || cust?.name || cust?.customerFullName || null;
+          dealerName = dealer?.fullName || dealer?.name || dealer?.dealerName || dealer?.dealerFullName || null;
+        } catch (e) {
+          // ignore lookup errors, we'll fallback to IDs in the UI
+          console.debug('Customer/Dealer lookup failed', e);
+        }
+
+        const enhanced = {
+          ...data,
+          customerFullName: customerName || data.customerFullName || data.customerName || null,
+          dealerName: dealerName || data.dealerName || data.dealerFullName || null,
+        };
+
+        setSelectedTestDrive(enhanced);
         setShowDetailModal(true);
       }
     } catch (err) {
@@ -486,12 +513,12 @@ const TestDriveManagement = () => {
                     </p>
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label fw-semibold">Customer ID</label>
-                    <p className="text-muted">{selectedTestDrive.customerId}</p>
+                    <label className="form-label fw-semibold">Customer Name</label>
+                    <p className="text-muted">{selectedTestDrive.customerFullName || selectedTestDrive.customerName || selectedTestDrive.customerId}</p>
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label fw-semibold">Dealer ID</label>
-                    <p className="text-muted">{selectedTestDrive.dealerId}</p>
+                    <label className="form-label fw-semibold">Dealer Name</label>
+                    <p className="text-muted">{selectedTestDrive.dealerName || selectedTestDrive.dealerFullName || selectedTestDrive.dealerId}</p>
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Vehicle ID</label>

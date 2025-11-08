@@ -227,16 +227,18 @@ const SalesOrderManagement = () => {
 
   const handlePayClick = async (order) => {
     setSelectedOrder(order);
-    setPayMethod("Upfront");
     setInstallmentAmount(0);
     setPaySummary(null);
-    // Fetch payment summary for this order
+    // Fetch payment summary for this order and set initial payment method
     try {
       const resp = await getSalesOrdersSummary(order.id);
       const summaryData = extractSummaryData(resp);
       setPaySummary(summaryData);
+      const alreadyPaid = (summaryData?.paidAmount ?? summaryData?.data?.paidAmount ?? 0) > 0;
+      setPayMethod(alreadyPaid ? "Installment" : "Upfront");
     } catch (e) {
       setPaySummary(null);
+      setPayMethod("Upfront");
     }
     setShowPayModal(true);
   };
@@ -516,7 +518,7 @@ const SalesOrderManagement = () => {
                         min={0}
                         max={
                           paySummary
-                            ? (paySummary.totalAmount ?? paySummary.data?.totalAmount ?? 0) - (paySummary.paidAmount ?? paySummary.data?.paidAmount ?? 0)
+                            ? (paySummary.totalAmount ?? paySummary.data?.totalAmount ?? 0) - (paySummary.paidAmount ?? paySummary.data?.paidAmount ?? 0) + 1
                             : undefined
                         }
                         onChange={(e) => setInstallmentAmount(e.target.value)}
@@ -524,7 +526,7 @@ const SalesOrderManagement = () => {
                       />
                       {paySummary && (
                         <div className="form-text">
-                          Max: {((paySummary.totalAmount ?? paySummary.data?.totalAmount ?? 0) - (paySummary.paidAmount ?? paySummary.data?.paidAmount ?? 0))}
+                          Max: {((paySummary.totalAmount ?? paySummary.data?.totalAmount ?? 0) - (paySummary.paidAmount ?? paySummary.data?.paidAmount ?? 0) + 1 )}
                         </div>
                       )}
                     </div>
@@ -600,34 +602,26 @@ const SalesOrderManagement = () => {
                       <span className={`badge ${getStatusBadgeClass(order.status)}`}>{order.status}</span>
                     </td>
                     <td>
-                      <div className="dropdown">
-                        <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                          <i className="bx bx-dots-vertical-rounded"></i>
+                      <div className="d-flex gap-2 flex-wrap">
+                        <button className="btn btn-sm btn-outline-secondary" title="View Details" onClick={() => handleViewDetail(order)}>
+                          <i className="bx bx-show"></i>
                         </button>
-                        <div className="dropdown-menu">
-                          <button className="dropdown-item" onClick={() => handleViewDetail(order)}>
-                            <i className="bx bx-show me-2"></i>
-                            View Details
+                        {order.status === "Pending" && (
+                          <button className="btn btn-sm btn-outline-primary" title="Pay" onClick={() => handlePayClick(order)}>
+                            <i className="bx bx-credit-card"></i>
                           </button>
-                          <button className="dropdown-item" onClick={() => handlePayClick(order)}>
-                            <i className="bx bx-credit-card me-2"></i>
-                            Pay
+                        )}
+                        <button className="btn btn-sm btn-outline-info" title="Edit" onClick={() => handleEditClick(order)}>
+                          <i className="bx bx-edit"></i>
+                        </button>
+                        {order.status === "Confirmed" && (
+                          <button className="btn btn-sm btn-outline-success" title="Deliver" onClick={() => handleDeliverClick(order)}>
+                            <i className="bx bx-car"></i>
                           </button>
-                          <button className="dropdown-item" onClick={() => handleEditClick(order)}>
-                            <i className="bx bx-edit me-2"></i>
-                            Edit
-                          </button>
-                          {order.status === "Confirmed" && (
-                            <button className="dropdown-item" onClick={() => handleDeliverClick(order)}>
-                              <i className="bx bx-car me-2"></i>
-                              Deliver
-                            </button>
-                          )}
-                          <button className="dropdown-item text-danger" onClick={() => handleDeleteClick(order)}>
-                            <i className="bx bx-trash me-2"></i>
-                            Delete
-                          </button>
-                        </div>
+                        )}
+                        <button className="btn btn-sm btn-outline-danger" title="Delete" onClick={() => handleDeleteClick(order)}>
+                          <i className="bx bx-trash"></i>
+                        </button>
                       </div>
                     </td>
                   </tr>
