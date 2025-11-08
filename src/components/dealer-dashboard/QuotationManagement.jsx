@@ -29,35 +29,47 @@ const QuotationManagement = () => {
 
   // Filters
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterBy, setFilterBy] = useState("");
-  const [filterValue, setFilterValue] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [colorFilter, setColorFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+
+  // Sorting
+  const [sortBy, setSortBy] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 350);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
 
   useEffect(() => {
     const fetchQuotations = async () => {
       setLoading(true);
       setError(null);
       try {
-        // Get dealerId from JWT
+        // Get dealerId and userId from JWT/current user
         const token = localStorage.getItem("evdms_auth_token");
-        let dealerId;
+        let dealerId, userId;
         if (token) {
           const payload = decodeJwt(token);
           dealerId = payload?.dealerId;
+          userId = payload?.sub || payload?.userId;
         }
+        const filters = {};
+        if (dealerId) filters.dealerId = dealerId;
+        if (userId) filters.userId = userId;
+        if (colorFilter) filters.color = colorFilter;
+        if (statusFilter) filters.status = statusFilter;
         const params = {
           page: currentPage,
           pageSize,
-          search: searchTerm || undefined,
+          search: debouncedSearchTerm || undefined,
+          sortBy: sortBy || undefined,
+          sortOrder: sortOrder || undefined,
+          filters: Object.keys(filters).length > 0 ? JSON.stringify(filters) : undefined,
         };
-        // Always filter by dealerId
-        if (dealerId) {
-          params.filters = JSON.stringify({ dealerId });
-        }
-        // Attach additional filter if provided
-        if (filterBy && filterValue) {
-          const extraFilter = { [filterBy]: filterValue };
-          params.filters = params.filters ? JSON.stringify({ ...JSON.parse(params.filters), ...extraFilter }) : JSON.stringify(extraFilter);
-        }
         const response = await getAllQuotations(params);
         let items = [];
         let total = 0;
@@ -101,7 +113,7 @@ const QuotationManagement = () => {
       }
     };
     fetchQuotations();
-  }, [currentPage, searchTerm, filterBy, filterValue, pageSize]);
+  }, [currentPage, debouncedSearchTerm, pageSize, colorFilter, statusFilter, sortBy, sortOrder]);
 
   // Load customers and variants for dropdowns
   useEffect(() => {
@@ -126,27 +138,27 @@ const QuotationManagement = () => {
     setLoading(true);
     setError(null);
     try {
-      // Get dealerId from JWT
+      // Get dealerId and userId from JWT/current user
       const token = localStorage.getItem("evdms_auth_token");
-      let dealerId;
+      let dealerId, userId;
       if (token) {
         const payload = decodeJwt(token);
         dealerId = payload?.dealerId;
+        userId = payload?.sub || payload?.userId;
       }
+      const filters = {};
+      if (dealerId) filters.dealerId = dealerId;
+      if (userId) filters.userId = userId;
+      if (colorFilter) filters.color = colorFilter;
+      if (statusFilter) filters.status = statusFilter;
       const params = {
         page: currentPage,
         pageSize,
-        search: searchTerm || undefined,
+        search: debouncedSearchTerm || undefined,
+        sortBy: sortBy || undefined,
+        sortOrder: sortOrder || undefined,
+        filters: Object.keys(filters).length > 0 ? JSON.stringify(filters) : undefined,
       };
-      // Always filter by dealerId
-      if (dealerId) {
-        params.filters = JSON.stringify({ dealerId });
-      }
-      // Attach additional filter if provided
-      if (filterBy && filterValue) {
-        const extraFilter = { [filterBy]: filterValue };
-        params.filters = params.filters ? JSON.stringify({ ...JSON.parse(params.filters), ...extraFilter }) : JSON.stringify(extraFilter);
-      }
       const response = await getAllQuotations(params);
       let items = [];
       let total = 0;
@@ -423,7 +435,6 @@ const QuotationManagement = () => {
         } catch (orderErr) {
           console.error("Error creating order from quotation:", orderErr);
           // If error message matches, revert status to Sent
-          const msg = orderErr?.response?.data?.message || orderErr?.message || "";
           const failAlert = document.createElement("div");
           failAlert.className = "alert alert-warning alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3";
           failAlert.style.zIndex = "9999";
@@ -472,6 +483,16 @@ const QuotationManagement = () => {
     });
   };
 
+  const toggleSort = (field) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+    setCurrentPage(1);
+  };
+
   return (
     <div className="container-xxl flex-grow-1 container-p-y">
       {/* Header */}
@@ -512,35 +533,43 @@ const QuotationManagement = () => {
                 }}
               />
             </div>
-            <div className="col-md-3">
-              <label className="form-label">Filter by</label>
+            <div className="col-md-2">
+              <label className="form-label">Color</label>
               <select
                 className="form-select"
-                value={filterBy}
+                value={colorFilter}
                 onChange={(e) => {
-                  setFilterBy(e.target.value);
+                  setColorFilter(e.target.value);
                   setCurrentPage(1);
                 }}
               >
-                <option value="">None</option>
-                <option value="variantId">Variant ID</option>
-                <option value="status">Status</option>
-                <option value="color">Color</option>
-                <option value="customerId">Customer ID</option>
+                <option value="">All Colors</option>
+                <option value="Black">Black</option>
+                <option value="Blue">Blue</option>
+                <option value="Gray">Gray</option>
+                <option value="Green">Green</option>
+                <option value="Red">Red</option>
+                <option value="Silver">Silver</option>
+                <option value="White">White</option>
+                <option value="Yellow">Yellow</option>
               </select>
             </div>
-            <div className="col-md-3">
-              <label className="form-label">Filter value</label>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Value"
-                value={filterValue}
+            <div className="col-md-2">
+              <label className="form-label">Status</label>
+              <select
+                className="form-select"
+                value={statusFilter}
                 onChange={(e) => {
-                  setFilterValue(e.target.value);
+                  setStatusFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-              />
+              >
+                <option value="">All Statuses</option>
+                <option value="Draft">Draft</option>
+                <option value="Sent">Sent</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+              </select>
             </div>
             <div className="col-md-2">
               <label className="form-label">Page size</label>
@@ -564,8 +593,8 @@ const QuotationManagement = () => {
                 className="btn btn-outline-secondary me-2"
                 onClick={() => {
                   setSearchTerm("");
-                  setFilterBy("");
-                  setFilterValue("");
+                  setColorFilter("");
+                  setStatusFilter("");
                   setPageSize(10);
                   setCurrentPage(1);
                 }}
@@ -666,11 +695,21 @@ const QuotationManagement = () => {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Customer</th>
-                  <th>Variant</th>
-                  <th>Color</th>
-                  <th>Status</th>
-                  <th>Created At</th>
+                  <th style={{ cursor: "pointer" }} onClick={() => toggleSort("customerId")}>
+                    Customer {sortBy === "customerId" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
+                  <th style={{ cursor: "pointer" }} onClick={() => toggleSort("variantId")}>
+                    Variant {sortBy === "variantId" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
+                  <th style={{ cursor: "pointer" }} onClick={() => toggleSort("color")}>
+                    Color {sortBy === "color" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
+                  <th style={{ cursor: "pointer" }} onClick={() => toggleSort("status")}>
+                    Status {sortBy === "status" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
+                  <th style={{ cursor: "pointer" }} onClick={() => toggleSort("createdAt")}>
+                    Created At {sortBy === "createdAt" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -691,20 +730,13 @@ const QuotationManagement = () => {
                         <small className="text-muted">{formatDate(q.createdAt)}</small>
                       </td>
                       <td>
-                        <div className="dropdown">
-                          <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                            <i className="bx bx-dots-vertical-rounded"></i>
+                        <div className="d-flex gap-2">
+                          <button className="btn btn-outline-info btn-sm" onClick={() => handleViewDetail(q)}>
+                            <i className="bx bx-show me-1"></i> View Details
                           </button>
-                          <div className="dropdown-menu">
-                            <button className="dropdown-item" onClick={() => handleViewDetail(q)}>
-                              <i className="bx bx-show me-2"></i>
-                              View Details
-                            </button>
-                            <button className="dropdown-item text-danger" onClick={() => handleDeleteClick(q)}>
-                              <i className="bx bx-trash me-2"></i>
-                              Delete
-                            </button>
-                          </div>
+                          <button className="btn btn-outline-danger btn-sm" onClick={() => handleDeleteClick(q)}>
+                            <i className="bx bx-trash me-1"></i> Delete
+                          </button>
                         </div>
                       </td>
                     </tr>
