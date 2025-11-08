@@ -10,23 +10,28 @@ const FeedbackManagement = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [feedbackToDelete, setFeedbackToDelete] = useState(null);
-
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [pageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(10);
   const [totalResults, setTotalResults] = useState(0);
-
-  // Filter states
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 350);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
 
   useEffect(() => {
     const fetchFeedbacks = async () => {
       setLoading(true);
       setError(null);
       try {
-        // Get dealerId from JWT
         const token = localStorage.getItem("evdms_auth_token");
         let dealerId;
         if (token) {
@@ -36,13 +41,13 @@ const FeedbackManagement = () => {
         const params = {
           page: currentPage,
           pageSize: pageSize,
-          search: searchTerm,
+          search: debouncedSearchTerm,
+          sortBy: sortBy || undefined,
+          sortOrder: sortOrder || undefined,
         };
-        // Always filter by dealerId
         if (dealerId) {
           params.filters = JSON.stringify({ dealerId });
         }
-        // Attach status filter if provided
         if (statusFilter) {
           const extraFilter = { status: statusFilter };
           params.filters = params.filters ? JSON.stringify({ ...JSON.parse(params.filters), ...extraFilter }) : JSON.stringify(extraFilter);
@@ -61,13 +66,12 @@ const FeedbackManagement = () => {
       }
     };
     fetchFeedbacks();
-  }, [currentPage, searchTerm, statusFilter, pageSize]);
+  }, [currentPage, debouncedSearchTerm, statusFilter, pageSize, sortBy, sortOrder]);
 
   const loadFeedbacks = async () => {
     setLoading(true);
     setError(null);
     try {
-      // Get dealerId from JWT
       const token = localStorage.getItem("evdms_auth_token");
       let dealerId;
       if (token) {
@@ -77,13 +81,13 @@ const FeedbackManagement = () => {
       const params = {
         page: currentPage,
         pageSize: pageSize,
-        search: searchTerm,
+        search: debouncedSearchTerm,
+        sortBy: sortBy || undefined,
+        sortOrder: sortOrder || undefined,
       };
-      // Always filter by dealerId
       if (dealerId) {
         params.filters = JSON.stringify({ dealerId });
       }
-      // Attach status filter if provided
       if (statusFilter) {
         const extraFilter = { status: statusFilter };
         params.filters = params.filters ? JSON.stringify({ ...JSON.parse(params.filters), ...extraFilter }) : JSON.stringify(extraFilter);
@@ -117,7 +121,6 @@ const FeedbackManagement = () => {
 
   const handleUpdateStatus = async (newStatus) => {
     try {
-      // PUT requires full feedback object
       const updatedFeedback = {
         customerId: selectedFeedback.customerId,
         dealerId: selectedFeedback.dealerId,
@@ -130,7 +133,6 @@ const FeedbackManagement = () => {
       setSelectedFeedback(null);
       loadFeedbacks();
 
-      // Show success message
       const alert = document.createElement("div");
       alert.className = "alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3";
       alert.style.zIndex = "9999";
@@ -159,7 +161,6 @@ const FeedbackManagement = () => {
       setFeedbackToDelete(null);
       loadFeedbacks();
 
-      // Show success message
       const alert = document.createElement("div");
       alert.className = "alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3";
       alert.style.zIndex = "9999";
@@ -200,6 +201,16 @@ const FeedbackManagement = () => {
     });
   };
 
+  const toggleSort = (field) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+    setCurrentPage(1);
+  };
+
   return (
     <div className="container-xxl flex-grow-1 container-p-y">
       {/* Header */}
@@ -221,7 +232,7 @@ const FeedbackManagement = () => {
       <div className="card mb-4">
         <div className="card-body">
           <div className="row g-3">
-            <div className="col-md-6">
+            <div className="col-md-4">
               <label className="form-label">Search</label>
               <input
                 type="text"
@@ -234,7 +245,7 @@ const FeedbackManagement = () => {
                 }}
               />
             </div>
-            <div className="col-md-6">
+            <div className="col-md-2">
               <label className="form-label">Status Filter</label>
               <select
                 className="form-select"
@@ -249,6 +260,36 @@ const FeedbackManagement = () => {
                 <option value="Reviewed">Reviewed</option>
                 <option value="Resolved">Resolved</option>
               </select>
+            </div>
+            <div className="col-md-2">
+              <label className="form-label">Page size</label>
+              <select
+                className="form-select"
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+              >
+                {[5, 10, 20, 50, 100].map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="col-12 mt-2 d-flex justify-content-end">
+              <button
+                className="btn btn-outline-secondary me-2"
+                onClick={() => {
+                  setSearchTerm("");
+                  setStatusFilter("");
+                  setPageSize(10);
+                  setCurrentPage(1);
+                }}
+              >
+                Reset
+              </button>
             </div>
           </div>
         </div>
@@ -286,10 +327,18 @@ const FeedbackManagement = () => {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Customer</th>
-                  <th>Content</th>
-                  <th>Status</th>
-                  <th>Created At</th>
+                  <th style={{ cursor: "pointer" }} onClick={() => toggleSort("customerFullName")}>
+                    Customer {sortBy === "customerFullName" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
+                  <th style={{ cursor: "pointer" }} onClick={() => toggleSort("content")}>
+                    Content {sortBy === "content" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
+                  <th style={{ cursor: "pointer" }} onClick={() => toggleSort("status")}>
+                    Status {sortBy === "status" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
+                  <th style={{ cursor: "pointer" }} onClick={() => toggleSort("createdAt")}>
+                    Created At {sortBy === "createdAt" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -309,20 +358,13 @@ const FeedbackManagement = () => {
                       <small className="text-muted">{formatDate(feedback.createdAt)}</small>
                     </td>
                     <td>
-                      <div className="dropdown">
-                        <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                          <i className="bx bx-dots-vertical-rounded"></i>
+                      <div className="d-flex gap-2">
+                        <button className="btn btn-outline-info btn-sm" onClick={() => handleViewDetail(feedback)}>
+                          <i className="bx bx-show me-1"></i> View Details
                         </button>
-                        <div className="dropdown-menu">
-                          <button className="dropdown-item" onClick={() => handleViewDetail(feedback)}>
-                            <i className="bx bx-show me-2"></i>
-                            View Details
-                          </button>
-                          <button className="dropdown-item text-danger" onClick={() => handleDeleteClick(feedback)}>
-                            <i className="bx bx-trash me-2"></i>
-                            Delete
-                          </button>
-                        </div>
+                        <button className="btn btn-outline-danger btn-sm" onClick={() => handleDeleteClick(feedback)}>
+                          <i className="bx bx-trash me-1"></i> Delete
+                        </button>
                       </div>
                     </td>
                   </tr>
