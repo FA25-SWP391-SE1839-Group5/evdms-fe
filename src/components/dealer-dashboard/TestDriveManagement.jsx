@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { createTestDrive, deleteTestDrive, getAllTestDrives, getTestDriveById, patchTestDrive } from "../../services/testDriveService";
-import { getCustomerById, getDealerById } from "../../services/dashboardService";
 import { decodeJwt } from "../../utils/jwt";
 
 const TestDriveManagement = () => {
@@ -14,11 +13,13 @@ const TestDriveManagement = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [testDriveToDelete, setTestDriveToDelete] = useState(null);
 
-  // Pagination state
+  // Pagination and sorting state
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [pageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(10);
   const [totalResults, setTotalResults] = useState(0);
+  const [sortBy, setSortBy] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
 
   // Filter states
   const [searchTerm, setSearchTerm] = useState("");
@@ -89,7 +90,7 @@ const TestDriveManagement = () => {
   useEffect(() => {
     loadTestDrives();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, searchTerm, statusFilter]);
+  }, [currentPage, searchTerm, statusFilter, pageSize, sortBy, sortOrder]);
 
   const loadTestDrives = async () => {
     setLoading(true);
@@ -106,6 +107,8 @@ const TestDriveManagement = () => {
         page: currentPage,
         pageSize: pageSize,
         search: searchTerm,
+        sortBy: sortBy || undefined,
+        sortOrder: sortOrder || undefined,
       };
       // Always filter by dealerId
       if (dealerId) {
@@ -129,38 +132,24 @@ const TestDriveManagement = () => {
       setLoading(false);
     }
   };
+  // Table column sort handler
+  const toggleSort = (field) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+    setCurrentPage(1);
+  };
 
   const handleViewDetail = async (testDrive) => {
     try {
       const response = await getTestDriveById(testDrive.id);
       if (response) {
+        // Use only the API response, which already contains all necessary info
         const data = response?.data ?? response;
-
-        // fetch customer and dealer names in parallel, but don't block modal if they fail
-        let customerName = null;
-        let dealerName = null;
-        try {
-          const [custResp, dealerResp] = await Promise.all([
-            getCustomerById(data.customerId),
-            getDealerById(data.dealerId),
-          ]);
-          // normalize possible shapes
-          const cust = custResp?.data ?? custResp;
-          const dealer = dealerResp?.data ?? dealerResp;
-          customerName = cust?.fullName || cust?.name || cust?.customerFullName || null;
-          dealerName = dealer?.fullName || dealer?.name || dealer?.dealerName || dealer?.dealerFullName || null;
-        } catch (e) {
-          // ignore lookup errors, we'll fallback to IDs in the UI
-          console.debug('Customer/Dealer lookup failed', e);
-        }
-
-        const enhanced = {
-          ...data,
-          customerFullName: customerName || data.customerFullName || data.customerName || null,
-          dealerName: dealerName || data.dealerName || data.dealerFullName || null,
-        };
-
-        setSelectedTestDrive(enhanced);
+        setSelectedTestDrive(data);
         setShowDetailModal(true);
       }
     } catch (err) {
@@ -293,9 +282,9 @@ const TestDriveManagement = () => {
         return "bg-label-primary";
       case "Completed":
         return "bg-label-success";
-      case "Cancelled":
+      case "Canceled":
         return "bg-label-danger";
-      case "InProgress":
+      case "NoShow":
         return "bg-label-info";
       default:
         return "bg-label-secondary";
@@ -333,18 +322,18 @@ const TestDriveManagement = () => {
             <i className="bx bx-plus me-1"></i>
             New Test Drive
           </button>
-          <button className="btn btn-outline-primary" onClick={loadTestDrives} disabled={loading}>
-            <i className="bx bx-refresh me-1"></i>
+          <button className="btn btn-primary" onClick={loadTestDrives} disabled={loading}>
+            {loading ? <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> : <i className="bx bx-refresh me-1"></i>}
             Refresh
           </button>
         </div>
       </div>
 
-      {/* Filters */}
+      {/* Filters and page size */}
       <div className="card mb-4">
         <div className="card-body">
-          <div className="row g-3">
-            <div className="col-md-6">
+          <div className="row g-3 align-items-center">
+            <div className="col-md-5">
               <label className="form-label">Search</label>
               <input
                 type="text"
@@ -357,7 +346,7 @@ const TestDriveManagement = () => {
                 }}
               />
             </div>
-            <div className="col-md-6">
+            <div className="col-md-3">
               <label className="form-label">Status Filter</label>
               <select
                 className="form-select"
@@ -370,8 +359,24 @@ const TestDriveManagement = () => {
                 <option value="">All Status</option>
                 <option value="Scheduled">Scheduled</option>
                 <option value="Completed">Completed</option>
-                <option value="Cancelled">Cancelled</option>
-                <option value="InProgress">In Progress</option>
+                <option value="Canceled">Canceled</option>
+                <option value="NoShow">No Show</option>
+              </select>
+            </div>
+            <div className="col-md-2">
+              <label className="form-label">Page Size</label>
+              <select
+                className="form-select"
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+              >
+                <option value={5}>5 per page</option>
+                <option value={10}>10 per page</option>
+                <option value={25}>25 per page</option>
+                <option value={50}>50 per page</option>
               </select>
             </div>
           </div>
@@ -410,10 +415,18 @@ const TestDriveManagement = () => {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Customer</th>
-                  <th>VIN</th>
-                  <th>Scheduled At</th>
-                  <th>Status</th>
+                  <th onClick={() => toggleSort("customerFullName")} style={{ cursor: "pointer" }}>
+                    Customer {sortBy === "customerFullName" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
+                  <th onClick={() => toggleSort("vehicleVin")} style={{ cursor: "pointer" }}>
+                    VIN {sortBy === "vehicleVin" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
+                  <th onClick={() => toggleSort("scheduledAt")} style={{ cursor: "pointer" }}>
+                    Scheduled At {sortBy === "scheduledAt" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
+                  <th onClick={() => toggleSort("status")} style={{ cursor: "pointer" }}>
+                    Status {sortBy === "status" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -433,24 +446,16 @@ const TestDriveManagement = () => {
                       <span className={`badge ${getStatusBadgeClass(testDrive.status)}`}>{testDrive.status}</span>
                     </td>
                     <td>
-                      <div className="dropdown">
-                        <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                          <i className="bx bx-dots-vertical-rounded"></i>
+                      <div className="d-flex gap-2">
+                        <button className="btn btn-outline-primary btn-sm" title="View Details" onClick={() => handleViewDetail(testDrive)}>
+                          <i className="bx bx-show me-1"></i> View
                         </button>
-                        <div className="dropdown-menu">
-                          <button className="dropdown-item" onClick={() => handleViewDetail(testDrive)}>
-                            <i className="bx bx-show me-2"></i>
-                            View Details
-                          </button>
-                          <button className="dropdown-item" onClick={() => handleEditClick(testDrive)}>
-                            <i className="bx bx-edit me-2"></i>
-                            Edit
-                          </button>
-                          <button className="dropdown-item text-danger" onClick={() => handleDeleteClick(testDrive)}>
-                            <i className="bx bx-trash me-2"></i>
-                            Delete
-                          </button>
-                        </div>
+                        <button className="btn btn-outline-secondary btn-sm" title="Edit" onClick={() => handleEditClick(testDrive)}>
+                          <i className="bx bx-edit me-1"></i> Edit
+                        </button>
+                        <button className="btn btn-outline-danger btn-sm" title="Delete" onClick={() => handleDeleteClick(testDrive)}>
+                          <i className="bx bx-trash me-1"></i> Delete
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -517,12 +522,12 @@ const TestDriveManagement = () => {
                     <p className="text-muted">{selectedTestDrive.customerFullName || selectedTestDrive.customerName || selectedTestDrive.customerId}</p>
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label fw-semibold">Dealer Name</label>
-                    <p className="text-muted">{selectedTestDrive.dealerName || selectedTestDrive.dealerFullName || selectedTestDrive.dealerId}</p>
-                  </div>
-                  <div className="col-md-6">
                     <label className="form-label fw-semibold">Vehicle ID</label>
                     <p className="text-muted">{selectedTestDrive.vehicleId}</p>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label fw-semibold">Vehicle VIN</label>
+                    <p className="text-muted">{selectedTestDrive.vehicleVin || "N/A"}</p>
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Scheduled At</label>
