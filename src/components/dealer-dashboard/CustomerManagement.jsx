@@ -10,20 +10,28 @@ const CustomerManagement = () => {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [form, setForm] = useState({ fullName: "", email: "", phone: "", address: "" });
 
-  // Pagination, search, filter, sort
+  // Pagination, search, sort
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalResults, setTotalResults] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterBy, setFilterBy] = useState("");
-  const [filterValue, setFilterValue] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
 
+  // Debounce only searchTerm
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      loadCustomers();
+    }, 350);
+    return () => clearTimeout(handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm]);
+
+  // Immediate load for page, pageSize, sort
   useEffect(() => {
     loadCustomers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, pageSize, searchTerm, filterBy, filterValue, sortBy, sortOrder]);
+  }, [currentPage, pageSize, sortBy, sortOrder]);
 
   const loadCustomers = async () => {
     try {
@@ -38,13 +46,7 @@ const CustomerManagement = () => {
         sortOrder: sortOrder || undefined,
       };
 
-      // backend may accept filters as JSON string (filters={"fullName":"..."})
-      // or as dictionary binding like filters[fullName]=value. Send both to be compatible.
-      if (filterBy && filterValue) {
-        params.filters = JSON.stringify({ [filterBy]: filterValue });
-        // also add bracketed param so older model binding can bind to IDictionary
-        params[`filters[${filterBy}]`] = filterValue;
-      }
+      // ...existing code...
 
       // Debug: log params so you can inspect the exact outgoing query in browser console/network
       // Remove or lower verbosity in production
@@ -71,13 +73,20 @@ const CustomerManagement = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      await createCustomer(form);
+      const resp = await createCustomer(form);
+      // If API returns success false, show its message
+      if (resp && resp.success === false && resp.message) {
+        setError(resp.message);
+        return;
+      }
       setShowCreateModal(false);
       loadCustomers();
       showSuccessAlert("Customer created successfully!");
     } catch (err) {
       console.error("Error creating customer:", err);
-      setError("Failed to create customer.");
+      // Try to extract message from error response
+      let apiMsg = err?.response?.data?.message || err?.message;
+      setError(apiMsg || "Failed to create customer.");
     } finally {
       setLoading(false);
     }
@@ -94,14 +103,19 @@ const CustomerManagement = () => {
     if (!selectedCustomer) return;
     try {
       setLoading(true);
-      await updateCustomer(selectedCustomer.id || selectedCustomer._id, form);
+      const resp = await updateCustomer(selectedCustomer.id || selectedCustomer._id, form);
+      if (resp && resp.success === false && resp.message) {
+        setError(resp.message);
+        return;
+      }
       setShowEditModal(false);
       setSelectedCustomer(null);
       loadCustomers();
       showSuccessAlert("Customer updated successfully!");
     } catch (err) {
       console.error("Error updating customer:", err);
-      setError("Failed to update customer.");
+      let apiMsg = err?.response?.data?.message || err?.message;
+      setError(apiMsg || "Failed to update customer.");
     } finally {
       setLoading(false);
     }
@@ -166,18 +180,22 @@ const CustomerManagement = () => {
           </h4>
           <p className="text-muted mb-0">Manage customers</p>
         </div>
-        <div>
+        <div className="d-flex gap-2">
           <button className="btn btn-primary" onClick={handleOpenCreate}>
             <i className="bx bx-plus me-1" /> New Customer
+          </button>
+          <button className="btn btn-primary" onClick={loadCustomers} disabled={loading}>
+            {loading ? <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> : <i className="bx bx-refresh me-1"></i>}
+            Refresh
           </button>
         </div>
       </div>
 
-      {/* Controls: search, filter, pageSize */}
+      {/* Controls: search, pageSize */}
       <div className="card mb-3">
         <div className="card-body">
           <div className="row g-2 align-items-center">
-            <div className="col-md-4">
+            <div className="col-md-6">
               <input
                 type="text"
                 className="form-control"
@@ -190,26 +208,6 @@ const CustomerManagement = () => {
               />
             </div>
             <div className="col-md-2">
-              <select className="form-select" value={filterBy} onChange={(e) => setFilterBy(e.target.value)}>
-                <option value="">Filter by</option>
-                <option value="fullName">Name</option>
-                <option value="phone">Phone</option>
-                <option value="email">Email</option>
-                <option value="address">Address</option>
-              </select>
-            </div>
-            <div className="col-md-3">
-              <input
-                className="form-control"
-                placeholder="Filter value"
-                value={filterValue}
-                onChange={(e) => {
-                  setFilterValue(e.target.value);
-                  setCurrentPage(1);
-                }}
-              />
-            </div>
-            <div className="col-md-1">
               <select
                 className="form-select"
                 value={pageSize}
@@ -218,19 +216,17 @@ const CustomerManagement = () => {
                   setCurrentPage(1);
                 }}
               >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
+                <option value={5}>5 per page</option>
+                <option value={10}>10 per page</option>
+                <option value={25}>25 per page</option>
+                <option value={50}>50 per page</option>
               </select>
             </div>
-            <div className="col-md-2 text-end">
+            <div className="col-md-4 text-end">
               <button
                 className="btn btn-outline-secondary"
                 onClick={() => {
                   setSearchTerm("");
-                  setFilterBy("");
-                  setFilterValue("");
                   setSortBy("");
                   setSortOrder("asc");
                   setCurrentPage(1);
@@ -243,13 +239,7 @@ const CustomerManagement = () => {
         </div>
       </div>
 
-      {error && (
-        <div className="alert alert-danger alert-dismissible fade show" role="alert">
-          <i className="bx bx-error me-2" />
-          {error}
-          <button type="button" className="btn-close" onClick={() => setError(null)}></button>
-        </div>
-      )}
+      {/* Only show error in modal, not here */}
 
       <div className="card">
         <div className="table-responsive text-nowrap">
@@ -354,6 +344,14 @@ const CustomerManagement = () => {
                 <button type="button" className="btn-close" onClick={() => setShowCreateModal(false)} />
               </div>
               <div className="modal-body">
+                {/* Error message inside modal */}
+                {error && (
+                  <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i className="bx bx-error me-2" />
+                    {error}
+                    <button type="button" className="btn-close" onClick={() => setError(null)}></button>
+                  </div>
+                )}
                 <div className="mb-3">
                   <label className="form-label">Full Name</label>
                   <input className="form-control" value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} required />
@@ -394,6 +392,14 @@ const CustomerManagement = () => {
                 <button type="button" className="btn-close" onClick={() => setShowEditModal(false)} />
               </div>
               <div className="modal-body">
+                {/* Error message inside modal */}
+                {error && (
+                  <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i className="bx bx-error me-2" />
+                    {error}
+                    <button type="button" className="btn-close" onClick={() => setError(null)}></button>
+                  </div>
+                )}
                 <div className="mb-3">
                   <label className="form-label">Full Name</label>
                   <input className="form-control" value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} required />
