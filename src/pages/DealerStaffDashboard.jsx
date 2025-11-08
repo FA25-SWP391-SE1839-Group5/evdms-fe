@@ -6,6 +6,7 @@ import SalesOrderManagement from "../components/dealer-dashboard/SalesOrderManag
 import TestDriveManagement from "../components/dealer-dashboard/TestDriveManagement";
 import VehicleManagement from "../components/dealer-dashboard/VehicleManagement";
 import { getAllFeedbacks } from "../services/feedbackService";
+import { getAllQuotations } from "../services/quotationService";
 import { getAllSalesOrders } from "../services/salesOrderService";
 import { getAllTestDrives } from "../services/testDriveService";
 import { decodeJwt } from "../utils/jwt";
@@ -184,11 +185,17 @@ const DealerStaffDashboard = ({ currentPage }) => {
         feedbackParams.filters = filters;
       }
 
-      const [salesOrdersResponse, testDrivesResponse, feedbacksResponse] = await Promise.all([getAllSalesOrders(salesOrderParams), getAllTestDrives(testDriveParams), getAllFeedbacks(feedbackParams)]);
+      const [salesOrdersResponse, testDrivesResponse, feedbacksResponse, quotationsResponse] = await Promise.all([
+        getAllSalesOrders(salesOrderParams),
+        getAllTestDrives(testDriveParams),
+        getAllFeedbacks(feedbackParams),
+        getAllQuotations({ page: 1, pageSize: 100 }),
+      ]);
 
       const salesOrders = salesOrdersResponse?.data?.items || [];
       const testDrives = testDrivesResponse?.data?.items || [];
       const feedbacks = feedbacksResponse?.data?.items || [];
+      const quotations = quotationsResponse?.data?.items || [];
 
       // Calculate stats from Sales Orders
       const pendingSalesOrders = salesOrders.filter((o) => o.status === "Pending").length;
@@ -223,10 +230,16 @@ const DealerStaffDashboard = ({ currentPage }) => {
         reviewedFeedbacks,
         resolvedFeedbacks,
 
-        // Quotations (placeholders — replace with real data/service when available)
-        totalQuotations: 0,
-        pendingQuotations: 0,
-        approvedQuotations: 0,
+        // Quotations
+        totalQuotations: quotations.length,
+        pendingQuotations: quotations.filter((q) => {
+          const s = q.status || "";
+          return s === "Pending" || s === "Sent" || s === "Draft";
+        }).length,
+        approvedQuotations: quotations.filter((q) => {
+          const s = q.status || "";
+          return s === "Approved" || s === "Accepted";
+        }).length,
       };
 
       setStats(statsData);
