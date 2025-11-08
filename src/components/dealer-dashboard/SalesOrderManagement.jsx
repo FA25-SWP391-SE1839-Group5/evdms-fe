@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createPayment, createSalesOrder, deleteSalesOrder, deliverSalesOrders, getAllSalesOrders, getSalesOrderById, getSalesOrdersSummary, updateSalesOrder } from "../../services/salesOrderService";
+import { getCustomerById, getAllPayments } from "../../services/dashboardService";
+import { getVehicleById } from "../../services/vehicleService";
 import { decodeJwt } from "../../utils/jwt";
 
 const SalesOrderManagement = () => {
@@ -7,6 +9,7 @@ const SalesOrderManagement = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderPayments, setOrderPayments] = useState([]);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -40,6 +43,9 @@ const SalesOrderManagement = () => {
     date: "",
     status: "Pending",
   });
+
+  // cache for vehicle lookups to avoid repeated requests for the same vehicleId
+  const vehicleCacheRef = useRef(new Map());
 
   useEffect(() => {
     loadSalesOrders();
@@ -84,7 +90,37 @@ const SalesOrderManagement = () => {
       const response = await getAllSalesOrders(params);
 
       if (response?.data) {
-        setSalesOrders(response.data.items || []);
+        const items = response.data.items || [];
+
+        // collect unique vehicleIds from the items
+        const uniqueVehicleIds = [...new Set(items.map((o) => o.vehicleId).filter(Boolean))];
+
+        // find which ids are not yet cached
+        const toFetch = uniqueVehicleIds.filter((id) => !vehicleCacheRef.current.has(id));
+
+        // fetch missing vehicle records in parallel and populate the cache with VIN (or null)
+        await Promise.all(
+          toFetch.map(async (vid) => {
+            try {
+              const resp = await getVehicleById(vid);
+              const vehicle = resp?.data ?? resp;
+              const vin = vehicle?.vin || vehicle?.vehicleVin || vehicle?.vinNumber || vehicle?.registrationNumber || null;
+              vehicleCacheRef.current.set(vid, vin);
+            } catch (e) {
+              console.debug("Failed to fetch vehicle for VIN enrichment", vid, e);
+              // avoid refetch attempts in same session
+              vehicleCacheRef.current.set(vid, null);
+            }
+          })
+        );
+
+        // attach vehicleVin to each order from cache (or keep existing order.vehicleVin)
+        const enriched = items.map((o) => ({
+          ...o,
+          vehicleVin: o.vehicleVin || vehicleCacheRef.current.get(o.vehicleId) || null,
+        }));
+
+        setSalesOrders(enriched);
         setTotalResults(response.data.totalResults || 0);
         setTotalPages(Math.ceil((response.data.totalResults || 0) / pageSize));
       }
@@ -122,8 +158,65 @@ const SalesOrderManagement = () => {
   const handleViewDetail = async (order) => {
     try {
       const response = await getSalesOrderById(order.id);
-      if (response?.data) {
-        setSelectedOrder(response.data);
+      if (response) {
+        const data = response?.data ?? response;
+
+        // fetch customer name, vehicle VIN, and payments in parallel
+        let customerName = null;
+        let vehicleData = null; // Store full vehicle data
+        let vehicleVin = null;
+        let payments = [];
+        
+        try {
+          const [custResp, vehicleResp, paymentsResp] = await Promise.all([
+            getCustomerById(data.customerId),
+            getVehicleById(data.vehicleId),
+            getAllPayments({
+              page: 1,
+              pageSize: 10,
+              filters: JSON.stringify({ salesOrderId: order.id }),
+          }),
+        ]);
+          // Log the actual URL that was called
+          console.log('Payments response:', paymentsResp);
+
+          const cust = custResp?.data ?? custResp;
+          const vehicle = vehicleResp?.data ?? vehicleResp;
+          
+          // Extract customer name
+          customerName = cust?.fullName || cust?.name || cust?.customerFullName || null;
+          
+          // Extract vehicle data - based on your response structure
+          vehicleData = vehicle; // Store the full vehicle object
+          vehicleVin = vehicle?.vin || null; // Direct access to vin field
+          
+          // Debug logging
+          if (!vehicleVin) {
+            console.debug("Vehicle response (no VIN found):", vehicle);
+            console.debug("Available vehicle fields:", Object.keys(vehicle));
+          }
+          
+          payments = paymentsResp?.data?.items || 
+          paymentsResp?.items || 
+          paymentsResp?.data || 
+          [];
+
+          console.log('Payments response:', paymentsResp);
+          console.log('Extracted payments:', payments);
+        } catch (e) {
+          console.debug("Customer/Vehicle/Payments lookup failed", e);
+        }
+
+        const enhanced = {
+          ...data,
+          customerFullName: customerName || data.customerFullName || data.customerName || null,
+          vehicleVin: vehicleVin || data.vehicleVin || data.vin || null,
+          // Store additional vehicle data if needed
+          vehicleData: vehicleData, 
+        };
+
+        setSelectedOrder(enhanced);
+        setOrderPayments(payments);
         setShowDetailModal(true);
       }
     } catch (err) {
@@ -688,20 +781,12 @@ const SalesOrderManagement = () => {
                     <p className="text-muted">{selectedOrder.quotationId}</p>
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label fw-semibold">Dealer ID</label>
-                    <p className="text-muted">{selectedOrder.dealerId}</p>
+                    <label className="form-label fw-semibold">Customer Name</label>
+                    <p className="text-muted">{selectedOrder.customerFullName || selectedOrder.customerName || selectedOrder.customerId}</p>
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label fw-semibold">User ID</label>
-                    <p className="text-muted">{selectedOrder.userId}</p>
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Customer ID</label>
-                    <p className="text-muted">{selectedOrder.customerId}</p>
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Vehicle ID</label>
-                    <p className="text-muted">{selectedOrder.vehicleId}</p>
+                    <label className="form-label fw-semibold">VIN</label>
+                    <p className="text-muted">{selectedOrder.vehicleData.data.vin}</p>
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Order Date</label>
@@ -714,6 +799,33 @@ const SalesOrderManagement = () => {
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Updated At</label>
                     <p className="text-muted">{formatDateTime(selectedOrder.updatedAt)}</p>
+                  </div>
+                  <div className="col-md-12">
+                    <label className="form-label fw-semibold">Payments</label>
+                    {orderPayments.length === 0 ? (
+                      <p className="text-muted">No payments found for this order.</p>
+                    ) : (
+                      <div className="table-responsive">
+                        <table className="table table-sm">
+                          <thead>
+                            <tr>
+                              <th>Method</th>
+                              <th>Amount</th>
+                              <th>Date</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {orderPayments.map((p) => (
+                              <tr key={p.id}>
+                                <td>{p.method}</td>
+                                <td>${p.amount}</td>
+                                <td>{p.createdAt ? formatDateTime(p.createdAt) : "N/A"}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

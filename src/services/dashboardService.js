@@ -526,9 +526,27 @@ export const deleteQuotation = async (id) => {
 // ============================================
 // PAYMENTS
 // ============================================
-export const getAllPayments = async () => {
+export const getAllPayments = async (params = {}) => {
   try {
-    const response = await api.get('/payments');
+    const config = {
+      params: {}
+    };
+    
+    // Add filters - handle both stringified JSON and individual filters
+    if (params.filters) {
+      config.params.filters = params.filters;
+    }
+    
+    // Add individual filter properties
+    Object.keys(params).forEach(key => {
+      if (key.startsWith('filters[') && key.endsWith(']')) {
+        config.params[key] = params[key];
+      }
+    });
+    
+    console.log('API call config:', config); // Debug log
+    
+    const response = await api.get('/payments', config);
     return response.data;
   } catch (error) {
     console.error('Error fetching payments:', error);
