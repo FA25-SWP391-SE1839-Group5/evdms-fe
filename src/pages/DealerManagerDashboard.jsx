@@ -67,7 +67,7 @@ const DealerManagerDashboard = ({ currentPage }) => {
             throw new Error("Could not determine Dealer ID for the current user.");
           }
           // phan nay` voi check dum` cai dashboardService.
-            const filters = ("filter:",{myDealerId});
+            const filters = {filters: JSON.stringify({ dealerId: myDealerId })};
             const [ordersRes, usersRes, paymentsRes] = await Promise.all([
             getAllOrders(filters),     // <-- Sends { filters: '{"dealerId":"..."}' }
             getAllUsers(filters),      // <-- Sends { filters: '{"dealerId":"..."}' }

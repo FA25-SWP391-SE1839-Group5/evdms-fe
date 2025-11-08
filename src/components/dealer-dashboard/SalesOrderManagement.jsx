@@ -172,8 +172,6 @@ const SalesOrderManagement = () => {
             getCustomerById(data.customerId),
             getVehicleById(data.vehicleId),
             getAllPayments({
-              page: 1,
-              pageSize: 10,
               filters: JSON.stringify({ salesOrderId: order.id }),
           }),
         ]);
