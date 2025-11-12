@@ -177,19 +177,21 @@ const DealerStaffDashboard = ({ currentPage }) => {
       let salesOrderParams = { ...baseParams };
       let testDriveParams = { ...baseParams };
       let feedbackParams = { ...baseParams };
+      let quotationParams = { ...baseParams };
 
       if (dealerId) {
         const filters = JSON.stringify({ dealerId });
         salesOrderParams.filters = filters;
         testDriveParams.filters = filters;
         feedbackParams.filters = filters;
+        quotationParams.filters = filters;
       }
 
       const [salesOrdersResponse, testDrivesResponse, feedbacksResponse, quotationsResponse] = await Promise.all([
         getAllSalesOrders(salesOrderParams),
         getAllTestDrives(testDriveParams),
         getAllFeedbacks(feedbackParams),
-        getAllQuotations({ page: 1, pageSize: 100 }),
+        getAllQuotations(quotationParams),
       ]);
 
       const salesOrders = salesOrdersResponse?.data?.items || [];
