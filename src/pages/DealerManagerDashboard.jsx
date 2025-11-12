@@ -9,6 +9,7 @@ import PromotionManagement from "../components/dealer-mananger-dashboard/Promoti
 import StaffManagement from "../components/dealer-mananger-dashboard/staff-management/StaffManagement";
 import StaffPerformancePage from "../components/dealer-mananger-dashboard/staff-performance/StaffPerformancePage";
 import VehicleModelBrowse from "../components/dealer-mananger-dashboard/VehicleModelBrowse";
+import VehicleVariantBrowse from "../components/dealer-mananger-dashboard/VehicleVariantBrowse";
 
 // --- Import your services ---
 import { getAllOrders, getAllPayments, getAllUsers, getCurrentUser } from "../services/dashboardService"; // <-- TODO: Make sure this path is correct
@@ -321,6 +322,8 @@ const DealerManagerDashboard = ({ currentPage }) => {
         return <StaffPerformancePage />;
       case "vehicle-model-browse":
         return <VehicleModelBrowse />;
+      case "vehicle-variant-browse":
+        return <VehicleVariantBrowse />;
       case "dealer-orders":
         return <DealerOrdersPage />;
       case "dealer-payments":

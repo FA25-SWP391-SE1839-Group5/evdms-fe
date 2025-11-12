@@ -25,6 +25,7 @@ const DealerSidebar = ({ currentPage, onNavigate }) => {
       { id: "staff", label: "Staff Management", icon: "bx-user-plus", page: "dealer-staff" },
       { id: "performance", label: "Staff Performance", icon: "bx-line-chart", page: "dealer-performance" },
       { id: "vehicle-model-browse", label: "Vehicle Models", icon: "bx-car", page: "vehicle-model-browse" },
+      { id: "vehicle-variant-browse", label: "Vehicle Variants", icon: "bx-category", page: "vehicle-variant-browse" },
       { id: "orders", label: "Dealer Orders", icon: "bx-package", page: "dealer-orders" },
       { id: "payments", label: "Dealer Payments", icon: "bx-credit-card", page: "dealer-payments" },
       { id: "promotions", label: "Promotions", icon: "bx-gift", page: "dealer-promotions" },
@@ -88,6 +89,7 @@ const DealerSidebar = ({ currentPage, onNavigate }) => {
             </li>
             {renderMenuItem(menuItems[3])}
             {renderMenuItem(menuItems[4])}
+            {renderMenuItem(menuItems[4])}
             {renderMenuItem(menuItems[5])}
             <li className="menu-header small text-uppercase">
               <span className="menu-header-text">Feedback</span>
@@ -100,6 +102,7 @@ const DealerSidebar = ({ currentPage, onNavigate }) => {
               <span className="menu-header-text">Vehicle Info</span>
             </li>
             {renderMenuItem(menuItems[3])}
+            {renderMenuItem(menuItems[4])}
             <li className="menu-header small text-uppercase">
               <span className="menu-header-text">Dealer Management</span>
             </li>
@@ -108,12 +111,12 @@ const DealerSidebar = ({ currentPage, onNavigate }) => {
             <li className="menu-header small text-uppercase">
               <span className="menu-header-text">Orders & Payments</span>
             </li>
-            {renderMenuItem(menuItems[4])}
             {renderMenuItem(menuItems[5])}
+            {renderMenuItem(menuItems[6])}
             <li className="menu-header small text-uppercase">
               <span className="menu-header-text">Promotions</span>
             </li>
-            {renderMenuItem(menuItems[6])}
+            {renderMenuItem(menuItems[7])}
           </>
         )}
       </ul>
