@@ -865,23 +865,25 @@ const QuotationManagement = () => {
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Total Amount</label>
-                    <p className="text-muted">{selectedQuotation.totalAmount != null ? selectedQuotation.totalAmount : "-"}</p>
+                    <p className="text-muted">{selectedQuotation.totalAmount != null ? `$${selectedQuotation.totalAmount}` : "-"}</p>
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Status</label>
-                    {isEditing ? (
-                      <select className="form-select" value={editForm?.status || selectedQuotation.status || "Draft"} onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}>
-                        {["Draft", "Sent", "Approved", "Rejected"].map((s) => (
-                          <option key={s} value={s}>
-                            {s}
-                          </option>
-                        ))}
-                      </select>
-                    ) : selectedQuotation.status ? (
-                      <span className={`badge ${getStatusBadgeClass(selectedQuotation.status)}`}>{selectedQuotation.status}</span>
-                    ) : (
-                      <p className="text-muted">-</p>
-                    )}
+                    <div>
+                      {isEditing ? (
+                        <select className="form-select" value={editForm?.status || selectedQuotation.status || "Draft"} onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}>
+                          {["Draft", "Sent", "Approved", "Rejected"].map((s) => (
+                            <option key={s} value={s}>
+                              {s}
+                            </option>
+                          ))}
+                        </select>
+                      ) : selectedQuotation.status ? (
+                        <span className={`badge ${getStatusBadgeClass(selectedQuotation.status)}`}>{selectedQuotation.status}</span>
+                      ) : (
+                        <p className="text-muted">-</p>
+                      )}
+                    </div>
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Created At</label>

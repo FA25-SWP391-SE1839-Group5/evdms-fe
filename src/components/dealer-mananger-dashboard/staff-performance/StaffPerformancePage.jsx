@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Alert, Button, Card, Col, Form, Row, Spinner, Table } from "react-bootstrap";
-import { getDealerStaffSales } from "../../../services/reportService";
+import { exportDealerStaffSales, getDealerStaffSales } from "../../../services/reportService";
 import { decodeJwt } from "../../../utils/jwt";
 
 const StaffPerformancePage = () => {
@@ -54,6 +54,22 @@ const StaffPerformancePage = () => {
   const handleFilterSubmit = (e) => {
     e.preventDefault();
     fetchReport(); // Gọi lại API với filter mới
+  };
+
+  // Export handler
+  const handleExport = async () => {
+    try {
+      const token = localStorage.getItem("evdms_auth_token");
+      const payload = decodeJwt(token);
+      const dealerId = payload?.dealerId;
+      const queryParams = {};
+      if (filters.startDate) queryParams.startDate = filters.startDate;
+      if (filters.endDate) queryParams.endDate = filters.endDate;
+      if (dealerId) queryParams.dealerId = dealerId;
+      await exportDealerStaffSales("csv", queryParams);
+    } catch (err) {
+      setError("Export failed: " + (err.message || "Unknown error"));
+    }
   };
 
   // Hàm render nội dung chính
@@ -121,10 +137,15 @@ const StaffPerformancePage = () => {
                 <Form.Control type="date" name="endDate" value={filters.endDate} onChange={handleFilterChange} />
               </Form.Group>
             </Col>
-            <Col md={4} className="d-grid">
+            <Col md={2} className="d-grid">
               <Button type="submit" variant="primary" disabled={isLoading}>
                 {isLoading ? <Spinner as="span" size="sm" /> : <i className="bx bx-filter-alt me-1"></i>}
                 Filter
+              </Button>
+            </Col>
+            <Col md={2} className="d-grid">
+              <Button variant="success" onClick={handleExport} disabled={isLoading}>
+                <i className="bx bx-export me-1"></i> Export CSV
               </Button>
             </Col>
           </Row>

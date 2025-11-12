@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createDealerPayment, getAllDealerOrders, markDealerOrderDelivered, patchDealerOrder } from "../../services/dealerOrderService";
 import DealerOrderReviewModal from "./dealer-orders/DealerOrderReviewModal";
 
-const ORDER_STATUSES = ["Pending", "Confirmed", "Delivered", "Canceled"];
+const ORDER_STATUSES = ["Pending", "Confirmed", "Paid", "Delivered", "Canceled"];
 
 const DealerOrderManagement = () => {
   // State

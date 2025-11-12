@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createCustomer, deleteCustomer, getAllCustomers, updateCustomer } from "../../services/dashboardService";
+import { createCustomer, deleteCustomer, exportCustomers, getAllCustomers, updateCustomer } from "../../services/dashboardService";
 
 const CustomerManagement = () => {
   const [customers, setCustomers] = useState([]);
@@ -11,6 +11,36 @@ const CustomerManagement = () => {
   const [form, setForm] = useState({ fullName: "", email: "", phone: "", address: "" });
 
   // Pagination, search, sort
+  const [exporting, setExporting] = useState(false);
+  // Export handler
+  const handleExport = async () => {
+    setExporting(true);
+    setError(null);
+    try {
+      const response = await exportCustomers();
+      // Get filename from Content-Disposition header
+      let filename = "customers.csv";
+      const disposition = response.headers?.["content-disposition"] || response.headers?.get?.("content-disposition");
+      if (disposition) {
+        const match = disposition.match(/filename="?([^";]+)"?/);
+        if (match && match[1]) {
+          filename = match[1];
+        }
+      }
+      // Download the CSV file
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      setError("Export failed: " + (err.message || "Unknown error"));
+    } finally {
+      setExporting(false);
+    }
+  };
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalResults, setTotalResults] = useState(0);
@@ -187,6 +217,10 @@ const CustomerManagement = () => {
           <button className="btn btn-primary" onClick={loadCustomers} disabled={loading}>
             {loading ? <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> : <i className="bx bx-refresh me-1"></i>}
             Refresh
+          </button>
+          <button className="btn btn-success" onClick={handleExport} disabled={exporting}>
+            {exporting ? <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> : <i className="bx bx-export me-1"></i>}
+            Export CSV
           </button>
         </div>
       </div>

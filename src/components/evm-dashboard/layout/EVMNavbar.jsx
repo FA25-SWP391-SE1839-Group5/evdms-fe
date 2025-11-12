@@ -85,7 +85,7 @@ const EVMNavbar = () => {
             ) : user ? (
               <h4 className="mb-0 text-primary fw-bold">
                 <i className="bx bx-user-circle me-2"></i>
-                Welcome, {getRoleDisplay(user.role)}
+                Welcome, {user.name}
               </h4>
             ) : (
               <h4 className="mb-0 text-muted">Welcome</h4>

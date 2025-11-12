@@ -1,12 +1,13 @@
 import { Plus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { createUser, deleteUser, getAllUsers, getUserById, patchUser } from "../../../services/userService";
+import { createUser, deleteUser, exportUsersByDealer, getAllUsers, getUserById, patchUser } from "../../../services/userService";
 import { decodeJwt } from "../../../utils/jwt";
 import UserDetailsModal from "../../admin-dashboard/users/UserDetailsModal";
 import StaffUserModal from "./StaffUserModal";
 
 const StaffManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [exporting, setExporting] = useState(false);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -29,6 +30,36 @@ const StaffManagement = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [validationErrors, setValidationErrors] = useState({});
+
+  // Export handler
+  const handleExport = async () => {
+    setExporting(true);
+    setError("");
+    try {
+      const response = await exportUsersByDealer();
+      // Get filename from Content-Disposition header
+      let filename = "dealer-users.csv";
+      const disposition = response.headers?.["content-disposition"] || response.headers?.get?.("content-disposition");
+      if (disposition) {
+        const match = disposition.match(/filename="?([^";]+)"?/);
+        if (match && match[1]) {
+          filename = match[1];
+        }
+      }
+      // Download the CSV file
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      setError("Export failed: " + (err.message || "Unknown error"));
+    } finally {
+      setExporting(false);
+    }
+  };
 
   useEffect(() => {
     if (error || success) {
@@ -347,7 +378,7 @@ const StaffManagement = () => {
     <>
       <div className="card">
         <div className="card-header border-bottom bg-white">
-          <div className="d-flex justify-content-end mb-3">
+          <div className="d-flex justify-content-end mb-3 gap-2">
             <button
               type="button"
               className="btn btn-primary rounded-pill d-flex align-items-center px-4 py-2"
@@ -359,6 +390,10 @@ const StaffManagement = () => {
             >
               <Plus size={18} className="me-2" />
               <span className="fw-semibold">Add Staff</span>
+            </button>
+            <button type="button" className="btn btn-success rounded-pill d-flex align-items-center px-4 py-2" style={{ minWidth: 140 }} onClick={handleExport} disabled={exporting}>
+              {exporting ? <span className="spinner-border spinner-border-sm me-2" /> : <i className="bx bx-export me-2" />}
+              <span className="fw-semibold">Export CSV</span>
             </button>
           </div>
           <div className="d-flex flex-wrap align-items-center mb-2 gap-2" style={{ justifyContent: "flex-start" }}>

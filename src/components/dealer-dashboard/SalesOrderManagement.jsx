@@ -1,6 +1,6 @@
-import { useEffect, useState, useRef } from "react";
-import { createPayment, createSalesOrder, deleteSalesOrder, deliverSalesOrders, getAllSalesOrders, getSalesOrderById, getSalesOrdersSummary, updateSalesOrder } from "../../services/salesOrderService";
-import { getCustomerById, getAllPayments } from "../../services/dashboardService";
+import { useEffect, useRef, useState } from "react";
+import { getAllPayments, getCustomerById } from "../../services/dashboardService";
+import { createPayment, createSalesOrder, deleteSalesOrder, deliverSalesOrders, getAllSalesOrders, getSalesOrderById, getSalesOrdersSummary, patchSalesOrder } from "../../services/salesOrderService";
 import { getVehicleById } from "../../services/vehicleService";
 import { decodeJwt } from "../../utils/jwt";
 
@@ -167,41 +167,38 @@ const SalesOrderManagement = () => {
         let vehicleData = null; // Store full vehicle data
         let vehicleVin = null;
         let payments = [];
-        
+
         try {
           const [custResp, vehicleResp, paymentsResp] = await Promise.all([
             getCustomerById(data.customerId),
             getVehicleById(data.vehicleId),
             getAllPayments({
               filters: JSON.stringify({ salesOrderId: order.id }),
-          }),
-        ]);
+            }),
+          ]);
           // Log the actual URL that was called
-          console.log('Payments response:', paymentsResp);
+          console.log("Payments response:", paymentsResp);
 
           const cust = custResp?.data ?? custResp;
           const vehicle = vehicleResp?.data ?? vehicleResp;
-          
+
           // Extract customer name
           customerName = cust?.fullName || cust?.name || cust?.customerFullName || null;
-          
+
           // Extract vehicle data - based on your response structure
           vehicleData = vehicle; // Store the full vehicle object
           vehicleVin = vehicle?.vin || null; // Direct access to vin field
-          
+
           // Debug logging
           if (!vehicleVin) {
             console.debug("Vehicle response (no VIN found):", vehicle);
             console.debug("Available vehicle fields:", Object.keys(vehicle));
           }
-          
-          payments = paymentsResp?.data?.items || 
-          paymentsResp?.items || 
-          paymentsResp?.data || 
-          [];
 
-          console.log('Payments response:', paymentsResp);
-          console.log('Extracted payments:', payments);
+          payments = paymentsResp?.data?.items || paymentsResp?.items || paymentsResp?.data || [];
+
+          console.log("Payments response:", paymentsResp);
+          console.log("Extracted payments:", payments);
         } catch (e) {
           console.debug("Customer/Vehicle/Payments lookup failed", e);
         }
@@ -211,7 +208,7 @@ const SalesOrderManagement = () => {
           customerFullName: customerName || data.customerFullName || data.customerName || null,
           vehicleVin: vehicleVin || data.vehicleVin || data.vin || null,
           // Store additional vehicle data if needed
-          vehicleData: vehicleData, 
+          vehicleData: vehicleData,
         };
 
         setSelectedOrder(enhanced);
@@ -243,12 +240,6 @@ const SalesOrderManagement = () => {
       if (response?.data) {
         setSelectedOrder(response.data);
         setFormData({
-          quotationId: response.data.quotationId,
-          dealerId: response.data.dealerId,
-          userId: response.data.userId,
-          customerId: response.data.customerId,
-          vehicleId: response.data.vehicleId,
-          date: response.data.date ? response.data.date.substring(0, 16) : "",
           status: response.data.status,
         });
         setShowEditModal(true);
@@ -279,23 +270,15 @@ const SalesOrderManagement = () => {
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
     try {
-      const dataToSend = {
-        quotationId: formData.quotationId,
-        dealerId: formData.dealerId,
-        userId: formData.userId,
-        customerId: formData.customerId,
-        vehicleId: formData.vehicleId,
-        date: new Date(formData.date).toISOString(),
-        status: formData.status,
-      };
-      await updateSalesOrder(selectedOrder.id, dataToSend);
+      // Only send status field, use PATCH
+      await patchSalesOrder(selectedOrder.id, { status: formData.status });
       setShowEditModal(false);
       setSelectedOrder(null);
       loadSalesOrders();
-      showSuccessAlert("Sales order updated successfully!");
+      showSuccessAlert("Sales order status updated successfully!");
     } catch (err) {
       console.error("Error updating sales order:", err);
-      setError("Failed to update sales order.");
+      setError("Failed to update sales order status.");
     }
   };
 
@@ -328,7 +311,7 @@ const SalesOrderManagement = () => {
       setPaySummary(summaryData);
       const alreadyPaid = (summaryData?.paidAmount ?? summaryData?.data?.paidAmount ?? 0) > 0;
       setPayMethod(alreadyPaid ? "Installment" : "Upfront");
-    } catch (e) {
+    } catch {
       setPaySummary(null);
       setPayMethod("Upfront");
     }
@@ -411,10 +394,10 @@ const SalesOrderManagement = () => {
       case "Pending":
         return "bg-label-warning";
       case "Confirmed":
-        return "bg-label-info";
-      case "Completed":
+        return "bg-label-primary";
+      case "Delivered":
         return "bg-label-success";
-      case "Cancelled":
+      case "Canceled":
         return "bg-label-danger";
       default:
         return "bg-label-secondary";
@@ -624,18 +607,12 @@ const SalesOrderManagement = () => {
                         className="form-control"
                         value={installmentAmount}
                         min={0}
-                        max={
-                          paySummary
-                            ? (paySummary.totalAmount ?? paySummary.data?.totalAmount ?? 0) - (paySummary.paidAmount ?? paySummary.data?.paidAmount ?? 0) + 1
-                            : undefined
-                        }
+                        max={paySummary ? (paySummary.totalAmount ?? paySummary.data?.totalAmount ?? 0) - (paySummary.paidAmount ?? paySummary.data?.paidAmount ?? 0) : undefined}
                         onChange={(e) => setInstallmentAmount(e.target.value)}
                         required
                       />
                       {paySummary && (
-                        <div className="form-text">
-                          Max: {((paySummary.totalAmount ?? paySummary.data?.totalAmount ?? 0) - (paySummary.paidAmount ?? paySummary.data?.paidAmount ?? 0) + 1 )}
-                        </div>
+                        <div className="form-text">Max: {(paySummary.totalAmount ?? paySummary.data?.totalAmount ?? 0) - (paySummary.paidAmount ?? paySummary.data?.paidAmount ?? 0)}</div>
                       )}
                     </div>
                   )}
@@ -957,51 +934,25 @@ const SalesOrderManagement = () => {
       {/* Edit Modal */}
       {showEditModal && selectedOrder && (
         <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
-          <div className="modal-dialog modal-lg">
+          <div className="modal-dialog">
             <div className="modal-content">
               <form onSubmit={handleUpdateSubmit}>
                 <div className="modal-header">
                   <h5 className="modal-title">
                     <i className="bx bx-edit me-2"></i>
-                    Edit Sales Order
+                    Edit Sales Order Status
                   </h5>
                   <button type="button" className="btn-close" onClick={() => setShowEditModal(false)}></button>
                 </div>
                 <div className="modal-body">
-                  <div className="row g-3">
-                    <div className="col-md-6">
-                      <label className="form-label">Quotation ID *</label>
-                      <input type="text" className="form-control" value={formData.quotationId} onChange={(e) => setFormData({ ...formData, quotationId: e.target.value })} required />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label">Dealer ID *</label>
-                      <input type="text" className="form-control" value={formData.dealerId} onChange={(e) => setFormData({ ...formData, dealerId: e.target.value })} required />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label">User ID *</label>
-                      <input type="text" className="form-control" value={formData.userId} onChange={(e) => setFormData({ ...formData, userId: e.target.value })} required />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label">Customer ID *</label>
-                      <input type="text" className="form-control" value={formData.customerId} onChange={(e) => setFormData({ ...formData, customerId: e.target.value })} required />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label">Vehicle ID *</label>
-                      <input type="text" className="form-control" value={formData.vehicleId} onChange={(e) => setFormData({ ...formData, vehicleId: e.target.value })} required />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label">Order Date *</label>
-                      <input type="datetime-local" className="form-control" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} required />
-                    </div>
-                    <div className="col-md-12">
-                      <label className="form-label">Status *</label>
-                      <select className="form-select" value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} required>
-                        <option value="Pending">Pending</option>
-                        <option value="Confirmed">Confirmed</option>
-                        <option value="Completed">Completed</option>
-                        <option value="Cancelled">Cancelled</option>
-                      </select>
-                    </div>
+                  <div className="mb-3">
+                    <label className="form-label">Status *</label>
+                    <select className="form-select" value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} required>
+                      <option value="Pending">Pending</option>
+                      <option value="Confirmed">Confirmed</option>
+                      <option value="Delivered">Delivered</option>
+                      <option value="Canceled">Canceled</option>
+                    </select>
                   </div>
                 </div>
                 <div className="modal-footer">

@@ -357,9 +357,9 @@ const VehicleManagement = () => {
     if (c.includes("red")) return "bg-label-danger";
     if (c.includes("blue")) return "bg-label-primary";
     if (c.includes("green")) return "bg-label-success";
-    if (c.includes("yellow")) return "bg-label-warning text-dark";
+    if (c.includes("yellow")) return "bg-label-warning";
     if (c.includes("silver") || c.includes("gray") || c.includes("grey")) return "bg-label-secondary";
-    if (c.includes("black")) return "bg-label-secondary text-light";
+    if (c.includes("black")) return "bg-dark";
     if (c.includes("white")) return "bg-label-light text-dark";
     return "bg-label-secondary";
   };
@@ -367,13 +367,9 @@ const VehicleManagement = () => {
   const getTypeBadgeClass = (type) => {
     if (!type) return "bg-label-secondary";
     const t = String(type).toLowerCase();
-    if (t.includes("suv")) return "bg-label-info";
-    if (t.includes("sedan")) return "bg-label-primary";
-    if (t.includes("hatch")) return "bg-label-success";
-    if (t.includes("truck") || t.includes("pickup")) return "bg-label-danger";
-    if (t.includes("van") || t.includes("mpv")) return "bg-label-warning text-dark";
-    if (t.includes("coupe") || t.includes("convertible")) return "bg-label-secondary";
-    if (t.includes("electric") || t.includes("ev")) return "bg-label-success";
+    if (t === "sale") return "bg-label-success";
+    if (t === "demo") return "bg-label-info";
+    if (t === "display") return "bg-label-warning";
     return "bg-label-secondary";
   };
 
@@ -437,7 +433,7 @@ const VehicleManagement = () => {
               <input
                 type="text"
                 className="form-control"
-                placeholder="Search VIN/color/type..."
+                placeholder="Search VIN"
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -638,61 +634,53 @@ const VehicleManagement = () => {
                   <button type="button" className="btn-close" onClick={handleCloseCompare}></button>
                 </div>
                 <div className="modal-body">
-                  <div className="row">
-                    <div className="col-6">
-                      <h6 className="mb-2">Vehicle A</h6>
-                      <div className="mb-2">
-                        <strong>VIN:</strong> {compareVehicles[0].vin}
+                  <div className="row g-4 mb-4">
+                    {[0, 1].map((idx) => (
+                      <div className="col-6" key={idx}>
+                        <div className="card shadow-sm h-100">
+                          <div className="card-body">
+                            <div className="d-flex align-items-center mb-3">
+                              <div className="me-3">
+                                <i className="bx bx-car display-5 text-primary" />
+                              </div>
+                              <div>
+                                <h6 className="mb-0">{idx === 0 ? "Vehicle A" : "Vehicle B"}</h6>
+                                <small className="text-muted">VIN: {compareVehicles[idx].vin}</small>
+                              </div>
+                            </div>
+                            <div className="mb-2">
+                              <strong>Variant:</strong> {variantNameMap[compareVehicles[idx].variantId] || compareVehicles[idx].variantId}
+                            </div>
+                            {/* Dealer field removed as requested */}
+                            <div className="mb-2">
+                              <strong>Color:</strong>{" "}
+                              {compareVehicles[idx].color ? (
+                                <span className={`badge ${getColorBadgeClass(compareVehicles[idx].color)}`}>{compareVehicles[idx].color}</span>
+                              ) : (
+                                <span className="text-muted">-</span>
+                              )}
+                            </div>
+                            <div className="mb-2">
+                              <strong>Type:</strong>{" "}
+                              {compareVehicles[idx].type ? (
+                                <span className={`badge ${getTypeBadgeClass(compareVehicles[idx].type)}`}>{compareVehicles[idx].type}</span>
+                              ) : (
+                                <span className="text-muted">-</span>
+                              )}
+                            </div>
+                            <div className="mb-2">
+                              <strong>Status:</strong> <span className={`badge ${getStatusBadgeClass(compareVehicles[idx].status)}`}>{compareVehicles[idx].status}</span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div className="mb-2">
-                        <strong>Variant:</strong> {variantNameMap[compareVehicles[0].variantId] || compareVehicles[0].variantId}
-                      </div>
-                      <div className="mb-2">
-                        <strong>Dealer:</strong> {dealerNameMap[compareVehicles[0].dealerId] || compareVehicles[0].dealerId}
-                      </div>
-                      <div className="mb-2">
-                        <strong>Color:</strong>{" "}
-                        {compareVehicles[0].color ? <span className={`badge ${getColorBadgeClass(compareVehicles[0].color)}`}>{compareVehicles[0].color}</span> : <span className="text-muted">-</span>}
-                      </div>
-                      <div className="mb-2">
-                        <strong>Type:</strong>{" "}
-                        {compareVehicles[0].type ? <span className={`badge ${getTypeBadgeClass(compareVehicles[0].type)}`}>{compareVehicles[0].type}</span> : <span className="text-muted">-</span>}
-                      </div>
-                      <div className="mb-2">
-                        <strong>Status:</strong> {compareVehicles[0].status}
-                      </div>
-                    </div>
-                    <div className="col-6">
-                      <h6 className="mb-2">Vehicle B</h6>
-                      <div className="mb-2">
-                        <strong>VIN:</strong> {compareVehicles[1].vin}
-                      </div>
-                      <div className="mb-2">
-                        <strong>Variant:</strong> {variantNameMap[compareVehicles[1].variantId] || compareVehicles[1].variantId}
-                      </div>
-                      <div className="mb-2">
-                        <strong>Dealer:</strong> {dealerNameMap[compareVehicles[1].dealerId] || compareVehicles[1].dealerId}
-                      </div>
-                      <div className="mb-2">
-                        <strong>Color:</strong>{" "}
-                        {compareVehicles[1].color ? <span className={`badge ${getColorBadgeClass(compareVehicles[1].color)}`}>{compareVehicles[1].color}</span> : <span className="text-muted">-</span>}
-                      </div>
-                      <div className="mb-2">
-                        <strong>Type:</strong>{" "}
-                        {compareVehicles[1].type ? <span className={`badge ${getTypeBadgeClass(compareVehicles[1].type)}`}>{compareVehicles[1].type}</span> : <span className="text-muted">-</span>}
-                      </div>
-                      <div className="mb-2">
-                        <strong>Status:</strong> {compareVehicles[1].status}
-                      </div>
-                    </div>
+                    ))}
                   </div>
 
-                  <hr />
-
-                  <h6>Variant Specs Comparison</h6>
-                  <div className="table-responsive">
-                    <table className="table table-sm">
-                      <thead>
+                  <h6 className="mb-3">Variant Specs Comparison</h6>
+                  <div className="table-responsive mb-4">
+                    <table className="table table-bordered table-striped align-middle">
+                      <thead className="table-light">
                         <tr>
                           <th>Spec</th>
                           <th>Vehicle A</th>
@@ -701,46 +689,46 @@ const VehicleManagement = () => {
                       </thead>
                       <tbody>
                         {(() => {
-                          // build union of spec keys
                           const aSpecs = compareVariants[0]?.specs || {};
                           const bSpecs = compareVariants[1]?.specs || {};
                           const keys = Array.from(new Set([...Object.keys(aSpecs), ...Object.keys(bSpecs)]));
-                          return keys.map((k) => (
-                            <tr key={k}>
-                              <td>{k.replace(/([A-Z])/g, " $1").trim()}</td>
-                              <td>{aSpecs[k] ? `${aSpecs[k].value}${aSpecs[k].unit ? ` ${aSpecs[k].unit}` : ""}` : "-"}</td>
-                              <td>{bSpecs[k] ? `${bSpecs[k].value}${bSpecs[k].unit ? ` ${bSpecs[k].unit}` : ""}` : "-"}</td>
-                            </tr>
-                          ));
+                          return keys.map((k) => {
+                            const aVal = aSpecs[k] ? `${aSpecs[k].value}${aSpecs[k].unit ? ` ${aSpecs[k].unit}` : ""}` : "-";
+                            const bVal = bSpecs[k] ? `${bSpecs[k].value}${bSpecs[k].unit ? ` ${bSpecs[k].unit}` : ""}` : "-";
+                            const highlight = aVal !== bVal && aVal !== "-" && bVal !== "-";
+                            return (
+                              <tr key={k}>
+                                <td>{k.replace(/([A-Z])/g, " $1").trim()}</td>
+                                <td className={highlight ? "table-warning" : ""}>{aVal}</td>
+                                <td className={highlight ? "table-warning" : ""}>{bVal}</td>
+                              </tr>
+                            );
+                          });
                         })()}
                       </tbody>
                     </table>
                   </div>
 
-                  <h6 className="mt-3">Variant Features Comparison</h6>
-                  <div className="row">
-                    <div className="col-6">
-                      {compareVariants[0] ? (
-                        Object.entries(compareVariants[0].features || {}).map(([cat, list]) => (
-                          <div key={cat} className="mb-2">
-                            <strong>{cat}:</strong> {Array.isArray(list) ? list.join(", ") : String(list)}
+                  <h6 className="mb-3">Variant Features Comparison</h6>
+                  <div className="row g-4">
+                    {[0, 1].map((idx) => (
+                      <div className="col-6" key={idx}>
+                        <div className="card h-100">
+                          <div className="card-header bg-light fw-bold">{idx === 0 ? "Vehicle A Features" : "Vehicle B Features"}</div>
+                          <div className="card-body">
+                            {compareVariants[idx] ? (
+                              Object.entries(compareVariants[idx].features || {}).map(([cat, list]) => (
+                                <div key={cat} className="mb-2">
+                                  <strong>{cat}:</strong> {Array.isArray(list) ? list.join(", ") : String(list)}
+                                </div>
+                              ))
+                            ) : (
+                              <div className="text-muted">No features found.</div>
+                            )}
                           </div>
-                        ))
-                      ) : (
-                        <div>No variant A features</div>
-                      )}
-                    </div>
-                    <div className="col-6">
-                      {compareVariants[1] ? (
-                        Object.entries(compareVariants[1].features || {}).map(([cat, list]) => (
-                          <div key={cat} className="mb-2">
-                            <strong>{cat}:</strong> {Array.isArray(list) ? list.join(", ") : String(list)}
-                          </div>
-                        ))
-                      ) : (
-                        <div>No variant B features</div>
-                      )}
-                    </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
                 <div className="modal-footer">
@@ -792,9 +780,6 @@ const VehicleManagement = () => {
                   Vehicle Details
                 </h5>
                 <div>
-                  <button type="button" className="btn btn-sm btn-outline-secondary me-2" onClick={() => setShowRawJson((s) => !s)}>
-                    {showRawJson ? "Hide JSON" : "Show JSON"}
-                  </button>
                   <button
                     type="button"
                     className="btn-close"

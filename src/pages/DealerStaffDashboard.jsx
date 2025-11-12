@@ -35,11 +35,20 @@ const DealerStaffDashboard = ({ currentPage }) => {
         return acc;
       }, {});
 
+      // Map status to color
+      const statusColorMap = {
+        Pending: "#ffab00", // yellow
+        Confirmed: "#03c3ec", // blue
+        Delivered: "#71dd37", // green
+        Canceled: "#ff3e1d", // red
+      };
+      const chartLabels = Object.keys(statusCounts);
+      const chartColors = chartLabels.map((status) => statusColorMap[status] || "#8592a3");
       const salesOrdersChart = new window.ApexCharts(salesOrdersChartEl, {
         series: Object.values(statusCounts),
         chart: { type: "donut", height: 300 },
-        labels: Object.keys(statusCounts),
-        colors: ["#ffab00", "#03c3ec", "#71dd37", "#ff3e1d"],
+        labels: chartLabels,
+        colors: chartColors,
         legend: { position: "bottom", fontSize: "13px" },
         plotOptions: {
           pie: {
@@ -177,19 +186,21 @@ const DealerStaffDashboard = ({ currentPage }) => {
       let salesOrderParams = { ...baseParams };
       let testDriveParams = { ...baseParams };
       let feedbackParams = { ...baseParams };
+      let quotationParams = { ...baseParams };
 
       if (dealerId) {
         const filters = JSON.stringify({ dealerId });
         salesOrderParams.filters = filters;
         testDriveParams.filters = filters;
         feedbackParams.filters = filters;
+        quotationParams.filters = filters;
       }
 
       const [salesOrdersResponse, testDrivesResponse, feedbacksResponse, quotationsResponse] = await Promise.all([
         getAllSalesOrders(salesOrderParams),
         getAllTestDrives(testDriveParams),
         getAllFeedbacks(feedbackParams),
-        getAllQuotations({ page: 1, pageSize: 100 }),
+        getAllQuotations(quotationParams),
       ]);
 
       const salesOrders = salesOrdersResponse?.data?.items || [];
@@ -532,15 +543,15 @@ const DealerStaffDashboard = ({ currentPage }) => {
                                     <td>
                                       <span
                                         className={`badge ${
-                                          order.status === "Completed"
-                                            ? "bg-success"
+                                          order.status === "Pending"
+                                            ? "bg-label-warning"
                                             : order.status === "Confirmed"
-                                            ? "bg-info"
-                                            : order.status === "Pending"
-                                            ? "bg-warning"
-                                            : order.status === "Cancelled"
-                                            ? "bg-danger"
-                                            : "bg-secondary"
+                                            ? "bg-label-primary"
+                                            : order.status === "Delivered"
+                                            ? "bg-label-success"
+                                            : order.status === "Canceled"
+                                            ? "bg-label-danger"
+                                            : "bg-label-secondary"
                                         }`}
                                       >
                                         {order.status || "N/A"}
