@@ -1,39 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { Bar } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
+import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from "chart.js";
+import { useEffect, useState } from "react";
+import { Bar } from "react-chartjs-2";
 
 // Your component imports
 import DealerOrdersPage from "../components/dealer-mananger-dashboard/dealer-orders/DealerOrdersPage";
 import DealerPaymentsPage from "../components/dealer-mananger-dashboard/dealer-payments/DealerPaymentsPage";
+import PromotionManagement from "../components/dealer-mananger-dashboard/PromotionManagement";
 import StaffManagement from "../components/dealer-mananger-dashboard/staff-management/StaffManagement";
 import StaffPerformancePage from "../components/dealer-mananger-dashboard/staff-performance/StaffPerformancePage";
-import PromotionManagement from "../components/dealer-mananger-dashboard/PromotionManagement";
+import VehicleModelBrowse from "../components/dealer-mananger-dashboard/VehicleModelBrowse";
 
 // --- Import your services ---
-import { 
-  getCurrentUser, 
-  getAllOrders, 
-  getAllUsers,
-  getAllPayments
-} from '../services/dashboardService'; // <-- TODO: Make sure this path is correct
+import { getAllOrders, getAllPayments, getAllUsers, getCurrentUser } from "../services/dashboardService"; // <-- TODO: Make sure this path is correct
 
 // Register Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const DealerManagerDashboard = ({ currentPage }) => {
   // --- State for your data ---
@@ -59,7 +40,6 @@ const DealerManagerDashboard = ({ currentPage }) => {
         setIsLoading(true);
         setError(null);
         try {
-
           const userRes = await getCurrentUser();
           const myDealerId = userRes.data.data?.dealerId;
           console.log("Current User's Dealer ID:", myDealerId);
@@ -67,21 +47,20 @@ const DealerManagerDashboard = ({ currentPage }) => {
             throw new Error("Could not determine Dealer ID for the current user.");
           }
           // phan nay` voi check dum` cai dashboardService.
-            const filters = {filters: JSON.stringify({ dealerId: myDealerId })};
-            const [ordersRes, usersRes, paymentsRes] = await Promise.all([
-            getAllOrders(filters),     // <-- Sends { filters: '{"dealerId":"..."}' }
-            getAllUsers(filters),      // <-- Sends { filters: '{"dealerId":"..."}' }
-            getAllPayments({pageSize:100}) // <-- Still fetch all payments
+          const filters = { filters: JSON.stringify({ dealerId: myDealerId }) };
+          const [ordersRes, usersRes, paymentsRes] = await Promise.all([
+            getAllOrders(filters), // <-- Sends { filters: '{"dealerId":"..."}' }
+            getAllUsers(filters), // <-- Sends { filters: '{"dealerId":"..."}' }
+            getAllPayments({ pageSize: 100 }), // <-- Still fetch all payments
           ]);
 
           // --- Data is now pre-filtered by the API ---
           const myOrders = ordersRes.data?.items || [];
           const myStaff = usersRes.data?.items || [];
-          const allPayments = paymentsRes.data?.items || []; 
+          const allPayments = paymentsRes.data?.items || [];
 
           // Step 3: Process the data
           processDashboardData(myOrders, myStaff, allPayments);
-
         } catch (err) {
           console.error("Failed to fetch dashboard data:", err);
           setError(err.message || "Failed to load dashboard.");
@@ -94,45 +73,39 @@ const DealerManagerDashboard = ({ currentPage }) => {
     }
   }, [currentPage]);
 
-
   /**
    * Helper function to calculate all dashboard data
    */
   const processDashboardData = (myOrders, myStaff, allPayments) => {
-    
     // --- Calculate KPIs ---
     const today = new Date();
     const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
-    const deliveredMonthlyOrders = myOrders.filter(o =>
-      new Date(o.createdAt) >= startOfMonth && o.status === 'Delivered'
-    );
-    
-    const deliveredMonthlyOrderIds = new Set(deliveredMonthlyOrders.map(o => o.id));
+    const deliveredMonthlyOrders = myOrders.filter((o) => new Date(o.createdAt) >= startOfMonth && o.status === "Delivered");
+
+    const deliveredMonthlyOrderIds = new Set(deliveredMonthlyOrders.map((o) => o.id));
 
     // We still filter payments on the frontend, which is fast.
-    const monthlyRevenue = allPayments
-      .filter(p => deliveredMonthlyOrderIds.has(p.salesOrderId))
-      .reduce((sum, p) => sum + (p.amount || 0), 0);
+    const monthlyRevenue = allPayments.filter((p) => deliveredMonthlyOrderIds.has(p.salesOrderId)).reduce((sum, p) => sum + (p.amount || 0), 0);
 
     const kpis = {
       carsSold: deliveredMonthlyOrders.length,
       revenue: monthlyRevenue,
-      pendingOrders: myOrders.filter(o => o.status === 'Pending').length,
-      activeStaff: myStaff.filter(s => s.isActive).length,
+      pendingOrders: myOrders.filter((o) => o.status === "Pending").length,
+      activeStaff: myStaff.filter((s) => s.isActive).length,
     };
     setKpiData(kpis);
 
     // --- Get Top Staff ---
-    const allDeliveredOrders = myOrders.filter(o => o.status === 'Delivered');
+    const allDeliveredOrders = myOrders.filter((o) => o.status === "Delivered");
 
     const salesByStaff = allDeliveredOrders.reduce((acc, order) => {
       if (!order.userId) return acc;
-      
+
       const currentSales = acc[order.userId]?.sales || 0;
       acc[order.userId] = {
         name: order.userFullName,
-        sales: currentSales + 1
+        sales: currentSales + 1,
       };
       return acc;
     }, {});
@@ -141,14 +114,14 @@ const DealerManagerDashboard = ({ currentPage }) => {
       .map(([id, data]) => ({ id, ...data }))
       .sort((a, b) => b.sales - a.sales)
       .slice(0, 5);
-    
+
     setTopStaff(topStaffData);
 
     // --- Get Recent Orders ---
     const recentOrdersData = myOrders
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, 5)
-      .map(o => ({
+      .map((o) => ({
         id: o.id,
         customerName: o.customerFullName,
         status: o.status,
@@ -160,15 +133,13 @@ const DealerManagerDashboard = ({ currentPage }) => {
     const chartSalesData = [];
     for (let i = 5; i >= 0; i--) {
       const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
-      const monthLabel = d.toLocaleString('en-US', { month: 'short' });
+      const monthLabel = d.toLocaleString("en-US", { month: "short" });
       const year = d.getFullYear();
       chartLabels.push(`${monthLabel} ${year}`);
 
-      const salesInMonth = myOrders.filter(o => {
+      const salesInMonth = myOrders.filter((o) => {
         const orderDate = new Date(o.createdAt);
-        return o.status === 'Delivered' &&
-               orderDate.getFullYear() === d.getFullYear() &&
-               orderDate.getMonth() === d.getMonth();
+        return o.status === "Delivered" && orderDate.getFullYear() === d.getFullYear() && orderDate.getMonth() === d.getMonth();
       }).length;
       chartSalesData.push(salesInMonth);
     }
@@ -177,21 +148,20 @@ const DealerManagerDashboard = ({ currentPage }) => {
       labels: chartLabels,
       datasets: [
         {
-          label: 'Cars Sold',
+          label: "Cars Sold",
           data: chartSalesData,
-          backgroundColor: 'rgba(54, 162, 235, 0.6)',
+          backgroundColor: "rgba(54, 162, 235, 0.6)",
         },
       ],
     });
   };
-
 
   // --- RENDER LOGIC ---
 
   const renderDashboardOverview = () => {
     if (isLoading) {
       return (
-        <div className="d-flex justify-content-center align-items-center" style={{ height: '300px' }}>
+        <div className="d-flex justify-content-center align-items-center" style={{ height: "300px" }}>
           <div className="spinner-border text-primary" role="status">
             <span className="visually-hidden">Loading...</span>
           </div>
@@ -258,7 +228,6 @@ const DealerManagerDashboard = ({ currentPage }) => {
         </div>
         {/* --- END OF CORRECTION --- */}
 
-
         {/* Chart Row */}
         <div className="row">
           <div className="col-12 mb-4">
@@ -267,21 +236,20 @@ const DealerManagerDashboard = ({ currentPage }) => {
                 <h5 className="card-title mb-0">Sales Overview (Last 6 Months)</h5>
               </div>
               <div className="card-body">
-                <Bar 
+                <Bar
                   options={{
                     responsive: true,
                     plugins: {
-                      legend: { position: 'top' },
-                      title: { display: true, text: 'Monthly Car Sales' },
+                      legend: { position: "top" },
+                      title: { display: true, text: "Monthly Car Sales" },
                     },
                   }}
-                  data={salesChartData} 
+                  data={salesChartData}
                 />
               </div>
             </div>
           </div>
         </div>
-
 
         {/* Data Lists Row */}
         <div className="row">
@@ -289,14 +257,18 @@ const DealerManagerDashboard = ({ currentPage }) => {
             <div className="card h-100">
               <div className="card-header d-flex justify-content-between align-items-center">
                 <h5 className="card-title mb-0">Top Staff Performers</h5>
-                <a href="#dealer-performance" className="btn btn-sm btn-outline-primary">View All</a>
+                <a href="#dealer-performance" className="btn btn-sm btn-outline-primary">
+                  View All
+                </a>
               </div>
               <div className="card-body">
                 <ul className="list-group list-group-flush">
                   {topStaff.length > 0 ? (
                     topStaff.map((staff, index) => (
                       <li key={staff.id} className="list-group-item d-flex justify-content-between align-items-center">
-                        <span>{index + 1}. {staff.name}</span>
+                        <span>
+                          {index + 1}. {staff.name}
+                        </span>
                         <span className="badge bg-primary">{staff.sales} Sales</span>
                       </li>
                     ))
@@ -311,20 +283,19 @@ const DealerManagerDashboard = ({ currentPage }) => {
             <div className="card h-100">
               <div className="card-header d-flex justify-content-between align-items-center">
                 <h5 className="card-title mb-0">Recent Orders</h5>
-                <a href="#dealer-orders" className="btn btn-sm btn-outline-primary">View All</a>
+                <a href="#dealer-orders" className="btn btn-sm btn-outline-primary">
+                  View All
+                </a>
               </div>
               <div className="card-body">
                 <ul className="list-group list-group-flush">
                   {recentOrders.length > 0 ? (
-                    recentOrders.map(order => (
+                    recentOrders.map((order) => (
                       <li key={order.id} className="list-group-item">
                         <strong>Order #{order.id.substring(0, 8)}...</strong> - {order.customerName}
-                        <span className={`badge bg-${
-                          order.status === 'Delivered' ? 'success' 
-                          : order.status === 'Pending' ? 'warning' 
-                          : order.status === 'Cancelled' ? 'danger' 
-                          : 'secondary'
-                        } float-end`}>
+                        <span
+                          className={`badge bg-${order.status === "Delivered" ? "success" : order.status === "Pending" ? "warning" : order.status === "Cancelled" ? "danger" : "secondary"} float-end`}
+                        >
                           {order.status}
                         </span>
                       </li>
@@ -348,6 +319,8 @@ const DealerManagerDashboard = ({ currentPage }) => {
         return <StaffManagement />;
       case "dealer-performance":
         return <StaffPerformancePage />;
+      case "vehicle-model-browse":
+        return <VehicleModelBrowse />;
       case "dealer-orders":
         return <DealerOrdersPage />;
       case "dealer-payments":
