@@ -8,6 +8,7 @@ const SalesOrderManagement = () => {
   const [salesOrders, setSalesOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [formError, setFormError] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orderPayments, setOrderPayments] = useState([]);
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -338,18 +339,27 @@ const SalesOrderManagement = () => {
     e.preventDefault();
     if (!selectedOrder) return;
     setProcessingPayment(true);
-    setError(null);
+    setFormError(null);
     try {
       let amountToPay = 0;
+      let totalAmount = 0;
 
       if (payMethod === "Upfront") {
         // get current total from summary (quotation total)
         const summaryResp = await getSalesOrdersSummary(selectedOrder.id);
-        // summaryResp may be { data: { totalAmount, ... } } or raw
-        const totalAmount = summaryResp?.data?.totalAmount ?? summaryResp?.totalAmount ?? 0;
+        totalAmount = summaryResp?.data?.totalAmount ?? summaryResp?.totalAmount ?? 0;
         amountToPay = totalAmount;
       } else {
+        // For installment, get total amount for validation
+        const summaryResp = await getSalesOrdersSummary(selectedOrder.id);
+        totalAmount = summaryResp?.data?.totalAmount ?? summaryResp?.totalAmount ?? 0;
         amountToPay = Number(installmentAmount) || 0;
+        // Prevent installment if less than 10% of total price
+        if (amountToPay < 0.1 * totalAmount) {
+          setFormError(`Installment amount must be at least 10% of total price ($${(0.1 * totalAmount).toFixed(2)}).`);
+          setProcessingPayment(false);
+          return;
+        }
       }
 
       const paymentDto = {
@@ -581,6 +591,13 @@ const SalesOrderManagement = () => {
                           <div>{String(paySummary.isFullyPaid ?? paySummary.data?.isFullyPaid ?? false)}</div>
                         </div>
                       </div>
+                    </div>
+                  )}
+                  {/* Error message for payment validation */}
+                  {formError && (
+                    <div className="alert alert-danger" role="alert">
+                      <i className="bx bx-error me-2"></i>
+                      {formError}
                     </div>
                   )}
                   <div className="mb-3">
