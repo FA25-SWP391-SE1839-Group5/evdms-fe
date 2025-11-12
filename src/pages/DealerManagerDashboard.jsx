@@ -185,8 +185,7 @@ const DealerManagerDashboard = ({ currentPage }) => {
           <div className="col-12">
             <div className="card mb-4">
               <div className="card-body">
-                <h4 className="mb-1">Welcome, Dealer Manager!</h4>
-                <p className="mb-0 text-muted">Here's your sales and staff overview for today.</p>
+                <h4 className="mb-0">Here's your sales and staff overview for today!</h4>
               </div>
             </div>
           </div>
