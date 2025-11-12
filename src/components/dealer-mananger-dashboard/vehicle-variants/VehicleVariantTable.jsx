@@ -8,7 +8,7 @@ const SORTABLE_COLUMNS = [
   { key: "features", label: "Features" },
 ];
 
-const VehicleVariantTable = ({ variants, getModelName, formatPrice, handleView, handleEdit, handleDeleteClick, loading, showModal, page, pageSize, totalResults, totalPages, setPage }) => {
+const VehicleVariantTable = ({ variants, getModelName, formatPrice, handleView, loading, showModal, page, pageSize, totalResults, totalPages, setPage }) => {
   const [sort, setSort] = useState({ key: "name", direction: "asc" });
 
   const handleSort = (key) => {
@@ -109,12 +109,6 @@ const VehicleVariantTable = ({ variants, getModelName, formatPrice, handleView, 
                             <div className="btn-group" role="group">
                               <button className="btn btn-sm btn-outline-info" onClick={() => handleView(variant.id)} title="View">
                                 <i className="bx bx-show" />
-                              </button>
-                              <button className="btn btn-sm btn-outline-primary" onClick={() => handleEdit(variant.id)} title="Edit">
-                                <i className="bx bx-edit" />
-                              </button>
-                              <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteClick(variant)} title="Delete">
-                                <i className="bx bx-trash" />
                               </button>
                             </div>
                           </td>

@@ -1,6 +1,6 @@
 import { getAllVehicleModels } from "../../services/vehicleModelService";
 import { getAllVehicleVariants, getVehicleVariantById } from "../../services/vehicleVariantService";
-import VehicleVariantSearchFilter from "./vehicle-variant/VehicleVariantSearchFilter";
+import VehicleVariantSearchFilter from "./vehicle-variants/VehicleVariantSearchFilter";
 
 // Specs configuration with categories and units
 const SPECS_CONFIG = {
@@ -69,24 +69,10 @@ const FEATURES_CONFIG = {
 };
 
 import { useEffect, useRef, useState } from "react";
-import VehicleVariantHeader from "./vehicle-variant/VehicleVariantHeader";
-import VehicleVariantTable from "./vehicle-variant/VehicleVariantTable";
+import VehicleVariantHeader from "./vehicle-variants/VehicleVariantHeader";
+import VehicleVariantTable from "./vehicle-variants/VehicleVariantTable";
 
 const VehicleVariantBrowse = () => {
-  // Open create modal if ?create=1 is in the URL
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("create") === "1") {
-      setModalMode("create");
-      setCurrentVariant(null);
-      setCurrentStep(1);
-      setShowModal(true);
-      // Remove the query param from the URL (optional, for cleaner UX)
-      params.delete("create");
-      const newUrl = window.location.pathname + (params.toString() ? `?${params}` : "");
-      window.history.replaceState({}, "", newUrl);
-    }
-  }, []);
   // State management
   const [variants, setVariants] = useState([]);
   const [models, setModels] = useState([]);
@@ -113,7 +99,7 @@ const VehicleVariantBrowse = () => {
   // Modal state
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState("create"); // 'create', 'edit', 'view'
-  const [currentVariant, setCurrentVariant] = useState(null);
+  const [, setCurrentVariant] = useState(null);
   const [currentStep, setCurrentStep] = useState(1); // Multi-step form
 
   // Form state
@@ -124,10 +110,6 @@ const VehicleVariantBrowse = () => {
     specs: {},
     features: {},
   });
-
-  // Delete confirmation
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [variantToDelete, setVariantToDelete] = useState(null);
 
   // Fetch models on mount
   useEffect(() => {
@@ -187,63 +169,6 @@ const VehicleVariantBrowse = () => {
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
     setPage(1);
-  };
-
-  // Open modal for create
-  const handleCreate = () => {
-    setModalMode("create");
-    setFormData({
-      modelId: models[0]?.id || "",
-      name: "",
-      basePrice: 0,
-      specs: {},
-      features: {},
-    });
-    setCurrentVariant(null);
-    setCurrentStep(1);
-    setShowModal(true);
-  };
-
-  // Open modal for edit
-  const handleEdit = async (id) => {
-    try {
-      setLoading(true);
-      const variant = await getVehicleVariantById(id);
-      setCurrentVariant(variant);
-
-      // Normalize specs: API returns PascalCase keys, keep as-is
-      const normalizedSpecs = {};
-      if (variant.specs) {
-        Object.entries(variant.specs).forEach(([key, value]) => {
-          normalizedSpecs[key] = value;
-        });
-      }
-
-      // Normalize features: API returns lowercase categories, convert to PascalCase
-      const normalizedFeatures = {};
-      if (variant.features) {
-        Object.entries(variant.features).forEach(([key, value]) => {
-          const pascalKey = key.charAt(0).toUpperCase() + key.slice(1);
-          normalizedFeatures[pascalKey] = value;
-        });
-      }
-
-      setFormData({
-        modelId: variant.modelId,
-        name: variant.name,
-        basePrice: variant.basePrice,
-        specs: normalizedSpecs,
-        features: normalizedFeatures,
-      });
-
-      setModalMode("edit");
-      setCurrentStep(1);
-      setShowModal(true);
-    } catch (err) {
-      setError("Failed to fetch variant details: " + (err.message || "Unknown error"));
-    } finally {
-      setLoading(false);
-    }
   };
 
   // Open modal for view
@@ -366,101 +291,6 @@ const VehicleVariantBrowse = () => {
   const nextStep = () => setStepWithScroll((prev) => Math.min(prev + 1, 3));
   const prevStep = () => setStepWithScroll((prev) => Math.max(prev - 1, 1));
 
-  const preparePayload = () => {
-    const payload = {
-      modelId: formData.modelId,
-      name: formData.name,
-      basePrice: formData.basePrice,
-    };
-
-    // Always send all spec keys, with empty arrays if not selected
-    const specs = {};
-    Object.keys(SPECS_CONFIG).forEach((category) => {
-      Object.keys(SPECS_CONFIG[category]).forEach((specName) => {
-        const spec = formData.specs[specName];
-        const config = SPECS_CONFIG[category][specName];
-        if (spec && spec.value !== undefined && spec.value !== "" && spec.value !== null) {
-          const camelKey = specName.charAt(0).toLowerCase() + specName.slice(1);
-          specs[camelKey] = {
-            value: config.unit ? Number(spec.value) : String(spec.value),
-            ...(config.unit ? { unit: config.unit } : {}),
-          };
-        }
-      });
-    });
-    payload.specs = specs;
-
-    // Always send all feature categories, with empty arrays if not selected
-    const features = {};
-    Object.keys(FEATURES_CONFIG).forEach((category) => {
-      const selected = formData.features[category] || [];
-      features[category.toLowerCase()] = selected;
-    });
-    payload.features = features;
-
-    return payload;
-  };
-
-  // Handle form submit
-  const handleSubmit = async () => {
-    setError(null);
-    setSuccess(null);
-
-    // Validation
-    if (!formData.modelId || !formData.name || formData.basePrice <= 0) {
-      setError("Please fill in all required fields (Model, Name, Base Price)");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const payload = preparePayload();
-
-      if (modalMode === "create") {
-        await createVehicleVariant(payload);
-        setSuccess("Variant created successfully!");
-      } else if (modalMode === "edit") {
-        await updateVehicleVariant(currentVariant.id, payload);
-        setSuccess("Variant updated successfully!");
-      }
-
-      await fetchVariants();
-      setTimeout(() => {
-        setShowModal(false);
-        setSuccess(null);
-      });
-    } catch (err) {
-      setError("Failed to save variant: " + (err.response?.data?.message || err.message || "Unknown error"));
-      console.error("Save error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle delete
-  const handleDeleteClick = (variant) => {
-    setVariantToDelete(variant);
-    setShowDeleteModal(true);
-  };
-
-  const confirmDelete = async () => {
-    if (!variantToDelete) return;
-
-    try {
-      setLoading(true);
-      await deleteVehicleVariant(variantToDelete.id);
-      setSuccess("Variant deleted successfully!");
-      setShowDeleteModal(false);
-      setVariantToDelete(null);
-      await fetchVariants();
-      setTimeout(() => setSuccess(null), 3000);
-    } catch (err) {
-      setError("Failed to delete variant: " + (err.message || "Unknown error"));
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Get model name by ID
   const getModelName = (modelId) => {
     const model = models.find((m) => m.id === modelId);
@@ -497,24 +327,6 @@ const VehicleVariantBrowse = () => {
               <label className="form-label text-muted small">Variant Name</label>
               <p className="mb-0 fw-semibold">{formData.name}</p>
             </div>
-            {currentVariant && (
-              <>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label text-muted small">Created At</label>
-                  <p className="mb-0">{new Date(currentVariant.createdAt).toLocaleString()}</p>
-                </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label text-muted small">Updated At</label>
-                  <p className="mb-0">{new Date(currentVariant.updatedAt).toLocaleString()}</p>
-                </div>
-                <div className="col-12 mb-3">
-                  <label className="form-label text-muted small">Variant ID</label>
-                  <p className="mb-0">
-                    <code className="text-muted">{currentVariant.id}</code>
-                  </p>
-                </div>
-              </>
-            )}
           </div>
         </div>
       );
@@ -891,7 +703,7 @@ const VehicleVariantBrowse = () => {
   return (
     <div className="container-xxl flex-grow-1 container-p-y">
       {/* Header */}
-      <VehicleVariantHeader onCreate={handleCreate} onRefresh={fetchVariants} totalResults={totalResults} />
+      <VehicleVariantHeader onRefresh={fetchVariants} totalResults={totalResults} />
 
       {/* Alerts (only show in background if modal is not open) */}
       {!showModal && error && (
@@ -926,8 +738,6 @@ const VehicleVariantBrowse = () => {
         getModelName={getModelName}
         formatPrice={formatPrice}
         handleView={handleView}
-        handleEdit={handleEdit}
-        handleDeleteClick={handleDeleteClick}
         loading={loading}
         showModal={showModal}
         page={page}
@@ -944,18 +754,6 @@ const VehicleVariantBrowse = () => {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
-                  {modalMode === "create" && (
-                    <>
-                      <i className="bx bx-plus me-2" />
-                      Create New Variant
-                    </>
-                  )}
-                  {modalMode === "edit" && (
-                    <>
-                      <i className="bx bx-edit me-2" />
-                      Edit Variant
-                    </>
-                  )}
                   {modalMode === "view" && (
                     <>
                       <i className="bx bx-show me-2" />
@@ -1070,7 +868,7 @@ const VehicleVariantBrowse = () => {
                         <i className="bx bx-chevron-right ms-1" />
                       </button>
                     ) : (
-                      <button type="button" className="btn btn-success" onClick={handleSubmit} disabled={loading}>
+                      <button type="button" className="btn btn-success" disabled={loading}>
                         {loading ? (
                           <>
                             <span className="spinner-border spinner-border-sm me-2" />
@@ -1091,9 +889,6 @@ const VehicleVariantBrowse = () => {
           </div>
         </div>
       )}
-
-      {/* Delete Confirmation Modal */}
-      <VehicleVariantDeleteModal show={showDeleteModal} loading={loading} variant={variantToDelete} onCancel={() => setShowDeleteModal(false)} onConfirm={confirmDelete} />
     </div>
   );
 };
