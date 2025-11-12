@@ -61,19 +61,57 @@ const DealerSidebar = ({ currentPage, onNavigate }) => {
       <div className="app-brand demo">
         <a href="#" className="app-brand-link" onClick={(e) => handleMenuClick(e, userRole === "staff" || userRole === "dealer_staff" ? "staff-dashboard" : "dealer-dashboard")}>
           <span className="app-brand-logo demo">
-            {/* You might want a different logo or color */}
             <img src="/assets/images/elecar_logo.svg" alt="EVDMS Logo" className="img-fluid" style={{ maxHeight: "56px" }} />
           </span>
           <span className="app-brand-text demo menu-text fw-bolder ms-2">EVDMS</span>
         </a>
-        {/* Mobile toggle */}
+
         <a href="#" className="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
-          <i className="bx bx-chevron-left bx-sm align-middle" />
+          <i className="bx bx-chevron-left bx-sm align-middle" />\
         </a>
       </div>
       <div className="menu-inner-shadow" />
-      {/* Menu */}
-      <ul className="menu-inner py-1">{menuItems.map(renderMenuItem)}</ul>
+      {/* Menu with sections */}
+      <ul className="menu-inner py-1">
+        {/* Dashboard always at top, not under a section */}
+        {renderMenuItem(menuItems[0])}
+        {userRole === "staff" || userRole === "dealer_staff" ? (
+          <>
+            <li className="menu-header small text-uppercase">
+              <span className="menu-header-text">Vehicle & Customers</span>
+            </li>
+            {renderMenuItem(menuItems[1])}
+            {renderMenuItem(menuItems[2])}
+            <li className="menu-header small text-uppercase">
+              <span className="menu-header-text">Sales & Test Drives</span>
+            </li>
+            {renderMenuItem(menuItems[3])}
+            {renderMenuItem(menuItems[4])}
+            {renderMenuItem(menuItems[5])}
+            <li className="menu-header small text-uppercase">
+              <span className="menu-header-text">Feedback</span>
+            </li>
+            {renderMenuItem(menuItems[6])}
+          </>
+        ) : (
+          <>
+            <li className="menu-header small text-uppercase">
+              <span className="menu-header-text">Dealer Management</span>
+            </li>
+            {renderMenuItem(menuItems[1])}
+            {renderMenuItem(menuItems[2])}
+            <li className="menu-header small text-uppercase">
+              <span className="menu-header-text">Orders & Payments</span>
+            </li>
+            {renderMenuItem(menuItems[3])}
+            {renderMenuItem(menuItems[4])}
+            <li className="menu-header small text-uppercase">
+              <span className="menu-header-text">Promotions</span>
+            </li>
+            {renderMenuItem(menuItems[5])}
+          </>
+        )}
+      </ul>
     </aside>
   );
 };
