@@ -44,11 +44,9 @@ const DealerPaymentDetailsModal = ({ show, onClose, payment, uploading = false, 
         <div className="mb-3">
           <strong>Order ID:</strong> {payment.dealerOrderId}
         </div>
+        {/* Dealer Name removed as requested */}
         <div className="mb-3">
-          <strong>Dealer Name:</strong> {payment.dealerName}
-        </div>
-        <div className="mb-3">
-          <strong>Amount:</strong> {payment.amount?.toLocaleString()} USD
+          <strong>Amount:</strong> ${payment.amount?.toLocaleString()}
         </div>
         <div className="mb-3">
           <strong>Status:</strong> {getStatusBadge(payment.status)}

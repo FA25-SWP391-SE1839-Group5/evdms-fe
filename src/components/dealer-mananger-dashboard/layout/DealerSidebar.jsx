@@ -89,7 +89,6 @@ const DealerSidebar = ({ currentPage, onNavigate }) => {
             </li>
             {renderMenuItem(menuItems[3])}
             {renderMenuItem(menuItems[4])}
-            {renderMenuItem(menuItems[4])}
             {renderMenuItem(menuItems[5])}
             <li className="menu-header small text-uppercase">
               <span className="menu-header-text">Feedback</span>

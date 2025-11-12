@@ -40,7 +40,7 @@ const DealerPaymentReviewModal = ({ open, payment, onClose, onPaid, onFailed, lo
           <strong>Dealer Order ID:</strong> {payment.dealerOrderId}
         </div>
         <div className="mb-3">
-          <strong>Amount:</strong> {payment.amount?.toLocaleString()} USD
+          <strong>Amount:</strong> ${payment.amount?.toLocaleString()}
         </div>
         <div className="mb-3">
           <strong>Status:</strong> {getStatusBadge(payment.status)}
@@ -61,10 +61,10 @@ const DealerPaymentReviewModal = ({ open, payment, onClose, onPaid, onFailed, lo
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="success" onClick={onPaid} disabled={loading}>
+        <Button variant="success" onClick={onPaid} disabled={loading || !payment.documentUrl || payment.status !== "Pending"}>
           Mark as Paid
         </Button>
-        <Button variant="danger" onClick={onFailed} disabled={loading}>
+        <Button variant="danger" onClick={onFailed} disabled={loading || payment.status !== "Pending"}>
           Mark as Failed
         </Button>
         <Button variant="secondary" onClick={onClose} disabled={loading}>
