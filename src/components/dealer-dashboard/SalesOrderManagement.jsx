@@ -1,6 +1,6 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { getAllPayments, getCustomerById } from "../../services/dashboardService";
 import { createPayment, createSalesOrder, deleteSalesOrder, deliverSalesOrders, getAllSalesOrders, getSalesOrderById, getSalesOrdersSummary, updateSalesOrder } from "../../services/salesOrderService";
-import { getCustomerById, getAllPayments } from "../../services/dashboardService";
 import { getVehicleById } from "../../services/vehicleService";
 import { decodeJwt } from "../../utils/jwt";
 
@@ -166,41 +166,38 @@ const SalesOrderManagement = () => {
         let vehicleData = null; // Store full vehicle data
         let vehicleVin = null;
         let payments = [];
-        
+
         try {
           const [custResp, vehicleResp, paymentsResp] = await Promise.all([
             getCustomerById(data.customerId),
             getVehicleById(data.vehicleId),
             getAllPayments({
               filters: JSON.stringify({ salesOrderId: order.id }),
-          }),
-        ]);
+            }),
+          ]);
           // Log the actual URL that was called
-          console.log('Payments response:', paymentsResp);
+          console.log("Payments response:", paymentsResp);
 
           const cust = custResp?.data ?? custResp;
           const vehicle = vehicleResp?.data ?? vehicleResp;
-          
+
           // Extract customer name
           customerName = cust?.fullName || cust?.name || cust?.customerFullName || null;
-          
+
           // Extract vehicle data - based on your response structure
           vehicleData = vehicle; // Store the full vehicle object
           vehicleVin = vehicle?.vin || null; // Direct access to vin field
-          
+
           // Debug logging
           if (!vehicleVin) {
             console.debug("Vehicle response (no VIN found):", vehicle);
             console.debug("Available vehicle fields:", Object.keys(vehicle));
           }
-          
-          payments = paymentsResp?.data?.items || 
-          paymentsResp?.items || 
-          paymentsResp?.data || 
-          [];
 
-          console.log('Payments response:', paymentsResp);
-          console.log('Extracted payments:', payments);
+          payments = paymentsResp?.data?.items || paymentsResp?.items || paymentsResp?.data || [];
+
+          console.log("Payments response:", paymentsResp);
+          console.log("Extracted payments:", payments);
         } catch (e) {
           console.debug("Customer/Vehicle/Payments lookup failed", e);
         }
@@ -210,7 +207,7 @@ const SalesOrderManagement = () => {
           customerFullName: customerName || data.customerFullName || data.customerName || null,
           vehicleVin: vehicleVin || data.vehicleVin || data.vin || null,
           // Store additional vehicle data if needed
-          vehicleData: vehicleData, 
+          vehicleData: vehicleData,
         };
 
         setSelectedOrder(enhanced);
@@ -327,7 +324,7 @@ const SalesOrderManagement = () => {
       setPaySummary(summaryData);
       const alreadyPaid = (summaryData?.paidAmount ?? summaryData?.data?.paidAmount ?? 0) > 0;
       setPayMethod(alreadyPaid ? "Installment" : "Upfront");
-    } catch (e) {
+    } catch {
       setPaySummary(null);
       setPayMethod("Upfront");
     }
@@ -607,18 +604,12 @@ const SalesOrderManagement = () => {
                         className="form-control"
                         value={installmentAmount}
                         min={0}
-                        max={
-                          paySummary
-                            ? (paySummary.totalAmount ?? paySummary.data?.totalAmount ?? 0) - (paySummary.paidAmount ?? paySummary.data?.paidAmount ?? 0) + 1
-                            : undefined
-                        }
+                        max={paySummary ? (paySummary.totalAmount ?? paySummary.data?.totalAmount ?? 0) - (paySummary.paidAmount ?? paySummary.data?.paidAmount ?? 0) : undefined}
                         onChange={(e) => setInstallmentAmount(e.target.value)}
                         required
                       />
                       {paySummary && (
-                        <div className="form-text">
-                          Max: {((paySummary.totalAmount ?? paySummary.data?.totalAmount ?? 0) - (paySummary.paidAmount ?? paySummary.data?.paidAmount ?? 0) + 1 )}
-                        </div>
+                        <div className="form-text">Max: {(paySummary.totalAmount ?? paySummary.data?.totalAmount ?? 0) - (paySummary.paidAmount ?? paySummary.data?.paidAmount ?? 0)}</div>
                       )}
                     </div>
                   )}
