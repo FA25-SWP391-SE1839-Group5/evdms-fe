@@ -1,3 +1,23 @@
+// Helper for copying to clipboard and showing success alert
+const handleCopyId = (id) => {
+  if (!id) return;
+  navigator.clipboard.writeText(id.toString());
+  showSuccessAlert("Order ID copied to clipboard!");
+};
+
+// Show success alert (bootstrap style)
+const showSuccessAlert = (message) => {
+  const alert = document.createElement("div");
+  alert.className = "alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3";
+  alert.style.zIndex = "9999";
+  alert.innerHTML = `
+      <i class="bx bx-check-circle me-2"></i>
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+  document.body.appendChild(alert);
+  setTimeout(() => alert.remove(), 3000);
+};
 // src/components/DealerPayments/DealerPaymentsPage.jsx
 import { useEffect, useState } from "react";
 import { Alert, Badge, Button, Card, Col, Form, Row, Spinner, Table } from "react-bootstrap";
@@ -213,7 +233,15 @@ const DealerPaymentsPage = () => {
               ) : payments.length > 0 ? (
                 payments.map((payment) => (
                   <tr key={payment.id}>
-                    <td>{payment.dealerOrderId ? payment.dealerOrderId.substring(0, 8) : "N/A"}...</td>
+                    <td>
+                      {payment.dealerOrderId ? (
+                        <small className="text-muted" style={{ cursor: "pointer" }} title={payment.dealerOrderId} onClick={() => handleCopyId(payment.dealerOrderId)}>
+                          {payment.dealerOrderId.substring(0, 8)}...
+                        </small>
+                      ) : (
+                        "N/A"
+                      )}
+                    </td>
                     <td className="text-primary fw-semibold">{payment.amount != null ? formatCurrency(payment.amount) : "N/A"}</td>
                     <td>{payment.createdAt ? new Date(payment.createdAt).toLocaleString() : "N/A"}</td>
                     <td>{renderStatusBadge(payment.status)}</td>
