@@ -10,6 +10,8 @@ import LoginPage from "./pages/LoginPage";
 import { initialState, routeReducer, ROUTES } from "./routes";
 import { getStoredToken } from "./services/authService";
 
+import ResetPasswordPage from "./pages/ResetPasswordPage";
+
 const App = () => {
   const [routeState, dispatch] = useReducer(routeReducer, initialState);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
