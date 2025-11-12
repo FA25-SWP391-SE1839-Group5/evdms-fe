@@ -1,4 +1,4 @@
-const DealerOrderReviewModal = ({ open, order, onClose, onAccept, onDecline, onDeliver, loading }) => {
+const DealerOrderReviewModal = ({ open, order, onClose, onAccept, onDecline, onDeliver, loading, errorMessage }) => {
   if (!open || !order) return null;
 
   // Helper for pretty field names
@@ -77,6 +77,11 @@ const DealerOrderReviewModal = ({ open, order, onClose, onAccept, onDecline, onD
                 </div>
               ))}
             </div>
+            {errorMessage && (
+              <div className="alert alert-danger mt-3" role="alert">
+                {errorMessage}
+              </div>
+            )}
           </div>
           <div className="modal-footer">
             <button type="button" className="btn btn-danger" onClick={onDecline} disabled={loading || order.status !== "Pending"}>
@@ -85,7 +90,7 @@ const DealerOrderReviewModal = ({ open, order, onClose, onAccept, onDecline, onD
             <button type="button" className="btn btn-success" onClick={onAccept} disabled={loading || order.status !== "Pending"}>
               {loading ? "Accepting..." : "Accept"}
             </button>
-            <button type="button" className="btn btn-primary" onClick={onDeliver} disabled={loading || (order.status !== "Confirmed" && order.status !== "Paid")}> 
+            <button type="button" className="btn btn-primary" onClick={onDeliver} disabled={loading || (order.status !== "Confirmed" && order.status !== "Paid")}>
               {loading ? "Delivering..." : "Deliver"}
             </button>
           </div>

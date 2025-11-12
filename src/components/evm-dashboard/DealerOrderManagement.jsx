@@ -21,6 +21,7 @@ const DealerOrderManagement = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
+  const [modalErrorMessage, setModalErrorMessage] = useState("");
 
   useEffect(() => {
     fetchOrders();
@@ -53,6 +54,7 @@ const DealerOrderManagement = () => {
   // Modal handlers
   const handleReview = (order) => {
     setSelectedOrder(order);
+    setModalErrorMessage("");
     setModalOpen(true);
   };
 
@@ -60,17 +62,21 @@ const DealerOrderManagement = () => {
     setModalOpen(false);
     setSelectedOrder(null);
     setModalLoading(false);
+    setModalErrorMessage("");
   };
 
   const handleAccept = async () => {
     if (!selectedOrder) return;
     setModalLoading(true);
+    setModalErrorMessage("");
     try {
       await createDealerPayment({ dealerOrderId: selectedOrder.id });
       handleModalClose();
       fetchOrders();
     } catch (err) {
-      setError("Failed to accept order: " + (err.message || "Unknown error"));
+      // Try to get API error message
+      let apiMsg = err?.response?.data?.message || err.message || "Unknown error";
+      setModalErrorMessage(apiMsg);
       setModalLoading(false);
     }
   };
@@ -78,12 +84,14 @@ const DealerOrderManagement = () => {
   const handleDecline = async () => {
     if (!selectedOrder) return;
     setModalLoading(true);
+    setModalErrorMessage("");
     try {
       await patchDealerOrder(selectedOrder.id, { status: "Canceled" });
       handleModalClose();
       fetchOrders();
     } catch (err) {
-      setError("Failed to decline order: " + (err.message || "Unknown error"));
+      let apiMsg = err?.response?.data?.message || err.message || "Unknown error";
+      setModalErrorMessage(apiMsg);
       setModalLoading(false);
     }
   };
@@ -91,12 +99,14 @@ const DealerOrderManagement = () => {
   const handleDeliver = async () => {
     if (!selectedOrder) return;
     setModalLoading(true);
+    setModalErrorMessage("");
     try {
       await markDealerOrderDelivered(selectedOrder.id);
       handleModalClose();
       fetchOrders();
     } catch (err) {
-      setError("Failed to deliver order: " + (err.message || "Unknown error"));
+      let apiMsg = err?.response?.data?.message || err.message || "Unknown error";
+      setModalErrorMessage(apiMsg);
       setModalLoading(false);
     }
   };
@@ -332,7 +342,16 @@ const DealerOrderManagement = () => {
         </div>
       </div>
       {/* Review Modal */}
-      <DealerOrderReviewModal open={modalOpen} order={selectedOrder} onClose={handleModalClose} onAccept={handleAccept} onDecline={handleDecline} onDeliver={handleDeliver} loading={modalLoading} />
+      <DealerOrderReviewModal
+        open={modalOpen}
+        order={selectedOrder}
+        onClose={handleModalClose}
+        onAccept={handleAccept}
+        onDecline={handleDecline}
+        onDeliver={handleDeliver}
+        loading={modalLoading}
+        errorMessage={modalErrorMessage}
+      />
     </div>
   );
 };
