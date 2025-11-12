@@ -325,24 +325,11 @@ const SalesOrderManagement = () => {
     setFormError(null);
     try {
       let amountToPay = 0;
-      let totalAmount = 0;
-
       if (payMethod === "Upfront") {
-        // get current total from summary (quotation total)
         const summaryResp = await getSalesOrdersSummary(selectedOrder.id);
-        totalAmount = summaryResp?.data?.totalAmount ?? summaryResp?.totalAmount ?? 0;
-        amountToPay = totalAmount;
+        amountToPay = summaryResp?.data?.totalAmount ?? summaryResp?.totalAmount ?? 0;
       } else {
-        // For installment, get total amount for validation
-        const summaryResp = await getSalesOrdersSummary(selectedOrder.id);
-        totalAmount = summaryResp?.data?.totalAmount ?? summaryResp?.totalAmount ?? 0;
         amountToPay = Number(installmentAmount) || 0;
-        // Prevent installment if less than 10% of total price
-        if (amountToPay < 0.1 * totalAmount) {
-          setFormError(`Installment amount must be at least 10% of total price ($${(0.1 * totalAmount).toFixed(2)}).`);
-          setProcessingPayment(false);
-          return;
-        }
       }
 
       const paymentDto = {
@@ -365,12 +352,13 @@ const SalesOrderManagement = () => {
         showSuccessAlert("Payment recorded.");
       }
 
-      // Close pay modal but keep summary modal open
       setShowPayModal(false);
       loadSalesOrders();
     } catch (err) {
+      // Display error from API if available
+      const apiError = err?.response?.data?.message || err?.message || "Failed to process payment. Please try again.";
+      setFormError(apiError);
       console.error("Error processing payment:", err);
-      setError("Failed to process payment. Please try again.");
     } finally {
       setProcessingPayment(false);
     }
@@ -604,15 +592,18 @@ const SalesOrderManagement = () => {
                       <label className="form-label">Amount to Pay</label>
                       <input
                         type="number"
+                        step="any"
                         className="form-control"
                         value={installmentAmount}
                         min={0}
-                        max={paySummary ? (paySummary.totalAmount ?? paySummary.data?.totalAmount ?? 0) - (paySummary.paidAmount ?? paySummary.data?.paidAmount ?? 0) : undefined}
-                        onChange={(e) => setInstallmentAmount(e.target.value)}
+                        max={paySummary ? Number(((paySummary.totalAmount ?? paySummary.data?.totalAmount ?? 0) - (paySummary.paidAmount ?? paySummary.data?.paidAmount ?? 0)).toFixed(2)) : undefined}
+                        onChange={(e) => setInstallmentAmount(e.target.value === "" ? "" : parseFloat(e.target.value))}
                         required
                       />
                       {paySummary && (
-                        <div className="form-text">Max: {(paySummary.totalAmount ?? paySummary.data?.totalAmount ?? 0) - (paySummary.paidAmount ?? paySummary.data?.paidAmount ?? 0)}</div>
+                        <div className="form-text">
+                          Max: {((paySummary.totalAmount ?? paySummary.data?.totalAmount ?? 0) - (paySummary.paidAmount ?? paySummary.data?.paidAmount ?? 0) || 0).toFixed(2)}
+                        </div>
                       )}
                     </div>
                   )}
