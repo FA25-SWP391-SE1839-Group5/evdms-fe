@@ -1,23 +1,3 @@
-// Helper for copying to clipboard and showing success alert
-const handleCopyId = (id) => {
-  if (!id) return;
-  navigator.clipboard.writeText(id.toString());
-  showSuccessAlert("Order ID copied to clipboard!");
-};
-
-// Show success alert (bootstrap style)
-const showSuccessAlert = (message) => {
-  const alert = document.createElement("div");
-  alert.className = "alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3";
-  alert.style.zIndex = "9999";
-  alert.innerHTML = `
-      <i class="bx bx-check-circle me-2"></i>
-      ${message}
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-  document.body.appendChild(alert);
-  setTimeout(() => alert.remove(), 3000);
-};
 import { useEffect, useState } from "react";
 import { getAllDealerPayments, markDealerPaymentFailed, markDealerPaymentPaid } from "../../services/dealerOrderService";
 import DealerPaymentReviewModal from "./dealer-payment/DealerPaymentReviewModal";
@@ -212,9 +192,6 @@ const DealerPaymentsManagement = () => {
                 <table className="table table-hover">
                   <thead>
                     <tr>
-                      <th style={{ cursor: "pointer" }} onClick={() => handleSort("dealerOrderId")}>
-                        Dealer Order ID {sortBy === "dealerOrderId" && (sortOrder === "asc" ? "▲" : "▼")}
-                      </th>
                       <th style={{ cursor: "pointer" }} onClick={() => handleSort("amount")}>
                         Amount (USD) {sortBy === "amount" && (sortOrder === "asc" ? "▲" : "▼")}
                       </th>
@@ -233,7 +210,7 @@ const DealerPaymentsManagement = () => {
                   <tbody>
                     {payments.length === 0 ? (
                       <tr>
-                        <td colSpan="6" className="text-center py-5 text-muted">
+                        <td colSpan="5" className="text-center py-5 text-muted">
                           <i className="bx bx-file bx-lg mb-2" />
                           <p>No dealer payments found</p>
                         </td>
@@ -241,15 +218,6 @@ const DealerPaymentsManagement = () => {
                     ) : (
                       payments.map((payment) => (
                         <tr key={payment.id}>
-                          <td>
-                            {payment.dealerOrderId ? (
-                              <small className="text-muted" style={{ cursor: "pointer" }} title={payment.dealerOrderId} onClick={() => handleCopyId(payment.dealerOrderId)}>
-                                {payment.dealerOrderId.substring(0, 8)}...
-                              </small>
-                            ) : (
-                              "N/A"
-                            )}
-                          </td>
                           <td className="text-primary fw-semibold">{formatCurrency(payment.amount)}</td>
                           <td>{getStatusBadge(payment.status)}</td>
                           <td>{formatDate(payment.createdAt)}</td>

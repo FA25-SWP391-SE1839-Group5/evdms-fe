@@ -508,12 +508,6 @@ const VehicleVariantManagement = () => {
                   <label className="form-label text-muted small">Updated At</label>
                   <p className="mb-0">{new Date(currentVariant.updatedAt).toLocaleString()}</p>
                 </div>
-                <div className="col-12 mb-3">
-                  <label className="form-label text-muted small">Variant ID</label>
-                  <p className="mb-0">
-                    <code className="text-muted">{currentVariant.id}</code>
-                  </p>
-                </div>
               </>
             )}
           </div>
@@ -891,8 +885,8 @@ const VehicleVariantManagement = () => {
 
   return (
     <div className="container-xxl flex-grow-1 container-p-y">
-  {/* Header */}
-  <VehicleVariantHeader onCreate={handleCreate} onRefresh={fetchVariants} totalResults={totalResults} />
+      {/* Header */}
+      <VehicleVariantHeader onCreate={handleCreate} onRefresh={fetchVariants} totalResults={totalResults} />
 
       {/* Alerts (only show in background if modal is not open) */}
       {!showModal && error && (

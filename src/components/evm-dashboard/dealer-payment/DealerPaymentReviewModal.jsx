@@ -37,9 +37,6 @@ const DealerPaymentReviewModal = ({ open, payment, onClose, onPaid, onFailed, lo
       </Modal.Header>
       <Modal.Body>
         <div className="mb-3">
-          <strong>Dealer Order ID:</strong> {payment.dealerOrderId}
-        </div>
-        <div className="mb-3">
           <strong>Amount:</strong> ${payment.amount?.toLocaleString()}
         </div>
         <div className="mb-3">

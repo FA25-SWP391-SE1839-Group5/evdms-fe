@@ -43,13 +43,6 @@ const VehicleModelDetailsModal = ({ show, onClose, currentModel, imagePreview, u
                   {currentModel.updatedAt}
                 </p>
               </div>
-              <div className="col-12 mt-2">
-                <p className="mb-2">
-                  <strong>ID:</strong>
-                  <br />
-                  <code className="text-muted">{currentModel.id}</code>
-                </p>
-              </div>
             </div>
           </div>
           <div className="modal-footer">

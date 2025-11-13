@@ -344,7 +344,19 @@ const DealerOrderManagement = () => {
       {/* Review Modal */}
       <DealerOrderReviewModal
         open={modalOpen}
-        order={selectedOrder}
+        order={
+          selectedOrder
+            ? {
+                dealerName: selectedOrder.dealerName,
+                variantName: selectedOrder.variantName,
+                color: selectedOrder.color,
+                quantity: selectedOrder.quantity,
+                status: selectedOrder.status,
+                createdAt: selectedOrder.createdAt,
+                updatedAt: selectedOrder.updatedAt,
+              }
+            : null
+        }
         onClose={handleModalClose}
         onAccept={handleAccept}
         onDecline={handleDecline}

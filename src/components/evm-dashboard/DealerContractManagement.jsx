@@ -663,13 +663,6 @@ const DealerContractManagement = () => {
                       <div className="row">
                         <div className="col-md-6">
                           <p className="mb-2">
-                            <strong>Contract ID:</strong>
-                            <br />
-                            <code className="text-muted">{currentContract.id}</code>
-                          </p>
-                        </div>
-                        <div className="col-md-6">
-                          <p className="mb-2">
                             <strong>Status:</strong>
                             <br />
                             <span className={`badge bg-label-${getContractStatus(currentContract.startDate, currentContract.endDate).color}`}>

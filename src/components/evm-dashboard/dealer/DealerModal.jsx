@@ -91,13 +91,6 @@ const DealerModal = ({ showModal, modalMode, loading, formData, REGIONS, handleI
                       {currentDealer.updatedAt}
                     </p>
                   </div>
-                  <div className="col-12 mt-2">
-                    <p className="mb-2">
-                      <strong>ID:</strong>
-                      <br />
-                      <code className="text-muted">{currentDealer.id}</code>
-                    </p>
-                  </div>
                 </div>
               )}
             </div>

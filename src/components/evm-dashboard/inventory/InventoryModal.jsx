@@ -79,13 +79,6 @@ const InventoryModal = ({ show, loading, modalMode, formData, variants, currentI
                 <div className="mt-3">
                   <hr />
                   <div className="row">
-                    <div className="col-md-12">
-                      <p className="mb-2">
-                        <strong>Inventory ID:</strong>
-                        <br />
-                        <code className="text-muted">{currentInventory.id}</code>
-                      </p>
-                    </div>
                     <div className="col-md-6 mt-2">
                       <p className="mb-2">
                         <strong>Created At:</strong>
