@@ -39,13 +39,6 @@ const DealerPaymentDetailsModal = ({ show, onClose, payment, uploading = false, 
       <Modal.Body>
         {error && <Alert variant="danger">{error}</Alert>}
         <div className="mb-3">
-          <strong>Payment ID:</strong> {payment.id}
-        </div>
-        <div className="mb-3">
-          <strong>Order ID:</strong> {payment.dealerOrderId}
-        </div>
-        {/* Dealer Name removed as requested */}
-        <div className="mb-3">
           <strong>Amount:</strong> ${payment.amount?.toLocaleString()}
         </div>
         <div className="mb-3">

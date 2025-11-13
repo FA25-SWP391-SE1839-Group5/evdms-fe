@@ -1,11 +1,5 @@
-import { useEffect, useState, useRef } from "react";
-import {
-  getAllPromotions,
-  getPromotionById,
-  createPromotion,
-  updatePromotion,
-  deletePromotion,
-} from "../../services/dashboardService";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createPromotion, deletePromotion, getAllPromotions, getPromotionById, updatePromotion } from "../../services/dashboardService";
 import { decodeJwt } from "../../utils/jwt";
 
 const PromotionManagement = () => {
@@ -23,7 +17,7 @@ const PromotionManagement = () => {
     description: "",
     discountPercent: "",
     startDate: "",
-    endDate: ""
+    endDate: "",
   });
 
   // Pagination, search, filter
@@ -31,9 +25,9 @@ const PromotionManagement = () => {
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
-    const [searchTerm, setSearchTerm] = useState("");  
-    const [debouncedSearch, setDebouncedSearch] = useState("");
-    const searchTimeout = useRef();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const searchTimeout = useRef();
   // Remove filterBy/filterValue state, use dealerId from JWT
 
   useEffect(() => {
@@ -45,61 +39,64 @@ const PromotionManagement = () => {
     return () => clearTimeout(searchTimeout.current);
   }, [searchTerm]);
 
+  const loadPromotions = useCallback(
+    async (dealerIdOverride) => {
+      try {
+        setLoading(true);
+        setError(null);
+        // Always filter by dealerId from JWT
+        const token = localStorage.getItem("evdms_auth_token");
+        const decoded = decodeJwt(token);
+        const dealerId = dealerIdOverride || decoded?.dealerId || decoded?.dealer || "";
+        const params = {
+          page: currentPage,
+          pageSize,
+          search: searchTerm || undefined,
+          filters: JSON.stringify({ dealerId }),
+        };
+        const response = await getAllPromotions(params);
+        let items = [];
+        let total = 0;
+        if (response?.data?.items) {
+          items = response.data.items;
+          total = response.data.totalResults || items.length;
+        } else if (Array.isArray(response?.data)) {
+          items = response.data;
+          total = items.length;
+        } else if (Array.isArray(response)) {
+          items = response;
+          total = items.length;
+        }
+        setPromotions(items);
+        setTotalResults(total);
+        setTotalPages(Math.max(1, Math.ceil(total / pageSize)));
+      } catch {
+        setError("Failed to load promotions. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [currentPage, pageSize, searchTerm]
+  );
+
   useEffect(() => {
     // Get dealerId from JWT
-    const token = localStorage.getItem('evdms_auth_token');
+    const token = localStorage.getItem("evdms_auth_token");
     const decoded = decodeJwt(token);
     const dealerId = decoded?.dealerId || decoded?.dealer || "";
     // Update URL with query params for navigation/history
     const params = new URLSearchParams();
-    if (debouncedSearch) params.set('search', debouncedSearch);
-    if (pageSize !== 10) params.set('pageSize', pageSize);
-    if (currentPage !== 1) params.set('page', currentPage);
+    if (debouncedSearch) params.set("search", debouncedSearch);
+    if (pageSize !== 10) params.set("pageSize", pageSize);
+    if (currentPage !== 1) params.set("page", currentPage);
     // Always filter by dealerId
-    params.set('filters', JSON.stringify({ dealerId }));
-    const url = `/dealer-promotions${params.toString() ? '?' + params.toString() : ''}`;
+    params.set("filters", JSON.stringify({ dealerId }));
+    const url = `/dealer-promotions${params.toString() ? "?" + params.toString() : ""}`;
     if (window.location.pathname + window.location.search !== url) {
-      window.history.pushState({}, '', url);
+      window.history.pushState({}, "", url);
     }
     loadPromotions(dealerId);
-  }, [currentPage, pageSize, debouncedSearch]);
-
-  const loadPromotions = async (dealerIdOverride) => {
-    try {
-      setLoading(true);
-      setError(null);
-      // Always filter by dealerId from JWT
-      const token = localStorage.getItem('evdms_auth_token');
-      const decoded = decodeJwt(token);
-      const dealerId = dealerIdOverride || decoded?.dealerId || decoded?.dealer || "";
-      const params = {
-        page: currentPage,
-        pageSize,
-        search: searchTerm || undefined,
-        filters: JSON.stringify({ dealerId })
-      };
-      const response = await getAllPromotions(params);
-      let items = [];
-      let total = 0;
-      if (response?.data?.items) {
-        items = response.data.items;
-        total = response.data.totalResults || items.length;
-      } else if (Array.isArray(response?.data)) {
-        items = response.data;
-        total = items.length;
-      } else if (Array.isArray(response)) {
-        items = response;
-        total = items.length;
-      }
-  setPromotions(items);
-  setTotalResults(total);
-  setTotalPages(Math.max(1, Math.ceil(total / pageSize)));
-    } catch (err) {
-      setError("Failed to load promotions. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [currentPage, pageSize, debouncedSearch, loadPromotions]);
 
   const handleViewDetail = async (promo) => {
     try {
@@ -110,7 +107,7 @@ const PromotionManagement = () => {
         setIsEditing(false);
         setEditForm(null);
       }
-    } catch (err) {
+    } catch {
       setError("Failed to load promotion details.");
     }
   };
@@ -125,7 +122,7 @@ const PromotionManagement = () => {
       description: "",
       discountPercent: "",
       startDate: "",
-      endDate: ""
+      endDate: "",
     });
     setShowCreateModal(true);
   };
@@ -176,7 +173,7 @@ const PromotionManagement = () => {
     try {
       setLoading(true);
       // Get dealerId from token
-      const token = localStorage.getItem('evdms_auth_token');
+      const token = localStorage.getItem("evdms_auth_token");
       const decoded = decodeJwt(token);
       const dealerId = decoded?.dealerId || decoded?.dealer || "";
       await updatePromotion(editForm.id, {
@@ -195,7 +192,7 @@ const PromotionManagement = () => {
       alert.innerHTML = `Promotion updated successfully! <button type='button' class='btn-close' data-bs-dismiss='alert'></button>`;
       document.body.appendChild(alert);
       setTimeout(() => alert.remove(), 3000);
-    } catch (err) {
+    } catch {
       setError("Failed to update promotion.");
     } finally {
       setLoading(false);
@@ -214,7 +211,7 @@ const PromotionManagement = () => {
       alert.innerHTML = `Promotion deleted successfully! <button type='button' class='btn-close' data-bs-dismiss='alert'></button>`;
       document.body.appendChild(alert);
       setTimeout(() => alert.remove(), 3000);
-    } catch (err) {
+    } catch {
       setError("Failed to delete promotion.");
     }
   };
@@ -254,26 +251,36 @@ const PromotionManagement = () => {
           <div className="modal-dialog">
             <form className="modal-content" onSubmit={handleCreateSubmit}>
               <div className="modal-header">
-                <h5 className="modal-title"><i className="bx bx-plus me-2"></i>Create Promotion</h5>
+                <h5 className="modal-title">
+                  <i className="bx bx-plus me-2"></i>Create Promotion
+                </h5>
                 <button type="button" className="btn-close" onClick={() => setShowCreateModal(false)}></button>
               </div>
               <div className="modal-body">
                 {/* Only description, discountPercent, startDate, endDate fields */}
                 <div className="mb-3">
                   <label className="form-label">Description</label>
-                  <input type="text" className="form-control" value={createForm.description} onChange={e => setCreateForm({ ...createForm, description: e.target.value })} required />
+                  <input type="text" className="form-control" value={createForm.description} onChange={(e) => setCreateForm({ ...createForm, description: e.target.value })} required />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Discount Percent</label>
-                  <input type="number" className="form-control" value={createForm.discountPercent} onChange={e => setCreateForm({ ...createForm, discountPercent: e.target.value })} required min="0" max="100" />
+                  <input
+                    type="number"
+                    className="form-control"
+                    value={createForm.discountPercent}
+                    onChange={(e) => setCreateForm({ ...createForm, discountPercent: e.target.value })}
+                    required
+                    min="0"
+                    max="100"
+                  />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Start Date</label>
-                  <input type="date" className="form-control" value={createForm.startDate} onChange={e => setCreateForm({ ...createForm, startDate: e.target.value })} required />
+                  <input type="date" className="form-control" value={createForm.startDate} onChange={(e) => setCreateForm({ ...createForm, startDate: e.target.value })} required />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">End Date</label>
-                  <input type="date" className="form-control" value={createForm.endDate} onChange={e => setCreateForm({ ...createForm, endDate: e.target.value })} required />
+                  <input type="date" className="form-control" value={createForm.endDate} onChange={(e) => setCreateForm({ ...createForm, endDate: e.target.value })} required />
                 </div>
                 {error && (
                   <div className="alert alert-danger mt-2" role="alert">
@@ -282,8 +289,12 @@ const PromotionManagement = () => {
                 )}
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Create</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  Create
+                </button>
               </div>
             </form>
           </div>
@@ -309,14 +320,30 @@ const PromotionManagement = () => {
             </div>
             <div className="col-md-4">
               <label className="form-label">Page size</label>
-              <select className="form-select" value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}>
-                {[5,10,20,50,100].map((s) => (
-                  <option key={s} value={s}>{s}</option>
+              <select
+                className="form-select"
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+              >
+                {[5, 10, 20, 50, 100].map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
                 ))}
               </select>
             </div>
             <div className="col-12 mt-2 d-flex justify-content-end">
-              <button className="btn btn-outline-secondary" onClick={() => { setSearchTerm(''); setPageSize(10); setCurrentPage(1); }}>
+              <button
+                className="btn btn-outline-secondary"
+                onClick={() => {
+                  setSearchTerm("");
+                  setPageSize(10);
+                  setCurrentPage(1);
+                }}
+              >
                 Reset
               </button>
             </div>
@@ -370,15 +397,34 @@ const PromotionManagement = () => {
                   const statusClass = status === "Active" ? "badge bg-label-success" : "badge bg-label-secondary";
                   return (
                     <tr key={p.id || p._id || p.promotionId}>
-                      <td><span className="fw-bold">{p.description}</span></td>
-                      <td><span className="text-primary fw-semibold">{p.discountPercent}%</span></td>
-                      <td><span className={statusClass}>{status}</span></td>
-                      <td><span>{formatDate(p.startDate)}</span></td>
-                      <td><span>{formatDate(p.endDate)}</span></td>
+                      <td>
+                        <span className="fw-bold">{p.description}</span>
+                      </td>
+                      <td>
+                        <span className="text-primary fw-semibold">{p.discountPercent}%</span>
+                      </td>
+                      <td>
+                        <span className={statusClass}>{status}</span>
+                      </td>
+                      <td>
+                        <span>{formatDate(p.startDate)}</span>
+                      </td>
+                      <td>
+                        <span>{formatDate(p.endDate)}</span>
+                      </td>
                       <td>
                         <div>
                           <div className="btn-group" role="group">
-                            <button className="btn btn-sm btn-success" onClick={() => { setSelectedPromotion(p); setIsEditing(true); setEditForm({ ...p }); setShowDetailModal(true); }} title="Edit">
+                            <button
+                              className="btn btn-sm btn-success"
+                              onClick={() => {
+                                setSelectedPromotion(p);
+                                setIsEditing(true);
+                                setEditForm({ ...p });
+                                setShowDetailModal(true);
+                              }}
+                              title="Edit"
+                            >
                               <i className="bx bx-edit" />
                             </button>
                             <button className="btn btn-sm btn-outline-info" onClick={() => handleViewDetail(p)} title="View Details">
@@ -436,40 +482,34 @@ const PromotionManagement = () => {
                 </h5>
                 <div className="d-flex align-items-center">
                   <button type="button" className="btn btn-outline-secondary me-2" onClick={handleEditToggle}>
-                    {isEditing ? (<><i className="bx bx-x me-1"></i> Cancel</>) : (<><i className="bx bx-edit me-1"></i> Edit</>)}
+                    {isEditing ? (
+                      <>
+                        <i className="bx bx-x me-1"></i> Cancel
+                      </>
+                    ) : (
+                      <>
+                        <i className="bx bx-edit me-1"></i> Edit
+                      </>
+                    )}
                   </button>
-                  <button type="button" className="btn-close" onClick={() => { setShowDetailModal(false); setIsEditing(false); setEditForm(null); }}></button>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={() => {
+                      setShowDetailModal(false);
+                      setIsEditing(false);
+                      setEditForm(null);
+                    }}
+                  ></button>
                 </div>
               </div>
               <div className="modal-body">
                 <div className="row g-3">
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Promotion ID</label>
-                    <p className="text-muted">{selectedPromotion.id || '-'}</p>
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Dealer ID</label>
-                    {isEditing ? (
-                      <input className="form-control" value={editForm?.dealerId || selectedPromotion.dealerId} onChange={e => setEditForm({ ...editForm, dealerId: e.target.value })} />
-                    ) : (
-                      <p className="text-muted">{selectedPromotion.dealerId}</p>
-                    )}
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Type</label>
-                    {isEditing ? (
-                      <select className="form-select" value={editForm?.type || selectedPromotion.type} onChange={e => setEditForm({ ...editForm, type: e.target.value })}>
-                        <option value="Dealer">Dealer</option>
-                        <option value="OEM">OEM</option>
-                      </select>
-                    ) : (
-                      <p className="text-muted">{selectedPromotion.type}</p>
-                    )}
-                  </div>
+                  {/* Promotion ID, Dealer ID, and Type removed as requested */}
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Description</label>
                     {isEditing ? (
-                      <input className="form-control" value={editForm?.description || selectedPromotion.description} onChange={e => setEditForm({ ...editForm, description: e.target.value })} />
+                      <input className="form-control" value={editForm?.description || selectedPromotion.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} />
                     ) : (
                       <p className="text-muted">{selectedPromotion.description}</p>
                     )}
@@ -477,7 +517,14 @@ const PromotionManagement = () => {
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Discount Percent</label>
                     {isEditing ? (
-                      <input className="form-control" type="number" value={editForm?.discountPercent || selectedPromotion.discountPercent} onChange={e => setEditForm({ ...editForm, discountPercent: e.target.value })} min="0" max="100" />
+                      <input
+                        className="form-control"
+                        type="number"
+                        value={editForm?.discountPercent || selectedPromotion.discountPercent}
+                        onChange={(e) => setEditForm({ ...editForm, discountPercent: e.target.value })}
+                        min="0"
+                        max="100"
+                      />
                     ) : (
                       <p className="text-muted">{selectedPromotion.discountPercent}</p>
                     )}
@@ -485,7 +532,12 @@ const PromotionManagement = () => {
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Start Date</label>
                     {isEditing ? (
-                      <input className="form-control" type="date" value={editForm?.startDate || selectedPromotion.startDate?.substring(0,10)} onChange={e => setEditForm({ ...editForm, startDate: e.target.value })} />
+                      <input
+                        className="form-control"
+                        type="date"
+                        value={editForm?.startDate ? editForm.startDate.substring(0, 10) : selectedPromotion.startDate ? selectedPromotion.startDate.substring(0, 10) : ""}
+                        onChange={(e) => setEditForm({ ...editForm, startDate: e.target.value })}
+                      />
                     ) : (
                       <p className="text-muted">{formatDate(selectedPromotion.startDate)}</p>
                     )}
@@ -493,7 +545,12 @@ const PromotionManagement = () => {
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">End Date</label>
                     {isEditing ? (
-                      <input className="form-control" type="date" value={editForm?.endDate || selectedPromotion.endDate?.substring(0,10)} onChange={e => setEditForm({ ...editForm, endDate: e.target.value })} />
+                      <input
+                        className="form-control"
+                        type="date"
+                        value={editForm?.endDate ? editForm.endDate.substring(0, 10) : selectedPromotion.endDate ? selectedPromotion.endDate.substring(0, 10) : ""}
+                        onChange={(e) => setEditForm({ ...editForm, endDate: e.target.value })}
+                      />
                     ) : (
                       <p className="text-muted">{formatDate(selectedPromotion.endDate)}</p>
                     )}
@@ -509,8 +566,12 @@ const PromotionManagement = () => {
                   <div className="col-12">
                     {isEditing ? (
                       <div className="d-flex justify-content-end">
-                        <button type="button" className="btn btn-outline-secondary me-2" onClick={handleEditToggle}>Cancel</button>
-                        <button type="button" className="btn btn-primary" onClick={handleSaveEdit}>Save</button>
+                        <button type="button" className="btn btn-outline-secondary me-2" onClick={handleEditToggle}>
+                          Cancel
+                        </button>
+                        <button type="button" className="btn btn-primary" onClick={handleSaveEdit}>
+                          Save
+                        </button>
                       </div>
                     ) : null}
                   </div>
@@ -541,7 +602,7 @@ const PromotionManagement = () => {
               <div className="modal-body">
                 <p>Are you sure you want to delete this promotion?</p>
                 <div className="alert alert-warning">
-                  <strong>Promotion ID:</strong> {promotionToDelete.id}
+                  <strong>Promotion Description:</strong> {promotionToDelete.description}
                 </div>
                 <p className="text-danger mb-0">
                   <i className="bx bx-error-circle me-1"></i>

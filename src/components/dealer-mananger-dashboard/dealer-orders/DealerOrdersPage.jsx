@@ -1,24 +1,3 @@
-// Helper for copying to clipboard and showing success alert
-const handleCopyId = (id) => {
-  if (!id) return;
-  navigator.clipboard.writeText(id.toString());
-  showSuccessAlert("Order ID copied to clipboard!");
-};
-
-// Show success alert (bootstrap style)
-const showSuccessAlert = (message) => {
-  const alert = document.createElement("div");
-  alert.className = "alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3";
-  alert.style.zIndex = "9999";
-  alert.innerHTML = `
-      <i class="bx bx-check-circle me-2"></i>
-      ${message}
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-  document.body.appendChild(alert);
-  setTimeout(() => alert.remove(), 3000);
-};
-
 import { useEffect, useState } from "react";
 import { Alert, Badge, Button, Card, Col, Dropdown, Form, Modal, Row, Spinner, Table } from "react-bootstrap";
 // Đảm bảo các đường dẫn service này là chính xác
@@ -403,9 +382,7 @@ const DealerOrdersPage = () => {
           <Table striped bordered hover responsive>
             <thead>
               <tr>
-                <th style={{ cursor: "pointer" }} onClick={() => handleSort("id")}>
-                  Order ID{renderSort("id")}
-                </th>
+                {/* Order ID column removed */}
                 <th style={{ cursor: "pointer" }} onClick={() => handleSort("variantName")}>
                   Vehicle Variant{renderSort("variantName")}
                 </th>
@@ -434,15 +411,7 @@ const DealerOrdersPage = () => {
               ) : orders.length > 0 ? (
                 orders.map((order) => (
                   <tr key={order.id}>
-                    <td>
-                      {order.id ? (
-                        <small className="text-muted" style={{ cursor: "pointer" }} title={order.id} onClick={() => handleCopyId(order.id)}>
-                          {order.id.substring(0, 8)}...
-                        </small>
-                      ) : (
-                        "N/A"
-                      )}
-                    </td>
+                    {/* Order ID cell removed */}
                     <td>{order.variantName || "N/A"}</td>
                     <td>{order.quantity || 1}</td>
                     <td>{renderColorBadge(order.color || "N/A")}</td>

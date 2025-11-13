@@ -583,6 +583,13 @@ const OemPromotionManagement = () => {
               </div>
               <div className="modal-body">
                 <p>Are you sure you want to delete this promotion?</p>
+                <div className="alert alert-warning">
+                  <strong>Promotion Description:</strong> {promotionToDelete.description}
+                </div>
+                <p className="text-danger mb-0">
+                  <i className="bx bx-error-circle me-1"></i>
+                  This action cannot be undone.
+                </p>
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowDeleteModal(false)}>
