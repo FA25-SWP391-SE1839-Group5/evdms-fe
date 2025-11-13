@@ -221,19 +221,6 @@ const SalesOrderManagement = () => {
     }
   };
 
-  const handleCreateClick = () => {
-    setFormData({
-      quotationId: "",
-      dealerId: "",
-      userId: "",
-      customerId: "",
-      vehicleId: "",
-      date: "",
-      status: "Pending",
-    });
-    setShowCreateModal(true);
-  };
-
   const handleEditClick = async (order) => {
     try {
       const response = await getSalesOrderById(order.id);
@@ -424,10 +411,6 @@ const SalesOrderManagement = () => {
           <p className="text-muted mb-0">Manage sales orders and quotations</p>
         </div>
         <div className="d-flex gap-2">
-          <button className="btn btn-primary" onClick={handleCreateClick}>
-            <i className="bx bx-plus me-1"></i>
-            New Sales Order
-          </button>
           <button className="btn btn-outline-primary" onClick={loadSalesOrders} disabled={loading}>
             <i className="bx bx-refresh me-1"></i>
             Refresh

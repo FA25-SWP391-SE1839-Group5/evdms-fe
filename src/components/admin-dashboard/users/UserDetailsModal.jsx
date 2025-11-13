@@ -58,14 +58,6 @@ export default function UserDetailsModal({ show, onClose, user, getRoleBadgeClas
                     </td>
                     <td>{user.lastLoginAt && user.lastLoginAt !== "0001-01-01T00:00:00" ? new Date(user.lastLoginAt).toLocaleString() : "Never"}</td>
                   </tr>
-                  <tr>
-                    <td className="ps-0">
-                      <strong>User ID:</strong>
-                    </td>
-                    <td>
-                      <code className="text-muted">{user.id || "N/A"}</code>
-                    </td>
-                  </tr>
                 </tbody>
               </table>
             </div>

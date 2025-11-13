@@ -291,7 +291,6 @@ const AuditLogManagement = () => {
             <thead>
               <tr>
                 <th>User</th>
-                <th>Entity ID</th>
                 <th>Action</th>
                 <th>Description</th>
                 <th>Timestamp</th>
@@ -322,9 +321,6 @@ const AuditLogManagement = () => {
                             <small className="text-muted">{user?.role || "Unknown"}</small>
                           </div>
                         </div>
-                      </td>
-                      <td>
-                        <code className="text-muted">{log.id ? log.id.slice(0, 8) + "..." : "-"}</code>
                       </td>
                       <td>
                         <span className="badge bg-label-primary text-uppercase">{log.action || "N/A"}</span>
