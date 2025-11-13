@@ -427,7 +427,7 @@ const SalesOrderManagement = () => {
               <input
                 type="text"
                 className="form-control"
-                placeholder="Search by customer, dealer, or vehicle ID..."
+                placeholder="Search by customer or VIN"
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -481,9 +481,6 @@ const SalesOrderManagement = () => {
                 <div className="row g-3">
                   <div className="col-12">
                     <p>
-                      <strong>Sales Order ID:</strong> {paymentSummary.salesOrderId ?? paymentSummary.salesOrderId}
-                    </p>
-                    <p>
                       <strong>Total Amount:</strong> {paymentSummary.totalAmount ?? paymentSummary.data?.totalAmount ?? "N/A"}
                     </p>
                     <p>
@@ -522,7 +519,6 @@ const SalesOrderManagement = () => {
                   <button type="button" className="btn-close" onClick={() => setShowPayModal(false)}></button>
                 </div>
                 <div className="modal-body">
-                  <p className="text-muted">Sales Order ID: {selectedOrder.id}</p>
                   {/* Payment summary section */}
                   {paySummary && (
                     <div className="mb-3 border rounded p-2 bg-light">
@@ -733,18 +729,10 @@ const SalesOrderManagement = () => {
               <div className="modal-body">
                 <div className="row g-3">
                   <div className="col-md-6">
-                    <label className="form-label fw-semibold">Sales Order ID</label>
-                    <p className="text-muted">{selectedOrder.id}</p>
-                  </div>
-                  <div className="col-md-6">
                     <label className="form-label fw-semibold">Status</label>
                     <p>
                       <span className={`badge ${getStatusBadgeClass(selectedOrder.status)}`}>{selectedOrder.status}</span>
                     </p>
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Quotation ID</label>
-                    <p className="text-muted">{selectedOrder.quotationId}</p>
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Customer Name</label>
@@ -959,9 +947,9 @@ const SalesOrderManagement = () => {
               <div className="modal-body">
                 <p>Are you sure you want to delete this sales order?</p>
                 <div className="alert alert-warning">
-                  <strong>Sales Order ID:</strong> {orderToDelete.id}
+                  <strong>Customer:</strong> {orderToDelete.customerFullName}
                   <br />
-                  <strong>Customer ID:</strong> {orderToDelete.customerId}
+                  <strong>Vehicle VIN:</strong> {orderToDelete.vehicleVin}
                   <br />
                   <strong>Date:</strong> {formatDate(orderToDelete.date)}
                   <br />

@@ -338,7 +338,7 @@ const TestDriveManagement = () => {
               <input
                 type="text"
                 className="form-control"
-                placeholder="Search by customer, dealer, or vehicle ID..."
+                placeholder="Search by customer or VIN"
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -508,10 +508,6 @@ const TestDriveManagement = () => {
               <div className="modal-body">
                 <div className="row g-3">
                   <div className="col-md-6">
-                    <label className="form-label fw-semibold">Test Drive ID</label>
-                    <p className="text-muted">{selectedTestDrive.id}</p>
-                  </div>
-                  <div className="col-md-6">
                     <label className="form-label fw-semibold">Status</label>
                     <p>
                       <span className={`badge ${getStatusBadgeClass(selectedTestDrive.status)}`}>{selectedTestDrive.status}</span>
@@ -520,10 +516,6 @@ const TestDriveManagement = () => {
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Customer Name</label>
                     <p className="text-muted">{selectedTestDrive.customerFullName || selectedTestDrive.customerName || selectedTestDrive.customerId}</p>
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Vehicle ID</label>
-                    <p className="text-muted">{selectedTestDrive.vehicleId}</p>
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Vehicle VIN</label>
@@ -667,7 +659,7 @@ const TestDriveManagement = () => {
               <div className="modal-body">
                 <p>Are you sure you want to delete this test drive?</p>
                 <div className="alert alert-warning">
-                  <strong>Test Drive ID:</strong> {testDriveToDelete.id}
+                  <strong>Customer:</strong> {testDriveToDelete.customerFullName}
                   <br />
                   <strong>Scheduled At:</strong> {formatDateTime(testDriveToDelete.scheduledAt)}
                   <br />

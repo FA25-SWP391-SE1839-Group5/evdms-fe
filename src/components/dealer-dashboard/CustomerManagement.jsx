@@ -191,15 +191,6 @@ const CustomerManagement = () => {
 
   const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
 
-  // Helper for copying to clipboard
-  const handleCopyId = (id) => {
-    if (!id) return;
-    navigator.clipboard.writeText(id.toString());
-    showSuccessAlert("ID copied to clipboard!");
-  };
-
-  // No need for hoveredId state when using native tooltip
-
   return (
     <div className="container-xxl flex-grow-1 container-p-y">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -293,9 +284,6 @@ const CustomerManagement = () => {
             <table className="table">
               <thead>
                 <tr>
-                  <th onClick={() => toggleSort("id")} style={{ cursor: "pointer" }}>
-                    ID {sortBy === "id" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
-                  </th>
                   <th onClick={() => toggleSort("fullName")} style={{ cursor: "pointer" }}>
                     Name {sortBy === "fullName" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
                   </th>
@@ -314,11 +302,6 @@ const CustomerManagement = () => {
               <tbody className="table-border-bottom-0">
                 {customers.map((c) => (
                   <tr key={c.id || c._id}>
-                    <td>
-                      <small className="text-muted" style={{ cursor: "pointer" }} title={c.id || c._id} onClick={() => handleCopyId(c.id || c._id)}>
-                        {(c.id || c._id)?.toString().substring(0, 8)}...
-                      </small>
-                    </td>
                     <td>{c.fullName || c.name || "-"}</td>
                     <td>{c.email || "-"}</td>
                     <td>{c.address || "-"}</td>

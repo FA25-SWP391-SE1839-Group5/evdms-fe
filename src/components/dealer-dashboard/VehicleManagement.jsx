@@ -13,7 +13,6 @@ const VehicleManagement = () => {
   const [variantNameMap, setVariantNameMap] = useState({});
   const [dealerNameMap, setDealerNameMap] = useState({});
   const [selectedDealer, setSelectedDealer] = useState(null);
-  const [showRawJson, setShowRawJson] = useState(false);
   // Compare two vehicles
   const [selectedForCompare, setSelectedForCompare] = useState([]); // array of vehicle ids
   const [compareVehicles, setCompareVehicles] = useState([]); // full vehicle objects
@@ -787,25 +786,12 @@ const VehicleManagement = () => {
                       setShowDetailModal(false);
                       setSelectedVehicle(null);
                       setSelectedVariant(null);
-                      setShowRawJson(false);
                     }}
                   ></button>
                 </div>
               </div>
               <div className="modal-body">
                 <div className="row g-3">
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Vehicle ID</label>
-                    <p className="text-muted">{selectedVehicle.id}</p>
-                  </div>
-                  {showRawJson && (
-                    <div className="col-12 mt-2">
-                      <label className="form-label fw-semibold">Raw JSON (vehicle / variant)</label>
-                      <pre style={{ maxHeight: 240, overflow: "auto" }} className="bg-light p-2 border">
-                        {JSON.stringify({ vehicle: selectedVehicle, variant: selectedVariant }, null, 2)}
-                      </pre>
-                    </div>
-                  )}
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">VIN</label>
                     <p className="text-muted">{selectedVehicle.vin}</p>
@@ -827,10 +813,6 @@ const VehicleManagement = () => {
                     <p>
                       <span className={`badge ${getStatusBadgeClass(selectedVehicle.status)}`}>{selectedVehicle.status}</span>
                     </p>
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Variant ID</label>
-                    <p className="text-muted">{selectedVehicle.variantId}</p>
                   </div>
                   <div className="col-12">
                     <label className="form-label fw-semibold">Variant Detail</label>

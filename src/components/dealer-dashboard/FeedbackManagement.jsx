@@ -417,16 +417,8 @@ const FeedbackManagement = () => {
               <div className="modal-body">
                 <div className="row g-3">
                   <div className="col-md-6">
-                    <label className="form-label fw-semibold">Feedback ID</label>
-                    <p className="text-muted">{selectedFeedback.id}</p>
-                  </div>
-                  <div className="col-md-6">
                     <label className="form-label fw-semibold">Customer Name</label>
-                    <p className="text-muted">{selectedFeedback.customerName || selectedFeedback.customerId}</p>
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Dealer ID</label>
-                    <p className="text-muted">{selectedFeedback.dealerId}</p>
+                    <p className="text-muted">{selectedFeedback.customerFullName}</p>
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Current Status</label>
@@ -502,6 +494,8 @@ const FeedbackManagement = () => {
               <div className="modal-body">
                 <p>Are you sure you want to delete this feedback?</p>
                 <div className="alert alert-warning">
+                  <strong>Customer:</strong> {feedbackToDelete.customerFullName}
+                  <br />
                   <strong>Content:</strong> {feedbackToDelete.content}
                 </div>
                 <p className="text-danger mb-0">

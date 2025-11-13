@@ -418,7 +418,6 @@ const QuotationManagement = () => {
       // If the status is changed to Approved (or Approve), create a sales order
       if (newStatus === "Approved" || newStatus === "Approve") {
         try {
-          // Minimal payload: include the quotation id so backend can create order from it
           const orderPayload = { quotationId: selectedQuotation.id };
           await createOrder(orderPayload);
 
@@ -525,7 +524,7 @@ const QuotationManagement = () => {
               <input
                 type="text"
                 className="form-control"
-                placeholder="Search by customer, quote id or color"
+                placeholder="Search by customer or variant name"
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -811,10 +810,6 @@ const QuotationManagement = () => {
               <div className="modal-body">
                 <div className="row g-3">
                   <div className="col-md-6">
-                    <label className="form-label fw-semibold">Quotation ID</label>
-                    {isEditing ? <input className="form-control" value={editForm?.id || selectedQuotation.id} disabled /> : <p className="text-muted">{selectedQuotation.id || "-"}</p>}
-                  </div>
-                  <div className="col-md-6">
                     <label className="form-label fw-semibold">Customer</label>
                     {isEditing ? (
                       <select className="form-select" value={editForm?.customerId || selectedQuotation.customerId} onChange={(e) => setEditForm({ ...editForm, customerId: e.target.value })}>
@@ -960,7 +955,9 @@ const QuotationManagement = () => {
               <div className="modal-body">
                 <p>Are you sure you want to delete this quotation?</p>
                 <div className="alert alert-warning">
-                  <strong>Quotation ID:</strong> {quotationToDelete.id}
+                  <strong>Customer:</strong> {quotationToDelete.customerFullName}
+                  <br />
+                  <strong>Variant:</strong> {quotationToDelete.variantName}
                 </div>
                 <p className="text-danger mb-0">
                   <i className="bx bx-error-circle me-1"></i>
