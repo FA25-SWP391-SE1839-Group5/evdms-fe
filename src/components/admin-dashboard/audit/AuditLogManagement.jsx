@@ -323,7 +323,26 @@ const AuditLogManagement = () => {
                         </div>
                       </td>
                       <td>
-                        <span className="badge bg-label-primary text-uppercase">{log.action || "N/A"}</span>
+                        {(() => {
+                          const actionColors = {
+                            Login: "bg-label-success",
+                            Logout: "bg-label-secondary",
+                            PasswordReset: "bg-label-warning",
+                            AccountCreation: "bg-label-info",
+                            AccountDeletion: "bg-label-danger",
+                            CreateDealerOrder: "bg-label-primary",
+                            DeliverDealerOrder: "bg-label-success",
+                            CreateDealerPayment: "bg-label-primary",
+                            MarkDealerPaymentAsPaid: "bg-label-success",
+                            MarkDealerPaymentAsFailed: "bg-label-danger",
+                            CreateQuotation: "bg-label-info",
+                            CreateSalesOrder: "bg-label-primary",
+                            DeliverSalesOrder: "bg-label-success",
+                          };
+                          const action = log.action || "N/A";
+                          const colorClass = actionColors[action] || "bg-label-secondary";
+                          return <span className={`badge ${colorClass} text-uppercase`}>{action}</span>;
+                        })()}
                       </td>
                       <td style={{ whiteSpace: "normal", maxWidth: "400px" }}>{log.description || "-"}</td>
                       <td>{formatDateTimestamp(log.createdAt)}</td>
