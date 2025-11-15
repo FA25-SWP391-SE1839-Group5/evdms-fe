@@ -1,3 +1,4 @@
+import { createInventory } from "../../services/inventoryService";
 import { getAllVehicleModels } from "../../services/vehicleModelService";
 import { createVehicleVariant, deleteVehicleVariant, getAllVehicleVariants, getVehicleVariantById, updateVehicleVariant } from "../../services/vehicleVariantService";
 import VehicleVariantDeleteModal from "./vehicle-variant/VehicleVariantDeleteModal";
@@ -418,8 +419,18 @@ const VehicleVariantManagement = () => {
       const payload = preparePayload();
 
       if (modalMode === "create") {
-        await createVehicleVariant(payload);
+        // Create the vehicle variant
+        const createdVariant = await createVehicleVariant(payload);
         setSuccess("Variant created successfully!");
+
+        // Automatically create OEM inventory for the new variant with quantity = 0
+        if (createdVariant && createdVariant.id) {
+          try {
+            await createInventory({ variantId: createdVariant.id, quantity: 0 });
+          } catch (inventoryError) {
+            console.error("Failed to create OEM inventory for new variant:", inventoryError);
+          }
+        }
       } else if (modalMode === "edit") {
         await updateVehicleVariant(currentVariant.id, payload);
         setSuccess("Variant updated successfully!");
