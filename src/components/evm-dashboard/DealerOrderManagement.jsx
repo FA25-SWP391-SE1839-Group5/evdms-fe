@@ -68,12 +68,19 @@ const DealerOrderManagement = () => {
     setInventoryAdjustSuccess("");
     setInventoryAdjustAmount("");
     setCurrentInventory(null);
+    let found = null;
     try {
       const inventories = await getAllInventories({ search: order.variantName });
-      const found = inventories.items.find((inv) => inv.variantId === order.variantId);
+      found = inventories.items.find((inv) => inv.variantId === order.variantId);
       setCurrentInventory(found || null);
     } catch {
       setCurrentInventory(null);
+    }
+    // Show inventory adjust UI if stock < quantity
+    if (found && Number(found.quantity) < Number(order.quantity)) {
+      setShowInventoryAdjust(true);
+      const missing = Number(order.quantity) - Number(found.quantity);
+      setInventoryAdjustAmount(missing > 0 ? String(missing) : "");
     }
     setModalOpen(true);
   };
