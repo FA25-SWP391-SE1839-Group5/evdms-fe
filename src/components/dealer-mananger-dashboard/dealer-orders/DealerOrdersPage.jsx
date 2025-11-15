@@ -4,6 +4,7 @@ import { Alert, Badge, Button, Card, Col, Dropdown, Form, Modal, Row, Spinner, T
 import { createDealerOrder, getAllDealerOrders } from "../../../services/dealerOrderService";
 import { uploadDealerPaymentDocument } from "../../../services/dealerService";
 import { getAllVehicleVariants } from "../../../services/vehicleVariantService";
+import { getAllInventories } from "../../../services/inventoryService";
 import { decodeJwt } from "../../../utils/jwt";
 
 // Helper function to map color names to badge classes
@@ -75,6 +76,8 @@ const DealerOrdersPage = () => {
   const [selectedVariant, setSelectedVariant] = useState("");
   const [orderQuantity, setOrderQuantity] = useState(1);
   const [orderColor, setOrderColor] = useState("");
+  const [inventoryCount, setInventoryCount] = useState(null);
+  const [isInventoryLoading, setIsInventoryLoading] = useState(false);
 
   // State cho Modal Upload Biên lai
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -147,6 +150,8 @@ const DealerOrdersPage = () => {
       setVariants(variantArray);
       if (variantArray.length > 0) {
         setSelectedVariant(variantArray[0].id);
+        // Fetch inventory for initially selected variant
+        fetchInventoryForVariant(variantArray[0].id);
       }
     } catch (err) {
       setModalError(err.message);
@@ -155,6 +160,35 @@ const DealerOrdersPage = () => {
       setIsVariantsLoading(false);
     }
   };
+
+  // Fetch inventory count for a variant
+  const fetchInventoryForVariant = async (variantId) => {
+    if (!variantId) {
+      setInventoryCount(null);
+      return;
+    }
+    setIsInventoryLoading(true);
+    setInventoryCount(null);
+    try {
+      // Ask inventory service for all inventories matching this variant
+      const filters = JSON.stringify({ variantId });
+      const resp = await getAllInventories({ page: 1, pageSize: 1000, filters });
+      const items = resp.items || [];
+      // Sum up quantities across matched inventory records
+      const total = items.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
+      setInventoryCount(total);
+    } catch (err) {
+      console.error("Failed to fetch inventory for variant", variantId, err);
+      setInventoryCount(null);
+    } finally {
+      setIsInventoryLoading(false);
+    }
+  };
+
+  // When selected variant changes, refresh inventory count
+  useEffect(() => {
+    if (selectedVariant) fetchInventoryForVariant(selectedVariant);
+  }, [selectedVariant]);
 
   const handleCreateOrder = async (e) => {
     e.preventDefault();
@@ -484,9 +518,31 @@ const DealerOrdersPage = () => {
               </Form.Select>
             </Form.Group>
 
+            {/* Inventory availability info */}
+            <div className="mb-2">
+              {isInventoryLoading ? (
+                <small className="text-muted">Checking inventory...</small>
+              ) : inventoryCount === null ? (
+                <small className="text-muted">Inventory: unavailable</small>
+              ) : (
+                <small className={`fw-semibold ${inventoryCount === 0 ? 'text-danger' : 'text-success'}`}>
+                  Available in inventory: {inventoryCount}
+                </small>
+              )}
+            </div>
+
             <Form.Group className="mb-3" controlId="orderQuantity">
               <Form.Label>Quantity</Form.Label>
               <Form.Control type="number" value={orderQuantity} onChange={(e) => setOrderQuantity(e.target.value)} min="1" required />
+              {inventoryCount !== null && (
+                <div className="form-text mt-1">
+                  {Number(orderQuantity) > inventoryCount ? (
+                    <span className="text-danger">Requested quantity exceeds available inventory.</span>
+                  ) : (
+                    <span className="text-muted">You may order up to {inventoryCount} unit{inventoryCount > 1 ? 's' : ''}.</span>
+                  )}
+                </div>
+              )}
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="orderColor">
@@ -510,7 +566,13 @@ const DealerOrdersPage = () => {
             <Button variant="secondary" onClick={() => setShowCreateModal(false)}>
               Cancel
             </Button>
-            <Button type="submit" variant="primary" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={
+                isSubmitting || isInventoryLoading || (inventoryCount !== null && Number(orderQuantity) > inventoryCount)
+              }
+            >
               {isSubmitting ? <Spinner as="span" size="sm" /> : "Place Order"}
             </Button>
           </Modal.Footer>
