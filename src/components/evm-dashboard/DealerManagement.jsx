@@ -1,21 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import {
-  getAllDealers,
-  getDealerById,
-  createDealer,
-  updateDealer,
-  deleteDealer
-} from '../../services/dealerService';
+import { useEffect, useRef, useState } from "react";
+import { createDealer, deleteDealer, getAllDealers, getDealerById, updateDealer } from "../../services/dealerService";
+import DealerDeleteModal from "./dealer/DealerDeleteModal";
+import DealerModal from "./dealer/DealerModal";
+import DealerTable from "./dealer/DealerTable";
 
 // Hardcoded regions as per requirement
-const REGIONS = [
-  'Ho Chi Minh City',
-  'Hanoi',
-  'Da Nang',
-  'Nha Trang'
-];
+const REGIONS = ["Ho Chi Minh City", "Hanoi", "Da Nang", "Nha Trang"];
 
 const DealerManagement = () => {
+  // Open create modal if ?create=1 is in the URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("create") === "1") {
+      setModalMode && setModalMode("create");
+      setShowModal && setShowModal(true);
+      // Remove the query param from the URL (optional, for cleaner UX)
+      params.delete("create");
+      const newUrl = window.location.pathname + (params.toString() ? `?${params}` : "");
+      window.history.replaceState({}, "", newUrl);
+    }
+  }, []);
   // State management
   const [dealers, setDealers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -26,19 +30,22 @@ const DealerManagement = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalResults, setTotalResults] = useState(0);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const searchTimeout = useRef();
+  const [sortBy, setSortBy] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
 
   // Modal state
   const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState('create'); // 'create', 'edit', 'view'
+  const [modalMode, setModalMode] = useState("create"); // 'create', 'edit', 'view'
   const [currentDealer, setCurrentDealer] = useState(null);
 
   // Form state
   const [formData, setFormData] = useState({
-    name: '',
-    region: '',
-    address: ''
+    name: "",
+    region: "",
+    address: "",
   });
 
   // Delete confirmation
@@ -56,19 +63,19 @@ const DealerManagement = () => {
           pageSize,
           search: searchTerm,
           sortBy,
-          sortOrder: 'asc'
+          sortOrder,
         });
         setDealers(data.items);
         setTotalResults(data.totalResults);
       } catch (err) {
-        setError('Failed to fetch dealers: ' + (err.message || 'Unknown error'));
-        console.error('Fetch error:', err);
+        setError("Failed to fetch dealers: " + (err.message || "Unknown error"));
+        console.error("Fetch error:", err);
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, [page, pageSize, searchTerm, sortBy]);
+  }, [page, pageSize, searchTerm, sortBy, sortOrder]);
 
   // Fetch dealers
   const fetchDealers = async () => {
@@ -80,28 +87,50 @@ const DealerManagement = () => {
         pageSize,
         search: searchTerm,
         sortBy,
-        sortOrder: 'asc'
+        sortOrder,
       });
       setDealers(data.items);
       setTotalResults(data.totalResults);
     } catch (err) {
-      setError('Failed to fetch dealers: ' + (err.message || 'Unknown error'));
-      console.error('Fetch error:', err);
+      setError("Failed to fetch dealers: " + (err.message || "Unknown error"));
+      console.error("Fetch error:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle search input change
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
+  // Handle sort click
+  const handleSort = (field) => {
+    if (sortBy === field) {
+      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
     setPage(1);
   };
 
+  // Handle search input change with debounce
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchInput(value);
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    searchTimeout.current = setTimeout(() => {
+      setSearchTerm(value);
+      setPage(1);
+    }, 150);
+  };
+
+  // Keep searchInput in sync with searchTerm on mount
+  useEffect(() => {
+    setSearchInput(searchTerm);
+    // eslint-disable-next-line
+  }, []);
+
   // Open modal for create
   const handleCreate = () => {
-    setModalMode('create');
-    setFormData({ name: '', region: REGIONS[0], address: '' });
+    setModalMode("create");
+    setFormData({ name: "", region: REGIONS[0], address: "" });
     setCurrentDealer(null);
     setShowModal(true);
   };
@@ -115,12 +144,12 @@ const DealerManagement = () => {
       setFormData({
         name: dealer.name,
         region: dealer.region,
-        address: dealer.address
+        address: dealer.address,
       });
-      setModalMode('edit');
+      setModalMode("edit");
       setShowModal(true);
     } catch (err) {
-      setError('Failed to fetch dealer details: ' + (err.message || 'Unknown error'));
+      setError("Failed to fetch dealer details: " + (err.message || "Unknown error"));
     } finally {
       setLoading(false);
     }
@@ -135,12 +164,12 @@ const DealerManagement = () => {
       setFormData({
         name: dealer.name,
         region: dealer.region,
-        address: dealer.address
+        address: dealer.address,
       });
-      setModalMode('view');
+      setModalMode("view");
       setShowModal(true);
     } catch (err) {
-      setError('Failed to fetch dealer details: ' + (err.message || 'Unknown error'));
+      setError("Failed to fetch dealer details: " + (err.message || "Unknown error"));
     } finally {
       setLoading(false);
     }
@@ -149,7 +178,7 @@ const DealerManagement = () => {
   // Handle form input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   // Handle form submit
@@ -160,15 +189,15 @@ const DealerManagement = () => {
 
     // Validation
     if (!formData.name.trim()) {
-      setError('Dealer name is required');
+      setError("Dealer name is required");
       return;
     }
     if (!formData.region) {
-      setError('Region is required');
+      setError("Region is required");
       return;
     }
     if (!formData.address.trim()) {
-      setError('Address is required');
+      setError("Address is required");
       return;
     }
 
@@ -178,26 +207,25 @@ const DealerManagement = () => {
       const payload = {
         name: formData.name,
         region: formData.region,
-        address: formData.address
+        address: formData.address,
       };
 
-      if (modalMode === 'create') {
+      if (modalMode === "create") {
         await createDealer(payload);
-        setSuccess('Dealer created successfully!');
-      } else if (modalMode === 'edit') {
+        setSuccess("Dealer created successfully!");
+        setShowModal(false); // Close immediately after create
+        await fetchDealers();
+        setTimeout(() => setSuccess(null), 1500);
+      } else if (modalMode === "edit") {
         await updateDealer(currentDealer.id, payload);
-        setSuccess('Dealer updated successfully!');
+        setSuccess("Dealer updated successfully!");
+        setShowModal(false); // Close immediately after update
+        await fetchDealers();
+        setTimeout(() => setSuccess(null), 1500);
       }
-
-      // Refresh list and close modal
-      await fetchDealers();
-      setTimeout(() => {
-        setShowModal(false);
-        setSuccess(null);
-      }, 1500);
     } catch (err) {
-      setError('Failed to save dealer: ' + (err.response?.data?.message || err.message || 'Unknown error'));
-      console.error('Save error:', err);
+      setError("Failed to save dealer: " + (err.response?.data?.message || err.message || "Unknown error"));
+      console.error("Save error:", err);
     } finally {
       setLoading(false);
     }
@@ -215,13 +243,13 @@ const DealerManagement = () => {
     try {
       setLoading(true);
       await deleteDealer(dealerToDelete.id);
-      setSuccess('Dealer deleted successfully!');
+      setSuccess("Dealer deleted successfully!");
       setShowDeleteModal(false);
       setDealerToDelete(null);
       await fetchDealers();
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      setError('Failed to delete dealer: ' + (err.message || 'Unknown error'));
+      setError("Failed to delete dealer: " + (err.message || "Unknown error"));
     } finally {
       setLoading(false);
     }
@@ -232,24 +260,24 @@ const DealerManagement = () => {
 
   // Format date
   const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return "N/A";
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
   // Get region badge color
   const getRegionColor = (region) => {
     const colors = {
-      'Ho Chi Minh City': 'primary',
-      'Hanoi': 'success',
-      'Da Nang': 'info',
-      'Nha Trang': 'warning'
+      "Ho Chi Minh City": "primary",
+      Hanoi: "success",
+      "Da Nang": "info",
+      "Nha Trang": "warning",
     };
-    return colors[region] || 'secondary';
+    return colors[region] || "secondary";
   };
 
   return (
@@ -260,10 +288,17 @@ const DealerManagement = () => {
           <h4 className="fw-bold mb-1">Dealer Management</h4>
           <p className="text-muted mb-0">Manage dealer locations, regions, and contracts</p>
         </div>
-        <button className="btn btn-primary" onClick={handleCreate}>
-          <i className="bx bx-plus me-1" />
-          Add New Dealer
-        </button>
+        <div>
+          {typeof totalResults === "number" && <span className="badge bg-label-primary me-3">{totalResults} Total</span>}
+          <button className="btn btn-outline-primary me-2" onClick={handleCreate}>
+            <i className="bx bx-plus me-1" />
+            Add New Dealer
+          </button>
+          <button className="btn btn-primary" onClick={fetchDealers}>
+            <i className="bx bx-refresh me-1" />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Alerts */}
@@ -291,19 +326,13 @@ const DealerManagement = () => {
                 <span className="input-group-text">
                   <i className="bx bx-search" />
                 </span>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Search by dealer name or region..."
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                />
+                <input type="text" className="form-control" placeholder="Search by dealer name or region..." value={searchInput} onChange={handleSearchChange} />
               </div>
             </div>
             <div className="col-md-3">
-              <select 
-                className="form-select" 
-                value={pageSize} 
+              <select
+                className="form-select"
+                value={pageSize}
                 onChange={(e) => {
                   setPageSize(Number(e.target.value));
                   setPage(1);
@@ -313,18 +342,6 @@ const DealerManagement = () => {
                 <option value="10">10 per page</option>
                 <option value="20">20 per page</option>
                 <option value="50">50 per page</option>
-              </select>
-            </div>
-            <div className="col-md-3">
-              <select 
-                className="form-select" 
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-              >
-                <option value="">Sort by...</option>
-                <option value="name">Name</option>
-                <option value="region">Region</option>
-                <option value="createdAt">Created Date</option>
               </select>
             </div>
           </div>
@@ -342,128 +359,51 @@ const DealerManagement = () => {
             </div>
           ) : (
             <>
-              <div className="table-responsive">
-                <table className="table table-hover">
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Region</th>
-                      <th>Address</th>
-                      <th>Created At</th>
-                      <th>Updated At</th>
-                      <th style={{ width: '150px' }}>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {dealers.length === 0 ? (
-                      <tr>
-                        <td colSpan="6" className="text-center py-5 text-muted">
-                          <i className="bx bx-store bx-lg mb-2" />
-                          <p>No dealers found</p>
-                        </td>
-                      </tr>
-                    ) : (
-                      dealers.map((dealer) => (
-                        <tr key={dealer.id}>
-                          <td>
-                            <strong>{dealer.name}</strong>
-                          </td>
-                          <td>
-                            <span className={`badge bg-label-${getRegionColor(dealer.region)}`}>
-                              {dealer.region}
-                            </span>
-                          </td>
-                          <td>
-                            <div 
-                              className="text-truncate" 
-                              style={{ maxWidth: '250px' }}
-                              title={dealer.address}
-                            >
-                              {dealer.address}
-                            </div>
-                          </td>
-                          <td>{formatDate(dealer.createdAt)}</td>
-                          <td>{formatDate(dealer.updatedAt)}</td>
-                          <td>
-                            <div className="btn-group" role="group">
-                              <button
-                                className="btn btn-sm btn-outline-info"
-                                onClick={() => handleView(dealer.id)}
-                                title="View Details"
-                              >
-                                <i className="bx bx-show" />
-                              </button>
-                              <button
-                                className="btn btn-sm btn-outline-primary"
-                                onClick={() => handleEdit(dealer.id)}
-                                title="Edit"
-                              >
-                                <i className="bx bx-edit" />
-                              </button>
-                              <button
-                                className="btn btn-sm btn-outline-danger"
-                                onClick={() => handleDeleteClick(dealer)}
-                                title="Delete"
-                              >
-                                <i className="bx bx-trash" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-
+              <DealerTable
+                dealers={dealers}
+                getRegionColor={getRegionColor}
+                formatDate={formatDate}
+                handleView={handleView}
+                handleEdit={handleEdit}
+                handleDeleteClick={handleDeleteClick}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                handleSort={handleSort}
+              />
               {/* Pagination */}
               {totalPages > 1 && (
                 <div className="d-flex justify-content-between align-items-center mt-4">
                   <div className="text-muted">
-                    Showing {((page - 1) * pageSize) + 1} to {Math.min(page * pageSize, totalResults)} of {totalResults} results
+                    Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, totalResults)} of {totalResults} results
                   </div>
                   <nav>
                     <ul className="pagination mb-0">
-                      <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
-                        <button 
-                          className="page-link" 
-                          onClick={() => setPage(page - 1)}
-                          disabled={page === 1}
-                        >
+                      <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
+                        <button className="page-link" onClick={() => setPage(page - 1)} disabled={page === 1}>
                           Previous
                         </button>
                       </li>
                       {[...new Array(totalPages)].map((_, i) => {
                         const pageNum = i + 1;
-                        if (
-                          pageNum === 1 || 
-                          pageNum === totalPages || 
-                          (pageNum >= page - 1 && pageNum <= page + 1)
-                        ) {
+                        if (pageNum === 1 || pageNum === totalPages || (pageNum >= page - 1 && pageNum <= page + 1)) {
                           return (
-                            <li 
-                              key={pageNum} 
-                              className={`page-item ${page === pageNum ? 'active' : ''}`}
-                            >
-                              <button 
-                                className="page-link" 
-                                onClick={() => setPage(pageNum)}
-                              >
+                            <li key={pageNum} className={`page-item ${page === pageNum ? "active" : ""}`}>
+                              <button className="page-link" onClick={() => setPage(pageNum)}>
                                 {pageNum}
                               </button>
                             </li>
                           );
                         } else if (pageNum === page - 2 || pageNum === page + 2) {
-                          return <li key={pageNum} className="page-item disabled"><span className="page-link">...</span></li>;
+                          return (
+                            <li key={pageNum} className="page-item disabled">
+                              <span className="page-link">...</span>
+                            </li>
+                          );
                         }
                         return null;
                       })}
-                      <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
-                        <button 
-                          className="page-link" 
-                          onClick={() => setPage(page + 1)}
-                          disabled={page === totalPages}
-                        >
+                      <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
+                        <button className="page-link" onClick={() => setPage(page + 1)} disabled={page === totalPages}>
                           Next
                         </button>
                       </li>
@@ -477,203 +417,26 @@ const DealerManagement = () => {
       </div>
 
       {/* Create/Edit Modal */}
-      {showModal && (
-        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-lg">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">
-                  {modalMode === 'create' && <><i className="bx bx-plus me-2" />Create New Dealer</>}
-                  {modalMode === 'edit' && <><i className="bx bx-edit me-2" />Edit Dealer</>}
-                  {modalMode === 'view' && <><i className="bx bx-show me-2" />View Dealer</>}
-                </h5>
-                <button 
-                  type="button" 
-                  className="btn-close" 
-                  onClick={() => setShowModal(false)}
-                  disabled={loading}
-                />
-              </div>
-              <form onSubmit={handleSubmit}>
-                <div className="modal-body">
-                  {/* Name */}
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Dealer Name <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      disabled={modalMode === 'view'}
-                      required
-                      placeholder="e.g., EV Motors Saigon"
-                    />
-                  </div>
-
-                  {/* Region */}
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Region <span className="text-danger">*</span>
-                    </label>
-                    <select
-                      className="form-select"
-                      name="region"
-                      value={formData.region}
-                      onChange={handleInputChange}
-                      disabled={modalMode === 'view'}
-                      required
-                    >
-                      {REGIONS.map(region => (
-                        <option key={region} value={region}>{region}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Address */}
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Address <span className="text-danger">*</span>
-                    </label>
-                    <textarea
-                      className="form-control"
-                      name="address"
-                      rows="3"
-                      value={formData.address}
-                      onChange={handleInputChange}
-                      disabled={modalMode === 'view'}
-                      required
-                      placeholder="Enter full address..."
-                    />
-                  </div>
-
-                  {/* View mode details */}
-                  {modalMode === 'view' && currentDealer && (
-                    <div className="row">
-                      <div className="col-md-6">
-                        <p className="mb-2">
-                          <strong>Created At:</strong><br />
-                          {formatDate(currentDealer.createdAt)}
-                        </p>
-                      </div>
-                      <div className="col-md-6">
-                        <p className="mb-2">
-                          <strong>Updated At:</strong><br />
-                          {formatDate(currentDealer.updatedAt)}
-                        </p>
-                      </div>
-                      <div className="col-12 mt-2">
-                        <p className="mb-2">
-                          <strong>ID:</strong><br />
-                          <code className="text-muted">{currentDealer.id}</code>
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div className="modal-footer">
-                  <button 
-                    type="button" 
-                    className="btn btn-secondary" 
-                    onClick={() => setShowModal(false)}
-                    disabled={loading}
-                  >
-                    {modalMode === 'view' ? 'Close' : 'Cancel'}
-                  </button>
-                  {modalMode !== 'view' && (
-                    <button 
-                      type="submit" 
-                      className="btn btn-primary"
-                      disabled={loading}
-                    >
-                      {loading ? (
-                        <>
-                          <span className="spinner-border spinner-border-sm me-2" />
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <i className="bx bx-save me-1" />
-                          {modalMode === 'create' ? 'Create' : 'Update'}
-                        </>
-                      )}
-                    </button>
-                  )}
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
+      <DealerModal
+        showModal={showModal}
+        modalMode={modalMode}
+        loading={loading}
+        formData={formData}
+        REGIONS={REGIONS}
+        handleInputChange={handleInputChange}
+        handleSubmit={handleSubmit}
+        setShowModal={setShowModal}
+        currentDealer={
+          currentDealer && {
+            ...currentDealer,
+            createdAt: formatDate(currentDealer.createdAt),
+            updatedAt: formatDate(currentDealer.updatedAt),
+          }
+        }
+      />
 
       {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header bg-danger text-white">
-                <h5 className="modal-title">
-                  <i className="bx bx-trash me-2" />
-                  Confirm Delete
-                </h5>
-                <button 
-                  type="button" 
-                  className="btn-close btn-close-white" 
-                  onClick={() => setShowDeleteModal(false)}
-                  disabled={loading}
-                />
-              </div>
-              <div className="modal-body">
-                <p>Are you sure you want to delete this dealer?</p>
-                {dealerToDelete && (
-                  <div className="alert alert-warning">
-                    <strong>{dealerToDelete.name}</strong>
-                    <p className="mb-0 mt-2">
-                      <small className="text-muted">
-                        Region: {dealerToDelete.region}<br />
-                        Address: {dealerToDelete.address}
-                      </small>
-                    </p>
-                    <p className="mb-0 mt-2 text-danger small">
-                      This action cannot be undone.
-                    </p>
-                  </div>
-                )}
-              </div>
-              <div className="modal-footer">
-                <button 
-                  type="button" 
-                  className="btn btn-secondary" 
-                  onClick={() => setShowDeleteModal(false)}
-                  disabled={loading}
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="button" 
-                  className="btn btn-danger"
-                  onClick={confirmDelete}
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm me-2" />
-                      Deleting...
-                    </>
-                  ) : (
-                    <>
-                      <i className="bx bx-trash me-1" />
-                      Delete
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <DealerDeleteModal showDeleteModal={showDeleteModal} dealerToDelete={dealerToDelete} loading={loading} setShowDeleteModal={setShowDeleteModal} confirmDelete={confirmDelete} />
     </div>
   );
 };

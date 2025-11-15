@@ -1,92 +1,159 @@
-import React from 'react';
-import VehicleModelManagement from '../components/evm-dashboard/VehicleModelManagement';
-import DealerManagement from '../components/evm-dashboard/DealerManagement';
-import DealerContractManagement from '../components/evm-dashboard/DealerContractManagement';
-import InventoryManagement from '../components/evm-dashboard/InventoryManagement';
-import VehicleVariantManagement from '../components/evm-dashboard/VehicleVariantManagement';
+import { useEffect, useState } from "react";
+import DealerContractManagement from "../components/evm-dashboard/DealerContractManagement";
+import OemPromotionManagement from "../components/evm-dashboard/OemPromotionManagement";
+import DealerManagement from "../components/evm-dashboard/DealerManagement";
+import DealerOrderManagement from "../components/evm-dashboard/DealerOrderManagement";
+import DealerPaymentsManagement from "../components/evm-dashboard/DealerPaymentsManagement";
+import InventoryManagement from "../components/evm-dashboard/InventoryManagement";
+import DealerTotalSales from "../components/evm-dashboard/reports/DealerTotalSales";
+import RegionTotalSales from "../components/evm-dashboard/reports/RegionTotalSales";
+import VariantOrderRates from "../components/evm-dashboard/reports/VariantOrderRates";
+import VehicleModelManagement from "../components/evm-dashboard/VehicleModelManagement";
+import VehicleVariantManagement from "../components/evm-dashboard/VehicleVariantManagement";
+import { getAllDealerContracts } from "../services/dealerService";
+import { getAllInventories } from "../services/inventoryService";
+import { getAllVehicleModels } from "../services/vehicleModelService";
+import { getAllVehicleVariants } from "../services/vehicleVariantService";
 
 const EVMDashboard = ({ currentPage }) => {
+  // Dashboard stats state
+  const [stats, setStats] = useState({
+    vehicleModels: null,
+    variants: null,
+    activeDealers: null,
+    pendingReview: null,
+    loading: true,
+    error: null,
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      setStats((s) => ({ ...s, loading: true, error: null }));
+      try {
+        const vehicleModelsRes = await getAllVehicleModels({ page: 0, pageSize: 0 });
+        const vehicleVariantsRes = await getAllVehicleVariants({ page: 0, pageSize: 0 });
+        // Fetch all dealer contracts and count active ones
+        let activeDealers = null;
+        try {
+          const dealerContractsRes = await getAllDealerContracts({ page: 1, pageSize: 10000 });
+          const now = new Date();
+          activeDealers = (dealerContractsRes.items || []).filter((contract) => {
+            const start = contract.startDate ? new Date(contract.startDate) : null;
+            const end = contract.endDate ? new Date(contract.endDate) : null;
+            return start && start <= now && (!end || end >= now);
+          }).length;
+        } catch {
+          activeDealers = null;
+        }
+        // Low Stock: get all inventories, count those with quantity <= 5
+        let lowStock = null;
+        try {
+          const inventoriesRes = await getAllInventories({ page: 1, pageSize: 10000 });
+          lowStock = (inventoriesRes.items || []).filter((inv) => typeof inv.quantity === "number" && inv.quantity <= 5).length;
+        } catch {
+          lowStock = null;
+        }
+        setStats({
+          vehicleModels: vehicleModelsRes.totalResults,
+          variants: vehicleVariantsRes.totalResults,
+          activeDealers,
+          lowStock,
+          loading: false,
+          error: null,
+        });
+      } catch (err) {
+        setStats((s) => ({ ...s, loading: false, error: err?.message || "Failed to load stats" }));
+      }
+    };
+    fetchStats();
+  }, []);
+
+  const renderStatValue = (value) => {
+    if (stats.loading)
+      return (
+        <span className="placeholder-glow">
+          <span className="placeholder col-6"></span>
+        </span>
+      );
+    if (stats.error) return <span className="text-danger">!</span>;
+    return value !== null && value !== undefined ? value : <span className="text-muted">-</span>;
+  };
+
   const renderContent = () => {
     switch (currentPage) {
-      case 'evm-dashboard':
+      case "evm-dashboard":
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
             <div className="row">
               <div className="col-12">
                 <div className="card mb-4">
                   <div className="card-body">
-                    <div className="d-flex align-items-center mb-4">
-                      <div className="avatar avatar-xl me-3 bg-label-primary rounded">
-                        <i className="bx bx-car bx-lg" />
-                      </div>
-                      <div>
-                        <h4 className="mb-1">Welcome to EVM Dashboard</h4>
-                        <p className="mb-0 text-muted">
-                          Manage vehicle models, variants, and specifications
-                        </p>
-                      </div>
+                    <div className="mb-4">
+                      <h4 className="mb-1">Welcome to EVM Dashboard</h4>
+                      <p className="mb-0 text-muted">Manage vehicles and dealers</p>
                     </div>
 
                     {/* Quick Stats */}
                     <div className="row g-3">
+                      {/* ...existing code... */}
                       <div className="col-md-3">
                         <div className="card bg-primary text-white">
                           <div className="card-body">
-                            <div className="d-flex justify-content-between">
+                            <div className="d-flex justify-content-between align-items-center">
                               <div>
-                                <h5 className="text-white mb-1">45</h5>
+                                <h5 className="text-white mb-1">{renderStatValue(stats.vehicleModels)}</h5>
                                 <p className="mb-0 small">Vehicle Models</p>
                               </div>
-                              <div className="avatar bg-white bg-opacity-25">
-                                <i className="bx bx-car text-white" />
+                              <div className="avatar d-flex align-items-center justify-content-center" style={{ width: 40, height: 40 }}>
+                                <i className="bx bx-car text-white bx-lg" />
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
-
+                      {/* ...existing code... */}
                       <div className="col-md-3">
                         <div className="card bg-success text-white">
                           <div className="card-body">
-                            <div className="d-flex justify-content-between">
+                            <div className="d-flex justify-content-between align-items-center">
                               <div>
-                                <h5 className="text-white mb-1">128</h5>
+                                <h5 className="text-white mb-1">{renderStatValue(stats.variants)}</h5>
                                 <p className="mb-0 small">Variants</p>
                               </div>
-                              <div className="avatar bg-white bg-opacity-25">
-                                <i className="bx bx-customize text-white" />
+                              <div className="avatar d-flex align-items-center justify-content-center" style={{ width: 40, height: 40 }}>
+                                <i className="bx bx-customize text-white bx-lg" />
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
-
+                      {/* ...existing code... */}
                       <div className="col-md-3">
                         <div className="card bg-info text-white">
                           <div className="card-body">
-                            <div className="d-flex justify-content-between">
+                            <div className="d-flex justify-content-between align-items-center">
                               <div>
-                                <h5 className="text-white mb-1">12</h5>
-                                <p className="mb-0 small">Active Models</p>
+                                <h5 className="text-white mb-1">{renderStatValue(stats.activeDealers)}</h5>
+                                <p className="mb-0 small">Active Dealers</p>
                               </div>
-                              <div className="avatar bg-white bg-opacity-25">
-                                <i className="bx bx-check-circle text-white" />
+                              <div className="avatar d-flex align-items-center justify-content-center" style={{ width: 40, height: 40 }}>
+                                <i className="bx bx-user-check text-white bx-lg" />
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
-
+                      {/* ...existing code... */}
                       <div className="col-md-3">
                         <div className="card bg-warning text-white">
                           <div className="card-body">
-                            <div className="d-flex justify-content-between">
+                            <div className="d-flex justify-content-between align-items-center">
                               <div>
-                                <h5 className="text-white mb-1">8</h5>
-                                <p className="mb-0 small">Pending Review</p>
+                                <h5 className="text-white mb-1">{renderStatValue(stats.lowStock)}</h5>
+                                <p className="mb-0 small">Low Stock</p>
                               </div>
-                              <div className="avatar bg-white bg-opacity-25">
-                                <i className="bx bx-time text-white" />
+                              <div className="avatar d-flex align-items-center justify-content-center" style={{ width: 40, height: 40 }}>
+                                <i className="bx bx-error text-white bx-lg" />
                               </div>
                             </div>
                           </div>
@@ -98,26 +165,60 @@ const EVMDashboard = ({ currentPage }) => {
                     <div className="mt-4">
                       <h5 className="mb-3">Quick Actions</h5>
                       <div className="d-flex flex-wrap gap-2">
-                        <button 
+                        <button
                           className="btn btn-primary"
-                          onClick={() => window.location.href = '/vehicle-models'}
+                          onClick={() => {
+                            window.location.href = "/vehicle-models?create=1";
+                          }}
                         >
-                          <i className="bx bx-plus me-2" />
-                          Add New Model
+                          <span className="d-inline-flex align-items-center">
+                            <i className="bx bx-car" style={{ marginRight: 8 }} />
+                            Add New Model
+                          </span>
                         </button>
-                        <button 
-                          className="btn btn-outline-primary"
-                          onClick={() => window.location.href = '/vehicle-variants'}
+                        <button
+                          className="btn btn-success"
+                          onClick={() => {
+                            window.location.href = "/vehicle-variants?create=1";
+                          }}
                         >
-                          <i className="bx bx-customize me-2" />
-                          Manage Variants
+                          <span className="d-inline-flex align-items-center">
+                            <i className="bx bx-customize" style={{ marginRight: 8 }} />
+                            Add New Variant
+                          </span>
                         </button>
-                        <button 
-                          className="btn btn-outline-primary"
-                          onClick={() => window.location.href = '/specifications'}
+                        <button
+                          className="btn btn-info"
+                          onClick={() => {
+                            window.location.href = "/dealers?create=1";
+                          }}
                         >
-                          <i className="bx bx-list-ul me-2" />
-                          View Specifications
+                          <span className="d-inline-flex align-items-center">
+                            <i className="bx bx-store" style={{ marginRight: 8 }} />
+                            Add New Dealer
+                          </span>
+                        </button>
+                        <button
+                          className="btn btn-warning"
+                          onClick={() => {
+                            window.location.href = "/dealer-contracts?create=1";
+                          }}
+                        >
+                          <span className="d-inline-flex align-items-center">
+                            <i className="bx bx-file" style={{ marginRight: 8 }} />
+                            Add New Contract
+                          </span>
+                        </button>
+                        <button
+                          className="btn btn-danger"
+                          onClick={() => {
+                            window.location.href = "/oem-inventories?create=1";
+                          }}
+                        >
+                          <span className="d-inline-flex align-items-center">
+                            <i className="bx bx-package" style={{ marginRight: 8 }} />
+                            Add New Inventory
+                          </span>
                         </button>
                       </div>
                     </div>
@@ -128,58 +229,78 @@ const EVMDashboard = ({ currentPage }) => {
           </div>
         );
 
-      case 'vehicle-models':
+      case "vehicle-models":
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
             <VehicleModelManagement />
           </div>
         );
 
-      case 'dealers':
-        return (
-          <div className="container-xxl flex-grow-1 container-p-y">
-            <DealerManagement />
-          </div>
-        );
-
-      case 'dealer-contracts':
-        return (
-          <div className="container-xxl flex-grow-1 container-p-y">
-            <DealerContractManagement />
-          </div>
-        );
-
-      case 'oem-inventories':
-        return (
-          <div className="container-xxl flex-grow-1 container-p-y">
-            <InventoryManagement />
-          </div>
-        );
-
-      case 'vehicle-variants':
+      case "vehicle-variants":
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
             <VehicleVariantManagement />
           </div>
         );
 
-      case 'specifications':
+      case "dealers":
         return (
           <div className="container-xxl flex-grow-1 container-p-y">
-            <div className="card">
-              <div className="card-header">
-                <h5 className="mb-0">Vehicle Specifications</h5>
-              </div>
-              <div className="card-body">
-                <div className="alert alert-info">
-                  <i className="bx bx-info-circle me-2" />
-                  Specifications management coming soon...
-                </div>
-              </div>
-            </div>
+            <DealerManagement />
           </div>
         );
 
+      case "dealer-contracts":
+        return (
+          <div className="container-xxl flex-grow-1 container-p-y">
+            <DealerContractManagement />
+          </div>
+        );
+
+      case "oem-inventories":
+        return (
+          <div className="container-xxl flex-grow-1 container-p-y">
+            <InventoryManagement />
+          </div>
+        );
+
+      case "variant-order-rates":
+        return (
+          <div className="container-xxl flex-grow-1 container-p-y">
+            <VariantOrderRates />
+          </div>
+        );
+      case "dealer-orders":
+        return (
+          <div className="container-xxl flex-grow-1 container-p-y">
+            <DealerOrderManagement />
+          </div>
+        );
+      case "dealer-payments":
+        return (
+          <div className="container-xxl flex-grow-1 container-p-y">
+            <DealerPaymentsManagement />
+          </div>
+        );
+      case "dealer-total-sales":
+        return (
+          <div className="container-xxl flex-grow-1 container-p-y">
+            <DealerTotalSales />
+          </div>
+        );
+      case "region-total-sales":
+        return (
+          <div className="container-xxl flex-grow-1 container-p-y">
+            <RegionTotalSales />
+          </div>
+        );
+
+      case "oem-promotions":
+        return (
+          <div className="container-xxl flex-grow-1 container-p-y">
+            <OemPromotionManagement />
+          </div>
+        );
       default:
         return (
           <div className="container-xxl flex-grow-1 container-p-y">

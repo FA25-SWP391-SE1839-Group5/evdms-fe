@@ -1,20 +1,19 @@
-import React, { useReducer, useState, useEffect } from 'react';
-import HomePage from './pages/HomePage';
-import LoginPage from './pages/LoginPage';
-import CatalogPage from './pages/CatalogPage';
-import EVDetailPage from './pages/EVDetailPage';
-import VehicleModelPage from './pages/VehicleModelPage';
-import AdminDashboard from './pages/AdminDashboard';
-import EVMDashboard from './pages/EVMDashboard';
-import Layout from './components/admin-dashboard/layout/Layout';
-import EVMLayout from './components/evm-dashboard/layout/EVMLayout';
-import { routeReducer, initialState, ROUTES } from './routes';
-import { logout, getStoredToken } from './services/authService';
+import { useEffect, useReducer, useState } from "react";
+import Layout from "./components/admin-dashboard/layout/Layout";
+import DealerLayout from "./components/dealer-mananger-dashboard/layout/DealerLayout";
+import EVMLayout from "./components/evm-dashboard/layout/EVMLayout";
+import AdminDashboard from "./pages/AdminDashboard";
+import DealerManagerDashboard from "./pages/DealerManagerDashboard";
+import DealerStaffDashboard from "./pages/DealerStaffDashboard";
+import EVMDashboard from "./pages/EVMDashboard";
+import LoginPage from "./pages/LoginPage";
+import { initialState, routeReducer, ROUTES } from "./routes";
+import { getStoredToken } from "./services/authService";
+
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 const App = () => {
   const [routeState, dispatch] = useReducer(routeReducer, initialState);
-  const [favorites, setFavorites] = useState(new Set());
-  const [compareList, setCompareList] = useState([]);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
@@ -30,7 +29,7 @@ const App = () => {
       "/assets/js/dashboards-analytics.js",
     ];
 
-    scripts.forEach(src => {
+    scripts.forEach((src) => {
       const script = document.createElement("script");
       script.src = src;
       script.async = false; // đảm bảo load theo thứ tự
@@ -39,210 +38,113 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const checkAuthOrReset = () => {
+    const checkAuthAndRoute = () => {
+      console.log("--- Running Initial Auth Check ---");
       try {
-        // Check if URL has reset token parameter
-        const urlParams = new URLSearchParams(globalThis.location.search);
-        const resetToken = urlParams.get('token');
-        
-        if (resetToken) {
-          // User is trying to reset password
-          dispatch({ type: 'NAVIGATE_TO_RESET_PASSWORD' });
-          setIsCheckingAuth(false);
-          return;
-        }
-
-        // Check URL path first
-        const path = globalThis.location.pathname.replace('/', '');
-        
-        // If user is on /home or root path, show home page (no auth required)
-        if (path === 'home' || path === '') {
-          dispatch({ type: 'NAVIGATE_TO_HOME' });
-          setIsCheckingAuth(false);
-          return;
-        }
-
-        // If user is on /login, show login page
-        if (path === 'login') {
-          dispatch({ type: 'NAVIGATE_TO_LOGIN' });
-          setIsCheckingAuth(false);
-          return;
-        }
-
-        // For other paths, check authentication
         const stored = getStoredToken();
+
+        // ƯU TIÊN 1: Có token hợp lệ?
         if (stored?.user?.role) {
-          // User is logged in, restore session
-          dispatch({
-            type: 'LOGIN_SUCCESS',
-            payload: stored.user
-          });
-          
-          // If on catalog page, navigate there
-          if (path === 'catalog') {
-            dispatch({ type: 'NAVIGATE_TO_CATALOG' });
-          }
+          console.log("Token found. Dispatching LOGIN_SUCCESS:", stored.user);
+          dispatch({ type: "LOGIN_SUCCESS", payload: stored.user });
+          // Không set isCheckingAuth = false ở đây vội
+          return; // Kết thúc sớm nếu đã đăng nhập
+        }
+
+        // ƯU TIÊN 2: Không có token, kiểm tra URL đặc biệt
+        console.log("No token found. Checking URL:", window.location.pathname, window.location.search);
+        const urlParams = new URLSearchParams(window.location.search);
+        const resetToken = urlParams.get("token");
+        const path = window.location.pathname.replace("/", "");
+
+        if (resetToken /* && path === 'reset-password' */) {
+          // Có thể thêm check path nếu muốn
+          console.log("Reset token detected.");
+          dispatch({ type: "NAVIGATE_TO_RESET_PASSWORD" });
+        } else if (path === "login") {
+          console.log("No token, on /login path.");
+          dispatch({ type: "NAVIGATE_TO_LOGIN" });
+        } else if (path === "catalog") {
+          console.log("No token, on /catalog path.");
+          dispatch({ type: "NAVIGATE_TO_CATALOG" });
+        } else if (path === "" || path === "home") {
+          console.log("No token, on root or /home path.");
+          dispatch({ type: "NAVIGATE_TO_HOME" });
         } else {
-          // Invalid token or insufficient data - redirect to home
-          dispatch({ type: 'NAVIGATE_TO_HOME' });
+          // Các URL khác mà không có token -> Chuyển về Home (hoặc Login tùy ý)
+          console.log(`No token, on protected path /${path}. Redirecting to HOME.`);
+          dispatch({ type: "NAVIGATE_TO_HOME" });
         }
       } catch (error) {
-        console.error('Auth check failed:', error);
-        dispatch({ type: 'NAVIGATE_TO_HOME' });
+        console.error("Initial Auth check failed:", error);
+        dispatch({ type: "NAVIGATE_TO_HOME" }); // Lỗi thì về home
       } finally {
-        setIsCheckingAuth(false);
+        // Luôn tắt loading sau khi kiểm tra xong
+        // Dùng setTimeout để đảm bảo dispatch kịp xử lý trước khi tắt loading
+        setTimeout(() => {
+          console.log("--- Finished Initial Auth Check ---");
+          setIsCheckingAuth(false);
+        }, 0);
       }
     };
 
-    checkAuthOrReset();
-  }, []);
-
-  useEffect(() => {
-    const path = globalThis.location.pathname.replace('/', '');
-
-    // Handle URL-based routing
-    if (path === 'home') {
-      dispatch({ type: 'NAVIGATE_TO_HOME' });
-      return;
-    }
-    
-    if (path === 'login') {
-      dispatch({ type: 'NAVIGATE_TO_LOGIN' });
-      return;
-    }
-
-    if (path === 'catalog') {
-      dispatch({ type: 'NAVIGATE_TO_CATALOG' });
-      return;
-    }
-
-    // Admin dashboard sub-pages
-    if (['users', 'dealers', 'customers', 'dashboard'].includes(path)) {
-      // These are handled by the admin dashboard layout
-      return;
-    }
-  }, []);
+    checkAuthAndRoute();
+  }, []); // Hook này chỉ chạy 1 lần khi mount
 
   const getInitialAdminPage = () => {
-    const path = globalThis.location.pathname.replace('/', '');
-    if (!path || path === 'admin_dashboard') return 'dashboard';
+    const path = globalThis.location.pathname.replace("/", "");
+    if (!path || path === "admin-dashboard") return "dashboard";
     return path;
   };
 
-  // Sync logout across tabs
-  useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === 'evdms_auth_token' && !e.newValue) {
-        // Token was cleared in another tab
-        dispatch({ type: 'LOGOUT' });
-        setFavorites(new Set());
-        setCompareList([]);
-      }
-    };
+  const getInitialEVMPage = () => {
+    const path = globalThis.location.pathname.replace("/", "");
+    // Valid EVM pages
+    const validPages = ["evm-dashboard", "vehicle-models", "vehicle-variants", "dealers", "dealer-contracts", "oem-inventories", "variant-order-rates", "dealer-total-sales", "region-total-sales"];
+    if (validPages.includes(path)) {
+      return path;
+    }
+    // Default to evm-dashboard for invalid/empty paths
+    return "evm-dashboard";
+  };
 
-    globalThis.addEventListener('storage', handleStorageChange);
-    return () => globalThis.removeEventListener('storage', handleStorageChange);
-  }, []);
+  const getInitialDealerPage = () => {
+    const path = globalThis.location.pathname.replace("/", "");
+    // Các trang hợp lệ này được định nghĩa trong DealerLayout và DealerSidebar
+    const validPages = ["dealer-dashboard", "dealer-staff", "dealer-performance", "dealer-orders"];
+    if (validPages.includes(path)) {
+      return path;
+    }
+    return "dealer-dashboard"; // Trang mặc định
+  };
 
-  // Sync URL with routing state
+  // Sync URL when route changes
   useEffect(() => {
+    // Don't sync URL for login page
+    if (routeState.currentPage === ROUTES.LOGIN) {
+      return;
+    }
+
     const path = `/${routeState.currentPage}`;
     if (globalThis.location.pathname !== path) {
-      globalThis.history.pushState({}, '', path);
+      console.log("Sync URL - Pushing state to:", path);
+      globalThis.history.pushState({}, "", path);
     }
   }, [routeState.currentPage]);
-
-  // Handle browser back/forward buttons
-  useEffect(() => {
-    const handlePopState = () => {
-      const path = globalThis.location.pathname.replace('/', '');
-      
-      if (path === 'home' || path === '') {
-        dispatch({ type: 'NAVIGATE_TO_HOME' });
-      } else if (path === 'login') {
-        dispatch({ type: 'NAVIGATE_TO_LOGIN' });
-      } else if (path === 'catalog') {
-        dispatch({ type: 'NAVIGATE_TO_CATALOG' });
-      } else if (path === 'admin_dashboard' || path === 'dashboard') {
-        dispatch({ type: 'NAVIGATE_TO_ADMIN_DASHBOARD' });
-      }
-    };
-
-    globalThis.addEventListener('popstate', handlePopState);
-    return () => globalThis.removeEventListener('popstate', handlePopState);
-  }, []);
 
   // ============================================
   // AUTHENTICATION HANDLERS
   // ============================================
   const handleLoginSuccess = (userData) => {
-    dispatch({
-      type: 'LOGIN_SUCCESS',
-      payload: userData
-    });
-  };
-
-  const handleLogout = async () => {
-    await logout();
-    dispatch({ type: 'LOGOUT' });
-    setFavorites(new Set());
-    setCompareList([]);
-  };
-
-  // ============================================
-  // NAVIGATION HANDLERS
-  // ============================================
-  const navigateToHome = () => {
-    dispatch({
-      type: 'NAVIGATE_TO_HOME'
-    });
-  };
-
-  const navigateToLogin = () => {
-    dispatch({
-      type: 'NAVIGATE_TO_LOGIN'
-    });
-  };
-
-  const navigateToDetail = (vehicle) => {
-    dispatch({
-      type: 'NAVIGATE_TO_DETAIL',
-      payload: vehicle
-    });
-  };
-
-  const navigateToCatalog = () => {
-    dispatch({
-      type: 'NAVIGATE_TO_CATALOG'
-    });
-  };
-
-  // ============================================
-  // FAVORITES & COMPARE HANDLERS
-  // ============================================
-  const toggleFavorite = (vehicleId) => {
-    setFavorites(prev => {
-      const newFavorites = new Set(prev);
-      if (newFavorites.has(vehicleId)) {
-        newFavorites.delete(vehicleId);
-      } else {
-        newFavorites.add(vehicleId);
-      }
-      return newFavorites;
-    });
-  };
-
-  const toggleCompare = (vehicleId) => {
-    setCompareList(prev => {
-      if (prev.includes(vehicleId)) {
-        return prev.filter(id => id !== vehicleId);
-      } else if (prev.length < 3) {
-        return [...prev, vehicleId];
-      } else {
-        alert('Only compare to 3 cars');
-        return prev;
-      }
-    });
+    console.log("handleLoginSuccess called with:", userData);
+    // Đảm bảo userData có role
+    if (userData && userData.role) {
+      dispatch({ type: "LOGIN_SUCCESS", payload: userData });
+    } else {
+      console.error("handleLoginSuccess: Invalid userData received", userData);
+      // Có thể dispatch về login hoặc hiển thị lỗi
+      dispatch({ type: "NAVIGATE_TO_LOGIN" });
+    }
   };
 
   // Show loading screen while checking authentication
@@ -262,18 +164,8 @@ const App = () => {
   // ============================================
   return (
     <div className="font-sans">
-      {/* HOME PAGE */}
-      {routeState.currentPage === ROUTES.HOME && (
-        <HomePage 
-          onNavigateToCatalog={navigateToCatalog}
-          onNavigateToLogin={navigateToLogin}
-        />
-      )}
-
       {/* LOGIN PAGE */}
-      {routeState.currentPage === ROUTES.LOGIN && (
-        <LoginPage onLoginSuccess={handleLoginSuccess} />
-      )}
+      {routeState.currentPage === ROUTES.LOGIN && <LoginPage onLoginSuccess={handleLoginSuccess} />}
 
       {/* ADMIN DASHBOARD */}
       {routeState.currentPage === ROUTES.ADMIN_DASHBOARD && (
@@ -289,43 +181,23 @@ const App = () => {
         </EVMLayout>
       )}
 
-      {/* VEHICLE MODELS PAGE */}
-      {routeState.currentPage === ROUTES.VEHICLE_MODELS && (
-        <VehicleModelPage
-          user={routeState.user}
-          onLogout={handleLogout}
-        />
+      {/* DEALER MANAGER DASHBOARD */}
+      {routeState.currentPage === ROUTES.DEALER_MANAGER_DASHBOARD && (
+        <DealerLayout initialPage={getInitialDealerPage()}>
+          {/* DealerManagerDashboard là component children */}
+          <DealerManagerDashboard />
+        </DealerLayout>
+      )}
+
+      {/* DEALER STAFF DASHBOARD */}
+      {routeState.currentPage === ROUTES.DEALER_STAFF_DASHBOARD && (
+        <DealerLayout initialPage="staff-dashboard">
+          <DealerStaffDashboard />
+        </DealerLayout>
       )}
 
       {/* RESET PASSWORD PAGE */}
-      {routeState.currentPage === ROUTES.RESET_PASSWORD && (
-        <ResetPasswordPage />
-      )}
-      
-      {/* CATALOG PAGE */}
-      {routeState.currentPage === ROUTES.CATALOG && (
-        <CatalogPage
-          onVehicleSelect={navigateToDetail}
-          user={routeState.user}
-          onLogout={handleLogout}
-          onBackToHome={navigateToHome}
-        />
-      )}
-      
-      {/* DETAIL PAGE */}
-      {routeState.currentPage === ROUTES.DETAIL && (
-        <EVDetailPage
-          vehicle={routeState.selectedVehicle}
-          onBack={navigateToCatalog}
-          favorites={favorites}
-          toggleFavorite={toggleFavorite}
-          compareList={compareList}
-          toggleCompare={toggleCompare}
-          user={routeState.user}
-          onLogout={handleLogout}
-          onBackToHome={navigateToHome}
-        />
-      )}
+      {routeState.currentPage === ROUTES.RESET_PASSWORD && <ResetPasswordPage />}
     </div>
   );
 };

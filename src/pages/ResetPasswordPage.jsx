@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { AlertCircle, CheckCircle, XCircle } from "lucide-react";
+import { useEffect, useState } from "react";
 import ResetPasswordForm from "../components/auth/ResetPasswordForm";
 import { resetPassword } from "../services/authService";
-import { CheckCircle, XCircle, AlertCircle } from "lucide-react";
 
 const ResetPasswordPage = () => {
   const [token, setToken] = useState(null);
@@ -11,29 +11,29 @@ const ResetPasswordPage = () => {
   const [countdown, setCountdown] = useState(3);
 
   // Extract and hide token from URL
-useEffect(() => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const resetToken = urlParams.get("token");
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const resetToken = urlParams.get("token");
 
-  if (resetToken) {
-    // Lưu vào sessionStorage
-    sessionStorage.setItem("resetToken", resetToken);
+    if (resetToken) {
+      // Lưu vào sessionStorage
+      sessionStorage.setItem("resetToken", resetToken);
 
-    // Xóa token khỏi URL mà không reload trang
-    window.history.replaceState({}, document.title, window.location.pathname);
+      // Xóa token khỏi URL mà không reload trang
+      window.history.replaceState({}, document.title, window.location.pathname);
 
-    setToken(resetToken);
-  } else {
-    // Nếu không có token trong URL hoặc storage thì báo lỗi
-    const storedToken = sessionStorage.getItem("resetToken");
-    if (storedToken) {
-      setToken(storedToken);
+      setToken(resetToken);
     } else {
-      setMessageType("error");
-      setMessage("Invalid reset link. Please request a new password reset.");
+      // Nếu không có token trong URL hoặc storage thì báo lỗi
+      const storedToken = sessionStorage.getItem("resetToken");
+      if (storedToken) {
+        setToken(storedToken);
+      } else {
+        setMessageType("error");
+        setMessage("Invalid reset link. Please request a new password reset.");
+      }
     }
-  }
-}, []);
+  }, []);
 
   // Countdown for redirect
   useEffect(() => {
@@ -49,10 +49,16 @@ useEffect(() => {
     }
   }, [messageType, countdown]);
 
-  const handleSubmit = async ({ newPassword, confirmPassword }) => {
+  const handleSubmit = async ({ oldPassword, newPassword, confirmPassword }) => {
     if (!token) {
       setMessageType("error");
       setMessage("Invalid or expired reset link.");
+      return;
+    }
+
+    if (!oldPassword) {
+      setMessageType("error");
+      setMessage("Old password is required.");
       return;
     }
 
@@ -71,11 +77,14 @@ useEffect(() => {
 
     setLoading(true);
     setMessage("");
-    
+
     try {
       const savedToken = token || sessionStorage.getItem("resetToken");
-      await resetPassword(savedToken, newPassword, confirmPassword);
+      await resetPassword(savedToken, oldPassword, newPassword, confirmPassword);
+      setMessageType("success");
       setMessage("Password reset successfully! Redirecting to login...");
+      // Optionally clear token
+      sessionStorage.removeItem("resetToken");
     } catch (err) {
       setMessageType("error");
       setMessage(err.message || "Failed to reset password. Please try again.");
@@ -123,7 +132,7 @@ useEffect(() => {
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
       }}
     >
-      <div 
+      <div
         className="w-full max-w-md"
         style={{
           background: "#e0e5ec",
@@ -139,9 +148,7 @@ useEffect(() => {
               <XCircle className="w-16 h-16 text-red-500 mx-auto" />
             </div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Invalid Link</h2>
-            <p className="text-gray-600 mb-6">
-              This password reset link is invalid or has expired.
-            </p>
+            <p className="text-gray-600 mb-6">This password reset link is invalid or has expired.</p>
             <button
               onClick={handleRequestNewLink}
               className="inline-block px-6 py-3 rounded-xl font-semibold text-gray-700 transition-all"
@@ -164,12 +171,12 @@ useEffect(() => {
         ) : (
           <>
             <ResetPasswordForm onSubmit={handleSubmit} isLoading={loading} />
-            
+
             {message && (
-              <div 
+              <div
                 className={`mt-6 p-4 rounded-xl border-2 flex items-start space-x-3 ${getMessageStyle()}`}
                 style={{
-                  animation: messageType === "success" ? "successPulse 0.6s ease-out" : "fadeIn 0.3s ease-out"
+                  animation: messageType === "success" ? "successPulse 0.6s ease-out" : "fadeIn 0.3s ease-out",
                 }}
               >
                 {getIcon()}
@@ -177,7 +184,7 @@ useEffect(() => {
                   <p className="font-medium">{message}</p>
                   {messageType === "success" && (
                     <p className="text-sm mt-1">
-                      Redirecting in {countdown} second{countdown !== 1 ? 's' : ''}...
+                      Redirecting in {countdown} second{countdown !== 1 ? "s" : ""}...
                     </p>
                   )}
                 </div>
@@ -186,10 +193,7 @@ useEffect(() => {
 
             {messageType === "error" && (
               <div className="mt-4 text-center">
-                <button
-                  onClick={handleRequestNewLink}
-                  className="text-sm text-blue-600 hover:text-blue-800 transition-colors font-medium"
-                >
+                <button onClick={handleRequestNewLink} className="text-sm text-blue-600 hover:text-blue-800 transition-colors font-medium">
                   Request a new reset link
                 </button>
               </div>

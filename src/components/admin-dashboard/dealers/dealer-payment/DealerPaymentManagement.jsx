@@ -434,7 +434,7 @@ export default function DealerPaymentManagement() {
                                                         </>
                                                     )}
                                                     <button className="dropdown-item" onClick={() => handleEdit(p.id)}>
-                                                        <Edit size={16} className="me-1"/> Edit
+                                                       <i className="bx bx-edit-alt me-1" /> Edit
                                                     </button>
                                                     <button className="dropdown-item text-danger" onClick={() => handleDelete(p.id)}>
                                                         <Trash size={16} className="me-1"/> Delete

@@ -1,4 +1,5 @@
-import api from './api';
+import api from "./api";
+import { getAllVehicleModels } from "./vehicleModelService";
 
 // ============================================
 // DEALERS
@@ -6,7 +7,7 @@ import api from './api';
 const sanitizeParams = (params = {}) => {
   const cleaned = {};
   Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== '') {
+    if (value !== undefined && value !== null && value !== "") {
       cleaned[key] = value;
     }
   });
@@ -15,12 +16,12 @@ const sanitizeParams = (params = {}) => {
 
 export const getAllDealers = async (params = {}) => {
   try {
-    const response = await api.get('/dealers', {
-      params: sanitizeParams(params)
+    const response = await api.get("/dealers", {
+      params: sanitizeParams(params),
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching dealers:', error);
+    console.error("Error fetching dealers:", error);
     throw error;
   }
 };
@@ -30,17 +31,17 @@ export const getDealerById = async (id) => {
     const response = await api.get(`/dealers/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching dealer:', error);
+    console.error("Error fetching dealer:", error);
     throw error;
   }
 };
 
 export const createDealer = async (dealerData) => {
   try {
-    const response = await api.post('/dealers', dealerData);
+    const response = await api.post("/dealers", dealerData);
     return response.data;
   } catch (error) {
-    console.error('Error creating dealer:', error);
+    console.error("Error creating dealer:", error);
     throw error;
   }
 };
@@ -50,7 +51,7 @@ export const updateDealer = async (id, dealerData) => {
     const response = await api.put(`/dealers/${id}`, dealerData);
     return response.data;
   } catch (error) {
-    console.error('Error updating dealer:', error);
+    console.error("Error updating dealer:", error);
     throw error;
   }
 };
@@ -60,7 +61,7 @@ export const patchDealer = async (id, dealerData) => {
     const response = await api.patch(`/dealers/${id}`, dealerData);
     return response.data;
   } catch (error) {
-    console.error('Error partially updating dealer:', error);
+    console.error("Error partially updating dealer:", error);
     throw error;
   }
 };
@@ -70,7 +71,7 @@ export const deleteDealer = async (id) => {
     const response = await api.delete(`/dealers/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error deleting dealer:', error);
+    console.error("Error deleting dealer:", error);
     throw error;
   }
 };
@@ -81,12 +82,12 @@ export const deleteDealer = async (id) => {
 
 export const getAllDealerContracts = async (params = {}) => {
   try {
-    const response = await api.get('/dealer-contracts', {
-      params: sanitizeParams(params)
+    const response = await api.get("/dealer-contracts", {
+      params: sanitizeParams(params),
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching dealer contracts:', error);
+    console.error("Error fetching dealer contracts:", error);
     throw error;
   }
 };
@@ -96,17 +97,17 @@ export const getDealerContractById = async (id) => {
     const response = await api.get(`/dealer-contracts/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching dealer contract:', error);
+    console.error("Error fetching dealer contract:", error);
     throw error;
   }
 };
 
 export const createDealerContract = async (payload) => {
   try {
-    const response = await api.post('/dealer-contracts', payload);
+    const response = await api.post("/dealer-contracts", payload);
     return response.data;
   } catch (error) {
-    console.error('Error creating dealer contract:', error);
+    console.error("Error creating dealer contract:", error);
     throw error;
   }
 };
@@ -116,7 +117,7 @@ export const updateDealerContract = async (id, payload) => {
     const response = await api.put(`/dealer-contracts/${id}`, payload);
     return response.data;
   } catch (error) {
-    console.error('Error updating dealer contract:', error);
+    console.error("Error updating dealer contract:", error);
     throw error;
   }
 };
@@ -126,7 +127,7 @@ export const patchDealerContract = async (id, payload) => {
     const response = await api.patch(`/dealer-contracts/${id}`, payload);
     return response.data;
   } catch (error) {
-    console.error('Error partially updating dealer contract:', error);
+    console.error("Error partially updating dealer contract:", error);
     throw error;
   }
 };
@@ -136,7 +137,7 @@ export const deleteDealerContract = async (id) => {
     const response = await api.delete(`/dealer-contracts/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error deleting dealer contract:', error);
+    console.error("Error deleting dealer contract:", error);
     throw error;
   }
 };
@@ -144,12 +145,25 @@ export const deleteDealerContract = async (id) => {
 // ============================================
 // CUSTOMERS
 // ============================================
-export const getAllCustomers = async () => {
+// Export customers as CSV
+export const exportCustomers = async () => {
   try {
-    const response = await api.get('/customers');
+    const response = await api.get("/customers/export", {
+      responseType: "blob",
+    });
+    return response;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Failed to export customers.");
+  }
+};
+export const getAllCustomers = async (params = {}) => {
+  try {
+    const response = await api.get("/customers", {
+      params: sanitizeParams(params),
+    });
     return response.data;
   } catch (error) {
-    console.error('Error fetching customers:', error);
+    console.error("Error fetching customers:", error);
     throw error;
   }
 };
@@ -159,17 +173,17 @@ export const getCustomerById = async (id) => {
     const response = await api.get(`/customers/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching customer:', error);
+    console.error("Error fetching customer:", error);
     throw error;
   }
 };
 
 export const createCustomer = async (customerData) => {
   try {
-    const response = await api.post('/customers', customerData);
+    const response = await api.post("/customers", customerData);
     return response.data;
   } catch (error) {
-    console.error('Error creating customer:', error);
+    console.error("Error creating customer:", error);
     throw error;
   }
 };
@@ -179,7 +193,7 @@ export const updateCustomer = async (id, customerData) => {
     const response = await api.put(`/customers/${id}`, customerData);
     return response.data;
   } catch (error) {
-    console.error('Error updating customer:', error);
+    console.error("Error updating customer:", error);
     throw error;
   }
 };
@@ -189,7 +203,7 @@ export const deleteCustomer = async (id) => {
     const response = await api.delete(`/customers/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error deleting customer:', error);
+    console.error("Error deleting customer:", error);
     throw error;
   }
 };
@@ -199,10 +213,10 @@ export const deleteCustomer = async (id) => {
 // ============================================
 export const getAllInventories = async () => {
   try {
-    const response = await api.get('/oem-inventories');
+    const response = await api.get("/oem-inventories");
     return response.data;
   } catch (error) {
-    console.error('Error fetching inventories:', error);
+    console.error("Error fetching inventories:", error);
     throw error;
   }
 };
@@ -212,17 +226,17 @@ export const getInventoryById = async (id) => {
     const response = await api.get(`/oem-inventories/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching inventory:', error);
+    console.error("Error fetching inventory:", error);
     throw error;
   }
 };
 
 export const createInventory = async (inventoryData) => {
   try {
-    const response = await api.post('/oem-inventories', inventoryData);
+    const response = await api.post("/oem-inventories", inventoryData);
     return response.data;
   } catch (error) {
-    console.error('Error creating inventory:', error);
+    console.error("Error creating inventory:", error);
     throw error;
   }
 };
@@ -232,7 +246,7 @@ export const updateInventory = async (id, inventoryData) => {
     const response = await api.put(`/oem-inventories/${id}`, inventoryData);
     return response.data;
   } catch (error) {
-    console.error('Error updating inventory:', error);
+    console.error("Error updating inventory:", error);
     throw error;
   }
 };
@@ -242,7 +256,121 @@ export const deleteInventory = async (id) => {
     const response = await api.delete(`/oem-inventories/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error deleting inventory:', error);
+    console.error("Error deleting inventory:", error);
+    throw error;
+  }
+};
+
+// ============================================
+// EVM DASHBOARD STATISTICS
+// ============================================
+
+export const getEVMDashboardStats = async () => {
+  try {
+    // Fetch all necessary data in parallel
+    const [vehicleModels, vehicleVariants, dealers, dealerContracts, inventories] = await Promise.all([
+      getAllVehicleModels({ page: 1, pageSize: 1000 }),
+      api.get("/vehicle-variants", { params: { page: 1, pageSize: 1000 } }),
+      getAllDealers({ page: 1, pageSize: 1000 }),
+      getAllDealerContracts({ page: 1, pageSize: 1000 }),
+      getAllInventories(),
+    ]);
+
+    // Extract data
+    const modelsData = vehicleModels?.items || [];
+    const variantsData = vehicleVariants?.data?.data?.items || [];
+    const dealersData = dealers?.items || [];
+    const contractsData = dealerContracts?.items || [];
+    const inventoriesData = inventories?.data?.items || [];
+
+    // Calculate statistics
+    const stats = {
+      totalVehicleModels: modelsData.length,
+      totalVariants: variantsData.length,
+      totalDealers: dealersData.length,
+      totalContracts: contractsData.length,
+      totalInventory: inventoriesData.reduce((sum, item) => sum + (item.quantity || 0), 0),
+      activeContracts: contractsData.filter((c) => c.status === "Active" || c.status === "active").length,
+      pendingContracts: contractsData.filter((c) => c.status === "Pending" || c.status === "pending").length,
+
+      // Inventory by status
+      availableInventory: inventoriesData.filter((i) => i.status === "Available" || i.status === "available").reduce((sum, item) => sum + (item.quantity || 0), 0),
+      allocatedInventory: inventoriesData.filter((i) => i.status === "Allocated" || i.status === "allocated").reduce((sum, item) => sum + (item.quantity || 0), 0),
+
+      // Dealers by region
+      dealersByRegion: dealersData.reduce((acc, dealer) => {
+        const region = dealer.region || "Unknown";
+        acc[region] = (acc[region] || 0) + 1;
+        return acc;
+      }, {}),
+
+      // Models and variants data for charts
+      modelsData,
+      variantsData,
+      dealersData,
+      contractsData,
+      inventoriesData,
+    };
+
+    return stats;
+  } catch (error) {
+    console.error("Error fetching EVM dashboard stats:", error);
+    throw error;
+  }
+};
+
+export const getInventoryDistribution = async () => {
+  try {
+    const response = await getAllInventories();
+    const inventories = response?.data?.items || [];
+
+    // Group by vehicle variant
+    const distribution = inventories.reduce((acc, item) => {
+      const variantName = item.vehicleVariant?.name || item.variantName || "Unknown";
+      if (!acc[variantName]) {
+        acc[variantName] = { name: variantName, quantity: 0, available: 0, allocated: 0 };
+      }
+      acc[variantName].quantity += item.quantity || 0;
+      if (item.status === "Available" || item.status === "available") {
+        acc[variantName].available += item.quantity || 0;
+      } else if (item.status === "Allocated" || item.status === "allocated") {
+        acc[variantName].allocated += item.quantity || 0;
+      }
+      return acc;
+    }, {});
+
+    return Object.values(distribution);
+  } catch (error) {
+    console.error("Error fetching inventory distribution:", error);
+    throw error;
+  }
+};
+
+export const getContractTrends = async () => {
+  try {
+    const response = await getAllDealerContracts({ page: 1, pageSize: 1000 });
+    const contracts = response?.items || [];
+
+    // Group by month
+    const trends = contracts.reduce((acc, contract) => {
+      const date = new Date(contract.startDate || contract.createdAt);
+      const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+
+      if (!acc[monthYear]) {
+        acc[monthYear] = { month: monthYear, count: 0, active: 0, pending: 0 };
+      }
+      acc[monthYear].count++;
+      if (contract.status === "Active" || contract.status === "active") {
+        acc[monthYear].active++;
+      } else if (contract.status === "Pending" || contract.status === "pending") {
+        acc[monthYear].pending++;
+      }
+      return acc;
+    }, {});
+
+    return Object.values(trends).sort((a, b) => a.month.localeCompare(b.month));
+  } catch (error) {
+    console.error("Error fetching contract trends:", error);
     throw error;
   }
 };
@@ -250,12 +378,14 @@ export const deleteInventory = async (id) => {
 // ============================================
 // SALES ORDERS
 // ============================================
-export const getAllOrders = async () => {
+export const getAllOrders = async (params = {}) => {
   try {
-    const response = await api.get('/sales-orders');
+    const response = await api.get("/sales-orders", {
+      params: sanitizeParams(params),
+    });
     return response.data;
   } catch (error) {
-    console.error('Error fetching orders:', error);
+    console.error("Error fetching sales orders:", error);
     throw error;
   }
 };
@@ -265,17 +395,17 @@ export const getOrderById = async (id) => {
     const response = await api.get(`/sales-orders/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching order:', error);
+    console.error("Error fetching order:", error);
     throw error;
   }
 };
 
 export const createOrder = async (orderData) => {
   try {
-    const response = await api.post('/sales-orders', orderData);
+    const response = await api.post("/sales-orders", orderData);
     return response.data;
   } catch (error) {
-    console.error('Error creating order:', error);
+    console.error("Error creating order:", error);
     throw error;
   }
 };
@@ -285,7 +415,7 @@ export const updateOrder = async (id, orderData) => {
     const response = await api.put(`/sales-orders/${id}`, orderData);
     return response.data;
   } catch (error) {
-    console.error('Error updating order:', error);
+    console.error("Error updating order:", error);
     throw error;
   }
 };
@@ -295,7 +425,7 @@ export const deleteOrder = async (id) => {
     const response = await api.delete(`/sales-orders/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error deleting order:', error);
+    console.error("Error deleting order:", error);
     throw error;
   }
 };
@@ -305,10 +435,10 @@ export const deleteOrder = async (id) => {
 // ============================================
 export const getAllTestDrives = async () => {
   try {
-    const response = await api.get('/test-drives');
+    const response = await api.get("/test-drives");
     return response.data;
   } catch (error) {
-    console.error('Error fetching test drives:', error);
+    console.error("Error fetching test drives:", error);
     throw error;
   }
 };
@@ -318,17 +448,17 @@ export const getTestDriveById = async (id) => {
     const response = await api.get(`/test-drives/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching test drive:', error);
+    console.error("Error fetching test drive:", error);
     throw error;
   }
 };
 
 export const createTestDrive = async (testDriveData) => {
   try {
-    const response = await api.post('/test-drives', testDriveData);
+    const response = await api.post("/test-drives", testDriveData);
     return response.data;
   } catch (error) {
-    console.error('Error creating test drive:', error);
+    console.error("Error creating test drive:", error);
     throw error;
   }
 };
@@ -338,7 +468,7 @@ export const updateTestDrive = async (id, testDriveData) => {
     const response = await api.put(`/test-drives/${id}`, testDriveData);
     return response.data;
   } catch (error) {
-    console.error('Error updating test drive:', error);
+    console.error("Error updating test drive:", error);
     throw error;
   }
 };
@@ -348,7 +478,7 @@ export const deleteTestDrive = async (id) => {
     const response = await api.delete(`/test-drives/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error deleting test drive:', error);
+    console.error("Error deleting test drive:", error);
     throw error;
   }
 };
@@ -358,10 +488,10 @@ export const deleteTestDrive = async (id) => {
 // ============================================
 export const getAllQuotations = async () => {
   try {
-    const response = await api.get('/quotations');
+    const response = await api.get("/quotations");
     return response.data;
   } catch (error) {
-    console.error('Error fetching quotations:', error);
+    console.error("Error fetching quotations:", error);
     throw error;
   }
 };
@@ -371,17 +501,17 @@ export const getQuotationById = async (id) => {
     const response = await api.get(`/quotations/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching quotation:', error);
+    console.error("Error fetching quotation:", error);
     throw error;
   }
 };
 
 export const createQuotation = async (quotationData) => {
   try {
-    const response = await api.post('/quotations', quotationData);
+    const response = await api.post("/quotations", quotationData);
     return response.data;
   } catch (error) {
-    console.error('Error creating quotation:', error);
+    console.error("Error creating quotation:", error);
     throw error;
   }
 };
@@ -391,7 +521,7 @@ export const updateQuotation = async (id, quotationData) => {
     const response = await api.put(`/quotations/${id}`, quotationData);
     return response.data;
   } catch (error) {
-    console.error('Error updating quotation:', error);
+    console.error("Error updating quotation:", error);
     throw error;
   }
 };
@@ -401,7 +531,7 @@ export const deleteQuotation = async (id) => {
     const response = await api.delete(`/quotations/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error deleting quotation:', error);
+    console.error("Error deleting quotation:", error);
     throw error;
   }
 };
@@ -409,12 +539,30 @@ export const deleteQuotation = async (id) => {
 // ============================================
 // PAYMENTS
 // ============================================
-export const getAllPayments = async () => {
+export const getAllPayments = async (params = {}) => {
   try {
-    const response = await api.get('/payments');
+    const config = {
+      params: {},
+    };
+
+    // Add filters - handle both stringified JSON and individual filters
+    if (params.filters) {
+      config.params.filters = params.filters;
+    }
+
+    // Add individual filter properties
+    Object.keys(params).forEach((key) => {
+      if (key.startsWith("filters[") && key.endsWith("]")) {
+        config.params[key] = params[key];
+      }
+    });
+
+    console.log("API call config:", config); // Debug log
+
+    const response = await api.get("/payments", config);
     return response.data;
   } catch (error) {
-    console.error('Error fetching payments:', error);
+    console.error("Error fetching payments:", error);
     throw error;
   }
 };
@@ -424,17 +572,17 @@ export const getPaymentById = async (id) => {
     const response = await api.get(`/payments/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching payment:', error);
+    console.error("Error fetching payment:", error);
     throw error;
   }
 };
 
 export const createPayment = async (paymentData) => {
   try {
-    const response = await api.post('/payments', paymentData);
+    const response = await api.post("/payments", paymentData);
     return response.data;
   } catch (error) {
-    console.error('Error creating payment:', error);
+    console.error("Error creating payment:", error);
     throw error;
   }
 };
@@ -444,7 +592,7 @@ export const updatePayment = async (id, paymentData) => {
     const response = await api.put(`/payments/${id}`, paymentData);
     return response.data;
   } catch (error) {
-    console.error('Error updating payment:', error);
+    console.error("Error updating payment:", error);
     throw error;
   }
 };
@@ -454,7 +602,7 @@ export const deletePayment = async (id) => {
     const response = await api.delete(`/payments/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error deleting payment:', error);
+    console.error("Error deleting payment:", error);
     throw error;
   }
 };
@@ -462,12 +610,14 @@ export const deletePayment = async (id) => {
 // ============================================
 // PROMOTIONS
 // ============================================
-export const getAllPromotions = async () => {
+export const getAllPromotions = async (params = {}) => {
   try {
-    const response = await api.get('/promotions');
+    const response = await api.get("/promotions", {
+      params: sanitizeParams(params),
+    });
     return response.data;
   } catch (error) {
-    console.error('Error fetching promotions:', error);
+    console.error("Error fetching promotions:", error);
     throw error;
   }
 };
@@ -477,17 +627,17 @@ export const getPromotionById = async (id) => {
     const response = await api.get(`/promotions/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching promotion:', error);
+    console.error("Error fetching promotion:", error);
     throw error;
   }
 };
 
 export const createPromotion = async (promotionData) => {
   try {
-    const response = await api.post('/promotions', promotionData);
+    const response = await api.post("/promotions", promotionData);
     return response.data;
   } catch (error) {
-    console.error('Error creating promotion:', error);
+    console.error("Error creating promotion:", error);
     throw error;
   }
 };
@@ -497,7 +647,7 @@ export const updatePromotion = async (id, promotionData) => {
     const response = await api.put(`/promotions/${id}`, promotionData);
     return response.data;
   } catch (error) {
-    console.error('Error updating promotion:', error);
+    console.error("Error updating promotion:", error);
     throw error;
   }
 };
@@ -507,7 +657,7 @@ export const deletePromotion = async (id) => {
     const response = await api.delete(`/promotions/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error deleting promotion:', error);
+    console.error("Error deleting promotion:", error);
     throw error;
   }
 };
@@ -515,60 +665,44 @@ export const deletePromotion = async (id) => {
 // ============================================
 // USERS
 // ============================================
-export const getAllUsers = async () => {
-  console.log('📡 API Call: GET /api/users');
-  const response = await api.get('/users');
-  console.log('📥 Raw Response:', response.data);
-
-  const resData = response.data;
-  // 👉 Lấy mảng users từ data.items
-  const users = resData?.data?.items || [];
-
-  return {
-    success: resData.success ?? true,
-    data: users,
-    message: resData.message ?? null
-  };
-};
-
-export const getUserById = async (id) => {
+export const getAllUsers = async (params = {}) => {
   try {
-    console.log(`📡 API Call: GET /api/users/${id}`);
-    const response = await api.get(`/users/${id}`);
-    console.log('📥 Response:', response.data);
+    const response = await api.get("/users", {
+      params: sanitizeParams(params),
+    });
     return response.data;
   } catch (error) {
-    console.error(`❌ getUserById(${id}) error:`, error.response?.data || error.message);
+    console.error("Error fetching users:", error);
     throw error;
   }
 };
 
 export const createUser = async (userData) => {
   try {
-    console.log('📡 API Call: POST /api/users');
+    console.log("📡 API Call: POST /api/users");
 
     const dataToSend = {
       fullName: userData.fullName,
       email: userData.email,
       password: userData.password,
-      role: userData.role || 'DealerStaff', // Mặc định nếu không có
+      role: userData.role || "DealerStaff", // Mặc định nếu không có
       // Chỉ gửi dealerId nếu nó tồn tại và không rỗng
       ...(userData.dealerId && { dealerId: userData.dealerId }),
       // isActive có thể do backend xử lý mặc định
-      ...(typeof userData.isActive === 'boolean' && { isActive: userData.isActive }),
+      ...(typeof userData.isActive === "boolean" && { isActive: userData.isActive }),
     };
-      console.log('📤 Request body:', dataToSend);
+    console.log("📤 Request body:", dataToSend);
 
     // Validate required fields
     if (!userData.fullName || !userData.email || !userData.password) {
-      throw new Error('Missing required fields: fullName, email, password');
+      throw new Error("Missing required fields: fullName, email, password");
     }
 
-    const response = await api.post('/users', dataToSend);
-    console.log('✅ User created successfully:', response.data);
+    const response = await api.post("/users", dataToSend);
+    console.log("✅ User created successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error('❌ createUser error:', error.response?.data || error.message);
+    console.error("❌ createUser error:", error.response?.data || error.message);
     throw error;
   }
 };
@@ -579,15 +713,15 @@ export const updateUser = async (id, userData) => {
 
     const dataToSend = { ...userData };
     // Xóa password nếu rỗng (logic cũ giữ nguyên)
-    if (!dataToSend.password || dataToSend.password.trim() === '') {
+    if (!dataToSend.password || dataToSend.password.trim() === "") {
       delete dataToSend.password;
     }
     // Nếu API không cho sửa dealerId khi PUT, bạn có thể xóa nó ở đây:
     // delete dataToSend.dealerId;
-    console.log('📤 Request body:', dataToSend);
+    console.log("📤 Request body:", dataToSend);
 
     const response = await api.put(`/users/${id}`, dataToSend);
-    console.log('✅ User updated successfully:', response.data);
+    console.log("✅ User updated successfully:", response.data);
     return response.data;
   } catch (error) {
     console.error(`❌ updateUser(${id}) error:`, error.response?.data || error.message);
@@ -599,7 +733,7 @@ export const deleteUser = async (id) => {
   try {
     console.log(`📡 API Call: DELETE /api/users/${id}`);
     const response = await api.delete(`/users/${id}`);
-    console.log('✅ User deleted successfully from database:', response.data);
+    console.log("✅ User deleted successfully from database:", response.data);
     return response;
   } catch (error) {
     console.error(`❌ deleteUser(${id}) error:`, error.response?.data || error.message);
@@ -610,10 +744,10 @@ export const deleteUser = async (id) => {
 export const patchUser = async (id, userData) => {
   try {
     console.log(`📡 API Call: PATCH /api/users/${id}`);
-    console.log('📤 Request body:', userData);
+    console.log("📤 Request body:", userData);
 
     const response = await api.patch(`/users/${id}`, userData);
-    console.log('✅ User patched successfully:', response.data);
+    console.log("✅ User patched successfully:", response.data);
     return response;
   } catch (error) {
     console.error(`❌ patchUser(${id}) error:`, error.response?.data || error.message);
@@ -623,12 +757,12 @@ export const patchUser = async (id, userData) => {
 
 export const getCurrentUser = async () => {
   try {
-    console.log('📡 API Call: GET /api/users/me');
-    const response = await api.get('/users/me');
-    console.log('📥 Current user:', response.data);
+    console.log("📡 API Call: GET /api/users/me");
+    const response = await api.get("/users/me");
+    console.log("📥 Current user:", response.data);
     return response;
   } catch (error) {
-    console.error('❌ getCurrentUser error:', error.response?.data || error.message);
+    console.error("❌ getCurrentUser error:", error.response?.data || error.message);
     throw error;
   }
 };

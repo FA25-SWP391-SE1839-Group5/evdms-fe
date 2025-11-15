@@ -436,12 +436,12 @@ export default function DealerContractManagement() {
                             {/* Add Contract */}
                             <div className="col-md-auto ms-auto">
                                 <button
-                                type="button"
-                                className="btn btn-primary rounded-pill d-flex align-items-center"
-                                onClick={handleAdd}
+                                    type="button"
+                                    className="btn btn-primary rounded-pill d-flex align-items-center"
+                                    onClick={handleAdd}
                                 >
-                                <Plus size={18} className="me-2" />
-                                <span className="fw-semibold">Add Contract</span>
+                                    <Plus size={18} className="me-2" />
+                                    <span className="fw-semibold">Add Contract</span>
                                 </button>
                             </div>
                         </div>
@@ -555,7 +555,7 @@ export default function DealerContractManagement() {
                                                     title="Edit"
                                                     onClick={() => handleEdit(contract.id)}
                                                 >
-                                                    <Edit size={18} />
+                                                   <i className="bx bx-edit-alt" />
                                                 </button>
                                                 <button 
                                                     type="button" 
@@ -563,7 +563,7 @@ export default function DealerContractManagement() {
                                                     title="Delete"
                                                     onClick={() => handleDelete(contract.id, dealerMap[contract.dealerId])}
                                                 >
-                                                    <Trash size={18} />
+                                                    <i className="bx bx-trash" />
                                                 </button>
                                             </div>
                                         </td>

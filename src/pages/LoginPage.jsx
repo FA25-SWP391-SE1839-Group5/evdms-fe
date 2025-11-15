@@ -8,6 +8,7 @@ import BackgroundElements from "../components/common/BackgroundElements";
 import BrandHeader from "../components/common/BrandHeader";
 import NeumorphismCard from "../components/ui/NeumorphismCard";
 import { saveLoginToken, sendResetPasswordLink, validateLogin } from "../services/authService";
+import { decodeJwt } from "../utils/jwt";
 
 const LoginPage = ({ onLoginSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -15,8 +16,7 @@ const LoginPage = ({ onLoginSuccess }) => {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [userRole, setUserRole] = useState(null);
-  const [forgotMessage, setForgotMessage] = useState('');
-
+  const [forgotMessage, setForgotMessage] = useState("");
 
   // Handle main login
   const handleLogin = async (formData) => {
@@ -24,25 +24,52 @@ const LoginPage = ({ onLoginSuccess }) => {
     setLoginError("");
 
     try {
-      // API returns: { accessToken, refreshToken, id, fullName, email, role }
+      // API returns: { accessToken, ... }
       const userData = await validateLogin(formData.email, formData.password);
 
-      console.log('LoginPage - userData from API:', userData);
-
-      // Save token to localStorage (this will normalize the role)
+      // Save token to localStorage
       saveLoginToken(userData);
 
-      // Get the normalized user from localStorage
-      const savedUser = JSON.parse(localStorage.getItem('evdms_user'));
-      
-      console.log('LoginPage - savedUser from localStorage:', savedUser);
+      // Decode JWT to get role and other info
+      const jwtPayload = decodeJwt(userData.accessToken);
+      console.log("LoginPage - JWT Payload:", jwtPayload);
 
-      setUserRole(savedUser);
+      // Normalize role from JWT (could be "EvmStaff", "evm_staff", etc.)
+      const rawRole = jwtPayload.role || jwtPayload.Role || jwtPayload.ROLE;
+      console.log("LoginPage - Raw role from JWT:", rawRole);
+
+      // Normalize: "EvmStaff" -> "evm_staff"
+      const normalizedRole = rawRole
+        ? rawRole
+            .replace(/([A-Z])/g, "_$1")
+            .toLowerCase()
+            .replace(/^_/, "")
+        : undefined;
+
+      console.log("LoginPage - Normalized role:", normalizedRole);
+
+      const user = {
+        id: userData.id,
+        name: userData.fullName,
+        email: userData.email,
+        role: normalizedRole,
+        dealerId: jwtPayload.dealerId || jwtPayload.dealerID || undefined,
+      };
+
+      console.log("LoginPage - User object to send:", user);
+
+      if (!user.role) {
+        setLoginError("No user role found in token. Cannot redirect.");
+        setIsLoading(false);
+        return;
+      }
+
+      setUserRole(user);
       setShowSuccess(true);
 
       // Delay redirect để show success message
       setTimeout(() => {
-        onLoginSuccess(savedUser);
+        onLoginSuccess(user);
       }, 1500);
     } catch (error) {
       setLoginError(error.message || "Invalid email or password. Please try again.");
@@ -67,7 +94,7 @@ const LoginPage = ({ onLoginSuccess }) => {
       setForgotMessage("✅ Password reset link has been sent! Please check your email.");
       setTimeout(() => {
         setShowForgotPassword(false);
-      }, 3000);;
+      }, 3000);
     } catch (e) {
       setLoginError(e.message || "An error occurred. Please try again.");
     } finally {
@@ -100,15 +127,11 @@ const LoginPage = ({ onLoginSuccess }) => {
                 {!showSuccess ? (
                   <>
                     {showForgotPassword ? (
-                    <div className="flex flex-col items-center">
-                      <ForgotPasswordForm onSubmit={handleForgotPassword} onBack={() => setShowForgotPassword(false)} isLoading={isLoading} />
-                      {forgotMessage && (
-                        <p className="text-green-600 text-sm mt-4 text-center">{forgotMessage}</p>
-                      )}
-                      {loginError && (
-                        <p className="text-red-500 text-sm mt-4 text-center">{loginError}</p>
-                      )}
-                    </div>
+                      <div className="flex flex-col items-center">
+                        <ForgotPasswordForm onSubmit={handleForgotPassword} onBack={() => setShowForgotPassword(false)} isLoading={isLoading} />
+                        {forgotMessage && <p className="text-green-600 text-sm mt-4 text-center">{forgotMessage}</p>}
+                        {loginError && <p className="text-red-500 text-sm mt-4 text-center">{loginError}</p>}
+                      </div>
                     ) : (
                       <>
                         <LoginAvatar />
@@ -129,7 +152,7 @@ const LoginPage = ({ onLoginSuccess }) => {
 
               {/* Bottom Info */}
               <div className="text-center mt-8 space-y-2">
-                <p className="text-xs text-gray-400">© 2024 EVDMS - Electric Vehicle Dealer Management System</p>
+                <p className="text-xs text-gray-400">© {new Date().getFullYear()} EVDMS - Electric Vehicle Dealer Management System</p>
                 <div className="flex items-center justify-center space-x-4 text-xs text-gray-500">
                   <a href="#" className="hover:text-blue-500 transition-colors">
                     Privacy Policy
