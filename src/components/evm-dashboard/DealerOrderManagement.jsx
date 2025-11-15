@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { createDealerPayment, getAllDealerOrders, markDealerOrderDelivered, patchDealerOrder } from "../../services/dealerOrderService";
+import { adjustInventoryQuantity, getAllInventories, getInventoryById } from "../../services/inventoryService";
 import DealerOrderReviewModal from "./dealer-orders/DealerOrderReviewModal";
-
 const ORDER_STATUSES = ["Pending", "Confirmed", "Paid", "Delivered", "Canceled"];
-
 const DealerOrderManagement = () => {
   // State
   const [orders, setOrders] = useState([]);
@@ -22,6 +21,14 @@ const DealerOrderManagement = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [modalErrorMessage, setModalErrorMessage] = useState("");
+
+  // Inventory adjustment state
+  const [showInventoryAdjust, setShowInventoryAdjust] = useState(false);
+  const [inventoryAdjustLoading, setInventoryAdjustLoading] = useState(false);
+  const [inventoryAdjustError, setInventoryAdjustError] = useState("");
+  const [inventoryAdjustSuccess, setInventoryAdjustSuccess] = useState("");
+  const [inventoryAdjustAmount, setInventoryAdjustAmount] = useState("");
+  const [currentInventory, setCurrentInventory] = useState(null);
 
   useEffect(() => {
     fetchOrders();
@@ -52,9 +59,22 @@ const DealerOrderManagement = () => {
   };
 
   // Modal handlers
-  const handleReview = (order) => {
+  const handleReview = async (order) => {
     setSelectedOrder(order);
     setModalErrorMessage("");
+    setShowInventoryAdjust(false);
+    setInventoryAdjustLoading(false);
+    setInventoryAdjustError("");
+    setInventoryAdjustSuccess("");
+    setInventoryAdjustAmount("");
+    setCurrentInventory(null);
+    try {
+      const inventories = await getAllInventories({ search: order.variantName });
+      const found = inventories.items.find((inv) => inv.variantId === order.variantId);
+      setCurrentInventory(found || null);
+    } catch {
+      setCurrentInventory(null);
+    }
     setModalOpen(true);
   };
 
@@ -69,15 +89,46 @@ const DealerOrderManagement = () => {
     if (!selectedOrder) return;
     setModalLoading(true);
     setModalErrorMessage("");
+    setShowInventoryAdjust(false);
     try {
       await createDealerPayment({ dealerOrderId: selectedOrder.id });
       handleModalClose();
       fetchOrders();
     } catch (err) {
-      // Try to get API error message
       let apiMsg = err?.response?.data?.message || err.message || "Unknown error";
-      setModalErrorMessage(apiMsg);
       setModalLoading(false);
+      if (apiMsg.includes("Not enough inventory")) {
+        setShowInventoryAdjust(true);
+        // Prefill the amount needed to accept the order
+        if (selectedOrder && currentInventory) {
+          const missing = Number(selectedOrder.quantity) - Number(currentInventory.quantity);
+          setInventoryAdjustAmount(missing > 0 ? String(missing) : "");
+        }
+      }
+    }
+  };
+
+  const handleInventoryAdjust = async () => {
+    if (!selectedOrder || !currentInventory) return;
+    const addAmount = Number(inventoryAdjustAmount);
+    if (isNaN(addAmount) || addAmount <= 0) {
+      setInventoryAdjustError("Please enter a valid positive number.");
+      return;
+    }
+    setInventoryAdjustLoading(true);
+    setInventoryAdjustError("");
+    setInventoryAdjustSuccess("");
+    try {
+      const newQuantity = Number(currentInventory.quantity) + addAmount;
+      await adjustInventoryQuantity(currentInventory.id, currentInventory.variantId, newQuantity);
+      setInventoryAdjustSuccess("Inventory updated successfully. You can now retry accepting the order.");
+      const updated = await getInventoryById(currentInventory.id);
+      setCurrentInventory(updated);
+    } catch (err) {
+      let apiMsg = err?.response?.data?.message || err.message || "Failed to update inventory.";
+      setInventoryAdjustError(apiMsg);
+    } finally {
+      setInventoryAdjustLoading(false);
     }
   };
 
@@ -349,6 +400,7 @@ const DealerOrderManagement = () => {
             ? {
                 dealerName: selectedOrder.dealerName,
                 variantName: selectedOrder.variantName,
+                variantId: selectedOrder.variantId,
                 color: selectedOrder.color,
                 quantity: selectedOrder.quantity,
                 status: selectedOrder.status,
@@ -363,6 +415,14 @@ const DealerOrderManagement = () => {
         onDeliver={handleDeliver}
         loading={modalLoading}
         errorMessage={modalErrorMessage}
+        showInventoryAdjust={showInventoryAdjust}
+        inventoryAdjustLoading={inventoryAdjustLoading}
+        inventoryAdjustError={inventoryAdjustError}
+        inventoryAdjustSuccess={inventoryAdjustSuccess}
+        inventoryAdjustAmount={inventoryAdjustAmount}
+        setInventoryAdjustAmount={setInventoryAdjustAmount}
+        handleInventoryAdjust={handleInventoryAdjust}
+        currentInventory={currentInventory}
       />
     </div>
   );

@@ -1,4 +1,21 @@
-const DealerOrderReviewModal = ({ open, order, onClose, onAccept, onDecline, onDeliver, loading, errorMessage }) => {
+const DealerOrderReviewModal = ({
+  open,
+  order,
+  onClose,
+  onAccept,
+  onDecline,
+  onDeliver,
+  loading,
+  errorMessage,
+  showInventoryAdjust,
+  inventoryAdjustLoading,
+  inventoryAdjustError,
+  inventoryAdjustSuccess,
+  inventoryAdjustAmount,
+  setInventoryAdjustAmount,
+  handleInventoryAdjust,
+  currentInventory,
+}) => {
   if (!open || !order) return null;
 
   // Helper for pretty field names
@@ -80,6 +97,81 @@ const DealerOrderReviewModal = ({ open, order, onClose, onAccept, onDecline, onD
             {errorMessage && (
               <div className="alert alert-danger mt-3" role="alert">
                 {errorMessage}
+              </div>
+            )}
+            {showInventoryAdjust && (
+              <div className="card shadow-sm border-0 mb-3" style={{ background: "#fffbe6", borderRadius: "1rem" }}>
+                <div className="card-body p-3">
+                  <div className="d-flex align-items-center mb-2">
+                    <span className="me-2" style={{ fontSize: "1.5rem", color: "#ffc107" }}>
+                      <i className="bx bx-error-circle" />
+                    </span>
+                    <span style={{ fontWeight: 600, color: "#b8860b" }}>Not enough inventory for this variant</span>
+                  </div>
+                  <div className="mb-2 ms-1" style={{ fontSize: "0.98rem" }}>
+                    {currentInventory ? (
+                      <>
+                        <div className="d-flex flex-wrap align-items-center gap-2 mb-1">
+                          <span>
+                            Current stock for <strong>{order.variantName}</strong>:
+                          </span>
+                          <span className="badge bg-primary" style={{ fontSize: "1rem", padding: "0.5em 1em" }}>
+                            {currentInventory.quantity}
+                          </span>
+                        </div>
+                        <div className="d-flex flex-wrap align-items-center gap-2">
+                          <span>Requested:</span>
+                          <span className="badge bg-warning text-dark" style={{ fontSize: "1rem", padding: "0.5em 1em" }}>
+                            {order.quantity}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <span className="text-muted">Unable to fetch current inventory.</span>
+                    )}
+                  </div>
+                  <div className="d-flex align-items-center gap-2 mb-2 ms-1">
+                    <label htmlFor="inventoryAdjustAmount" className="form-label mb-0" style={{ fontWeight: 500 }}>
+                      Increase stock by:
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      className="form-control"
+                      style={{ maxWidth: "120px" }}
+                      id="inventoryAdjustAmount"
+                      value={inventoryAdjustAmount}
+                      onChange={(e) => setInventoryAdjustAmount(e.target.value)}
+                      disabled={inventoryAdjustLoading}
+                      placeholder="Amount"
+                    />
+                    <button className="btn btn-warning ms-2" style={{ minWidth: "140px" }} onClick={handleInventoryAdjust} disabled={inventoryAdjustLoading || !inventoryAdjustAmount}>
+                      {inventoryAdjustLoading ? (
+                        <span>
+                          <span className="spinner-border spinner-border-sm me-1" />
+                          Updating...
+                        </span>
+                      ) : (
+                        <span>
+                          <i className="bx bx-plus me-1" />
+                          Increase Inventory
+                        </span>
+                      )}
+                    </button>
+                  </div>
+                  {inventoryAdjustError && (
+                    <div className="alert alert-danger mt-2 py-2 px-3" role="alert" style={{ borderRadius: "0.5rem" }}>
+                      <i className="bx bx-error-circle me-1" />
+                      {inventoryAdjustError}
+                    </div>
+                  )}
+                  {inventoryAdjustSuccess && (
+                    <div className="alert alert-success mt-2 py-2 px-3" role="alert" style={{ borderRadius: "0.5rem" }}>
+                      <i className="bx bx-check-circle me-1" />
+                      {inventoryAdjustSuccess}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
