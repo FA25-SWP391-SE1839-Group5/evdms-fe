@@ -3,8 +3,8 @@ import { Alert, Badge, Button, Card, Col, Dropdown, Form, Modal, Row, Spinner, T
 // Đảm bảo các đường dẫn service này là chính xác
 import { createDealerOrder, getAllDealerOrders } from "../../../services/dealerOrderService";
 import { uploadDealerPaymentDocument } from "../../../services/dealerService";
-import { getAllVehicleVariants } from "../../../services/vehicleVariantService";
 import { getAllInventories } from "../../../services/inventoryService";
+import { getAllVehicleVariants } from "../../../services/vehicleVariantService";
 import { decodeJwt } from "../../../utils/jwt";
 
 // Helper function to map color names to badge classes
@@ -525,9 +525,7 @@ const DealerOrdersPage = () => {
               ) : inventoryCount === null ? (
                 <small className="text-muted">Inventory: unavailable</small>
               ) : (
-                <small className={`fw-semibold ${inventoryCount === 0 ? 'text-danger' : 'text-success'}`}>
-                  Available in inventory: {inventoryCount}
-                </small>
+                <small className={`fw-semibold ${inventoryCount === 0 ? "text-danger" : "text-success"}`}>Available in inventory: {inventoryCount}</small>
               )}
             </div>
 
@@ -537,9 +535,14 @@ const DealerOrdersPage = () => {
               {inventoryCount !== null && (
                 <div className="form-text mt-1">
                   {Number(orderQuantity) > inventoryCount ? (
-                    <span className="text-danger">Requested quantity exceeds available inventory.</span>
+                    <span className="text-warning">
+                      <i className="bx bx-time-five me-1" />
+                      Requested quantity exceeds available inventory. Your order may be delayed while we restock.
+                    </span>
                   ) : (
-                    <span className="text-muted">You may order up to {inventoryCount} unit{inventoryCount > 1 ? 's' : ''}.</span>
+                    <span className="text-muted">
+                      You may order up to {inventoryCount} unit{inventoryCount > 1 ? "s" : ""}.
+                    </span>
                   )}
                 </div>
               )}
@@ -566,13 +569,7 @@ const DealerOrdersPage = () => {
             <Button variant="secondary" onClick={() => setShowCreateModal(false)}>
               Cancel
             </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={
-                isSubmitting || isInventoryLoading || (inventoryCount !== null && Number(orderQuantity) > inventoryCount)
-              }
-            >
+            <Button type="submit" variant="primary" disabled={isSubmitting || isInventoryLoading}>
               {isSubmitting ? <Spinner as="span" size="sm" /> : "Place Order"}
             </Button>
           </Modal.Footer>
