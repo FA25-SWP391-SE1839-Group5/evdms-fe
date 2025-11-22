@@ -24,7 +24,7 @@ export default function UserStatsCards({ users = [] }) {
           <div className="card">
             <div className="card-body">
               <div className="d-flex justify-content-between align-items-center">
-                <div className="d-flex flex-column gap-1">
+                <div className="d-flex-column">
                   <h4 className="mb-1">{card.count}</h4>
                   <span className="text-muted">{card.label}</span>
                 </div>
