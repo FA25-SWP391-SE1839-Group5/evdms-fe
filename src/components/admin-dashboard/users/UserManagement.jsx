@@ -471,7 +471,7 @@ const UserManagement = () => {
                   ))}
                 </select>
               </div>
-              <div className="col-md-4">
+              <div className="col-md-item-center 4">
                 <select className="form-select" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
                   <option value="">Select Status</option>
                   <option value="true">Active</option>
